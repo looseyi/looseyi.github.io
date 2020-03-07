@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>CocoaPods on </title>
+    <link>http://localhost:1313/categories/cocoapods/</link>
+    <description>Recent content in CocoaPods on </description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sat, 21 Dec 2019 11:37:41 +2100</lastBuildDate>
+    
+	<atom:link href="http://localhost:1313/categories/cocoapods/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>浅析 Cocoapods-Binary 实现</title>
+      <link>http://localhost:1313/post/cocoapods-binary-1/</link>
+      <pubDate>Sat, 21 Dec 2019 11:37:41 +2100</pubDate>
+      
+      <guid>http://localhost:1313/post/cocoapods-binary-1/</guid>
+      <description>背景 公司级别的项目在发展过程，不可避免会遇到项目过大，导致的编译和开发效率的降低。在如何提高编译速度，加快生产效率，各大厂都有各种尝试，可惜</description>
+    </item>
+    
+  </channel>
+</rss>
