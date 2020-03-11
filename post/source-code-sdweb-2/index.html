@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>源码浅析 SDWebImage 5.5.2 - WebP Plugin - </title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="土土Edmond木" /><meta name="description" content="本文基于 SDWebImage 5.5.2。重读的原因也是由于发现它的 API 在不断迭代，许多结构已经不同与早期版本，同时也是为了做一个记录。整体分析可以查看上一篇文章" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.62.0 with theme even" />
+
+
+<link rel="canonical" href="http://localhost:1313/post/source-code-sdweb-2/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="源码浅析 SDWebImage 5.5.2 - WebP Plugin" />
+<meta property="og:description" content="本文基于 SDWebImage 5.5.2。重读的原因也是由于发现它的 API 在不断迭代，许多结构已经不同与早期版本，同时也是为了做一个记录。整体分析可以查看上一篇文章" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/post/source-code-sdweb-2/" />
+<meta property="article:published_time" content="2020-03-11T23:08:12+08:00" />
+<meta property="article:modified_time" content="2020-03-11T23:08:12+08:00" />
+<meta itemprop="name" content="源码浅析 SDWebImage 5.5.2 - WebP Plugin">
+<meta itemprop="description" content="本文基于 SDWebImage 5.5.2。重读的原因也是由于发现它的 API 在不断迭代，许多结构已经不同与早期版本，同时也是为了做一个记录。整体分析可以查看上一篇文章">
+<meta itemprop="datePublished" content="2020-03-11T23:08:12&#43;08:00" />
+<meta itemprop="dateModified" content="2020-03-11T23:08:12&#43;08:00" />
+<meta itemprop="wordCount" content="4502">
+
+
+
+<meta itemprop="keywords" content="source-code,iOS,cache," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="源码浅析 SDWebImage 5.5.2 - WebP Plugin"/>
+<meta name="twitter:description" content="本文基于 SDWebImage 5.5.2。重读的原因也是由于发现它的 API 在不断迭代，许多结构已经不同与早期版本，同时也是为了做一个记录。整体分析可以查看上一篇文章"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Aha Moment</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Aha Moment</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">源码浅析 SDWebImage 5.5.2 - WebP Plugin</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-03-11 </span>
+        
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#coder-plugins">Coder Plugins</a>
+      <ul>
+        <li></li>
+      </ul>
+    </li>
+    <li><a href="#sdwebimagewebpcoderhttpsgithubcomsdwebimagesdwebimagewebpcoder">SDWebImageWebPCoder</a>
+      <ul>
+        <li><a href="#decodedimage">DecodedImage</a></li>
+        <li><a href="#drawnwebpimage">DrawnWebpImage</a></li>
+        <li><a href="#createwebpimage">CreateWebpImage</a></li>
+        <li><a href="#encodedimage">EncodedImage</a></li>
+      </ul>
+    </li>
+    <li><a href="#heading">总结</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p>本文基于 SDWebImage 5.5.2。重读的原因也是由于发现它的 API 在不断迭代，许多结构已经不同与早期版本，同时也是为了做一个记录。整体分析可以查看上一篇文章：<a href="https://looseyi.github.io/post/source-code-sdweb/">源码浅析 SDWebImage 5.5.2</a>。</p>
+<p>本篇主要关于其插件系统，如何简单的通过插件来支持多样化的图片格式、支持系统图片加载，富文本 URL 加载，以及第三方插件的集成，比如 <a href="https://airbnb.design/lottie/">Lottie</a>、<a href="https://github.com/ibireme/YYImage">YYImage</a>、<a href="https://github.com/ibireme/YYCache">YYCache</a>、<a href="https://github.com/Flipboard/FLAnimatedImage">FLAnimatedImage</a>。目前支持的如下：</p>
+<p><img src="http://ww1.sinaimg.cn/large/8157560cgy1gco39siml4j21n40lmgq0.jpg" alt="plugins"></p>
+<p>详细请看官方文档：<a href="https://sdwebimage.github.io/">Documen Address</a>。</p>
+<h2 id="coder-plugins">Coder Plugins</h2>
+<p>我们先从 Coder 的 WebP 开始聊。上篇中只提过一嘴 Coder，这次会稍微具体展开介绍。<a href="https://developers.google.com/speed/webp">WebP</a> 图片格式是由狗爹提出的一种图片压缩格式。SD 在2013.10 SD 就已经支持的了 (<a href="https://github.com/SDWebImage/SDWebImage/releases/tag/3.5">Tag: 3.5</a>) ，当时的做法是通过 CocoaPods 提供的 subspec 的方式来实现的，这个方式一直延续到了4.x 的最后一个版本，也就是在5.x 协议化后去掉的。原来是这么做的：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">s</span><span class="o">.</span><span class="n">subspec</span> <span class="s1">&#39;WebP&#39;</span> <span class="k">do</span> <span class="o">|</span><span class="n">webp</span><span class="o">|</span>
+    <span class="n">webp</span><span class="o">.</span><span class="n">source_files</span> <span class="o">=</span> <span class="s1">&#39;SDWebImage/UIImage+WebP.{h,m}&#39;</span>
+    <span class="n">webp</span><span class="o">.</span><span class="n">xcconfig</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;GCC_PREPROCESSOR_DEFINITIONS&#39;</span> <span class="o">=</span><span class="o">&gt;</span> <span class="s1">&#39;$(inherited) SD_WEBP=1&#39;</span> <span class="p">}</span>
+    <span class="n">webp</span><span class="o">.</span><span class="n">dependency</span> <span class="s1">&#39;SDWebImage/Core&#39;</span>
+    <span class="n">webp</span><span class="o">.</span><span class="n">dependency</span> <span class="s1">&#39;libwebp&#39;</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>大家如果对 subspec 不太熟悉，可以看 <a href="https://guides.cocoapods.org/syntax/podspec.html#subspec">subspec 文档</a>，你可以理解他是当前 Podspec 的一个子集，也可以定义自己的 source_files、dependency、resource_bundle 等，所支持的配置与 Podspec 差不多。</p>
+<p>如果我们要开启 WebP 的话就是通过 <code>pod 'SDWebImage/WebP'</code> 或者 <code>pod 'SDWebImage', subspecs: ['WebP']</code> 来设置。可以看到它时通过修改 xcodefig 中预编译宏 <code>GCC_PREPROCESSOR_DEFINITIONS</code> 的 <strong>SD_WEBP=1</strong> 作为标记。然后内部通过 SD_WEBP 这个宏来达到条件编译的效果。</p>
+<p>当我们仅需要支持一种图片格式时，是比较简单的，一旦有更多格式需要支持的话，用宏来控制就比较痛苦了：</p>
+<ul>
+<li>类似 SD_WEBP 的宏满天飞，维护性差；</li>
+<li>当需要支持新格式时，必须更改核心代码，稳定性差；</li>
+<li>没有全局标识指明当前操作的图片格式，API 模糊不清，便利性差；</li>
+</ul>
+<p>至此，迎来了 5.x 的 <strong>SDImageCoder</strong> 协议。</p>
+<p>整个 pod <strong>SDWebImageWebPCoder</strong> 就两文件，其中的 <code>UIImage+WebP.h</code> 还仅是对 <code>+[SDImageWebPCoder decodedImageWithData]</code> 的包装。而 WebPCoder 声明如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">@interface</span> <span class="nc">SDImageWebPCoder</span> : <span class="nc">NSObject</span> <span class="o">&lt;</span><span class="n">SDProgressiveImageCoder</span><span class="p">,</span> <span class="n">SDAnimatedImageCoder</span><span class="o">&gt;</span>
+
+<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">class</span><span class="p">,</span> <span class="k">readonly</span><span class="p">,</span> <span class="n">nonnull</span><span class="p">)</span> <span class="n">SDImageWebPCoder</span> <span class="o">*</span><span class="n">sharedCoder</span><span class="p">;</span>
+
+<span class="k">@end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>够简单吧。不过，主要是看 <strong>SDImageCoder</strong> 和 <strong>SDAnimatedImageCoder</strong> 协议：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">@protocol</span> <span class="nc">SDImageCoder</span> <span class="o">&lt;</span><span class="n">NSObject</span><span class="o">&gt;</span>
+
+<span class="k">@required</span>
+<span class="cp">#</span><span class="cp">pragma mark - Decoding</span><span class="cp">
+</span><span class="cp"></span><span class="o">-</span> <span class="p">(</span><span class="kt">BOOL</span><span class="p">)</span><span class="nl">canDecodeFromData</span><span class="p">:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">NSData</span> <span class="o">*</span><span class="p">)</span><span class="n">data</span><span class="p">;</span>
+<span class="c1">/// 如果支持动图，可通过`+[SDImageCoderHelper animatedImageWithFrames:]` 来生成各帧的图片.
+</span><span class="c1"></span><span class="p">-</span> <span class="p">(</span><span class="n">nullable</span> <span class="n">UIImage</span> <span class="o">*</span><span class="p">)</span><span class="nf">decodedImageWithData:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">NSData</span> <span class="o">*</span><span class="p">)</span><span class="nv">data</span>
+                                   <span class="nf">options:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">SDImageCoderOptions</span> <span class="o">*</span><span class="p">)</span><span class="nv">options</span><span class="p">;</span>
+
+<span class="cp">#</span><span class="cp">pragma mark - Encoding</span><span class="cp">
+</span><span class="cp"></span><span class="p">-</span> <span class="p">(</span><span class="kt">BOOL</span><span class="p">)</span><span class="nf">canEncodeToFormat:</span><span class="p">(</span><span class="n">SDImageFormat</span><span class="p">)</span><span class="nv">format</span> <span class="n">NS_SWIFT_NAME</span><span class="p">(</span><span class="n">canEncode</span><span class="p">(</span><span class="nl">to</span><span class="p">:</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
+
+<span class="c1">/// 如果支持动图，可通过 `+[SDImageCoderHelper framesFromAnimatedImage:]` 将各帧集合成动图.
+</span><span class="c1"></span><span class="p">-</span> <span class="p">(</span><span class="n">nullable</span> <span class="n">NSData</span> <span class="o">*</span><span class="p">)</span><span class="nf">encodedDataWithImage:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">UIImage</span> <span class="o">*</span><span class="p">)</span><span class="nv">image</span>
+                                   <span class="nf">format:</span><span class="p">(</span><span class="n">SDImageFormat</span><span class="p">)</span><span class="nv">format</span>
+                                  <span class="nf">options:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">SDImageCoderOptions</span> <span class="o">*</span><span class="p">)</span><span class="nv">options</span><span class="p">;</span>
+
+<span class="k">@end</span>
+
+
+<span class="k">@protocol</span> <span class="nc">SDAnimatedImageCoder</span> <span class="o">&lt;</span><span class="n">SDImageCoder</span><span class="p">,</span> <span class="n">SDAnimatedImageProvider</span><span class="o">&gt;</span>
+
+<span class="k">@required</span>
+<span class="o">-</span> <span class="p">(</span><span class="n">nullable</span> <span class="kt">instancetype</span><span class="p">)</span><span class="nl">initWithAnimatedImageData</span><span class="p">:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">NSData</span> <span class="o">*</span><span class="p">)</span><span class="n">data</span> <span class="nl">options</span><span class="p">:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">SDImageCoderOptions</span> <span class="o">*</span><span class="p">)</span><span class="n">options</span><span class="p">;</span>
+
+<span class="k">@end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>SDProgressiveImageCoder</strong> 协议就不列出来了，大同小异。So，内部实现就是围绕这几个方法来实现的。</p>
+<h4 id="imagecontenttype"><strong>ImageContentType</strong></h4>
+<p>说实现之前，需要说明一个问题，<strong>如何通过 image data 分辨出图片格式 ？</strong> 我们需要回到 SD 的 <code>NSData+ImageContentType.h</code> 看看它所支持的图片格式：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">typedef</span> <span class="n">NSInteger</span> <span class="n">SDImageFormat</span> <span class="n">NS_TYPED_EXTENSIBLE_ENUM</span><span class="p">;</span>
+<span class="k">static</span> <span class="k">const</span> <span class="n">SDImageFormat</span> <span class="n">SDImageFormatUndefined</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+<span class="k">static</span> <span class="k">const</span> <span class="n">SDImageFormat</span> <span class="n">SDImageFormatJPEG</span>      <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="k">static</span> <span class="k">const</span> <span class="n">SDImageFormat</span> <span class="n">SDImageFormatPNG</span>       <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="k">static</span> <span class="k">const</span> <span class="n">SDImageFormat</span> <span class="n">SDImageFormatGIF</span>       <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+<span class="k">static</span> <span class="k">const</span> <span class="n">SDImageFormat</span> <span class="n">SDImageFormatTIFF</span>      <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+<span class="k">static</span> <span class="k">const</span> <span class="n">SDImageFormat</span> <span class="n">SDImageFormatWebP</span>      <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+<span class="k">static</span> <span class="k">const</span> <span class="n">SDImageFormat</span> <span class="n">SDImageFormatHEIC</span>      <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+<span class="k">static</span> <span class="k">const</span> <span class="n">SDImageFormat</span> <span class="n">SDImageFormatHEIF</span>      <span class="o">=</span> <span class="mi">6</span><span class="p">;</span>
+<span class="k">static</span> <span class="k">const</span> <span class="n">SDImageFormat</span> <span class="n">SDImageFormatPDF</span>       <span class="o">=</span> <span class="mi">7</span><span class="p">;</span>
+<span class="k">static</span> <span class="k">const</span> <span class="n">SDImageFormat</span> <span class="n">SDImageFormatSVG</span>       <span class="o">=</span> <span class="mi">8</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>发现没，这里的枚举定义方式与我们熟知的 <code>typedef NS_ENUM(NSInteger, xxx) {};</code> 不太一样。新东西 <strong>NS_TYPED_EXTENSIBLE_ENUM</strong> 可能你会比较陌生，不过，系统的 UILayoutPriority 也是可扩展枚举：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">typedef</span> <span class="kt">float</span> <span class="n">UILayoutPriority</span> <span class="n">NS_TYPED_EXTENSIBLE_ENUM</span><span class="p">;</span>
+<span class="k">static</span> <span class="k">const</span> <span class="n">UILayoutPriority</span> <span class="n">UILayoutPriorityRequired</span> <span class="nf">API_AVAILABLE</span><span class="p">(</span><span class="n">ios</span><span class="p">(</span><span class="mf">6.0</span><span class="p">)</span><span class="p">)</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">;</span> 
+<span class="p">.</span><span class="p">.</span><span class="p">.</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>关于它的说明网上比较少，这里找到篇相关的文章：<a href="https://medium.com/@derrickho_28266/why-ns-typed-enum-is-the-future-c67ed8affe03">Why NS_TYPED_ENUM is the future</a>。</p>
+<p>extensible enum 使用时很简单，而且它是 <strong>Swift 兼容的 API</strong> ，特点就是可扩展。它的想象力在哪里呢？当它和协议化后的类结合后，简直可以 <em>一个打十个</em> 。你可以不需要修改 SD 的核心代码，就能支持你想要的编码格式，真正的做到无入侵。是不是有一点点 <em><a href="https://developer.apple.com/videos/play/wwdc2015/408/">Protocol-Oriented Programming</a></em> 的感觉。</p>
+<p>该文章中提到的另一个 <strong>NS_STRING_ENUM</strong> 在 SD 中也有用到：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">typedef</span> <span class="n">NSString</span> <span class="o">*</span> <span class="n">SDImageCoderOption</span> <span class="n">NS_STRING_ENUM</span><span class="p">;</span>
+<span class="n">FOUNDATION_EXPORT</span> <span class="n">SDImageCoderOption</span> <span class="n">_Nonnull</span> <span class="k">const</span> <span class="n">SDImageCoderDecodeFirstFrameOnly</span><span class="p">;</span>
+<span class="n">FOUNDATION_EXPORT</span> <span class="n">SDImageCoderOption</span> <span class="n">_Nonnull</span> <span class="k">const</span> <span class="n">SDImageCoderDecodeScaleFactor</span><span class="p">;</span>
+<span class="p">.</span><span class="p">.</span><span class="p">.</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>回到我们的 <code>NSData+ImageContentType.h</code> ，有三个方法：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">@interface</span> <span class="nc">NSData</span> <span class="nl">(ImageContentType)</span>
+<span class="c1">/// 通过 data 获取 image format
+</span><span class="c1"></span><span class="p">+</span> <span class="p">(</span><span class="n">SDImageFormat</span><span class="p">)</span><span class="nf">sd_imageFormatForImageData:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">NSData</span> <span class="o">*</span><span class="p">)</span><span class="nv">data</span><span class="p">;</span>
+<span class="c1">/// 通过 image format 转换 UTType
+</span><span class="c1"></span><span class="p">+</span> <span class="p">(</span><span class="n">nonnull</span> <span class="n">CFStringRef</span><span class="p">)</span><span class="nf">sd_UTTypeFromImageFormat:</span><span class="p">(</span><span class="n">SDImageFormat</span><span class="p">)</span><span class="nv">format</span> <span class="n">CF_RETURNS_NOT_RETAINED</span> <span class="nf">NS_SWIFT_NAME</span><span class="p">(</span><span class="n">sd_UTType</span><span class="p">(</span><span class="nl">from</span><span class="p">:</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
+<span class="c1">/// 通过 UTType 转换为 image format
+</span><span class="c1"></span><span class="p">+</span> <span class="p">(</span><span class="n">SDImageFormat</span><span class="p">)</span><span class="nf">sd_imageFormatFromUTType:</span><span class="p">(</span><span class="n">nonnull</span> <span class="n">CFStringRef</span><span class="p">)</span><span class="nv">uttype</span><span class="p">;</span>
+
+<span class="k">@end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>稍微提一下这里的 <a href="https://www.wikiwand.com/en/Uniform_Type_Identifier">UTType (Uniform Type Identifiers)</a> 统一类型标识符是苹果在 Mac OS 10.4 提出的，它包括文本、图片、音频、视频格式等。这个<a href="https://escapetech.eu/manuals/qdrop/uti.html">网站</a>有详细的列出了它支持的格式，以及 UTType的作用，也可参照 wiki。而目前 UTType 是没用支持 WebP 和 SVG 的，但是它是可以提供扩展的，本质上 UTType 就是一个纯文本的字符串而已。WebP 和 SVG 在 SD 中的定义如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="c1">// Currently Image/IO does not support WebP
+</span><span class="c1"></span><span class="cp">#</span><span class="cp">define kSDUTTypeWebP ((__bridge CFStringRef)@&#34;public.webp&#34;)</span><span class="cp">
+</span><span class="cp"></span><span class="cp">#</span><span class="cp">define kSVGTagEnd @&#34;&lt;</span><span class="cp">/</span><span class="cp">svg&gt;&#34;</span><span class="cp">
+</span></code></pre></td></tr></table>
+</div>
+</div><p>可以回答前面的问题：<strong>如何通过 image data 分辨出图片格式 ？</strong> 就是：<strong><a href="https://www.garykessler.net/library/file_sigs.html">FILE SIGNATURES TABLE</a></strong></p>
+<blockquote>
+<p>In <a href="https://www.wikiwand.com/en/Computer">computing</a>, a <strong>file signature</strong> is data used to identify or verify the contents of a file. In particular, it may refer to:</p>
+<ul>
+<li><a href="https://www.wikiwand.com/en/File_format#Magic_number">File magic number</a>: bytes within a file used to identify the format of the file; generally a short sequence of bytes (most are 2-4 bytes long) placed at the beginning of the file; see <a href="https://www.wikiwand.com/en/List_of_file_signatures">list of file signatures</a></li>
+<li><a href="https://www.wikiwand.com/en/Checksum">File checksum</a> or more generally the result of a <a href="https://www.wikiwand.com/en/Hash_function">hash function</a> over the file contents: data used to verify the integrity of the file contents, generally against transmission errors or malicious attacks. The signature can be included at the end of the file or in a separate file.</li>
+</ul>
+</blockquote>
+<p>我们知道 Image 有两种描述方式：矢量图形或光栅图形(或称位图)，屏幕显示的都是位图，包含大量像素点信息。而为了提高对图片的传输和存储效率，都会采用一定算法对像素信息进行压缩。上面列出的各种格式则是对不同压缩算法的表示。由于图片数据都是  binary files，因此，按十六进制描述  JPEG 文件 file header 的字节序为：<code>FF D8</code> ，而 WebP 的则是 <code>57 45</code>：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="mi">52</span> <span class="mi">49</span> <span class="mi">46</span> <span class="mi">46</span> <span class="n">xx</span> <span class="n">xx</span> <span class="n">xx</span> <span class="n">xx</span>						<span class="n">RIFF</span> <span class="p">.</span><span class="p">.</span><span class="p">.</span><span class="p">.</span>   <span class="c1">//xx xx xx xx 是表示文件大小
+</span><span class="c1"></span><span class="mi">57</span> <span class="mi">45</span> <span class="mi">42</span> <span class="mi">50</span>	 									<span class="n">WEBP</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这里需要介绍一下 <a href="https://developers.google.com/speed/webp/docs/riff_container#color_profile">WebP</a> 构成：</p>
+<blockquote>
+<p>WebP is an image format that uses either (i) the VP8 key frame encoding to compress image data in a lossy way, or (ii) the WebP lossless encoding (and possibly other encodings in the future). These encoding schemes should make it more efficient than currently used formats. It is optimized for fast image transfer over the network (e.g., for websites). The WebP format has feature parity (color profile, metadata, animation etc) with other formats as well. This document describes the structure of a WebP file.</p>
+</blockquote>
+<p>WebP 是可以由多种编码压缩方式 (无损压缩、有损压缩<a href="https://www.wikiwand.com/en/VP8">VP8</a>) + 颜色描述文件 (<a href="https://fileinfo.com/extension/icc">ICC</a>) + 元数据 (metaData) + 多帧图片(动图) 组合的一种图片描述格式。同时 WebP 的这种描述格式是基于 <a href="https://www.wikiwand.com/en/Resource_Interchange_File_Format">RIFF File Format</a>，RIFF (resource interchange file forma) 是一种资源交换文件格式，或者说通用的容器文件格式。更多信息这里就不展开了。</p>
+<h2 id="sdwebimagewebpcoderhttpsgithubcomsdwebimagesdwebimagewebpcoder"><a href="https://github.com/SDWebImage/SDWebImageWebPCoder">SDWebImageWebPCoder</a></h2>
+<p>先看一眼 WebPCoder 有那些主要私有变量：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">@implementation</span> <span class="nc">SDImageWebPCoder</span> <span class="p">{</span>
+    <span class="n">WebPIDecoder</span> <span class="o">*</span><span class="n">_idec</span><span class="p">;</span> <span class="c1">// incremental decoding 增量解码器
+</span><span class="c1"></span>    <span class="n">WebPDemuxer</span> <span class="o">*</span><span class="n">_demux</span><span class="p">;</span> <span class="c1">// image data 分离器
+</span><span class="c1"></span>    <span class="n">WebPData</span> <span class="o">*</span><span class="n">_webpdata</span><span class="p">;</span> <span class="c1">// Copied for progressive animation demuxer
+</span><span class="c1"></span>    <span class="n">NSData</span> <span class="o">*</span><span class="n">_imageData</span><span class="p">;</span>
+    <span class="n">NSUInteger</span> <span class="n">_loopCount</span><span class="p">;</span> <span class="c1">// 动画循环次数
+</span><span class="c1"></span>    <span class="n">NSUInteger</span> <span class="n">_frameCount</span><span class="p">;</span> <span class="c1">// 动画帧数
+</span><span class="c1"></span>    <span class="n">NSArray</span><span class="o">&lt;</span><span class="n">SDWebPCoderFrame</span> <span class="o">*</span><span class="o">&gt;</span> <span class="o">*</span><span class="n">_frames</span><span class="p">;</span> <span class="c1">// 动画帧数据集合
+</span><span class="c1"></span>    <span class="n">CGContextRef</span> <span class="n">_canvas</span><span class="p">;</span> <span class="c1">// 图片画布
+</span><span class="c1"></span>    <span class="n">CGColorSpaceRef</span> <span class="n">_colorSpace</span><span class="p">;</span> <span class="c1">// 图片 icc 彩色空间
+</span><span class="c1"></span>    <span class="kt">BOOL</span> <span class="n">_hasAlpha</span><span class="p">;</span>
+    <span class="n">CGFloat</span> <span class="n">_canvasWidth</span><span class="p">;</span> <span class="c1">// 图片画布宽度
+</span><span class="c1"></span>    <span class="n">CGFloat</span> <span class="n">_canvasHeight</span><span class="p">;</span> <span class="c1">// 图片画布高度
+</span><span class="c1"></span>    <span class="n">NSUInteger</span> <span class="n">_currentBlendIndex</span><span class="p">;</span> <span class="c1">//动画的当前混合帧率
+</span><span class="c1"></span><span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>稍微说明一下 demux 这个词 (de multiplex <a href="https://blog.csdn.net/haomcu/article/details/7072707">音视频中的概念</a>) ，表示真心不懂。</p>
+<p>以上数据均通过解析 WebP 数据获取，还有部分是通过 SDImageCoderOptions 获取的：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="kt">BOOL</span> <span class="n">decodeFirstFrame</span> <span class="o">=</span> <span class="p">[</span><span class="n">options</span><span class="p">[</span><span class="n">SDImageCoderDecodeFirstFrameOnly</span><span class="p">]</span> <span class="n">boolValue</span><span class="p">]</span><span class="p">;</span>
+<span class="n">NSNumber</span> <span class="o">*</span><span class="n">scaleFactor</span> <span class="o">=</span> <span class="n">options</span><span class="p">[</span><span class="n">SDImageCoderDecodeScaleFactor</span><span class="p">]</span><span class="p">;</span>
+<span class="n">NSValue</span> <span class="o">*</span><span class="n">thumbnailSizeValue</span> <span class="o">=</span> <span class="n">options</span><span class="p">[</span><span class="n">SDImageCoderDecodeThumbnailPixelSize</span><span class="p">]</span><span class="p">;</span>
+<span class="n">NSNumber</span> <span class="o">*</span><span class="n">preserveAspectRatioValue</span> <span class="o">=</span> <span class="n">options</span><span class="p">[</span><span class="n">SDImageCoderDecodePreserveAspectRatio</span><span class="p">]</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="decodedimage">DecodedImage</h3>
+<p>开始解码前先生成 WebPData、WebPDemuxer、WebPIterator、CGColorSpaceRef 以及从 coder options 获取配置信息，简化后如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">WebPData</span> <span class="n">webpData</span><span class="p">;</span>
+<span class="n">WebPDataInit</span><span class="p">(</span><span class="o">&amp;</span><span class="n">webpData</span><span class="p">)</span><span class="p">;</span>
+<span class="n">webpData</span><span class="p">.</span><span class="n">bytes</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">bytes</span><span class="p">;</span>
+<span class="n">webpData</span><span class="p">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">length</span><span class="p">;</span>
+<span class="n">WebPDemuxer</span> <span class="o">*</span><span class="n">demuxer</span> <span class="o">=</span> <span class="n">WebPDemux</span><span class="p">(</span><span class="o">&amp;</span><span class="n">webpData</span><span class="p">)</span><span class="p">;</span>
+
+<span class="n">uint32_t</span> <span class="n">flags</span> <span class="o">=</span> <span class="n">WebPDemuxGetI</span><span class="p">(</span><span class="n">demuxer</span><span class="p">,</span> <span class="n">WEBP_FF_FORMAT_FLAGS</span><span class="p">)</span><span class="p">;</span>
+<span class="kt">BOOL</span> <span class="n">hasAnimation</span> <span class="o">=</span> <span class="n">flags</span> <span class="o">&amp;</span> <span class="n">ANIMATION_FLAG</span><span class="p">;</span>
+
+<span class="c1">// 获取 coder options 配置 scale、thumnailSize、preserveAspectRatio、decodeFirstFrame
+</span><span class="c1"></span><span class="c1">// ...
+</span><span class="c1"></span>
+<span class="c1">// for animated webp image
+</span><span class="c1"></span><span class="n">WebPIterator</span> <span class="n">iter</span><span class="p">;</span>
+<span class="c1">// libwebp&#39;s index start with 1
+</span><span class="c1"></span><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">WebPDemuxGetFrame</span><span class="p">(</span><span class="n">demuxer</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">iter</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">WebPDemuxReleaseIterator</span><span class="p">(</span><span class="o">&amp;</span><span class="n">iter</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">WebPDemuxDelete</span><span class="p">(</span><span class="n">demuxer</span><span class="p">)</span><span class="p">;</span>
+    <span class="k">return</span> <span class="nb">nil</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="n">CGColorSpaceRef</span> <span class="n">colorSpace</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="nl">sd_createColorSpaceWithDemuxer</span><span class="p">:</span><span class="n">demuxer</span><span class="p">]</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这里的 colorSpace 是通过读取 WebP 中的 <a href="https://developers.google.com/speed/webp/docs/riff_container#color_profile">ICC color profile</a> 来生成的，如果没有则使用 <code>[SDImageCoderHelper colorSpaceGetDeviceRGB];</code></p>
+<p>在获取缩略图尺寸后会与 WebP 的图片 canvas size 对比，检查是否需要使用缩略图：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="kt">int</span> <span class="n">canvasWidth</span> <span class="o">=</span> <span class="n">WebPDemuxGetI</span><span class="p">(</span><span class="n">demuxer</span><span class="p">,</span> <span class="n">WEBP_FF_CANVAS_WIDTH</span><span class="p">)</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">canvasHeight</span> <span class="o">=</span> <span class="n">WebPDemuxGetI</span><span class="p">(</span><span class="n">demuxer</span><span class="p">,</span> <span class="n">WEBP_FF_CANVAS_HEIGHT</span><span class="p">)</span><span class="p">;</span>
+<span class="n">CGSize</span> <span class="n">scaledSize</span> <span class="o">=</span> <span class="n">SDCalculateThumbnailSize</span><span class="p">(</span><span class="n">CGSizeMake</span><span class="p">(</span><span class="n">canvasWidth</span><span class="p">,</span> <span class="n">canvasHeight</span><span class="p">)</span><span class="p">,</span> <span class="n">preserveAspectRatio</span><span class="p">,</span> <span class="n">thumbnailSize</span><span class="p">)</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>AnimatedImage</strong></p>
+<p>SD 在 5.x 推出了 SDAnimatedImage（protocol too) 正是为动图设计的，而 WebP 是支持动图的，因此这里的解码会区分是否为动图。</p>
+<p>如果是单张图片则使用 <code>[self sd_createWebpImageWithData: colorSpace: scaledSize:]</code>  生成 CGImageRef 最后生成 image 并设置 <code>sd_imageFormat = SDImageFormatWebP</code>。</p>
+<p>如果为动图，先初始化 <a href="https://developer.apple.com/library/archive/documentation/GraphicsImaging/Conceptual/drawingwithquartz2d/dq_images/dq_images.html#//apple_ref/doc/uid/TP30001066-CH212-CJBHEGIB">CGBitmapInfo</a> 来提供位图的布局信息：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="kt">BOOL</span> <span class="n">hasAlpha</span> <span class="o">=</span> <span class="n">config</span><span class="p">.</span><span class="n">input</span><span class="p">.</span><span class="n">has_alpha</span><span class="p">;</span>
+<span class="n">CGBitmapInfo</span> <span class="n">bitmapInfo</span> <span class="o">=</span> <span class="n">kCGBitmapByteOrder32Host</span><span class="p">;</span>
+<span class="n">bitmapInfo</span> <span class="o">|</span><span class="o">=</span> <span class="n">hasAlpha</span> <span class="o">?</span> <span class="nl">kCGImageAlphaPremultipliedFirst</span> <span class="p">:</span> <span class="n">kCGImageAlphaNoneSkipFirst</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>我们先说为什么是使用 <em>kCGBitmapByteOrder32Host</em> ，我们知道 iPhone 是小端序，应该使用 <em>kCGBitmapByteOrder32Little</em> 才对，不过 32Host 是系统提供的一个宏，帮我们屏蔽了大小端端问题，定义如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="cp">#</span><span class="cp">ifdef __BIG_ENDIAN__</span><span class="cp">
+</span><span class="cp"></span>    <span class="cp">#</span><span class="cp">define kCGBitmapByteOrder16Host kCGBitmapByteOrder16Big</span><span class="cp">
+</span><span class="cp"></span>    <span class="cp">#</span><span class="cp">define kCGBitmapByteOrder32Host kCGBitmapByteOrder32Big</span><span class="cp">
+</span><span class="cp"></span><span class="cp">#</span><span class="cp">else </span><span class="cm">/* Little endian. */</span><span class="cp">
+</span><span class="cp"></span>    <span class="cp">#</span><span class="cp">define kCGBitmapByteOrder16Host kCGBitmapByteOrder16Little</span><span class="cp">
+</span><span class="cp"></span>    <span class="cp">#</span><span class="cp">define kCGBitmapByteOrder32Host kCGBitmapByteOrder32Little</span><span class="cp">
+</span><span class="cp"></span><span class="cp">#</span><span class="cp">endif</span><span class="cp">
+</span></code></pre></td></tr></table>
+</div>
+</div><p>简单来说 Apple 的 GPU 仅支持 32 bit 的颜色格式，if not 则会消耗 CPU 进行颜色格式转换。具体可以看 <a href="http://blog.leichunfeng.com/blog/2017/02/20/talking-about-the-decompression-of-the-image-in-ios/">WWDC 2014 Session 419</a> 。</p>
+<p>剩下一个 alpa 信息是由 CGImageAlphaInfo 来控制，其定义如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">ypedef</span> <span class="nf">CF_ENUM</span><span class="p">(</span><span class="n">uint32_t</span><span class="p">,</span> <span class="n">CGImageAlphaInfo</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">kCGImageAlphaNone</span><span class="p">,</span>               <span class="cm">/* For example, RGB. */</span>
+    <span class="n">kCGImageAlphaPremultipliedLast</span><span class="p">,</span>  <span class="cm">/* For example, premultiplied RGBA */</span>
+    <span class="n">kCGImageAlphaPremultipliedFirst</span><span class="p">,</span> <span class="cm">/* For example, premultiplied ARGB */</span>
+    <span class="n">kCGImageAlphaLast</span><span class="p">,</span>               <span class="cm">/* For example, non-premultiplied RGBA */</span>
+    <span class="n">kCGImageAlphaFirst</span><span class="p">,</span>              <span class="cm">/* For example, non-premultiplied ARGB */</span>
+    <span class="n">kCGImageAlphaNoneSkipLast</span><span class="p">,</span>       <span class="cm">/* For example, RBGX. */</span>
+    <span class="n">kCGImageAlphaNoneSkipFirst</span><span class="p">,</span>      <span class="cm">/* For example, XRGB. */</span>
+    <span class="n">kCGImageAlphaOnly</span>                <span class="cm">/* No color data, alpha data only */</span>
+<span class="p">}</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><a href="https://blog.csdn.net/mydreamremindme/article/details/50817294?depth_1-utm_source=distribute.pc_relevant.none-task&amp;utm_source=distribute.pc_relevant.none-task">这里</a> 有一个解释关于 premutipled 的作用的说明，还蛮不错的。AlphaInfo 提供了三方面的信息：</p>
+<ul>
+<li>是否有 alpha 值；</li>
+<li>如有 alpha 值，alpha 所处位置 first or last，like RGBA or ARGB；</li>
+<li>如有 alpha 值，每个颜色的分量是否已乘上 alpha 值。好处是可以避免 3 次的乘法运算。</li>
+</ul>
+<p>关于具体的使用这里有一个<a href="https://stackoverflow.com/questions/23723564/which-cgimagealphainfo-should-we-use">讨论</a> ，结论就是不包含 alpha 时用 <code>kCGImageAlphaNoneSkipFirst</code> ，否则使用 <code>kCGImageAlphaPremultipliedFirst</code>。</p>
+<p>紧接着就是生成 canvas 和 iterator 开始每一帧的绘制：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">CGContextRef</span> <span class="n">canvas</span> <span class="o">=</span> <span class="n">CGBitmapContextCreate</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">canvasWidth</span><span class="p">,</span> <span class="n">canvasHeight</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">[</span><span class="n">SDImageCoderHelper</span> <span class="n">colorSpaceGetDeviceRGB</span><span class="p">]</span><span class="p">,</span> <span class="n">bitmapInfo</span><span class="p">)</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">canvas</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">WebPDemuxDelete</span><span class="p">(</span><span class="n">demuxer</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">CGColorSpaceRelease</span><span class="p">(</span><span class="n">colorSpace</span><span class="p">)</span><span class="p">;</span>
+    <span class="k">return</span> <span class="nb">nil</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="n">NSMutableArray</span><span class="o">&lt;</span><span class="n">SDImageFrame</span> <span class="o">*</span><span class="o">&gt;</span> <span class="o">*</span><span class="n">frames</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSMutableArray</span> <span class="n">array</span><span class="p">]</span><span class="p">;</span>
+
+<span class="k">do</span> <span class="p">{</span>
+    <span class="k">@autoreleasepool</span> <span class="p">{</span>
+        <span class="n">CGImageRef</span> <span class="n">imageRef</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="nl">sd_drawnWebpImageWithCanvas</span><span class="p">:</span><span class="n">canvas</span> <span class="nl">iterator</span><span class="p">:</span><span class="n">iter</span> <span class="nl">colorSpace</span><span class="p">:</span><span class="n">colorSpace</span> <span class="nl">scaledSize</span><span class="p">:</span><span class="n">scaledSize</span><span class="p">]</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">imageRef</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">continue</span><span class="p">;</span>
+        <span class="p">}</span>
+
+<span class="cp">#</span><span class="cp">if SD_UIKIT || SD_WATCH</span><span class="cp">
+</span><span class="cp"></span>        <span class="n">UIImage</span> <span class="o">*</span><span class="n">image</span> <span class="o">=</span> <span class="p">[</span><span class="p">[</span><span class="n">UIImage</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithCGImage</span><span class="p">:</span><span class="n">imageRef</span> <span class="nl">scale</span><span class="p">:</span><span class="n">scale</span> <span class="nl">orientation</span><span class="p">:</span><span class="n">UIImageOrientationUp</span><span class="p">]</span><span class="p">;</span>
+<span class="cp">#</span><span class="cp">else</span><span class="cp">
+</span><span class="cp"></span>        <span class="n">UIImage</span> <span class="o">*</span><span class="n">image</span> <span class="o">=</span> <span class="p">[</span><span class="p">[</span><span class="n">UIImage</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithCGImage</span><span class="p">:</span><span class="n">imageRef</span> <span class="nl">scale</span><span class="p">:</span><span class="n">scale</span> <span class="nl">orientation</span><span class="p">:</span><span class="n">kCGImagePropertyOrientationUp</span><span class="p">]</span><span class="p">;</span>
+<span class="cp">#</span><span class="cp">endif</span><span class="cp">
+</span><span class="cp"></span>        <span class="n">CGImageRelease</span><span class="p">(</span><span class="n">imageRef</span><span class="p">)</span><span class="p">;</span>
+        
+        <span class="n">NSTimeInterval</span> <span class="n">duration</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="nl">sd_frameDurationWithIterator</span><span class="p">:</span><span class="n">iter</span><span class="p">]</span><span class="p">;</span>
+        <span class="n">SDImageFrame</span> <span class="o">*</span><span class="n">frame</span> <span class="o">=</span> <span class="p">[</span><span class="n">SDImageFrame</span> <span class="nl">frameWithImage</span><span class="p">:</span><span class="n">image</span> <span class="nl">duration</span><span class="p">:</span><span class="n">duration</span><span class="p">]</span><span class="p">;</span>
+        <span class="p">[</span><span class="n">frames</span> <span class="nl">addObject</span><span class="p">:</span><span class="n">frame</span><span class="p">]</span><span class="p">;</span>
+    <span class="p">}</span>
+    
+<span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="n">WebPDemuxNextFrame</span><span class="p">(</span><span class="o">&amp;</span><span class="n">iter</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>最后释放对应 iterator、demuer、canvas、colorSpace，生成 animatedImage，decode 结束：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">UIImage</span> <span class="o">*</span><span class="n">animatedImage</span> <span class="o">=</span> <span class="p">[</span><span class="n">SDImageCoderHelper</span> <span class="nl">animatedImageWithFrames</span><span class="p">:</span><span class="n">frames</span><span class="p">]</span><span class="p">;</span>
+<span class="n">animatedImage</span><span class="p">.</span><span class="n">sd_imageLoopCount</span> <span class="o">=</span> <span class="n">loopCount</span><span class="p">;</span>
+<span class="n">animatedImage</span><span class="p">.</span><span class="n">sd_imageFormat</span> <span class="o">=</span> <span class="n">SDImageFormatWebP</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="drawnwebpimage">DrawnWebpImage</h3>
+<p>drawnWebImage 方法是用于生成动图的每一帧图片的，内部通过 CreateWebpImage 生成当前帧的 image 然后在 canvas 上进行混合操作（基于 canvas size），最后根据 scale size 进行一定比例缩放。blend 代码如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="kt">BOOL</span> <span class="n">shouldBlend</span> <span class="o">=</span> <span class="n">iter</span><span class="p">.</span><span class="n">blend_method</span> <span class="o">=</span><span class="o">=</span> <span class="n">WEBP_MUX_BLEND</span><span class="p">;</span>
+
+<span class="c1">// If not blend, cover the target image rect. (firstly clear then draw)
+</span><span class="c1"></span><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">shouldBlend</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">CGContextClearRect</span><span class="p">(</span><span class="n">canvas</span><span class="p">,</span> <span class="n">imageRect</span><span class="p">)</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="n">CGContextDrawImage</span><span class="p">(</span><span class="n">canvas</span><span class="p">,</span> <span class="n">imageRect</span><span class="p">,</span> <span class="n">imageRef</span><span class="p">)</span><span class="p">;</span>
+<span class="n">CGImageRef</span> <span class="n">newImageRef</span> <span class="o">=</span> <span class="n">CGBitmapContextCreateImage</span><span class="p">(</span><span class="n">canvas</span><span class="p">)</span><span class="p">;</span>
+
+<span class="n">CGImageRelease</span><span class="p">(</span><span class="n">imageRef</span><span class="p">)</span><span class="p">;</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">iter</span><span class="p">.</span><span class="n">dispose_method</span> <span class="o">=</span><span class="o">=</span> <span class="n">WEBP_MUX_DISPOSE_BACKGROUND</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">CGContextClearRect</span><span class="p">(</span><span class="n">canvas</span><span class="p">,</span> <span class="n">imageRect</span><span class="p">)</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>blend_method 是当前帧指定的混合方式，如果无需混合会清理当地画布再进图像转换。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="c1">// Blend operation (animation only). Indicates how transparent pixels of the
+</span><span class="c1"></span><span class="c1">// current frame are blended with those of the previous canvas.
+</span><span class="c1"></span><span class="k">typedef</span> <span class="k">enum</span> <span class="n">WebPMuxAnimBlend</span> <span class="p">{</span>
+  <span class="n">WEBP_MUX_BLEND</span><span class="p">,</span>              <span class="c1">// Blend.
+</span><span class="c1"></span>  <span class="n">WEBP_MUX_NO_BLEND</span>            <span class="c1">// Do not blend.
+</span><span class="c1"></span><span class="p">}</span> <span class="n">WebPMuxAnimBlend</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>同时当前帧渲染结束还有一个 dispose_method 决定是否在下一帧渲染前清除当前 context：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="c1">// Dispose method (animation only). Indicates how the area used by the current
+</span><span class="c1"></span><span class="c1">// frame is to be treated before rendering the next frame on the canvas.
+</span><span class="c1"></span><span class="k">typedef</span> <span class="k">enum</span> <span class="n">WebPMuxAnimDispose</span> <span class="p">{</span>
+  <span class="n">WEBP_MUX_DISPOSE_NONE</span><span class="p">,</span>       <span class="c1">// Do not dispose.
+</span><span class="c1"></span>  <span class="n">WEBP_MUX_DISPOSE_BACKGROUND</span>  <span class="c1">// Dispose to background color.
+</span><span class="c1"></span><span class="p">}</span> <span class="n">WebPMuxAnimDispose</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="createwebpimage">CreateWebpImage</h3>
+<p>创建图片会初始化 WebPDecoderConfig 以及检查 webp 图片完整性：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">WebPDecoderConfig</span> <span class="n">config</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">WebPInitDecoderConfig</span><span class="p">(</span><span class="o">&amp;</span><span class="n">config</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nb">nil</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="c1">// 检查 webp 图片完整性
+</span><span class="c1"></span><span class="k">if</span> <span class="p">(</span><span class="n">WebPGetFeatures</span><span class="p">(</span><span class="n">webpData</span><span class="p">.</span><span class="n">bytes</span><span class="p">,</span> <span class="n">webpData</span><span class="p">.</span><span class="n">size</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">config</span><span class="p">.</span><span class="n">input</span><span class="p">)</span> <span class="o">!</span><span class="o">=</span> <span class="n">VP8_STATUS_OK</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nb">nil</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>WebPDecoderConfig 声明如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c++" data-lang="c++"><span class="c1">// Main object storing the configuration for advanced decoding.
+</span><span class="c1"></span><span class="k">struct</span> <span class="nc">WebPDecoderConfig</span> <span class="p">{</span>
+  <span class="n">WebPBitstreamFeatures</span> <span class="n">input</span><span class="p">;</span>  <span class="c1">// Immutable bitstream features (optional)
+</span><span class="c1"></span>  <span class="n">WebPDecBuffer</span> <span class="n">output</span><span class="p">;</span>         <span class="c1">// Output buffer (can point to external mem)
+</span><span class="c1"></span>  <span class="n">WebPDecoderOptions</span> <span class="n">options</span><span class="p">;</span>   <span class="c1">// Decoding options
+</span><span class="c1"></span><span class="p">}</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>对 WebPBitstreamFeatures、WebPDecBuffer、WebPDecoderOptions 具体包含数据类型可查看：<a href="https://developers.google.com/speed/webp/docs/api">WebP Doc</a> 。在 SD 中对 config 做了如下设置：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">config</span><span class="p">.</span><span class="n">options</span><span class="p">.</span><span class="n">use_threads</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">// 开启多线程解码；
+</span><span class="c1"></span><span class="n">config</span><span class="p">.</span><span class="n">output</span><span class="p">.</span><span class="n">colorspace</span> <span class="o">=</span> <span class="n">MODE_bgrA</span><span class="p">;</span> <span class="c1">// 颜色空间指定为 RGBA 顺序；
+</span><span class="c1"></span><span class="c1">// Use scaling for thumbnail
+</span><span class="c1"></span><span class="k">if</span> <span class="p">(</span><span class="n">scaledSize</span><span class="p">.</span><span class="n">width</span> <span class="o">!</span><span class="o">=</span> <span class="mi">0</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">scaledSize</span><span class="p">.</span><span class="n">height</span> <span class="o">!</span><span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">config</span><span class="p">.</span><span class="n">options</span><span class="p">.</span><span class="n">use_scaling</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="n">config</span><span class="p">.</span><span class="n">options</span><span class="p">.</span><span class="n">scaled_width</span> <span class="o">=</span> <span class="n">scaledSize</span><span class="p">.</span><span class="n">width</span><span class="p">;</span>
+    <span class="n">config</span><span class="p">.</span><span class="n">options</span><span class="p">.</span><span class="n">scaled_height</span> <span class="o">=</span> <span class="n">scaledSize</span><span class="p">.</span><span class="n">height</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这里的 <code>MODE_bgrA</code> 是属于 <a href="https://code.woboq.org/qt5/include/webp/decode.h.html">WEBP_CSP_MODE</a> 对 colorspace 的定义，不熟悉的可以看<a href="https://developer.apple.com/library/archive/documentation/GraphicsImaging/Conceptual/drawingwithquartz2d/dq_color/dq_color.html#//apple_ref/doc/uid/TP30001066-CH205-TPXREF101">苹果文档</a> 。</p>
+<p>配置完 decode Config，还有就是 CGBitmapInfo。 这个与 decode image 中的逻辑一样就不多说了，直接解码生成 CGImageRef：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="c1">// Decode the WebP image data into a RGBA value array
+</span><span class="c1"></span><span class="k">if</span> <span class="p">(</span><span class="n">WebPDecode</span><span class="p">(</span><span class="n">webpData</span><span class="p">.</span><span class="n">bytes</span><span class="p">,</span> <span class="n">webpData</span><span class="p">.</span><span class="n">size</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">config</span><span class="p">)</span> <span class="o">!</span><span class="o">=</span> <span class="n">VP8_STATUS_OK</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nb">nil</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="c1">// Construct a UIImage from the decoded RGBA value array
+</span><span class="c1"></span><span class="n">CGDataProviderRef</span> <span class="n">provider</span> <span class="o">=</span>
+<span class="n">CGDataProviderCreateWithData</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">config</span><span class="p">.</span><span class="n">output</span><span class="p">.</span><span class="n">u</span><span class="p">.</span><span class="n">RGBA</span><span class="p">.</span><span class="n">rgba</span><span class="p">,</span> <span class="n">config</span><span class="p">.</span><span class="n">output</span><span class="p">.</span><span class="n">u</span><span class="p">.</span><span class="n">RGBA</span><span class="p">.</span><span class="n">size</span><span class="p">,</span> <span class="n">FreeImageData</span><span class="p">)</span><span class="p">;</span>
+<span class="n">size_t</span> <span class="n">bitsPerComponent</span> <span class="o">=</span> <span class="mi">8</span><span class="p">;</span>
+<span class="n">size_t</span> <span class="n">bitsPerPixel</span> <span class="o">=</span> <span class="mi">32</span><span class="p">;</span>
+<span class="n">size_t</span> <span class="n">bytesPerRow</span> <span class="o">=</span> <span class="n">config</span><span class="p">.</span><span class="n">output</span><span class="p">.</span><span class="n">u</span><span class="p">.</span><span class="n">RGBA</span><span class="p">.</span><span class="n">stride</span><span class="p">;</span>
+<span class="n">size_t</span> <span class="n">width</span> <span class="o">=</span> <span class="n">config</span><span class="p">.</span><span class="n">output</span><span class="p">.</span><span class="n">width</span><span class="p">;</span>
+<span class="n">size_t</span> <span class="n">height</span> <span class="o">=</span> <span class="n">config</span><span class="p">.</span><span class="n">output</span><span class="p">.</span><span class="n">height</span><span class="p">;</span>
+<span class="n">CGColorRenderingIntent</span> <span class="n">renderingIntent</span> <span class="o">=</span> <span class="n">kCGRenderingIntentDefault</span><span class="p">;</span>
+<span class="n">CGImageRef</span> <span class="n">imageRef</span> <span class="o">=</span> <span class="n">CGImageCreate</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">bitsPerComponent</span><span class="p">,</span> <span class="n">bitsPerPixel</span><span class="p">,</span> <span class="n">bytesPerRow</span><span class="p">,</span> <span class="n">colorSpaceRef</span><span class="p">,</span> <span class="n">bitmapInfo</span><span class="p">,</span> <span class="n">provider</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NO</span><span class="p">,</span> <span class="n">renderingIntent</span><span class="p">)</span><span class="p">;</span>
+
+<span class="n">CGDataProviderRelease</span><span class="p">(</span><span class="n">provider</span><span class="p">)</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这里在第一步创建 dataProvider 的时候就传入了 FreeImageData 作为 callback，保证结束后及时清理 data：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">static</span> <span class="kt">void</span> <span class="nf">FreeImageData</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">info</span><span class="p">,</span> <span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="n">size_t</span> <span class="n">size</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">free</span><span class="p">(</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="n">data</span><span class="p">)</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这里的 info 信息其实是 <a href="https://developer.apple.com/documentation/coregraphics/1408288-cgdataprovidercreatewithdata?language=objc">CGDataProviderCreateWithData</a> 调用时传入的 NULL 它也可以是任意类型。</p>
+<p>至此，WebP decode 核心实现已经差不多了，剩下的 ProgressCoder 和 SDAnimatedImageCoder 中的 decode 逻辑也都大同小异。稍微不同的，在于 AnimatedImage 内部会将 WebPIterator 增量的帧迭代器中的各帧数据存储到 SDWebPCoderFrame 中，可以说 SDWebPCoderFrame 就是 WebPIterator 的翻版。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">@interface</span> <span class="nc">SDWebPCoderFrame</span> : <span class="nc">NSObject</span>
+
+<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">assign</span><span class="p">)</span> <span class="n">NSUInteger</span> <span class="n">index</span><span class="p">;</span> <span class="c1">// Frame index (zero based)
+</span><span class="c1"></span><span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">assign</span><span class="p">)</span> <span class="n">NSTimeInterval</span> <span class="n">duration</span><span class="p">;</span> <span class="c1">// Frame duration in seconds
+</span><span class="c1"></span><span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">assign</span><span class="p">)</span> <span class="n">NSUInteger</span> <span class="n">width</span><span class="p">;</span> <span class="c1">// Frame width
+</span><span class="c1"></span><span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">assign</span><span class="p">)</span> <span class="n">NSUInteger</span> <span class="n">height</span><span class="p">;</span> <span class="c1">// Frame height
+</span><span class="c1"></span><span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">assign</span><span class="p">)</span> <span class="n">NSUInteger</span> <span class="n">offsetX</span><span class="p">;</span> <span class="c1">// Frame origin.x in canvas (left-bottom based)
+</span><span class="c1"></span><span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">assign</span><span class="p">)</span> <span class="n">NSUInteger</span> <span class="n">offsetY</span><span class="p">;</span> <span class="c1">// Frame origin.y in canvas (left-bottom based)
+</span><span class="c1"></span><span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">assign</span><span class="p">)</span> <span class="kt">BOOL</span> <span class="n">hasAlpha</span><span class="p">;</span> <span class="c1">// Whether frame contains alpha
+</span><span class="c1"></span><span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">assign</span><span class="p">)</span> <span class="kt">BOOL</span> <span class="n">isFullSize</span><span class="p">;</span> <span class="c1">// Whether frame size is equal to canvas size
+</span><span class="c1"></span><span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">assign</span><span class="p">)</span> <span class="kt">BOOL</span> <span class="n">shouldBlend</span><span class="p">;</span> <span class="c1">// Frame dispose method
+</span><span class="c1"></span><span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">assign</span><span class="p">)</span> <span class="kt">BOOL</span> <span class="n">shouldDispose</span><span class="p">;</span> <span class="c1">// Frame blend operation
+</span><span class="c1"></span><span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">assign</span><span class="p">)</span> <span class="n">NSUInteger</span> <span class="n">blendFromIndex</span><span class="p">;</span> <span class="c1">// The nearest previous frame index which blend mode is WEBP_MUX_BLEND
+</span><span class="c1"></span>
+<span class="k">@end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>WebPIterator 可参照 <a href="https://developers.google.com/speed/webp/docs/container-api">WebP 文档</a> 。</p>
+<h3 id="encodedimage">EncodedImage</h3>
+<p>decode 逻辑与 encode 也基本是相反操作，细节先不表了。</p>
+<h2 id="heading">总结</h2>
+<p>这篇，主要描述了 SD 的 Coder 插件是如何运行的，SD 当前所支持的 image 格式。以及如何为其添加新类型的图片格式并融入整个 SD 的处理流中。 重点介绍 WebP 解码的实现和相关 API，并未涉及太多 WebP 内部实现。</p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">土土Edmond木</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2020-03-11
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/source-code/">source-code</a>
+          <a href="/tags/ios/">iOS</a>
+          <a href="/tags/cache/">cache</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/source-code-sdweb-1/">
+            <span class="next-text nav-default">源码浅析 SDWebImage 5.5.2</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:chun574271939@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://twitter.com/looseyi" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="https://github.com/looseyi" class="iconfont icon-github" title="github"></a>
+      <a href="https://www.weibo.com/foreverclp" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="https://www.zhihu.com/people/tu-tu-edmondmu" class="iconfont icon-zhihu" title="zhihu"></a>
+  <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2019-12-11 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">土土Edmond木</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>
