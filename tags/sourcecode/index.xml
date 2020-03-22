@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title></title>
-    <link>http://localhost:1313/</link>
-    <description>Recent content on </description>
+    <title>SourceCode on </title>
+    <link>http://localhost:1313/tags/sourcecode/</link>
+    <description>Recent content in SourceCode on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <lastBuildDate>Mon, 16 Mar 2020 23:10:58 +0800</lastBuildDate>
     
-	<atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://localhost:1313/tags/sourcecode/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -45,24 +45,6 @@
       
       <guid>http://localhost:1313/post/sourcecode-ios/source-code-mmkv/</guid>
       <description>MMKV（官方介绍） MMKV 是基于 mmap 内存映射的 key-value 组件，底层序列化/反序列化使用 protobuf 实现，性能高，稳定性强。从 2015 年中至今在微信上使用，其性能和稳定性经</description>
-    </item>
-    
-    <item>
-      <title>完善 Cocoapods-Binary 支持 Server 端缓存</title>
-      <link>http://localhost:1313/post/sourcecode-ios/cocoapods-binary-2/</link>
-      <pubDate>Mon, 06 Jan 2020 11:40:06 +2100</pubDate>
-      
-      <guid>http://localhost:1313/post/sourcecode-ios/cocoapods-binary-2/</guid>
-      <description>在开始之前，还是明确一下我们的目标，希望通过对 Cocoapods-binary 的改造使其支持 server 端缓存，从而达到 一处编译，处处使用 的 pods lib dependencies。同时会简单</description>
-    </item>
-    
-    <item>
-      <title>浅析 Cocoapods-Binary 实现</title>
-      <link>http://localhost:1313/post/sourcecode-ios/cocoapods-binary-1/</link>
-      <pubDate>Sat, 21 Dec 2019 11:37:41 +2100</pubDate>
-      
-      <guid>http://localhost:1313/post/sourcecode-ios/cocoapods-binary-1/</guid>
-      <description>背景 公司级别的项目在发展过程，不可避免会遇到项目过大，导致的编译和开发效率的降低。在如何提高编译速度，加快生产效率，各大厂都有各种尝试，可惜</description>
     </item>
     
   </channel>

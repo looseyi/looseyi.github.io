@@ -1,0 +1,1667 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>源码浅析 SDWebImage 5.5.2 - </title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="土土Edmond木" /><meta name="description" content="本文基于 SDWebImage 5.5.2。重读的原因也是由于发现它的 API 在不断迭代，许多结构已经不同与早期版本，同时也是为了做一个记录。阅读顺序也会依据 API 执行顺序" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.62.0 with theme even" />
+
+
+<link rel="canonical" href="http://localhost:1313/post/sourcecode-ios/source-code-sdweb-1/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="源码浅析 SDWebImage 5.5.2" />
+<meta property="og:description" content="本文基于 SDWebImage 5.5.2。重读的原因也是由于发现它的 API 在不断迭代，许多结构已经不同与早期版本，同时也是为了做一个记录。阅读顺序也会依据 API 执行顺序" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/post/sourcecode-ios/source-code-sdweb-1/" />
+<meta property="article:published_time" content="2020-02-22T23:08:12+08:00" />
+<meta property="article:modified_time" content="2020-02-22T23:08:12+08:00" />
+<meta itemprop="name" content="源码浅析 SDWebImage 5.5.2">
+<meta itemprop="description" content="本文基于 SDWebImage 5.5.2。重读的原因也是由于发现它的 API 在不断迭代，许多结构已经不同与早期版本，同时也是为了做一个记录。阅读顺序也会依据 API 执行顺序">
+<meta itemprop="datePublished" content="2020-02-22T23:08:12&#43;08:00" />
+<meta itemprop="dateModified" content="2020-02-22T23:08:12&#43;08:00" />
+<meta itemprop="wordCount" content="9053">
+
+
+
+<meta itemprop="keywords" content="SourceCode,iOS,cache," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="源码浅析 SDWebImage 5.5.2"/>
+<meta name="twitter:description" content="本文基于 SDWebImage 5.5.2。重读的原因也是由于发现它的 API 在不断迭代，许多结构已经不同与早期版本，同时也是为了做一个记录。阅读顺序也会依据 API 执行顺序"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Aha Moment</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Aha Moment</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">源码浅析 SDWebImage 5.5.2</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-02-22 </span>
+        
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#50-migration-guid">5.0 Migration Guid</a></li>
+    <li><a href="#view-category">View Category</a>
+      <ul>
+        <li><a href="#sdwebimagecontext">SDWebImageContext</a></li>
+      </ul>
+    </li>
+    <li><a href="#imageprefetcher">ImagePrefetcher</a></li>
+    <li><a href="#imageloader">ImageLoader</a>
+      <ul>
+        <li><a href="#heading">数据处理</a></li>
+      </ul>
+    </li>
+    <li><a href="#imagecache">ImageCache</a>
+      <ul>
+        <li><a href="#sdmemorycache">SDMemoryCache</a></li>
+        <li><a href="#sddiskcache">SDDiskCache</a></li>
+        <li><a href="#sdimagecache">SDImageCache</a></li>
+      </ul>
+    </li>
+    <li><a href="#imagemanaer">ImageManaer</a>
+      <ul>
+        <li><a href="#loadimage">loadImage</a></li>
+      </ul>
+    </li>
+    <li><a href="#heading-1">总结</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p>本文基于 SDWebImage 5.5.2。重读的原因也是由于发现它的 API 在不断迭代，许多结构已经不同与早期版本，同时也是为了做一个记录。阅读顺序也会依据 API 执行顺序进行，不会太拘泥于细节，更多是了解整个框架是如何运行的。</p>
+<p><img src="https://raw.githubusercontent.com/SDWebImage/SDWebImage/master/Docs/Diagrams/SDWebImageHighLevelDiagram.jpeg" alt="highlevel"></p>
+<h2 id="50-migration-guid">5.0 Migration Guid</h2>
+<p>如果大家有兴趣的，强烈推荐观看官方的推荐的<a href="https://github.com/SDWebImage/SDWebImage/wiki/5.0-Migration-guide">迁移文档</a>，提到了5.0版本的需要新特性，里面详细介绍其新特性和变化动机，主要 features：</p>
+<ul>
+<li>全新的 Animated Image View  (4.0 为 <code>FLAnimatedImageView</code>)；</li>
+<li>提供了 Image Transform 方便用户在下载图片后增加 scale, rotate, rounded corner 等操作；</li>
+<li>Customization，可以说一切皆协议，可以 custom <a href="https://github.com/SDWebImage/SDWebImage/wiki/Advanced-Usage#custom-cache-50">cache</a>、<a href="https://github.com/SDWebImage/SDWebImage/wiki/Advanced-Usage#custom-loader-50">loader</a>、<a href="https://github.com/SDWebImage/SDWebImage/wiki/Advanced-Usage#custom-coder-420">coder</a>；</li>
+<li>新增 View Indicator 来标识 Image 的 loading 状态；</li>
+</ul>
+<p>可以说，5.0 的变化在于将整个 SDWebImage 中的核心类进行了协议化，同时将图片的请求、加载、解码、缓存等操作尽可能的进行了插件化处理，达到方便扩展、可替换。</p>
+<p>协议化的类型很多，这里仅列出一小部分：</p>
+<table>
+<thead>
+<tr>
+<th>4.4</th>
+<th>5.0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SDWebImageCacheSerializerBlock</td>
+<td>id&lt;SDWebImageCacheSerializer&gt;</td>
+</tr>
+<tr>
+<td>SDWebImageCacheKeyFilterBlock</td>
+<td>id&lt;SDWebImageCacheKeyFilter&gt;</td>
+</tr>
+<tr>
+<td>SDWebImageDownloader</td>
+<td>id&lt;SDImageLoader&gt;</td>
+</tr>
+<tr>
+<td>SDImageCache</td>
+<td>id&lt;SDImageCache&gt;</td>
+</tr>
+<tr>
+<td>SDWebImageDownloaderProgressBlock</td>
+<td>id&lt;SDWebImageIndicator&gt;</td>
+</tr>
+<tr>
+<td>FLAnimatedImageView</td>
+<td>id&lt;SDAnimatedImage&gt;</td>
+</tr>
+</tbody>
+</table>
+<h2 id="view-category">View Category</h2>
+<p>作为上层 API 调用是通过在 <code>UIView + WebCache</code> 之上提供便利方法实现的，包含以下几个 ：</p>
+<ul>
+<li>UIImageView+HighlightedWebCache</li>
+<li>UIImageView+WebCache</li>
+<li>UIView+WebCacheOperation</li>
+<li>UIButton+WebCache</li>
+<li>NSButton+WebCache</li>
+</ul>
+<p>开始前，先来看看 <a href="https://github.com/SDWebImage/SDWebImage/blob/09f06159a3284f6981d5495728e5c3cb3dfb82fa/SDWebImage/Core/SDWebImageCompat.h">SDWebImageCompat.h</a> 它定义了<strong>SD_MAC、SD_UIKIT、SD_WATCH</strong> 这三个宏用来区分不同系统的 API 来满足条件编译，同时还利用其来抹除 API 在不同平台的差异，比如利用 <code>#define UIImage NSImage</code> 将 mac 上的 NSImage 统一为 UIImage。另外值得注意的一点就是：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="cp">#</span><span class="cp">ifndef dispatch_main_async_safe</span><span class="cp">
+</span><span class="cp"></span><span class="cp">#</span><span class="cp">define dispatch_main_async_safe(block)\</span><span class="cp">
+</span><span class="cp"></span><span class="cp">    if (dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL) == dispatch_queue_get_label(dispatch_get_main_queue())) {\</span><span class="cp">
+</span><span class="cp"></span><span class="cp">        block();\</span><span class="cp">
+</span><span class="cp"></span><span class="cp">    } else {\</span><span class="cp">
+</span><span class="cp"></span><span class="cp">        dispatch_async(dispatch_get_main_queue(), block);\</span><span class="cp">
+</span><span class="cp"></span><span class="cp">    }</span><span class="cp">
+</span><span class="cp"></span><span class="cp">#</span><span class="cp">endif</span><span class="cp">
+</span></code></pre></td></tr></table>
+</div>
+</div><p>区别于早起版本的实现：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="cp">#</span><span class="cp">define dispatch_main_async_safe(block)\</span><span class="cp">
+</span><span class="cp"></span><span class="cp">    if ([NSThread isMainThread]) {\</span><span class="cp">
+</span><span class="cp"></span><span class="cp">        block();\</span><span class="cp">
+</span><span class="cp"></span><span class="cp">    } else {\</span><span class="cp">
+</span><span class="cp"></span><span class="cp">        dispatch_async(dispatch_get_main_queue(), block);\</span><span class="cp">
+</span><span class="cp"></span><span class="cp">    }</span><span class="cp">
+</span><span class="cp"></span><span class="cp">#</span><span class="cp">endif</span><span class="cp">
+</span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><code>#ifndef</code> 提高了代码的严谨度，防止重复定义 <code>dispatch_main_async_safe</code></li>
+<li>判断条件由 isMainThread 改为了 dispatch_queue_t label 是否相等</li>
+</ul>
+<p>关于第二点，有一篇 <a href="https://github.com/SDWebImage/SDWebImage/pull/781">SD 的讨论</a>，以及另一篇说明 <a href="http://blog.benjamin-encz.de/post/main-queue-vs-main-thread/">GCD's Main Queue vs. Main Thread</a></p>
+<blockquote>
+<p>Calling an API from a non-main queue that is executing on the main thread will lead to issues if the library (like VektorKit) relies on checking for execution on the main queue.</p>
+</blockquote>
+<p>区别就是从判断<strong>是否在主线程执行</strong>改为<strong>是否由主队列上调度</strong>。因为 <strong>在主队列中的任务，一定会放到主线程执行</strong>。</p>
+<p>相比 UIImageView 的分类，UIButton 需要存储不同 <code>UIControlState</code> 和 backgrounImage 下的 image，Associate 了一个内部字典 <code>(NSMutableDictionary&lt;NSString *, NSURL *&gt; *)sd_imageURLStorage</code> 来保存图片。</p>
+<p>所有 View Category 的 <code>setImageUrl:</code> 最终收口到下面这个方法:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">sd_internalSetImageWithURL:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">NSURL</span> <span class="o">*</span><span class="p">)</span><span class="nv">url</span>
+                  <span class="nf">placeholderImage:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">UIImage</span> <span class="o">*</span><span class="p">)</span><span class="nv">placeholder</span>
+                           <span class="nf">options:</span><span class="p">(</span><span class="n">SDWebImageOptions</span><span class="p">)</span><span class="nv">options</span>
+                           <span class="nf">context:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">SDWebImageContext</span> <span class="o">*</span><span class="p">)</span><span class="nv">context</span>
+                     <span class="nf">setImageBlock:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">SDSetImageBlock</span><span class="p">)</span><span class="nv">setImageBlock</span>
+                          <span class="nf">progress:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">SDImageLoaderProgressBlock</span><span class="p">)</span><span class="nv">progressBlock</span>
+                         <span class="nf">completed:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">SDInternalCompletionBlock</span><span class="p">)</span><span class="nv">completedBlock</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这个方法实现很长，简单说明流程：</p>
+<ol>
+<li>copy <code>SDWebImageContext</code>  转为 immutable， 获取其中的 <code>validOperationKey</code> 默认值为 className；</li>
+<li>执行 <code>sd_cancelImageLoadOperationWithKey</code> 取消上一次任务，保证没有当前正在进行的异步下载操作, 不会与即将进行的操作发生冲突；</li>
+<li>设置占位图；</li>
+<li>初始化 <code>SDWebImageManager</code> 、<code>SDImageLoaderProgressBlock</code> , 重置 <code>NSProgress</code>、<code>SDWebImageIndicator</code>;</li>
+<li>开启下载<code>loadImageWithURL:</code> 并将返回的 <code>SDWebImageOperation</code> 存入 <code>sd_operationDictionary</code>，key 为 <code>validOperationKey</code>;</li>
+<li>取到图片后，调用 <code>sd_setImage:</code> 同时为新的 image 添加 Transition 过渡动画；</li>
+<li>动画结束后停止 indicator。</li>
+</ol>
+<p>稍微说明的是 <code>SDWebImageOperation</code>它是一个 **strong - weak **的 NSMapTable，也是通过关联值添加的：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="c1">// key is strong, value is weak because operation instance is retained by SDWebImageManager&#39;s runningOperations property
+</span><span class="c1"></span><span class="c1">// we should use lock to keep thread-safe because these method may not be acessed from main queue
+</span><span class="c1"></span><span class="k">typedef</span> <span class="n">NSMapTable</span><span class="o">&lt;</span><span class="n">NSString</span> <span class="o">*</span><span class="p">,</span> <span class="kt">id</span><span class="o">&lt;</span><span class="n">SDWebImageOperation</span><span class="o">&gt;</span><span class="o">&gt;</span> <span class="n">SDOperationsDictionary</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>用 weak 是因为 operation 实例是保存在 SDWebImageManager 的 runningOperations，这里只是保存了引用，以方便 cancel 。</p>
+<h3 id="sdwebimagecontext">SDWebImageContext</h3>
+<blockquote>
+<p>A SDWebImageContext object which hold the original context options from top-level API.</p>
+</blockquote>
+<p>image context 贯穿图片处理的整个流程，它将数据逐级带入各个处理任务中，存在两种类型的 ImageContext:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objectivec" data-lang="objectivec"><span class="k">typedef</span> <span class="n">NSString</span> <span class="o">*</span> <span class="n">SDWebImageContextOption</span> <span class="n">NS_EXTENSIBLE_STRING_ENUM</span><span class="p">;</span>
+<span class="k">typedef</span> <span class="n">NSDictionary</span><span class="o">&lt;</span><span class="n">SDWebImageContextOption</span><span class="p">,</span> <span class="kt">id</span><span class="o">&gt;</span> <span class="n">SDWebImageContext</span><span class="p">;</span>
+<span class="k">typedef</span> <span class="n">NSMutableDictionary</span><span class="o">&lt;</span><span class="n">SDWebImageContextOption</span><span class="p">,</span> <span class="kt">id</span><span class="o">&gt;</span><span class="n">SDWebImageMutableContext</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>SDWebImageContextOption 是一个可扩展的 String 枚举，目前有 15 种类型。基本上，你只需看名字也能猜出个大概，<a href="https://github.com/SDWebImage/SDWebImage/blob/5c3c40288f7e465ba94db9736e624f663831951a/SDWebImage/Core/SDWebImageDefine.h">文档</a>，简单做了如下分类：</p>
+<p><img src="http://ww1.sinaimg.cn/large/8157560cgy1gcbeto2gb6j20xj1whajv.jpg" alt="image context"></p>
+<p>从其参与度来看，可见其重要性。</p>
+<h2 id="imageprefetcher">ImagePrefetcher</h2>
+<p>Prefetcher 它与 SD 整个处理流关系不大，主要用 imageManger 进行图片批量下载，核心方法如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="cm">/**
+</span><span class="cm"> * Assign list of URLs to let SDWebImagePrefetcher to queue the prefetching. It based on the image manager so the image may from the cache and network according to the `options` property.
+</span><span class="cm"> * Prefetching is seperate to each other, which means the progressBlock and completionBlock you provide is bind to the prefetching for the list of urls.
+</span><span class="cm"> * Attention that call this will not cancel previous fetched urls. You should keep the token return by this to cancel or cancel all the prefetch.
+</span><span class="cm"> */</span>
+<span class="p">-</span> <span class="p">(</span><span class="n">nullable</span> <span class="n">SDWebImagePrefetchToken</span> <span class="o">*</span><span class="p">)</span><span class="nf">prefetchURLs:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">NSArray</span><span class="o">&lt;</span><span class="n">NSURL</span> <span class="o">*</span><span class="o">&gt;</span> <span class="o">*</span><span class="p">)</span><span class="nv">urls</span>
+                                          <span class="nf">progress:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">SDWebImagePrefetcherProgressBlock</span><span class="p">)</span><span class="nv">progressBlock</span>
+                                         <span class="nf">completed:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">SDWebImagePrefetcherCompletionBlock</span><span class="p">)</span><span class="nv">completionBlock</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>它将下载的 URLs 作为&quot;事务&quot;存入 <code>SDWebImagePrefetchToken</code> 中，避免之前版本在每次 <code>prefetchURLs:</code> 时将上一次的 fetching 操作 cancel 的问题。</p>
+<p>每个下载任务都是在 autoreleasesepool 环境下，且会用 <code>SDAsyncBlockOperation</code> 来包装真正的下载任务，来达到任务的可取消操作：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">@autoreleasepool</span> <span class="p">{</span>
+    <span class="p">@</span><span class="n">weakify</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">SDAsyncBlockOperation</span> <span class="o">*</span><span class="n">prefetchOperation</span> <span class="o">=</span> <span class="p">[</span><span class="n">SDAsyncBlockOperation</span> <span class="nl">blockOperationWithBlock</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="n">SDAsyncBlockOperation</span> <span class="o">*</span> <span class="n">_Nonnull</span> <span class="n">asyncOperation</span><span class="p">)</span> <span class="p">{</span>
+        <span class="p">@</span><span class="n">strongify</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">self</span> <span class="o">|</span><span class="o">|</span> <span class="n">asyncOperation</span><span class="p">.</span><span class="n">isCancelled</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="c1">/// load Image ...
+</span><span class="c1"></span>    <span class="p">}</span><span class="p">]</span><span class="p">;</span>
+    <span class="k">@synchronized</span> <span class="p">(</span><span class="n">token</span><span class="p">)</span> <span class="p">{</span>
+        <span class="p">[</span><span class="n">token</span><span class="p">.</span><span class="n">prefetchOperations</span> <span class="nl">addPointer</span><span class="p">:</span><span class="p">(</span><span class="k">__bridge</span> <span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="n">prefetchOperation</span><span class="p">]</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">prefetchQueue</span> <span class="nl">addOperation</span><span class="p">:</span><span class="n">prefetchOperation</span><span class="p">]</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>最后将任务存入 prefetchQueue，其限制下载的最大操作数默认为 3 。而 URLs 下载的真正任务是放在 <code>token.loadOperations</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">NSPointerArray</span> <span class="o">*</span><span class="n">operations</span> <span class="o">=</span> <span class="n">token</span><span class="p">.</span><span class="n">loadOperations</span><span class="p">;</span>
+<span class="kt">id</span><span class="o">&lt;</span><span class="n">SDWebImageOperation</span><span class="o">&gt;</span> <span class="n">operation</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">manager</span> <span class="nl">loadImageWithURL</span><span class="p">:</span><span class="n">url</span> <span class="nl">options</span><span class="p">:</span><span class="nb">self</span><span class="p">.</span><span class="n">options</span> <span class="nl">context</span><span class="p">:</span><span class="nb">self</span><span class="p">.</span><span class="n">context</span> <span class="nl">progress</span><span class="p">:</span><span class="nb">nil</span> <span class="nl">completed</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">image</span><span class="p">,</span> <span class="n">NSData</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">data</span><span class="p">,</span> <span class="n">NSError</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">error</span><span class="p">,</span> <span class="n">SDImageCacheType</span> <span class="n">cacheType</span><span class="p">,</span> <span class="kt">BOOL</span> <span class="n">finished</span><span class="p">,</span> <span class="n">NSURL</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">imageURL</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">/// progress handler    
+</span><span class="c1"></span><span class="p">}</span><span class="p">]</span><span class="p">;</span>
+<span class="n">NSAssert</span><span class="p">(</span><span class="n">operation</span> <span class="o">!</span><span class="o">=</span> <span class="nb">nil</span><span class="p">,</span> <span class="s">@&#34;</span><span class="s">Operation should not be nil, [SDWebImageManager loadImageWithURL:options:context:progress:completed:] break prefetch logic</span><span class="s">&#34;</span><span class="p">)</span><span class="p">;</span>
+<span class="k">@synchronized</span> <span class="p">(</span><span class="n">token</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">[</span><span class="n">operations</span> <span class="nl">addPointer</span><span class="p">:</span><span class="p">(</span><span class="k">__bridge</span> <span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="n">operation</span><span class="p">]</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><code>loadOperations</code> 与 <code>prefetchOperations</code> 均使用 <strong>NSPointerArray</strong> ，这里用到了其 <a href="apple-reference-documentation://hcx77yk4jV"><code>NSPointerFunctionsWeakMemory</code></a> 特性以及可以存储 <code>Null</code> 值，尽管其性能并不是很好，参见：<a href="https://objccn.io/issue-7-1/">基础集合类</a></p>
+<p>另外一个值得注意的是 PrefetchToken 对下载状态的线程安全管理，使用了 <a href="https://zhuanlan.zhihu.com/p/45566448">c++11 memory_order_relaxed</a> 。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c++" data-lang="c++"><span class="n">atomic_ulong</span> <span class="n">_skippedCount</span><span class="p">;</span>
+<span class="n">atomic_ulong</span> <span class="n">_finishedCount</span><span class="p">;</span>
+<span class="n">atomic_flag</span>  <span class="n">_isAllFinished</span><span class="p">;</span>
+    
+<span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">_totalCount</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>即通过内存顺序和原子操作做到无锁并发，从而提高效率。具体原理感兴趣的同学可以自行查阅资料。</p>
+<h2 id="imageloader">ImageLoader</h2>
+<p>SDWebImageDownloader 是 &lt;SDImageLoader&gt; 协议在 SD 内部的默认实现。它提供了 HTTP/HTTPS/FTP 或者 local URL 的 NSURLSession 来源的图片获取能力。同时它最大程度的开放整个下载过程的的可配置性。主要 properties ：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">@interface</span> <span class="nc">SDWebImageDownloader</span> : <span class="nc">NSObject</span>
+
+<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">copy</span><span class="p">,</span> <span class="k">readonly</span><span class="p">,</span> <span class="n">nonnull</span><span class="p">)</span> <span class="n">SDWebImageDownloaderConfig</span> <span class="o">*</span><span class="n">config</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">strong</span><span class="p">,</span> <span class="n">nullable</span><span class="p">)</span> <span class="kt">id</span><span class="o">&lt;</span><span class="n">SDWebImageDownloaderRequestModifier</span><span class="o">&gt;</span> <span class="n">requestModifier</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">strong</span><span class="p">,</span> <span class="n">nullable</span><span class="p">)</span> <span class="kt">id</span><span class="o">&lt;</span><span class="n">SDWebImageDownloaderResponseModifier</span><span class="o">&gt;</span> <span class="n">responseModifier</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">strong</span><span class="p">,</span> <span class="n">nullable</span><span class="p">)</span> <span class="kt">id</span><span class="o">&lt;</span><span class="n">SDWebImageDownloaderDecryptor</span><span class="o">&gt;</span> <span class="n">decryptor</span><span class="p">;</span>
+<span class="cm">/* ... */</span>
+
+<span class="p">-</span><span class="p">(</span><span class="n">nullable</span> <span class="n">SDWebImageDownloadToken</span> <span class="o">*</span><span class="p">)</span><span class="nf">downloadImageWithURL:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">NSURL</span> <span class="o">*</span><span class="p">)</span><span class="nv">url</span>
+    <span class="nf">options:</span><span class="p">(</span><span class="n">SDWebImageDownloaderOptions</span><span class="p">)</span><span class="nv">options</span>
+    <span class="nf">context:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">SDWebImageContext</span> <span class="o">*</span><span class="p">)</span><span class="nv">context</span>
+   <span class="nf">progress:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">SDWebImageDownloaderProgressBlock</span><span class="p">)</span><span class="nv">progressBlock</span>
+  <span class="nf">completed:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">SDWebImageDownloaderCompletedBlock</span><span class="p">)</span><span class="nv">completedBlock</span><span class="p">;</span>
+
+<span class="k">@end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>其中 downloaderConfig 是支持 NSCopy 协议的，提供的主要配置如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="c1">/// Defaults to 6.
+</span><span class="c1"></span><span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">assign</span><span class="p">)</span> <span class="n">NSInteger</span> <span class="n">maxConcurrentDownloads</span><span class="p">;</span>
+<span class="c1">/// Defaults to 15.0s.
+</span><span class="c1"></span><span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">assign</span><span class="p">)</span> <span class="n">NSTimeInterval</span> <span class="n">downloadTimeout</span><span class="p">;</span>
+<span class="c1">/// custom session configuration，不支持在使用过程中动态替换类型； 
+</span><span class="c1"></span><span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">strong</span><span class="p">,</span> <span class="n">nullable</span><span class="p">)</span> <span class="n">NSURLSessionConfiguration</span> <span class="o">*</span><span class="n">sessionConfiguration</span><span class="p">;</span>
+<span class="c1">/// 动态扩展类，需要遵循 `NSOperation&lt;SDWebImageDownloaderOperation&gt;` 以实现 SDImageLoader 定制
+</span><span class="c1"></span><span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">assign</span><span class="p">,</span> <span class="n">nullable</span><span class="p">)</span> <span class="kt">Class</span> <span class="n">operationClass</span><span class="p">;</span>
+<span class="c1">/// 图片下载顺序，默认 FIFO
+</span><span class="c1"></span><span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">assign</span><span class="p">)</span> <span class="n">SDWebImageDownloaderExecutionOrder</span> <span class="n">executionOrder</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>request modifier，提供在下载前修改 request，</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="c1">/// Modify the original URL request and return a new one instead. You can modify the HTTP header, cachePolicy, etc for this URL.
+</span><span class="c1"></span>
+<span class="k">@protocol</span> <span class="nc">SDWebImageDownloaderRequestModifier</span> <span class="o">&lt;</span><span class="n">NSObject</span><span class="o">&gt;</span>
+   
+<span class="o">-</span> <span class="p">(</span><span class="n">nullable</span> <span class="n">NSURLRequest</span> <span class="o">*</span><span class="p">)</span><span class="nl">modifiedRequestWithRequest</span><span class="p">:</span><span class="p">(</span><span class="n">nonnull</span> <span class="n">NSURLRequest</span> <span class="o">*</span><span class="p">)</span><span class="n">request</span><span class="p">;</span>
+
+<span class="k">@end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>同样，response modifier 则提供对返回值的修改，</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="c1">/// Modify the original URL response and return a new response. You can use this to check MIME-Type, mock server response, etc.
+</span><span class="c1"></span>
+<span class="k">@protocol</span> <span class="nc">SDWebImageDownloaderResponseModifier</span> <span class="o">&lt;</span><span class="n">NSObject</span><span class="o">&gt;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="n">nullable</span> <span class="n">NSURLResponse</span> <span class="o">*</span><span class="p">)</span><span class="nl">modifiedResponseWithResponse</span><span class="p">:</span><span class="p">(</span><span class="n">nonnull</span> <span class="n">NSURLResponse</span> <span class="o">*</span><span class="p">)</span><span class="n">response</span><span class="p">;</span>
+
+<span class="k">@end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>最后一个 decryptor 用于图片解密，默认提供了对 imageData 的 base64 转换，</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="c1">/// Decrypt the original download data and return a new data. You can use this to decrypt the data using your perfereed algorithm.
+</span><span class="c1"></span><span class="k">@protocol</span> <span class="nc">SDWebImageDownloaderDecryptor</span> <span class="o">&lt;</span><span class="n">NSObject</span><span class="o">&gt;</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="n">nullable</span> <span class="n">NSData</span> <span class="o">*</span><span class="p">)</span><span class="nl">decryptedDataWithData</span><span class="p">:</span><span class="p">(</span><span class="n">nonnull</span> <span class="n">NSData</span> <span class="o">*</span><span class="p">)</span><span class="n">data</span> <span class="nl">response</span><span class="p">:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">NSURLResponse</span> <span class="o">*</span><span class="p">)</span><span class="n">response</span><span class="p">;</span>
+
+<span class="k">@end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>通过这个协议化后的对象来处理数据，可以说是利用了设计模式中的 <strong>策略模式</strong> 或者 <strong>依赖注入</strong>。通过配置的方式获取到协议对象，调用方仅需关心协议对象提供的方法，无需在意其内部实现，达到功能解耦的目的。</p>
+<p><strong>DownloadImageWithURL</strong></p>
+<p>下载前先检查 URL 是否存在，没有则直接抛错返回。取到 URL 后尝试复用之前生成的 operation：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">NSOperation</span><span class="o">&lt;</span><span class="n">SDWebImageDownloaderOperation</span><span class="o">&gt;</span> <span class="o">*</span><span class="n">operation</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">URLOperations</span> <span class="nl">objectForKey</span><span class="p">:</span><span class="n">url</span><span class="p">]</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>如果 operation 存在，调用</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">@synchronized</span> <span class="p">(</span><span class="n">operation</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">downloadOperationCancelToken</span> <span class="o">=</span> <span class="p">[</span><span class="n">operation</span> <span class="nl">addHandlersForProgress</span><span class="p">:</span><span class="n">progressBlock</span> <span class="nl">completed</span><span class="p">:</span><span class="n">completedBlock</span><span class="p">]</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>并设置  queuePriority。这里用了 @synchronized(operation) ，同时 Operation 内部则会用 @synchronized(self)，以保证两个不同类间 operation 的线程安全，因为 operation 有可能被传递到解码或代理的队列中。这里 <code>addHandlersForProgress：</code> 会将 progressBlock 与 completedBlock 一起存入 <code>NSMutableDictionary&lt;NSString *, id&gt; SDCallbacksDictionary</code> 然后返回保存在 downloadOperationCancelToken 中。</p>
+<p>另外，Operation 在 <code>addHandlersForProgress:</code> 时并不会清除之前存储的 callbacks 是增量保存的，也就是说多次调用的 callBack 再完成后都会被依次执行。</p>
+<p>如果 operation 不存在、任务被取消、任务已完成，调用 <code>createDownloaderOperationWithUrl:options:context:</code> 创建出新的 operation 并存储在 URLOperations 中 。同时会配置 completionBlock，使得任务完成后可以及时清理 URLOperations。保存 progressBlock 和 completedBlock；提交 operation 到 downloadQueue。</p>
+<p>最终 operation、url、request、downloadOperationCancelToken 一起被打包进 SDWebImageDownloadToken， 下载方法结束。</p>
+<p><strong>CreateDownloaderOperation</strong></p>
+<p>下载结束，我们来聊聊 operation 是如何创建的。首先是生成 URLRequest：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="c1">// In order to prevent from potential duplicate caching (NSURLCache + SDImageCache) we disable the cache for image requests if told otherwise
+</span><span class="c1"></span><span class="n">NSURLRequestCachePolicy</span> <span class="n">cachePolicy</span> <span class="o">=</span> <span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageDownloaderUseNSURLCache</span> <span class="o">?</span> <span class="nl">NSURLRequestUseProtocolCachePolicy</span> <span class="p">:</span> <span class="n">NSURLRequestReloadIgnoringLocalCacheData</span><span class="p">;</span>
+<span class="n">NSMutableURLRequest</span> <span class="o">*</span><span class="n">mutableRequest</span> <span class="o">=</span> <span class="p">[</span><span class="p">[</span><span class="n">NSMutableURLRequest</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithURL</span><span class="p">:</span><span class="n">url</span> <span class="nl">cachePolicy</span><span class="p">:</span><span class="n">cachePolicy</span> <span class="nl">timeoutInterval</span><span class="p">:</span><span class="n">timeoutInterval</span><span class="p">]</span><span class="p">;</span>
+<span class="n">mutableRequest</span><span class="p">.</span><span class="n">HTTPShouldHandleCookies</span> <span class="o">=</span> <span class="n">SD_OPTIONS_CONTAINS</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">SDWebImageDownloaderHandleCookies</span><span class="p">)</span><span class="p">;</span>
+<span class="n">mutableRequest</span><span class="p">.</span><span class="n">HTTPShouldUsePipelining</span> <span class="o">=</span> <span class="nb">YES</span><span class="p">;</span>
+<span class="n">SD_LOCK</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">HTTPHeadersLock</span><span class="p">)</span><span class="p">;</span>
+<span class="n">mutableRequest</span><span class="p">.</span><span class="n">allHTTPHeaderFields</span> <span class="o">=</span> <span class="nb">self</span><span class="p">.</span><span class="n">HTTPHeaders</span><span class="p">;</span>
+<span class="n">SD_UNLOCK</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">HTTPHeadersLock</span><span class="p">)</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>主要通过 SDWebImageDownloaderOptions 获取参数来配置， timeout 是由 downloader 的 config.downloadTimeout 决定，默认为 15s。然后从 imageContext 中取出 <code>id&lt;SDWebImageDownloaderRequestModifier&gt; requestModifier</code> 对 request 进行改造。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="c1">// Request Modifier
+</span><span class="c1"></span><span class="kt">id</span><span class="o">&lt;</span><span class="n">SDWebImageDownloaderRequestModifier</span><span class="o">&gt;</span> <span class="n">requestModifier</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="p">[</span><span class="n">context</span> <span class="nl">valueForKey</span><span class="p">:</span><span class="n">SDWebImageContextDownloadRequestModifier</span><span class="p">]</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">requestModifier</span> <span class="o">=</span> <span class="p">[</span><span class="n">context</span> <span class="nl">valueForKey</span><span class="p">:</span><span class="n">SDWebImageContextDownloadRequestModifier</span><span class="p">]</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="n">requestModifier</span> <span class="o">=</span> <span class="nb">self</span><span class="p">.</span><span class="n">requestModifier</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>值得注意的是 requestModifier 的获取是有<strong>优先级</strong>的，通过 imageContext 得到的优先级高于 downloader 所拥有的。通过这种方既满足了接口调用方可控，又能支持全局配置，可谓老少皆宜。同理，<code>id&lt;SDWebImageDownloaderResponseModifier&gt; responseModifier</code> 、<code>id&lt;SDWebImageDownloaderDecryptor&gt; decryptor</code> 也是如此。</p>
+<p>之后会将确认过的 responseModifier 和 decryptor 再次保存到 imageContext 中为之后使用。</p>
+<p>最后，从 downloaderConfig 中取出 operationClass 创建 operation：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="kt">Class</span> <span class="n">operationClass</span> <span class="o">=</span> <span class="nb">self</span><span class="p">.</span><span class="n">config</span><span class="p">.</span><span class="n">operationClass</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">operationClass</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="p">[</span><span class="n">operationClass</span> <span class="nl">isSubclassOfClass</span><span class="p">:</span><span class="p">[</span><span class="n">NSOperation</span> <span class="k">class</span><span class="p">]</span><span class="p">]</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="p">[</span><span class="n">operationClass</span> <span class="nl">conformsToProtocol</span><span class="p">:</span><span class="p">@</span><span class="n">protocol</span><span class="p">(</span><span class="n">SDWebImageDownloaderOperation</span><span class="p">)</span><span class="p">]</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Custom operation class
+</span><span class="c1"></span><span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="n">operationClass</span> <span class="o">=</span> <span class="p">[</span><span class="n">SDWebImageDownloaderOperation</span> <span class="k">class</span><span class="p">]</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="n">NSOperation</span><span class="o">&lt;</span><span class="n">SDWebImageDownloaderOperation</span><span class="o">&gt;</span> <span class="o">*</span><span class="n">operation</span> <span class="o">=</span> <span class="p">[</span><span class="p">[</span><span class="n">operationClass</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithRequest</span><span class="p">:</span><span class="n">request</span> <span class="nl">inSession</span><span class="p">:</span><span class="nb">self</span><span class="p">.</span><span class="n">session</span> <span class="nl">options</span><span class="p">:</span><span class="n">options</span> <span class="nl">context</span><span class="p">:</span><span class="n">context</span><span class="p">]</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>设置其 credential、minimumProgressInterval、queuePriority、pendingOperation。</p>
+<p>默认情况下，每个任务是按照 FIFO 顺序添加到 downloadQueue 中，如果用户设置的是 LIFO 时，添加进队列前会修改队列中现有任务的优先级来达到效果：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">if</span> <span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">config</span><span class="p">.</span><span class="n">executionOrder</span> <span class="o">=</span><span class="o">=</span> <span class="n">SDWebImageDownloaderLIFOExecutionOrder</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Emulate LIFO execution order by systematically, each previous adding operation can dependency the new operation
+</span><span class="c1"></span>    <span class="c1">// This can gurantee the new operation to be execulated firstly, even if when some operations finished, meanwhile you appending new operations
+</span><span class="c1"></span>    <span class="c1">// Just make last added operation dependents new operation can not solve this problem. See test case #test15DownloaderLIFOExecutionOrder
+</span><span class="c1"></span>    <span class="k">for</span> <span class="p">(</span><span class="n">NSOperation</span> <span class="o">*</span><span class="n">pendingOperation</span> <span class="k">in</span> <span class="nb">self</span><span class="p">.</span><span class="n">downloadQueue</span><span class="p">.</span><span class="n">operations</span><span class="p">)</span> <span class="p">{</span>
+        <span class="p">[</span><span class="n">pendingOperation</span> <span class="nl">addDependency</span><span class="p">:</span><span class="n">operation</span><span class="p">]</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>通过遍历队列，将新任务修改为当前队列中所有任务的依赖以反转优先级。</p>
+<h3 id="heading">数据处理</h3>
+<p>SDWebImageDownloaderOperation 也是协议化后的类型，协议本身遵循 NSURLSessionTaskDelegate, NSURLSessionDataDelegate，它是真正处理 URL 请求数据的类，支持后台下载，支持对 responseData 修改(by responseModifier)，支持对 download ImageData 进行解密 (by decryptor)。其主要内部 properties 如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">@property</span> <span class="p">(</span><span class="k">assign</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">,</span> <span class="k">readwrite</span><span class="p">)</span> <span class="n">SDWebImageDownloaderOptions</span> <span class="n">options</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">copy</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">,</span> <span class="k">readwrite</span><span class="p">,</span> <span class="n">nullable</span><span class="p">)</span> <span class="n">SDWebImageContext</span> <span class="o">*</span><span class="n">context</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">strong</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">,</span> <span class="n">nonnull</span><span class="p">)</span> <span class="n">NSMutableArray</span><span class="o">&lt;</span><span class="n">SDCallbacksDictionary</span> <span class="o">*</span><span class="o">&gt;</span> <span class="o">*</span><span class="n">callbackBlocks</span><span class="p">;</span>
+
+<span class="k">@property</span> <span class="p">(</span><span class="k">strong</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">,</span> <span class="n">nullable</span><span class="p">)</span> <span class="n">NSMutableData</span> <span class="o">*</span><span class="n">imageData</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">copy</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">,</span> <span class="n">nullable</span><span class="p">)</span> <span class="n">NSData</span> <span class="o">*</span><span class="n">cachedData</span><span class="p">;</span> <span class="c1">// for `SDWebImageDownloaderIgnoreCachedResponse`
+</span><span class="c1"></span><span class="k">@property</span> <span class="p">(</span><span class="k">assign</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">)</span> <span class="n">NSUInteger</span> <span class="n">expectedSize</span><span class="p">;</span> <span class="c1">// may be 0
+</span><span class="c1"></span><span class="k">@property</span> <span class="p">(</span><span class="k">assign</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">)</span> <span class="n">NSUInteger</span> <span class="n">receivedSize</span><span class="p">;</span>
+
+<span class="k">@property</span> <span class="p">(</span><span class="k">strong</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">,</span> <span class="n">nullable</span><span class="p">)</span> <span class="kt">id</span><span class="o">&lt;</span><span class="n">SDWebImageDownloaderResponseModifier</span><span class="o">&gt;</span> <span class="n">responseModifier</span><span class="p">;</span> <span class="c1">// modifiy original URLResponse
+</span><span class="c1"></span><span class="k">@property</span> <span class="p">(</span><span class="k">strong</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">,</span> <span class="n">nullable</span><span class="p">)</span> <span class="kt">id</span><span class="o">&lt;</span><span class="n">SDWebImageDownloaderDecryptor</span><span class="o">&gt;</span> <span class="n">decryptor</span><span class="p">;</span> <span class="c1">// decrypt image data
+</span><span class="c1"></span><span class="c1">// This is weak because it is injected by whoever manages this session. If this gets nil-ed out, we won&#39;t be able to run
+</span><span class="c1"></span><span class="c1">// the task associated with this operation
+</span><span class="c1"></span><span class="k">@property</span> <span class="p">(</span><span class="k">weak</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">,</span> <span class="n">nullable</span><span class="p">)</span> <span class="n">NSURLSession</span> <span class="o">*</span><span class="n">unownedSession</span><span class="p">;</span>
+<span class="c1">// This is set if we&#39;re using not using an injected NSURLSession. We&#39;re responsible of invalidating this one
+</span><span class="c1"></span><span class="k">@property</span> <span class="p">(</span><span class="k">strong</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">,</span> <span class="n">nullable</span><span class="p">)</span> <span class="n">NSURLSession</span> <span class="o">*</span><span class="n">ownedSession</span><span class="p">;</span>
+
+<span class="k">@property</span> <span class="p">(</span><span class="k">strong</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">,</span> <span class="n">nonnull</span><span class="p">)</span> <span class="n">dispatch_queue_t</span> <span class="n">coderQueue</span><span class="p">;</span> <span class="c1">// the queue to do image decoding
+</span><span class="c1"></span><span class="cp">#</span><span class="cp">if SD_UIKIT</span><span class="cp">
+</span><span class="cp"></span><span class="k">@property</span> <span class="p">(</span><span class="k">assign</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">)</span> <span class="n">UIBackgroundTaskIdentifier</span> <span class="n">backgroundTaskId</span><span class="p">;</span>
+
+<span class="p">-</span> <span class="p">(</span><span class="n">nonnull</span> <span class="kt">instancetype</span><span class="p">)</span><span class="nf">initWithRequest:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">NSURLRequest</span> <span class="o">*</span><span class="p">)</span><span class="nv">request</span>
+                              <span class="nf">inSession:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">NSURLSession</span> <span class="o">*</span><span class="p">)</span><span class="nv">session</span>
+                                <span class="nf">options:</span><span class="p">(</span><span class="n">SDWebImageDownloaderOptions</span><span class="p">)</span><span class="nv">options</span>
+                                <span class="nf">context:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">SDWebImageContext</span> <span class="o">*</span><span class="p">)</span><span class="nv">context</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>初始化没有什么特别的，需要注意的是这里传入的 <code>nullable session</code> 是以 unownedSessin 保存，区别于内部默认生成的 <strong>ownedSession</strong>。如果初始化时 session 为空，会在 <code>start</code> 时创建 ownedSession。</p>
+<p>那么问题来了，由于我们需观察 session 的各个状态，需要设置 delegate 来完成，</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="p">[</span><span class="n">NSURLSession</span> <span class="nl">sessionWithConfiguration</span><span class="p">:</span><span class="nl">delegate</span><span class="p">:</span><span class="nl">delegateQueue</span><span class="p">:</span><span class="p">]</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>ownedSession 的 delegate 毋庸置疑就在 operation 内部，而初始化传入 session 的 delegate 则是 downloader 。它会通过 taskID 取出 operation 调用对应实现来完成回调的统一处理和转发，例如：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">URLSession:</span><span class="p">(</span><span class="n">NSURLSession</span> <span class="o">*</span><span class="p">)</span><span class="nv">session</span> <span class="nf">task:</span><span class="p">(</span><span class="n">NSURLSessionTask</span> <span class="o">*</span><span class="p">)</span><span class="nv">task</span> <span class="nf">didCompleteWithError:</span><span class="p">(</span><span class="n">NSError</span> <span class="o">*</span><span class="p">)</span><span class="nv">error</span> <span class="p">{</span>
+    
+    <span class="c1">// Identify the operation that runs this task and pass it the delegate method
+</span><span class="c1"></span>    <span class="n">NSOperation</span><span class="o">&lt;</span><span class="n">SDWebImageDownloaderOperation</span><span class="o">&gt;</span> <span class="o">*</span><span class="n">dataOperation</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="nl">operationWithTask</span><span class="p">:</span><span class="n">task</span><span class="p">]</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="p">[</span><span class="n">dataOperation</span> <span class="nl">respondsToSelector</span><span class="p">:</span><span class="k">@selector</span><span class="p">(</span><span class="nl">URLSession</span><span class="p">:</span><span class="nl">task</span><span class="p">:</span><span class="nl">didCompleteWithError</span><span class="p">:</span><span class="p">)</span><span class="p">]</span><span class="p">)</span> <span class="p">{</span>
+        <span class="p">[</span><span class="n">dataOperation</span> <span class="nl">URLSession</span><span class="p">:</span><span class="n">session</span> <span class="nl">task</span><span class="p">:</span><span class="n">task</span> <span class="nl">didCompleteWithError</span><span class="p">:</span><span class="n">error</span><span class="p">]</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>而 operation 内部则是真正的消费着。下载开始、结束、取消都会全局发送对应通知。 整个 responseData 处理流程比较清晰。</p>
+<ol>
+<li>
+<p>在 <strong>didReceiveResponse</strong> 时，会保存 response.expectedContentLength 作为 expectedSize。然后调用 <code>modifiedResponseWithResponse:</code> 保存编辑后的 reponse。</p>
+</li>
+<li>
+<p>每次 <strong>didReceiveData</strong> 会将 data 追加到 imageData：<code>[self.imageData appendData:data]</code> ，更新 receivedSize<code>self.receivedSize = self.imageData.length</code> 。最终，当 receivedSize &gt; expectedSize 判定下载完成，执行后续处理。在每次收到数据时，如果支持 <code>SDWebImageDownloaderProgressiveLoad</code>，则会进入 coderQueue 进行边下载边解码:</p>
+</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="c1">// progressive decode the image in coder queue
+</span><span class="c1"></span><span class="n">dispatch_async</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">coderQueue</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span>
+    <span class="k">@autoreleasepool</span> <span class="p">{</span>
+        <span class="n">UIImage</span> <span class="o">*</span><span class="n">image</span> <span class="o">=</span> <span class="n">SDImageLoaderDecodeProgressiveImageData</span><span class="p">(</span><span class="n">imageData</span><span class="p">,</span> <span class="nb">self</span><span class="p">.</span><span class="n">request</span><span class="p">.</span><span class="n">URL</span><span class="p">,</span> <span class="n">finished</span><span class="p">,</span> <span class="nb">self</span><span class="p">,</span> <span class="p">[</span><span class="p">[</span><span class="nb">self</span> <span class="k">class</span><span class="p">]</span> <span class="nl">imageOptionsFromDownloaderOptions</span><span class="p">:</span><span class="nb">self</span><span class="p">.</span><span class="n">options</span><span class="p">]</span><span class="p">,</span> <span class="nb">self</span><span class="p">.</span><span class="n">context</span><span class="p">)</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">image</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// We do not keep the progressive decoding image even when `finished`=YES. Because they are for view rendering but not take full function from downloader options. And some coders implementation may not keep consistent between progressive decoding and normal decoding.
+</span><span class="c1"></span>            
+            <span class="p">[</span><span class="nb">self</span> <span class="nl">callCompletionBlocksWithImage</span><span class="p">:</span><span class="n">image</span> <span class="nl">imageData</span><span class="p">:</span><span class="nb">nil</span> <span class="nl">error</span><span class="p">:</span><span class="nb">nil</span> <span class="nl">finished</span><span class="p">:</span><span class="nb">NO</span><span class="p">]</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span><span class="p">)</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>​		否则，会在 <strong>didCompleteWithError</strong> 时完成解码操作：<code>SDImageLoaderDecodeImageData</code> ，不过在解码前需要先解密:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">if</span> <span class="p">(</span><span class="n">imageData</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="nb">self</span><span class="p">.</span><span class="n">decryptor</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">imageData</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">decryptor</span> <span class="nl">decryptedDataWithData</span><span class="p">:</span><span class="n">imageData</span> <span class="nl">response</span><span class="p">:</span><span class="nb">self</span><span class="p">.</span><span class="n">response</span><span class="p">]</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><pre><code>3. 处理 complete 回调；
+</code></pre>
+<p>关于 decode 的逻辑我们最后聊。</p>
+<h2 id="imagecache">ImageCache</h2>
+<p>基本上 Cache 相关类的设计思路与 ImageLoader 一致，会有一份 SDImageCacheConfig 以配置缓存的过期时间，容量大小，读写权限，以及动态可扩展的 MemoryCache/DiskCache。</p>
+<p>SDImageCacheConfig 主要属性如下:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">@property</span> <span class="p">(</span><span class="k">assign</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">)</span> <span class="kt">BOOL</span> <span class="n">shouldDisableiCloud</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">assign</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">)</span> <span class="kt">BOOL</span> <span class="n">shouldCacheImagesInMemory</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">assign</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">)</span> <span class="kt">BOOL</span> <span class="n">shouldUseWeakMemoryCache</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">assign</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">)</span> <span class="kt">BOOL</span> <span class="n">shouldRemoveExpiredDataWhenEnterBackground</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">assign</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">)</span> <span class="n">NSDataReadingOptions</span> <span class="n">diskCacheReadingOptions</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">assign</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">)</span> <span class="n">NSDataWritingOptions</span> <span class="n">diskCacheWritingOptions</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">assign</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">)</span> <span class="n">NSTimeInterval</span> <span class="n">maxDiskAge</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">assign</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">)</span> <span class="n">NSUInteger</span> <span class="n">maxDiskSize</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">assign</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">)</span> <span class="n">NSUInteger</span> <span class="n">maxMemoryCost</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">assign</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">)</span> <span class="n">NSUInteger</span> <span class="n">maxMemoryCount</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">assign</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">)</span> <span class="n">SDImageCacheConfigExpireType</span> <span class="n">diskCacheExpireType</span><span class="p">;</span>
+<span class="c1">/// Defaults to built-in `SDMemoryCache` class.
+</span><span class="c1"></span><span class="k">@property</span> <span class="p">(</span><span class="k">assign</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">,</span> <span class="n">nonnull</span><span class="p">)</span> <span class="kt">Class</span> <span class="n">memoryCacheClass</span><span class="p">;</span>
+<span class="c1">/// Defaults to built-in `SDDiskCache` class.
+</span><span class="c1"></span><span class="k">@property</span> <span class="p">(</span><span class="k">assign</span> <span class="p">,</span><span class="k">nonatomic</span><span class="p">,</span> <span class="n">nonnull</span><span class="p">)</span> <span class="kt">Class</span> <span class="n">diskCacheClass</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>MemoryCache、DiskCache 的实例化都需要 SDImageCacheConfig 的传入：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="c1">/// SDMemoryCache
+</span><span class="c1"></span><span class="p">-</span> <span class="p">(</span><span class="n">nonnull</span> <span class="kt">instancetype</span><span class="p">)</span><span class="nf">initWithConfig:</span><span class="p">(</span><span class="n">nonnull</span> <span class="n">SDImageCacheConfig</span> <span class="o">*</span><span class="p">)</span><span class="nv">config</span><span class="p">;</span>
+<span class="c1">/// SDDiskCache
+</span><span class="c1"></span><span class="p">-</span> <span class="p">(</span><span class="n">nullable</span> <span class="kt">instancetype</span><span class="p">)</span><span class="nf">initWithCachePath:</span><span class="p">(</span><span class="n">nonnull</span> <span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">cachePath</span> <span class="nf">config:</span><span class="p">(</span><span class="n">nonnull</span> <span class="n">SDImageCacheConfig</span> <span class="o">*</span><span class="p">)</span><span class="nv">config</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>作为缓存协议，他们的接口声明基本一致，都是对数据的 CURD，区别在于 MemoryCache Protocl 操作的是 <strong>id</strong> 类型 (NSCache API 限制)，DiskCache 则是对 NSData。</p>
+<p>我们来看看他们的默认实现吧。</p>
+<h3 id="sdmemorycache">SDMemoryCache</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="cm">/**
+</span><span class="cm"> A memory cache which auto purge the cache on memory warning and support weak cache.
+</span><span class="cm"> */</span>
+<span class="k">@interface</span> <span class="nc">SDMemoryCache</span> <span class="o">&lt;</span><span class="n">KeyType</span><span class="p">,</span> <span class="n">ObjectType</span><span class="o">&gt;</span> <span class="o">:</span> <span class="n">NSCache</span> <span class="o">&lt;</span><span class="n">KeyType</span><span class="p">,</span> <span class="n">ObjectType</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">SDMemoryCache</span><span class="o">&gt;</span>
+
+<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">strong</span><span class="p">,</span> <span class="n">nonnull</span><span class="p">,</span> <span class="k">readonly</span><span class="p">)</span> <span class="n">SDImageCacheConfig</span> <span class="o">*</span><span class="n">config</span><span class="p">;</span>
+
+<span class="k">@end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>内部就是将 <strong>NSCache</strong> 扩展为了 SDMemoryCache 协议，并加入了 *<em>NSMapTable&lt;KeyType, ObjectType&gt; <em>weakCache</em></em> ，并为其添加了信号量锁来保证线程安全。这里的 weak-cache 是仅在 <em>iOS/tvOS</em> 平台添加的特性，因为在 macOS 上尽管收到系统内存警告，NSCache 也不会清理对应的缓存。weakCache 使用的是 strong-weak 引用不会有有额外的内存开销且不影响对象的生命周期。</p>
+<p>weakCache 的作用在于恢复缓存，它通过 CacheConfig 的 <strong>shouldUseWeakMemoryCache</strong> 开关以控制，详细说明可以查看 CacheConfig 的API 声明。先看看其如何实现的：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="p">-</span> <span class="p">(</span><span class="kt">id</span><span class="p">)</span><span class="nf">objectForKey:</span><span class="p">(</span><span class="kt">id</span><span class="p">)</span><span class="nv">key</span> <span class="p">{</span>
+    <span class="kt">id</span> <span class="n">obj</span> <span class="o">=</span> <span class="p">[</span><span class="nb">super</span> <span class="nl">objectForKey</span><span class="p">:</span><span class="n">key</span><span class="p">]</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">self</span><span class="p">.</span><span class="n">config</span><span class="p">.</span><span class="n">shouldUseWeakMemoryCache</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">obj</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">key</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="o">!</span><span class="n">obj</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// Check weak cache
+</span><span class="c1"></span>        <span class="n">SD_LOCK</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">weakCacheLock</span><span class="p">)</span><span class="p">;</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">weakCache</span> <span class="nl">objectForKey</span><span class="p">:</span><span class="n">key</span><span class="p">]</span><span class="p">;</span>
+        <span class="n">SD_UNLOCK</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">weakCacheLock</span><span class="p">)</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// Sync cache
+</span><span class="c1"></span>            <span class="n">NSUInteger</span> <span class="n">cost</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="p">[</span><span class="n">obj</span> <span class="nl">isKindOfClass</span><span class="p">:</span><span class="p">[</span><span class="n">UIImage</span> <span class="k">class</span><span class="p">]</span><span class="p">]</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">cost</span> <span class="o">=</span> <span class="p">[</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="p">)</span><span class="n">obj</span> <span class="n">sd_memoryCost</span><span class="p">]</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="p">[</span><span class="nb">super</span> <span class="nl">setObject</span><span class="p">:</span><span class="n">obj</span> <span class="nl">forKey</span><span class="p">:</span><span class="n">key</span> <span class="nl">cost</span><span class="p">:</span><span class="n">cost</span><span class="p">]</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">obj</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>由于 NSCache 遵循  <a href="apple-reference-documentation://hcnVx1bA-q"><code>NSDiscardableContent</code></a>  策略来存储临时对象的，当内存紧张时，缓存对象有可能被系统清理掉。此时，如果应用访问 MemoryCache 时，缓存一旦未命中，则会转入 diskCache 的查询操作，可能导致 image 闪烁现象。而当开启 shouldUseWeakMemoryCache 时，因为 weakCache 保存着对象的弱引用 （在对象 被 NSCache 被清理且没有被释放的情况下)，我们可通过 weakCache 取到缓存，将其塞会 NSCache 中。从而减少磁盘 I/O。</p>
+<h3 id="sddiskcache">SDDiskCache</h3>
+<p>这个更简单，内部使用 NSFileManager 管理图片数据读写， 调用 SDDiskCacheFileNameForKey 将 key MD5 处理后作为 fileName，存放在 diskCachePath 目录下。另外就是过期缓存的清理：</p>
+<ol>
+<li>根据 SDImageCacheConfigExpireType 排序得到 <code>NSDirectoryEnumerator *fileEnumerator</code> ，开始过滤；</li>
+<li>以 cacheConfig.maxDiskAage 对比判断是否过期，将过期 URL 存入 urlsToDelete；</li>
+<li>调用 <code>[self.fileManager removeItemAtURL:fileURL error:nil];</code></li>
+<li>根据 cacheConfig.maxDiskSize 来删除磁盘缓存的数据，清理到 maxDiskSize 的 1/2 为止。</li>
+</ol>
+<p>另外一点就是 SDDiskCache 同 <strong>YYKVStorage</strong> 一样同样支持为 UIImage 添加 extendData 用以存储额外信息，例如，图片的缩放比例, <a href="https://sspai.com/post/55279">URL rich link</a>, 时间等其他数据。</p>
+<p>不过 <strong>YYKVStorage</strong> 本身是用数据库中 <em><strong>manifest</strong></em> 表的 extended_data 字段来存储的。SDDiskCache 就另辟蹊径解决了。利用系统 API &lt;sys/xattr.h&gt; 的 <strong>setxattr</strong>、<strong>getxattr</strong>、<strong>listxattr</strong> 将 extendData 保存。可以说又涨姿势了。顺便说一下，它对应的 key 是用 <em>SDDiskCacheExtendedAttributeName</em>。</p>
+<h3 id="sdimagecache">SDImageCache</h3>
+<p>也是协议化后的类，负责调度 SDMemoryCache、SDDiskCache，其 Properties 如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">strong</span><span class="p">,</span> <span class="k">readwrite</span><span class="p">,</span> <span class="n">nonnull</span><span class="p">)</span> <span class="kt">id</span><span class="o">&lt;</span><span class="n">SDMemoryCache</span><span class="o">&gt;</span> <span class="n">memoryCache</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">strong</span><span class="p">,</span> <span class="k">readwrite</span><span class="p">,</span> <span class="n">nonnull</span><span class="p">)</span> <span class="kt">id</span><span class="o">&lt;</span><span class="n">SDDiskCache</span><span class="o">&gt;</span> <span class="n">diskCache</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">copy</span><span class="p">,</span> <span class="k">readwrite</span><span class="p">,</span> <span class="n">nonnull</span><span class="p">)</span> <span class="n">SDImageCacheConfig</span> <span class="o">*</span><span class="n">config</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">copy</span><span class="p">,</span> <span class="k">readwrite</span><span class="p">,</span> <span class="n">nonnull</span><span class="p">)</span> <span class="n">NSString</span> <span class="o">*</span><span class="n">diskCachePath</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">strong</span><span class="p">,</span> <span class="n">nullable</span><span class="p">)</span> <span class="n">dispatch_queue_t</span> <span class="n">ioQueue</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>其 <em>init</em> 中需要说明的就是 memoryCache 和  diskCache 实例的初始化是根据 CacheConfig 中定义的 class 来生成的，默认就是 SDMemoryCache 和 SDDiskCache。</p>
+<p>我们看看其核心方法：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">storeImage:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">UIImage</span> <span class="o">*</span><span class="p">)</span><span class="nv">image</span>
+         <span class="nf">imageData:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">NSData</span> <span class="o">*</span><span class="p">)</span><span class="nv">imageData</span>
+            <span class="nf">forKey:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">key</span>
+          <span class="nf">toMemory:</span><span class="p">(</span><span class="kt">BOOL</span><span class="p">)</span><span class="nv">toMemory</span>
+            <span class="nf">toDisk:</span><span class="p">(</span><span class="kt">BOOL</span><span class="p">)</span><span class="nv">toDisk</span>
+        <span class="nf">completion:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">SDWebImageNoParamsBlock</span><span class="p">)</span><span class="nv">completionBlock</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><ol>
+<li>
+<p>确保 image 和 key 存在；</p>
+</li>
+<li>
+<p>当 <em>shouldCacheImagesInMemory</em> 为 YES，则会调用 <code>[self.memoryCache setObject:image forKey:key cost:cost]</code> 进行 memoryCache 写入；</p>
+</li>
+<li>
+<p>进行 diskCache 写入，操作逻辑放入 ioQueue 和 autoreleasepool 中。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">dispatch_async</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">ioQueue</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span>
+    <span class="k">@autoreleasepool</span> <span class="p">{</span>
+        <span class="n">NSData</span> <span class="o">*</span><span class="n">data</span> <span class="o">=</span> <span class="p">.</span><span class="p">.</span><span class="p">.</span> <span class="c1">// 根据 SDImageFormat 对 image 进行编码获取
+</span><span class="c1"></span>        <span class="c1">/// data = [[SDImageCodersManager sharedManager] encodedDataWithImage:image format:format options:nil];
+</span><span class="c1"></span>        <span class="p">[</span><span class="nb">self</span> <span class="nl">_storeImageDataToDisk</span><span class="p">:</span><span class="n">data</span> <span class="nl">forKey</span><span class="p">:</span><span class="n">key</span><span class="p">]</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">image</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// Check extended data
+</span><span class="c1"></span>            <span class="kt">id</span> <span class="n">extendedObject</span> <span class="o">=</span> <span class="n">image</span><span class="p">.</span><span class="n">sd_extendedObject</span><span class="p">;</span>
+            <span class="c1">// ... get extended data
+</span><span class="c1"></span>            <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">diskCache</span> <span class="nl">setExtendedData</span><span class="p">:</span><span class="n">extendedData</span> <span class="nl">forKey</span><span class="p">:</span><span class="n">key</span><span class="p">]</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="c1">// call completionBlock in main queue
+</span><span class="c1"></span><span class="p">}</span><span class="p">)</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div></li>
+</ol>
+<p>相对 image storage 另一个重要的方法就是 image query 了，这是定义在 &lt;SDImageCache&gt; 协议中的方法：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="p">-</span> <span class="p">(</span><span class="kt">id</span><span class="o">&lt;</span><span class="n">SDWebImageOperation</span><span class="o">&gt;</span><span class="p">)</span><span class="nf">queryImageForKey:</span><span class="p">(</span><span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">key</span> <span class="nf">options:</span><span class="p">(</span><span class="n">SDWebImageOptions</span><span class="p">)</span><span class="nv">options</span> <span class="nf">context:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">SDWebImageContext</span> <span class="o">*</span><span class="p">)</span><span class="nv">context</span> <span class="nf">completion:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">SDImageCacheQueryCompletionBlock</span><span class="p">)</span><span class="nv">completionBlock</span> <span class="p">{</span>
+    <span class="n">SDImageCacheOptions</span> <span class="n">cacheOptions</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageQueryMemoryData</span><span class="p">)</span> <span class="n">cacheOptions</span> <span class="o">|</span><span class="o">=</span> <span class="n">SDImageCacheQueryMemoryData</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageQueryMemoryDataSync</span><span class="p">)</span> <span class="n">cacheOptions</span> <span class="o">|</span><span class="o">=</span> <span class="n">SDImageCacheQueryMemoryDataSync</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageQueryDiskDataSync</span><span class="p">)</span> <span class="n">cacheOptions</span> <span class="o">|</span><span class="o">=</span> <span class="n">SDImageCacheQueryDiskDataSync</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageScaleDownLargeImages</span><span class="p">)</span> <span class="n">cacheOptions</span> <span class="o">|</span><span class="o">=</span> <span class="n">SDImageCacheScaleDownLargeImages</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageAvoidDecodeImage</span><span class="p">)</span> <span class="n">cacheOptions</span> <span class="o">|</span><span class="o">=</span> <span class="n">SDImageCacheAvoidDecodeImage</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageDecodeFirstFrameOnly</span><span class="p">)</span> <span class="n">cacheOptions</span> <span class="o">|</span><span class="o">=</span> <span class="n">SDImageCacheDecodeFirstFrameOnly</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImagePreloadAllFrames</span><span class="p">)</span> <span class="n">cacheOptions</span> <span class="o">|</span><span class="o">=</span> <span class="n">SDImageCachePreloadAllFrames</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageMatchAnimatedImageClass</span><span class="p">)</span> <span class="n">cacheOptions</span> <span class="o">|</span><span class="o">=</span> <span class="n">SDImageCacheMatchAnimatedImageClass</span><span class="p">;</span>
+    
+    <span class="k">return</span> <span class="p">[</span><span class="nb">self</span> <span class="nl">queryCacheOperationForKey</span><span class="p">:</span><span class="n">key</span> <span class="nl">options</span><span class="p">:</span><span class="n">cacheOptions</span> <span class="nl">context</span><span class="p">:</span><span class="n">context</span> <span class="nl">done</span><span class="p">:</span><span class="n">completionBlock</span><span class="p">]</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>它只做了一件事情，将 SDWebImageOptions 转换为 SDImageCacheOptions，然后调用 <code>queryCacheOperationForKey:</code> ，其内部逻辑如下：</p>
+<p>首先，如果 query key 存在会通过 imageContext 获取 id&lt;SDImageTransformer&gt; transformer 对其转换:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">key</span> <span class="o">=</span> <span class="n">SDTransformedKeyForKey</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">transformerKey</span><span class="p">)</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>尝试从 memory cache 能获取到 image 时：</p>
+<ol>
+<li>
+<p>满足 SDImageCacheDecodeFirstFrameOnly 且遵循 SDAnimatedImage 协议，则会取出 CGImage 进行转换</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="c1">// Ensure static image
+</span><span class="c1"></span><span class="kt">Class</span> <span class="n">animatedImageClass</span> <span class="o">=</span> <span class="n">image</span><span class="p">.</span><span class="k">class</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">image</span><span class="p">.</span><span class="n">sd_isAnimated</span> <span class="o">|</span><span class="o">|</span> <span class="p">(</span><span class="p">[</span><span class="n">animatedImageClass</span> <span class="nl">isSubclassOfClass</span><span class="p">:</span><span class="p">[</span><span class="n">UIImage</span> <span class="k">class</span><span class="p">]</span><span class="p">]</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="p">[</span><span class="n">animatedImageClass</span> <span class="nl">conformsToProtocol</span><span class="p">:</span><span class="p">@</span><span class="n">protocol</span><span class="p">(</span><span class="n">SDAnimatedImage</span><span class="p">)</span><span class="p">]</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
+<span class="cp">#</span><span class="cp">if SD_MAC</span><span class="cp">
+</span><span class="cp"></span>    <span class="n">image</span> <span class="o">=</span> <span class="p">[</span><span class="p">[</span><span class="n">NSImage</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithCGImage</span><span class="p">:</span><span class="n">image</span><span class="p">.</span><span class="n">CGImage</span> <span class="nl">scale</span><span class="p">:</span><span class="n">image</span><span class="p">.</span><span class="n">scale</span> <span class="nl">orientation</span><span class="p">:</span><span class="n">kCGImagePropertyOrientationUp</span><span class="p">]</span><span class="p">;</span>
+<span class="cp">#</span><span class="cp">else</span><span class="cp">
+</span><span class="cp"></span>    <span class="n">image</span> <span class="o">=</span> <span class="p">[</span><span class="p">[</span><span class="n">UIImage</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithCGImage</span><span class="p">:</span><span class="n">image</span><span class="p">.</span><span class="n">CGImage</span> <span class="nl">scale</span><span class="p">:</span><span class="n">image</span><span class="p">.</span><span class="n">scale</span> <span class="nl">orientation</span><span class="p">:</span><span class="n">image</span><span class="p">.</span><span class="n">imageOrientation</span><span class="p">]</span><span class="p">;</span>
+<span class="cp">#</span><span class="cp">endif</span><span class="cp">
+</span><span class="cp"></span><span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>满足 SDImageCacheMatchAnimatedImageClass ，则会强制检查 image 类型是否匹配，否则将数据至 nil:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="c1">// Check image class matching
+</span><span class="c1"></span><span class="kt">Class</span> <span class="n">animatedImageClass</span> <span class="o">=</span> <span class="n">image</span><span class="p">.</span><span class="k">class</span><span class="p">;</span>
+<span class="kt">Class</span> <span class="n">desiredImageClass</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">SDWebImageContextAnimatedImageClass</span><span class="p">]</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">desiredImageClass</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="o">!</span><span class="p">[</span><span class="n">animatedImageClass</span> <span class="nl">isSubclassOfClass</span><span class="p">:</span><span class="n">desiredImageClass</span><span class="p">]</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div></li>
+</ol>
+<p>当可以从 memory cache 获取到 image 且为 SDImageCacheQueryMemoryData，直接完成返回，否则继续；</p>
+<p>开始 diskCache 读取，依据读取条件判定 I/O 操作是否为同步。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="c1">// Check whether we need to synchronously query disk
+</span><span class="c1"></span><span class="c1">// 1. in-memory cache hit &amp; memoryDataSync
+</span><span class="c1"></span><span class="c1">// 2. in-memory cache miss &amp; diskDataSync
+</span><span class="c1"></span><span class="kt">BOOL</span> <span class="n">shouldQueryDiskSync</span> <span class="o">=</span> <span class="p">(</span><span class="p">(</span><span class="n">image</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDImageCacheQueryMemoryDataSync</span><span class="p">)</span> <span class="o">|</span><span class="o">|</span>
+                            <span class="p">(</span><span class="o">!</span><span class="n">image</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDImageCacheQueryDiskDataSync</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>整个 diskQuery 时放入 queryDiskBlock 中:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="kt">void</span><span class="p">(</span><span class="o">^</span><span class="n">queryDiskBlock</span><span class="p">)</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="o">=</span>  <span class="o">^</span><span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">operation</span><span class="p">.</span><span class="n">isCancelled</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// call doneBlock &amp; return
+</span><span class="c1"></span>    <span class="p">}</span>
+    <span class="k">@autoreleasepool</span> <span class="p">{</span>
+        <span class="n">NSData</span> <span class="o">*</span><span class="n">diskData</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="nl">diskImageDataBySearchingAllPathsForKey</span><span class="p">:</span><span class="n">key</span><span class="p">]</span><span class="p">;</span>
+        <span class="n">UIImage</span> <span class="o">*</span><span class="n">diskImage</span><span class="p">;</span>
+        <span class="n">SDImageCacheType</span> <span class="n">cacheType</span> <span class="o">=</span> <span class="n">SDImageCacheTypeNone</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">image</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// the image is from in-memory cache, but need image data
+</span><span class="c1"></span>            <span class="n">diskImage</span> <span class="o">=</span> <span class="n">image</span><span class="p">;</span>
+            <span class="n">cacheType</span> <span class="o">=</span> <span class="n">SDImageCacheTypeMemory</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">diskData</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">cacheType</span> <span class="o">=</span> <span class="n">SDImageCacheTypeDisk</span><span class="p">;</span>
+            <span class="c1">// decode image data only if in-memory cache missed
+</span><span class="c1"></span>            <span class="n">diskImage</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="nl">diskImageForKey</span><span class="p">:</span><span class="n">key</span> <span class="nl">data</span><span class="p">:</span><span class="n">diskData</span> <span class="nl">options</span><span class="p">:</span><span class="n">options</span> <span class="nl">context</span><span class="p">:</span><span class="n">context</span><span class="p">]</span><span class="p">;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">diskImage</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="nb">self</span><span class="p">.</span><span class="n">config</span><span class="p">.</span><span class="n">shouldCacheImagesInMemory</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">NSUInteger</span> <span class="n">cost</span> <span class="o">=</span> <span class="n">diskImage</span><span class="p">.</span><span class="n">sd_memoryCost</span><span class="p">;</span>
+                <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">memoryCache</span> <span class="nl">setObject</span><span class="p">:</span><span class="n">diskImage</span> <span class="nl">forKey</span><span class="p">:</span><span class="n">key</span> <span class="nl">cost</span><span class="p">:</span><span class="n">cost</span><span class="p">]</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="c1">// call doneBlock
+</span><span class="c1"></span>        <span class="k">if</span> <span class="p">(</span><span class="n">doneBlock</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">shouldQueryDiskSync</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">doneBlock</span><span class="p">(</span><span class="n">diskImage</span><span class="p">,</span> <span class="n">diskData</span><span class="p">,</span> <span class="n">cacheType</span><span class="p">)</span><span class="p">;</span>
+            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                <span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_get_main_queue</span><span class="p">(</span><span class="p">)</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span>
+                    <span class="n">doneBlock</span><span class="p">(</span><span class="n">diskImage</span><span class="p">,</span> <span class="n">diskData</span><span class="p">,</span> <span class="n">cacheType</span><span class="p">)</span><span class="p">;</span>
+                <span class="p">}</span><span class="p">)</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>可以看到，有大量临时内存操作的时候 SD 都会放入 autoreleasepool 中，能保证其会被系统及时释放。还有一定比较重要的是，代码如果执行到这，就一定会有磁盘读取到操作，因此，如果不是必要得到 imageData 可以通过 <strong>SDImageCacheQueryMemoryData</strong> 来提供查询效率；</p>
+<p>补充一点 <code>SDTransformedKeyForKey</code> 的转换逻辑是以 <strong>SDImageTransformer</strong> 的 transformerKey 按顺序依次拼接在 image key 后面。例如：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="err">&#39;</span><span class="n">image</span><span class="p">.</span><span class="n">png</span><span class="err">&#39;</span> <span class="o">|</span><span class="o">&gt;</span> <span class="n">flip</span><span class="p">(</span><span class="nb">YES</span><span class="p">,</span><span class="nb">NO</span><span class="p">)</span> <span class="o">|</span><span class="o">&gt;</span> <span class="n">rotate</span><span class="p">(</span><span class="n">pi</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span><span class="nb">YES</span><span class="p">)</span>  <span class="o">=</span><span class="o">&gt;</span> 
+<span class="err">&#39;</span><span class="n">image</span><span class="o">-</span><span class="n">SDImageFlippingTransformer</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="o">-</span><span class="n">SDImageRotationTransformer</span><span class="p">(</span><span class="mf">0.78539816339</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="p">.</span><span class="n">png</span><span class="err">&#39;</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="imagemanaer">ImageManaer</h2>
+<p>SDImageManger 作为整个库的调度中心，上述各种逻辑的集大成者，它把各个组建串联，从视图 &gt; 下载 &gt; 解码器 &gt; 缓存。而它暴露的核心方法就一个，就是 loadImage:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">@property</span> <span class="p">(</span><span class="k">strong</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">,</span> <span class="k">readonly</span><span class="p">,</span> <span class="n">nonnull</span><span class="p">)</span> <span class="kt">id</span><span class="o">&lt;</span><span class="n">SDImageCache</span><span class="o">&gt;</span> <span class="n">imageCache</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">strong</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">,</span> <span class="k">readonly</span><span class="p">,</span> <span class="n">nonnull</span><span class="p">)</span> <span class="kt">id</span><span class="o">&lt;</span><span class="n">SDImageLoader</span><span class="o">&gt;</span> <span class="n">imageLoader</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">strong</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">,</span> <span class="n">nullable</span><span class="p">)</span> <span class="kt">id</span><span class="o">&lt;</span><span class="n">SDImageTransformer</span><span class="o">&gt;</span> <span class="n">transformer</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">strong</span><span class="p">,</span> <span class="n">nullable</span><span class="p">)</span> <span class="kt">id</span><span class="o">&lt;</span><span class="n">SDWebImageCacheKeyFilter</span><span class="o">&gt;</span> <span class="n">cacheKeyFilter</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">strong</span><span class="p">,</span> <span class="n">nullable</span><span class="p">)</span> <span class="kt">id</span><span class="o">&lt;</span><span class="n">SDWebImageCacheSerializer</span><span class="o">&gt;</span> <span class="n">cacheSerializer</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">strong</span><span class="p">,</span> <span class="n">nullable</span><span class="p">)</span> <span class="kt">id</span><span class="o">&lt;</span><span class="n">SDWebImageOptionsProcessor</span><span class="o">&gt;</span> <span class="n">optionsProcessor</span><span class="p">;</span>
+
+<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">class</span><span class="p">,</span> <span class="n">nullable</span><span class="p">)</span> <span class="kt">id</span><span class="o">&lt;</span><span class="n">SDImageCache</span><span class="o">&gt;</span> <span class="n">defaultImageCache</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">class</span><span class="p">,</span> <span class="n">nullable</span><span class="p">)</span> <span class="kt">id</span><span class="o">&lt;</span><span class="n">SDImageLoader</span><span class="o">&gt;</span> <span class="n">defaultImageLoader</span><span class="p">;</span>
+
+<span class="p">-</span> <span class="p">(</span><span class="n">nullable</span> <span class="n">SDWebImageCombinedOperation</span> <span class="o">*</span><span class="p">)</span><span class="nf">loadImageWithURL:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">NSURL</span> <span class="o">*</span><span class="p">)</span><span class="nv">url</span>
+                                                   <span class="nf">options:</span><span class="p">(</span><span class="n">SDWebImageOptions</span><span class="p">)</span><span class="nv">options</span>
+                                                   <span class="nf">context:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">SDWebImageContext</span> <span class="o">*</span><span class="p">)</span><span class="nv">context</span>
+                                                  <span class="nf">progress:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">SDImageLoaderProgressBlock</span><span class="p">)</span><span class="nv">progressBlock</span>
+                                                 <span class="nf">completed:</span><span class="p">(</span><span class="n">nonnull</span> <span class="n">SDInternalCompletionBlock</span><span class="p">)</span><span class="nv">completedBlock</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这里先简单说一下 cacheKeyFilter、cacheSerializer 和 optionsProcessor 这三个 API，其余的上面都提到过了。</p>
+<p><strong>SDWebImageCacheKeyFilter</strong></p>
+<p>默认情况下，是把 URL.absoluteString 作为 cacheKey ，而如果设置了 fileter 则会对通过 <code>cacheKeyForURL:</code> 对 cacheKey 拦截并进行修改；</p>
+<p><strong>SDWebImageCacheSerializer</strong></p>
+<p>默认情况下，ImageCache 会直接将 downloadData 进行缓存，而当我们使用其他图片格式进行传输时，例如 WEBP 格式的，那么磁盘中的存储则会按 WEBP 格式来。这会产生一个问题，每次当我们需要从磁盘读取 image 时都需要进行重复的编码操作。而通过 CacheSerializer 可以直接将 downloadData 转换为 JPEG/PNG 的格式的 NSData 缓存，从而提高访问效率。</p>
+<p><strong>SDWebImageOptionsProcessor</strong></p>
+<p>用于控制全局的 SDWebImageOptions 和 SDWebImageContext 中的参数。示例如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"> <span class="n">SDWebImageManager</span><span class="p">.</span><span class="n">sharedManager</span><span class="p">.</span><span class="n">optionsProcessor</span> <span class="o">=</span> <span class="p">[</span><span class="n">SDWebImageOptionsProcessor</span> <span class="nl">optionsProcessorWithBlock</span><span class="p">:</span><span class="o">^</span><span class="n">SDWebImageOptionsResult</span> <span class="o">*</span> <span class="n">_Nullable</span><span class="p">(</span><span class="n">NSURL</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">url</span><span class="p">,</span> <span class="n">SDWebImageOptions</span> <span class="n">options</span><span class="p">,</span> <span class="n">SDWebImageContext</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">context</span><span class="p">)</span> <span class="p">{</span>
+     <span class="c1">// Only do animation on `SDAnimatedImageView`
+</span><span class="c1"></span>     <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">context</span><span class="p">[</span><span class="n">SDWebImageContextAnimatedImageClass</span><span class="p">]</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">options</span> <span class="o">|</span><span class="o">=</span> <span class="n">SDWebImageDecodeFirstFrameOnly</span><span class="p">;</span>
+     <span class="p">}</span>
+     <span class="c1">// Do not force decode for png url
+</span><span class="c1"></span>     <span class="k">if</span> <span class="p">(</span><span class="p">[</span><span class="n">url</span><span class="p">.</span><span class="n">lastPathComponent</span> <span class="nl">isEqualToString</span><span class="p">:</span><span class="s">@&#34;</span><span class="s">png</span><span class="s">&#34;</span><span class="p">]</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">options</span> <span class="o">|</span><span class="o">=</span> <span class="n">SDWebImageAvoidDecodeImage</span><span class="p">;</span>
+     <span class="p">}</span>
+     <span class="c1">// Always use screen scale factor
+</span><span class="c1"></span>     <span class="n">SDWebImageMutableContext</span> <span class="o">*</span><span class="n">mutableContext</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSDictionary</span> <span class="nl">dictionaryWithDictionary</span><span class="p">:</span><span class="n">context</span><span class="p">]</span><span class="p">;</span>
+     <span class="n">mutableContext</span><span class="p">[</span><span class="n">SDWebImageContextImageScaleFactor</span><span class="p">]</span> <span class="o">=</span> <span class="l">@(</span><span class="n">UIScreen</span><span class="p">.</span><span class="n">mainScreen</span><span class="p">.</span><span class="n">scale</span><span class="l">)</span><span class="p">;</span>
+     <span class="n">context</span> <span class="o">=</span> <span class="p">[</span><span class="n">mutableContext</span> <span class="k">copy</span><span class="p">]</span><span class="p">;</span>
+ 
+     <span class="k">return</span> <span class="p">[</span><span class="p">[</span><span class="n">SDWebImageOptionsResult</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithOptions</span><span class="p">:</span><span class="n">options</span> <span class="nl">context</span><span class="p">:</span><span class="n">context</span><span class="p">]</span><span class="p">;</span>
+ <span class="p">}</span><span class="p">]</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="loadimage">loadImage</h3>
+<p>接口的的第一个参数 url 作为整个框架的连接核心，却设计成 nullable 应该完全是方便调用方而设计的。内部通过对 url 的 nil 判断以及对 NSString 类型的兼容 (强制转成 NSURL) 以保证后续的流程，否则结束调用。下载开始后又拆分成了一下 6 个方法：</p>
+<ul>
+<li>callCacheProcessForOperation</li>
+<li>callDownloadProcessForOperation</li>
+<li>callStoreCacheProcessForOperation</li>
+<li>callTransformProcessForOperation</li>
+<li>callCompletionBlockForOperation</li>
+<li>safelyRemoveOperationFromRunning</li>
+</ul>
+<p>分别是：缓存查询、下载、存储、转换、执行回调、清理回调。可以发现每个方法都是针对 operation 的操作，operation 在 loadImage 时会准备好，然后开始缓存查询。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">SDWebImageCombinedOperation</span> <span class="o">*</span><span class="n">operation</span> <span class="o">=</span> <span class="p">[</span><span class="n">SDWebImagCombinedOperation</span> <span class="n">new</span><span class="p">]</span><span class="p">;</span>
+<span class="n">operation</span><span class="p">.</span><span class="n">manager</span> <span class="o">=</span> <span class="nb">self</span><span class="p">;</span>
+
+<span class="c1">///  1
+</span><span class="c1"></span><span class="kt">BOOL</span> <span class="n">isFailedUrl</span> <span class="o">=</span> <span class="nb">NO</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">SD_LOCK</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">failedURLsLock</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">isFailedUrl</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">failedURLs</span> <span class="nl">containsObject</span><span class="p">:</span><span class="n">url</span><span class="p">]</span><span class="p">;</span>
+    <span class="n">SD_UNLOCK</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">failedURLsLock</span><span class="p">)</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">url</span><span class="p">.</span><span class="n">absoluteString</span><span class="p">.</span><span class="n">length</span> <span class="o">=</span><span class="o">=</span> <span class="mi">0</span> <span class="o">|</span><span class="o">|</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageRetryFailed</span><span class="p">)</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">isFailedUrl</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">[</span><span class="nb">self</span> <span class="nl">callCompletionBlockForOperation</span><span class="p">:</span><span class="n">operation</span> <span class="nl">completion</span><span class="p">:</span><span class="n">completedBlock</span> <span class="nl">error</span><span class="p">:</span><span class="p">[</span><span class="n">NSError</span> <span class="nl">errorWithDomain</span><span class="p">:</span><span class="n">SDWebImageErrorDomain</span> <span class="nl">code</span><span class="p">:</span><span class="n">SDWebImageErrorInvalidURL</span> <span class="nl">userInfo</span><span class="p">:</span><span class="l">@{</span><span class="nl">NSLocalizedDescriptionKey</span> <span class="p">:</span> <span class="s">@&#34;</span><span class="s">Image url is nil</span><span class="s">&#34;</span><span class="l">}</span><span class="p">]</span> <span class="nl">url</span><span class="p">:</span><span class="n">url</span><span class="p">]</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">operation</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">SD_LOCK</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">runningOperationsLock</span><span class="p">)</span><span class="p">;</span>
+<span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">runningOperations</span> <span class="nl">addObject</span><span class="p">:</span><span class="n">operation</span><span class="p">]</span><span class="p">;</span>
+<span class="n">SD_UNLOCK</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">runningOperationsLock</span><span class="p">)</span><span class="p">;</span>
+
+<span class="c1">// 2. Preprocess the options and context arg to decide the final the result for manager
+</span><span class="c1"></span><span class="n">SDWebImageOptionsResult</span> <span class="o">*</span><span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="nl">processedResultForURL</span><span class="p">:</span><span class="n">url</span> <span class="nl">options</span><span class="p">:</span><span class="n">options</span> <span class="nl">context</span><span class="p">:</span><span class="n">context</span><span class="p">]</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>loadImage</strong> 方法本身不复杂，方法走到最后则会转入缓存查询。在 operation 初始化完，会检查  failedURLs 是否包含当前 url，如果有且 options 为 SDWebImageRetryFailed，直接结束并返回 operation；如果检查通过会将 operation 存入 <code>runningOperations</code> 中。并将 options 和 imageContext 封入 SDWebImageOptionsResult。</p>
+<p>同时，会更新一波 imageContext，主要先将 transformer、cacheKeyFilter、cacheSerializer 存入 imageContext 做为全局默认设置，再调用 <strong>optionsProcessor</strong> 来提供用户的自定义 options 再次加工 imageContext 。这个套路大家应该有印象吧，前面的 ImageLoader 中的 requestModifer 的优先级逻辑与此类似，不过实现方式有些差异。最后转入 CacheProcess。</p>
+<p><strong>loadImage</strong> 过程是使用了 combineOperation，它是 combine 了 cache 和 loader 的操作任务，使其可以一步到位清理缓存查询和下载任务的作用。其声明如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">@interface</span> <span class="nc">SDWebImageCombinedOperation</span> : <span class="nc">NSObject</span> <span class="o">&lt;</span><span class="n">SDWebImageOperation</span><span class="o">&gt;</span>
+<span class="c1">/// imageCache queryImageForKey: 的 operation
+</span><span class="c1"></span><span class="k">@property</span> <span class="p">(</span><span class="k">strong</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">,</span> <span class="n">nullable</span><span class="p">,</span> <span class="k">readonly</span><span class="p">)</span> <span class="kt">id</span><span class="o">&lt;</span><span class="n">SDWebImageOperation</span><span class="o">&gt;</span> <span class="n">cacheOperation</span><span class="p">;</span>
+<span class="c1">/// imageLoader requestImageWithURL: 的 operation
+</span><span class="c1"></span><span class="k">@property</span> <span class="p">(</span><span class="k">strong</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">,</span> <span class="n">nullable</span><span class="p">,</span> <span class="k">readonly</span><span class="p">)</span> <span class="kt">id</span><span class="o">&lt;</span><span class="n">SDWebImageOperation</span><span class="o">&gt;</span> <span class="n">loaderOperation</span><span class="p">;</span>
+<span class="c1">/// Cancel the current operation, including cache and loader process
+</span><span class="c1"></span><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">cancel</span><span class="p">;</span>
+<span class="k">@end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>其提供的 cancel 方法会逐步检查两种类型 opration 然后逐一执行 cancel 操作。</p>
+<p><strong>callCacheProcessForOperation</strong></p>
+<p>先检查 <strong>SDWebImageFromLoaderOnly</strong> 值，判断是否为直接下载的任务，是则转到 downloadProcess。</p>
+<p>否则通过 imageCache 创建查询任务并将其保存到 combineOperation 的 cacheOperation ：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">operation</span><span class="p">.</span><span class="n">cacheOperation</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">imageCache</span> <span class="nl">queryImageForKey</span><span class="p">:</span><span class="n">key</span> <span class="nl">options</span><span class="p">:</span><span class="n">options</span> <span class="nl">context</span><span class="p">:</span><span class="n">context</span> <span class="nl">completion</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">cachedImage</span><span class="p">,</span> <span class="n">NSData</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">cachedData</span><span class="p">,</span> <span class="n">SDImageCacheType</span> <span class="n">cacheType</span><span class="p">)</span> <span class="p">{</span>
+   <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">operation</span> <span class="o">|</span><span class="o">|</span> <span class="n">operation</span><span class="p">.</span><span class="n">isCancelled</span><span class="p">)</span> <span class="p">{</span>
+    	<span class="c1">/// 1  
+</span><span class="c1"></span>   <span class="p">}</span>
+  	<span class="c1">/// 2
+</span><span class="c1"></span><span class="p">}</span><span class="p">]</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>对缓存查询的结果有两种情况需要处理：</p>
+<ol>
+<li>当队列执行到任务时，operaton  已被标志为 canceled 状态，结束下载任务；</li>
+<li>否则转到 downloadProcess 。</li>
+</ol>
+<p><strong>callDownloadProcessForOperation</strong></p>
+<p>下载的实现比较复杂，首先需要决定是否需要新建下载任务，由三个变量控制：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="kt">BOOL</span> <span class="n">shouldDownload</span> <span class="o">=</span> <span class="o">!</span><span class="n">SD_OPTIONS_CONTAINS</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">SDWebImageFromCacheOnly</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">shouldDownload</span> <span class="o">&amp;</span><span class="o">=</span> <span class="p">(</span><span class="o">!</span><span class="n">cachedImage</span> <span class="o">|</span><span class="o">|</span> <span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageRefreshCached</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">shouldDownload</span> <span class="o">&amp;</span><span class="o">=</span> <span class="p">(</span><span class="o">!</span><span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">delegate</span> <span class="nl">respondsToSelector</span><span class="p">:</span><span class="k">@selector</span><span class="p">(</span><span class="nl">imageManager</span><span class="p">:</span><span class="nl">shouldDownloadImageForURL</span><span class="p">:</span><span class="p">)</span><span class="p">]</span> <span class="o">|</span><span class="o">|</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">delegate</span> <span class="nl">imageManager</span><span class="p">:</span><span class="nb">self</span> <span class="nl">shouldDownloadImageForURL</span><span class="p">:</span><span class="n">url</span><span class="p">]</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">shouldDownload</span> <span class="o">&amp;</span><span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">imageLoader</span> <span class="nl">canRequestImageForURL</span><span class="p">:</span><span class="n">url</span><span class="p">]</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>通过 SDWebImageFromCacheOnly 决定是否可以仅从 cache 来获取，或者 cacheImage 是否存在；</li>
+<li>由代理决定是否需要新建下载任务</li>
+<li>通过 imageLoader 控制能否支持下载任务</li>
+</ul>
+<ol>
+<li>
+<p>如果 shouldDownload 为 NO，则结束下载并调用 <strong>callCompletionBlockForOperation</strong> 与 <strong>safelyRemoveOperationFromRunning</strong>。此时如果存在 cacheImage 则会随 completionBlock 一起返回。</p>
+</li>
+<li>
+<p>如果 shouldDownload 为 YES，在新建任务前，如有取到 cacheImage 且 SDWebImageRefreshCached 为 YES，会将其存入 imageContext (没有则创建 imageContext）。终于开始新建下载任务并将其保存在 combineOperation 的 loaderOperation。</p>
+</li>
+<li>
+<p>下载结束后回到 callBack，这里会先处理几种情况：</p>
+<ul>
+<li>operation 被 cancel 则抛弃下载的 image、data ，callCompletionBlock 结束下载；</li>
+<li>reqeust 被 cancel 导致的 error，callCompletionBlock 结束下载；</li>
+<li>图片刷新但是仍名字了 URLCache 则 do nothing；</li>
+<li>errro 出错，callCompletionBlockForOperation 并将 url 添加至 failedURLs；</li>
+<li>均无以上情况，如果是通过 retry 成功的，会先将 url 从 failedURLs 中移除，调用 storeCacheProcess；</li>
+</ul>
+<p>最后会对标记为 finished 的执行 safelyRemoveOperation；</p>
+</li>
+</ol>
+<p><strong>callStoreCacheProcessForOperation</strong></p>
+<p>先从 imageContext 中取出 storeCacheType、originalStoreCacheType、transformer、cacheSerializer，判断是否需要存储转换后图像数据、原始数据、等待缓存存储结束：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="kt">BOOL</span> <span class="n">shouldTransformImage</span> <span class="o">=</span> <span class="n">downloadedImage</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="p">(</span><span class="o">!</span><span class="n">downloadedImage</span><span class="p">.</span><span class="n">sd_isAnimated</span> <span class="o">|</span><span class="o">|</span> <span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageTransformAnimatedImage</span><span class="p">)</span><span class="p">)</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">transformer</span><span class="p">;</span>
+<span class="kt">BOOL</span> <span class="n">shouldCacheOriginal</span> <span class="o">=</span> <span class="n">downloadedImage</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">finished</span><span class="p">;</span>
+<span class="kt">BOOL</span> <span class="n">waitStoreCache</span> <span class="o">=</span> <span class="n">SD_OPTIONS_CONTAINS</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">SDWebImageWaitStoreCache</span><span class="p">)</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>如果 shouldCacheOriginal 为 NO，直接转入 transformProcess。否则，先确认存储类型是否为原始数据：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="c1">// normally use the store cache type, but if target image is transformed, use original store cache type instead
+</span><span class="c1"></span>        <span class="n">SDImageCacheType</span> <span class="n">targetStoreCacheType</span> <span class="o">=</span> <span class="n">shouldTransformImage</span> <span class="o">?</span> <span class="nl">originalStoreCacheType</span> <span class="p">:</span> <span class="n">storeCacheType</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>存储时如果 cacheSerializer 存在则会先转换数据格式，最终都调用 <code>[self stroageImage: ...]</code> 。</p>
+<p>当存储结束时，转入最后一步，transformProcess。</p>
+<p><strong>callTransformProcessForOperation</strong></p>
+<p>转换开始前会例行判断是否需要转换，为 false 则 callCompletionBlock 结束下载，判断如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c">
+<span class="kt">id</span><span class="o">&lt;</span><span class="n">SDImageTransformer</span><span class="o">&gt;</span> <span class="n">transformer</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">SDWebImageContextImageTransformer</span><span class="p">]</span><span class="p">;</span>
+<span class="kt">id</span><span class="o">&lt;</span><span class="n">SDWebImageCacheSerializer</span><span class="o">&gt;</span> <span class="n">cacheSerializer</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">SDWebImageContextCacheSerializer</span><span class="p">]</span><span class="p">;</span>
+<span class="kt">BOOL</span> <span class="n">shouldTransformImage</span> <span class="o">=</span> <span class="n">originalImage</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="p">(</span><span class="o">!</span><span class="n">originalImage</span><span class="p">.</span><span class="n">sd_isAnimated</span> <span class="o">|</span><span class="o">|</span> <span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageTransformAnimatedImage</span><span class="p">)</span><span class="p">)</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">transformer</span><span class="p">;</span>
+<span class="kt">BOOL</span> <span class="n">waitStoreCache</span> <span class="o">=</span> <span class="n">SD_OPTIONS_CONTAINS</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">SDWebImageWaitStoreCache</span><span class="p">)</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>如果需要转换，会进入全局队列开始处理：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_get_global_queue</span><span class="p">(</span><span class="n">DISPATCH_QUEUE_PRIORITY_HIGH</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span>
+    <span class="k">@autoreleasepool</span> <span class="p">{</span>
+        <span class="n">UIImage</span> <span class="o">*</span><span class="n">transformedImage</span> <span class="o">=</span> <span class="p">[</span><span class="n">transformer</span> <span class="nl">transformedImageWithImage</span><span class="p">:</span><span class="n">originalImage</span> <span class="nl">forKey</span><span class="p">:</span><span class="n">key</span><span class="p">]</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">transformedImage</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">finished</span><span class="p">)</span> <span class="p">{</span>
+				<span class="c1">/// 1
+</span><span class="c1"></span>        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+				<span class="n">callCompletionBlock</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span><span class="p">)</span><span class="p">;</span>        
+</code></pre></td></tr></table>
+</div>
+</div><p>转换成功后，会依据 <code>cacheData = [cacheSerializer cacheDataWithImage: originalData: imageURL:];</code>  进行 <code>[self storageImage: ...]</code>存储图片。存储结束后 callCompletionBlock。</p>
+<h2 id="heading-1">总结</h2>
+<p>整个框架的脉络，到此就结束了。这次先整体介绍，希望大家看完能够大概知道 SD 的 work-flow 很重要，以及一些细节上到处理和思考。个人感受，SD 5.0 更多的是其结构设计上的很多思路值得借鉴。</p>
+<ul>
+<li>如何设计一个稳定可扩展的 API 同时能支持安全动态添加参数？</li>
+<li>如果设计一个解耦可以动态插拔的架构？</li>
+</ul>
+<p>不过，这篇其实还少了 SDImageCoder，这个留到下一篇的 SDWebImage 插件及其扩展上来说。</p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">土土Edmond木</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2020-02-22
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/sourcecode/">SourceCode</a>
+          <a href="/tags/ios/">iOS</a>
+          <a href="/tags/cache/">cache</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/sourcecode-ios/source-code-sdweb-2/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">源码浅析 SDWebImage 5.5.2 - WebP Plugin</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/sourcecode-ios/source-code-mmkv/">
+            <span class="next-text nav-default">源码浅析 - MMKV iOS</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:chun574271939@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://twitter.com/looseyi" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="https://github.com/looseyi" class="iconfont icon-github" title="github"></a>
+      <a href="https://www.weibo.com/foreverclp" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="https://www.zhihu.com/people/tu-tu-edmondmu" class="iconfont icon-zhihu" title="zhihu"></a>
+  <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2019-12-11 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">土土Edmond木</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

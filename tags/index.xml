@@ -6,10 +6,37 @@
     <description>Recent content in Tags on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Wed, 11 Mar 2020 23:08:12 +0800</lastBuildDate>
+    <lastBuildDate>Mon, 16 Mar 2020 23:10:58 +0800</lastBuildDate>
     
 	<atom:link href="http://localhost:1313/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>iOS</title>
+      <link>http://localhost:1313/tags/ios/</link>
+      <pubDate>Mon, 16 Mar 2020 23:10:58 +0800</pubDate>
+      
+      <guid>http://localhost:1313/tags/ios/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Reactive</title>
+      <link>http://localhost:1313/tags/reactive/</link>
+      <pubDate>Mon, 16 Mar 2020 23:10:58 +0800</pubDate>
+      
+      <guid>http://localhost:1313/tags/reactive/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>SourceCode</title>
+      <link>http://localhost:1313/tags/sourcecode/</link>
+      <pubDate>Mon, 16 Mar 2020 23:10:58 +0800</pubDate>
+      
+      <guid>http://localhost:1313/tags/sourcecode/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>cache</title>
@@ -21,27 +48,9 @@
     </item>
     
     <item>
-      <title>iOS</title>
-      <link>http://localhost:1313/tags/ios/</link>
-      <pubDate>Wed, 11 Mar 2020 23:08:12 +0800</pubDate>
-      
-      <guid>http://localhost:1313/tags/ios/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>source-code</title>
-      <link>http://localhost:1313/tags/source-code/</link>
-      <pubDate>Wed, 11 Mar 2020 23:08:12 +0800</pubDate>
-      
-      <guid>http://localhost:1313/tags/source-code/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>Binary</title>
       <link>http://localhost:1313/tags/binary/</link>
-      <pubDate>Sat, 21 Dec 2019 11:37:41 +2100</pubDate>
+      <pubDate>Mon, 06 Jan 2020 11:40:06 +2100</pubDate>
       
       <guid>http://localhost:1313/tags/binary/</guid>
       <description></description>
@@ -50,7 +59,7 @@
     <item>
       <title>CocoaPods</title>
       <link>http://localhost:1313/tags/cocoapods/</link>
-      <pubDate>Sat, 21 Dec 2019 11:37:41 +2100</pubDate>
+      <pubDate>Mon, 06 Jan 2020 11:40:06 +2100</pubDate>
       
       <guid>http://localhost:1313/tags/cocoapods/</guid>
       <description></description>

@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>源码浅析 RxSwift 5.0 - Subscription - </title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="土土Edmond木" /><meta name="description" content="前言 ReactiveX 它是一个与语言无关的编程思想。作为成员框架之一 RxSwift 落地了大部分 ReactiveX 中关于流的操作。官方描述： An API for asynchronous programming with observable streams ReactiveX is a combination of the best ideas from the Observer pattern, the Iterator pattern," /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.62.0 with theme even" />
+
+
+<link rel="canonical" href="http://localhost:1313/post/sourcecode-ios/source-code-rxswift/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="源码浅析 RxSwift 5.0 - Subscription" />
+<meta property="og:description" content="前言 ReactiveX 它是一个与语言无关的编程思想。作为成员框架之一 RxSwift 落地了大部分 ReactiveX 中关于流的操作。官方描述： An API for asynchronous programming with observable streams ReactiveX is a combination of the best ideas from the Observer pattern, the Iterator pattern," />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/post/sourcecode-ios/source-code-rxswift/" />
+<meta property="article:published_time" content="2020-03-16T23:10:58+08:00" />
+<meta property="article:modified_time" content="2020-03-16T23:10:58+08:00" />
+<meta itemprop="name" content="源码浅析 RxSwift 5.0 - Subscription">
+<meta itemprop="description" content="前言 ReactiveX 它是一个与语言无关的编程思想。作为成员框架之一 RxSwift 落地了大部分 ReactiveX 中关于流的操作。官方描述： An API for asynchronous programming with observable streams ReactiveX is a combination of the best ideas from the Observer pattern, the Iterator pattern,">
+<meta itemprop="datePublished" content="2020-03-16T23:10:58&#43;08:00" />
+<meta itemprop="dateModified" content="2020-03-16T23:10:58&#43;08:00" />
+<meta itemprop="wordCount" content="4163">
+
+
+
+<meta itemprop="keywords" content="SourceCode,iOS,Reactive," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="源码浅析 RxSwift 5.0 - Subscription"/>
+<meta name="twitter:description" content="前言 ReactiveX 它是一个与语言无关的编程思想。作为成员框架之一 RxSwift 落地了大部分 ReactiveX 中关于流的操作。官方描述： An API for asynchronous programming with observable streams ReactiveX is a combination of the best ideas from the Observer pattern, the Iterator pattern,"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Aha Moment</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Aha Moment</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">源码浅析 RxSwift 5.0 - Subscription</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-03-16 </span>
+        
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#heading">前言</a></li>
+      </ul>
+    </li>
+    <li><a href="#observable">Observable</a></li>
+    <li><a href="#producer">Producer</a>
+      <ul>
+        <li><a href="#sinkdisposer">SinkDisposer</a></li>
+      </ul>
+    </li>
+    <li><a href="#subscription">Subscription</a>
+      <ul>
+        <li></li>
+      </ul>
+    </li>
+    <li><a href="#sink">Sink</a></li>
+    <li><a href="#heading-1">总结</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h3 id="heading">前言</h3>
+<p>ReactiveX 它是一个与语言无关的编程思想。作为成员框架之一 RxSwift 落地了大部分 ReactiveX 中关于流的操作。官方描述：</p>
+<blockquote>
+<p>An API for asynchronous programming with observable streams</p>
+</blockquote>
+<blockquote>
+<p>ReactiveX is a combination of the best ideas from the Observer pattern, the Iterator pattern, and functional programming</p>
+</blockquote>
+<p>本篇主要介绍 RxSwift 的内部流是如何传递及实现。关于响应式编程在 iOS 已经是一个很老的概念了，有很多好文章，比如 <a href="https://halfrost.com/tag/rac/">FRP</a> 系列。如果你在项目中犹豫使用哪个框架可以看看这两篇文章的分析：</p>
+<ul>
+<li><a href="https://dreampiggy.com/2016/11/17/FRP%E7%AE%80%E4%BB%8B%E2%80%94ReactiveCocoa%E3%80%81RxSwift%E3%80%81Bacon%E4%BB%A5%E5%8F%8A%E8%83%8C%E5%90%8E%E7%9A%84Functional/">FRP对比—ReactiveCocoa、RxSwift、Bacon以及背后的Functional</a></li>
+<li><a href="https://www.jianshu.com/p/2f83b766a081">iOS响应式编程：ReactiveCocoa vs RxSwift 选谁好</a></li>
+</ul>
+<h2 id="observable">Observable</h2>
+<p>既然一切皆流，那就从流的创建讲起。上代码：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="n">Observable</span><span class="p">.</span><span class="n">of</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="p">.</span><span class="n">subscribe</span><span class="p">(</span> <span class="p">{</span> <span class="bp">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span><span class="p">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>我们把 <strong>Swift.Sequence&lt;Int&gt;</strong> 序列转换为了 Observable 的观察流，<code>of(_:)</code>在 <a href="https://github.com/ReactiveX/RxSwift/blob/c6c0c540109678b96639c25e9c0ebe4a6d7a69a9/RxSwift/Observables/Sequence.swift">Sequence.swift</a> 的声明如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">extension</span> <span class="nc">ObservableType</span> <span class="p">{</span>
+   
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">of</span><span class="p">(</span><span class="kc">_</span> <span class="n">elements</span><span class="p">:</span> <span class="n">Element</span> <span class="p">.</span><span class="p">.</span><span class="p">.</span><span class="p">,</span> <span class="n">scheduler</span><span class="p">:</span> <span class="n">ImmediateSchedulerType</span> <span class="p">=</span> <span class="n">CurrentThreadScheduler</span><span class="p">.</span><span class="n">instance</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">Observable</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">ObservableSequence</span><span class="p">(</span><span class="n">elements</span><span class="p">:</span> <span class="n">elements</span><span class="p">,</span> <span class="n">scheduler</span><span class="p">:</span> <span class="n">scheduler</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这里利用了 Swift 的 <a href="https://docs.swift.org/swift-book/LanguageGuide/Protocols.html#">Protcol Extesion</a> 来为 ObservableType 添加默认实现。把 Sequence&lt;Int&gt; 存入了 ObservableSequence 中返回。先看一下 Observable 相关的继承链：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="o">|</span> <span class="o">---</span> <span class="n">ObservableSequence</span>
+    <span class="o">|</span> <span class="o">---</span> <span class="n">Producer</span>
+        <span class="o">|</span> <span class="o">---</span> <span class="n">Observable</span>
+            <span class="o">|</span> <span class="o">---</span> <span class="n">ObservableType</span>
+                <span class="o">|</span> <span class="o">---</span> <span class="n">ObservableConvertibleType</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>从根协议 ObservableConvertibleType 说起，利用关联类型声明了泛型方法 asObservable:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">public</span> <span class="kd">protocol</span> <span class="nc">ObservableConvertibleType</span> <span class="p">{</span>
+    <span class="c1">//</span><span class="c1">/</span><span class="c1"> </span><span class="c1">T</span><span class="c1">y</span><span class="c1">p</span><span class="c1">e</span><span class="c1"> </span><span class="c1">o</span><span class="c1">f</span><span class="c1"> </span><span class="c1">e</span><span class="c1">l</span><span class="c1">e</span><span class="c1">m</span><span class="c1">e</span><span class="c1">n</span><span class="c1">t</span><span class="c1">s</span><span class="c1"> </span><span class="c1">i</span><span class="c1">n</span><span class="c1"> </span><span class="c1">s</span><span class="c1">e</span><span class="c1">q</span><span class="c1">u</span><span class="c1">e</span><span class="c1">n</span><span class="c1">c</span><span class="c1">e</span><span class="c1">.</span>
+    <span class="n">associatedtype</span> <span class="n">Element</span>
+    <span class="kd">func</span> <span class="nf">asObservable</span><span class="p">(</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">Observable</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>ObservableType 则增加了 <code>subscribe(_:)</code> 方法：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">public</span> <span class="kd">protocol</span> <span class="nc">ObservableType</span><span class="p">:</span> <span class="n">ObservableConvertibleType</span> <span class="p">{</span>
+   
+    <span class="kd">func</span> <span class="nf">subscribe</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">:</span> <span class="n">ObserverType</span><span class="p">&gt;</span><span class="p">(</span><span class="kc">_</span> <span class="n">observer</span><span class="p">:</span> <span class="n">Observer</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">Disposable</span> <span class="k">where</span> <span class="n">Observer</span><span class="p">.</span><span class="n">Element</span> <span class="p">=</span><span class="p">=</span> <span class="n">Element</span>
+<span class="p">}</span>
+
+<span class="kd">extension</span> <span class="nc">ObservableType</span> <span class="p">{</span>
+    <span class="c1">//</span><span class="c1">/</span><span class="c1"> </span><span class="c1">D</span><span class="c1">e</span><span class="c1">f</span><span class="c1">a</span><span class="c1">u</span><span class="c1">l</span><span class="c1">t</span><span class="c1"> </span><span class="c1">i</span><span class="c1">m</span><span class="c1">p</span><span class="c1">l</span><span class="c1">e</span><span class="c1">m</span><span class="c1">e</span><span class="c1">n</span><span class="c1">t</span><span class="c1">a</span><span class="c1">t</span><span class="c1">i</span><span class="c1">o</span><span class="c1">n</span><span class="c1"> </span><span class="c1">o</span><span class="c1">f</span><span class="c1"> </span><span class="c1">c</span><span class="c1">o</span><span class="c1">n</span><span class="c1">v</span><span class="c1">e</span><span class="c1">r</span><span class="c1">t</span><span class="c1">i</span><span class="c1">n</span><span class="c1">g</span><span class="c1"> </span><span class="c1">`</span><span class="c1">O</span><span class="c1">b</span><span class="c1">s</span><span class="c1">e</span><span class="c1">r</span><span class="c1">v</span><span class="c1">a</span><span class="c1">b</span><span class="c1">l</span><span class="c1">e</span><span class="c1">T</span><span class="c1">y</span><span class="c1">p</span><span class="c1">e</span><span class="c1">`</span><span class="c1"> </span><span class="c1">t</span><span class="c1">o</span><span class="c1"> </span><span class="c1">`</span><span class="c1">O</span><span class="c1">b</span><span class="c1">s</span><span class="c1">e</span><span class="c1">r</span><span class="c1">v</span><span class="c1">a</span><span class="c1">b</span><span class="c1">l</span><span class="c1">e</span><span class="c1">`</span><span class="c1">.</span>
+    <span class="kd">public</span> <span class="kd">func</span> <span class="nf">asObservable</span><span class="p">(</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">Observable</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span> <span class="p">{</span>
+        <span class="c1">//</span><span class="c1"> </span><span class="c1">t</span><span class="c1">e</span><span class="c1">m</span><span class="c1">p</span><span class="c1">o</span><span class="c1">r</span><span class="c1">a</span><span class="c1">r</span><span class="c1">y</span><span class="c1"> </span><span class="c1">w</span><span class="c1">o</span><span class="c1">r</span><span class="c1">k</span><span class="c1">a</span><span class="c1">r</span><span class="c1">o</span><span class="c1">u</span><span class="c1">n</span><span class="c1">d</span>
+        <span class="c1">//</span><span class="c1">r</span><span class="c1">e</span><span class="c1">t</span><span class="c1">u</span><span class="c1">r</span><span class="c1">n</span><span class="c1"> </span><span class="c1">O</span><span class="c1">b</span><span class="c1">s</span><span class="c1">e</span><span class="c1">r</span><span class="c1">v</span><span class="c1">a</span><span class="c1">b</span><span class="c1">l</span><span class="c1">e</span><span class="c1">.</span><span class="c1">c</span><span class="c1">r</span><span class="c1">e</span><span class="c1">a</span><span class="c1">t</span><span class="c1">e</span><span class="c1">(</span><span class="c1">s</span><span class="c1">u</span><span class="c1">b</span><span class="c1">s</span><span class="c1">c</span><span class="c1">r</span><span class="c1">i</span><span class="c1">b</span><span class="c1">e</span><span class="c1">:</span><span class="c1"> </span><span class="c1">s</span><span class="c1">e</span><span class="c1">l</span><span class="c1">f</span><span class="c1">.</span><span class="c1">s</span><span class="c1">u</span><span class="c1">b</span><span class="c1">s</span><span class="c1">c</span><span class="c1">r</span><span class="c1">i</span><span class="c1">b</span><span class="c1">e</span><span class="c1">)</span>
+        <span class="k">return</span> <span class="n">Observable</span><span class="p">.</span><span class="n">create</span> <span class="p">{</span> <span class="n">o</span> <span class="k">in</span>
+            <span class="k">return</span> <span class="kc">self</span><span class="p">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>同时，利用 subscribe 方法完成了对 <code>asObservable()</code> 默认实现的扩展。</p>
+<p>关于上面的 temporary workaround 注释，翻了一下 <a href="https://github.com/ReactiveX/RxSwift/blob/master/RxSwift/ObservableType.swift">ObservableType.swift</a> 的 git history 是在 Swift 3.0 添加的。这种写法在 Swift 5.0 是可以 work 的。</p>
+<p>为什么可以这么写呢  ？</p>
+<p>我们先看 <code>creat(_:)</code> 的声明，在 <a href="https://github.com/ReactiveX/RxSwift/blob/master/RxSwift/Observables/Create.swift">Create.swift</a> 中定义：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">extension</span> <span class="nc">ObservableType</span> <span class="p">{</span>
+   
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">create</span><span class="p">(</span><span class="kc">_</span> <span class="n">subscribe</span><span class="p">:</span> <span class="p">@</span><span class="n">escaping</span> <span class="p">(</span><span class="n">AnyObserver</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">Disposable</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">Observable</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">AnonymousObservable</span><span class="p">(</span><span class="n">subscribe</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>参数是 closure，而 closure 本质就是匿名函数，在 Swift 中函数作为一等公民，是可以直接作为入参的。因此，上面可以省略 closure 直接写成：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="k">return</span> <span class="n">Observable</span><span class="p">.</span><span class="n">create</span><span class="p">(</span><span class="kc">self</span><span class="p">.</span><span class="n">subscribe</span><span class="p">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>最后看 Observable ：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Observable</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span> <span class="p">:</span> <span class="n">ObservableType</span> <span class="p">{</span>
+    
+    <span class="kd">public</span> <span class="kd">func</span> <span class="nf">subscribe</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">:</span> <span class="n">ObserverType</span><span class="p">&gt;</span><span class="p">(</span><span class="kc">_</span> <span class="n">observer</span><span class="p">:</span> <span class="n">Observer</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">Disposable</span> <span class="k">where</span> <span class="n">Observer</span><span class="p">.</span><span class="n">Element</span> <span class="p">=</span><span class="p">=</span> <span class="n">Element</span> <span class="p">{</span>
+        <span class="n">rxAbstractMethod</span><span class="p">(</span><span class="p">)</span>
+    <span class="p">}</span>
+    
+    <span class="kd">public</span> <span class="kd">func</span> <span class="nf">asObservable</span><span class="p">(</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">Observable</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="kc">self</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>作为一个抽象类，仅做了两件事：</p>
+<ol>
+<li>将<code>subscribe(_:)</code>方法标记为空方法，并通过 <a href="https://swifter.tips/fatalerror/">fatalError</a> 强制要求子类去实现；</li>
+<li>在 <code>asObservable() </code> 中将 self 直接 return。</li>
+</ol>
+<p>上面代码其实忽略了 <code>init()</code> 和 <code>deinit()</code> 的方法实现，RxSwift 在这两方法中引入了内部的资源统计，用于 debug，感兴趣的可以自行了解，实现如下:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">init</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
+    <span class="cp">#if</span> <span class="cp">TRACE_RESOURCES</span>
+        <span class="kc">_</span> <span class="p">=</span> <span class="n">Resources</span><span class="p">.</span><span class="n">incrementTotal</span><span class="p">(</span><span class="p">)</span>
+    <span class="cp">#endif</span>
+<span class="p">}</span>
+<span class="kd">deinit</span> <span class="p">{</span>
+    <span class="cp">#if</span> <span class="cp">TRACE_RESOURCES</span>
+        <span class="kc">_</span> <span class="p">=</span> <span class="n">Resources</span><span class="p">.</span><span class="n">decrementTotal</span><span class="p">(</span><span class="p">)</span>
+    <span class="cp">#endif</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="producer">Producer</h2>
+<p>前面 <code>of(_:)</code> 方法返回的 ObservableSequence 是 Producer 的具体子类。看一下 <a href="https://github.com/ReactiveX/RxSwift/blob/c6c0c540109678b96639c25e9c0ebe4a6d7a69a9/RxSwift/Observables/Producer.swift">Producer</a>：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">class</span> <span class="nc">Producer</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span> <span class="p">:</span> <span class="n">Observable</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span> <span class="p">{</span>
+    <span class="kr">override</span> <span class="kd">func</span> <span class="nf">subscribe</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">:</span> <span class="n">ObserverType</span><span class="p">&gt;</span><span class="p">(</span><span class="kc">_</span> <span class="n">observer</span><span class="p">:</span> <span class="n">Observer</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">Disposable</span> <span class="k">where</span> <span class="n">Observer</span><span class="p">.</span><span class="n">Element</span> <span class="p">=</span><span class="p">=</span> <span class="n">Element</span> <span class="p">{</span>
+        <span class="c1">//</span><span class="c1">/</span><span class="c1"> </span><span class="c1">S</span><span class="c1">c</span><span class="c1">h</span><span class="c1">e</span><span class="c1">d</span><span class="c1">u</span><span class="c1">l</span><span class="c1">e</span><span class="c1">r</span><span class="c1"> </span><span class="c1">{</span>
+        <span class="kd">let</span> <span class="nv">disposer</span> <span class="p">=</span> <span class="n">SinkDisposer</span><span class="p">(</span><span class="p">)</span>
+        <span class="kd">let</span> <span class="nv">sinkAndSubscription</span> <span class="p">=</span> <span class="kc">self</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">observer</span><span class="p">,</span> <span class="n">cancel</span><span class="p">:</span> <span class="n">disposer</span><span class="p">)</span>
+        <span class="n">disposer</span><span class="p">.</span><span class="n">setSinkAndSubscription</span><span class="p">(</span><span class="n">sink</span><span class="p">:</span> <span class="n">sinkAndSubscription</span><span class="p">.</span><span class="n">sink</span><span class="p">,</span> <span class="n">subscription</span><span class="p">:</span> <span class="n">sinkAndSubscription</span><span class="p">.</span><span class="n">subscription</span><span class="p">)</span>
+        <span class="c1">//</span><span class="c1">/</span><span class="c1"> </span><span class="c1">}</span>
+    <span class="p">}</span>
+
+    <span class="kd">func</span> <span class="nf">run</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">:</span> <span class="n">ObserverType</span><span class="p">&gt;</span><span class="p">(</span><span class="kc">_</span> <span class="n">observer</span><span class="p">:</span> <span class="n">Observer</span><span class="p">,</span> <span class="n">cancel</span><span class="p">:</span> <span class="n">Cancelable</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="p">(</span><span class="n">sink</span><span class="p">:</span> <span class="n">Disposable</span><span class="p">,</span> <span class="n">subscription</span><span class="p">:</span> <span class="n">Disposable</span><span class="p">)</span> <span class="k">where</span> <span class="n">Observer</span><span class="p">.</span><span class="n">Element</span> <span class="p">=</span><span class="p">=</span> <span class="n">Element</span> <span class="p">{</span>
+        <span class="n">rxAbstractMethod</span><span class="p">(</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>Scheduler 是 RxSwift 中相关的线程调度，它会根据标识选择相应线程去处理任务，先忽略。</p>
+</blockquote>
+<p><code>run(_:cancel:)</code> 作为抽象方法，它是出发 Observable 订阅逻辑的，先忽略。主要看 <code>subscribe(_:)</code> 的内容：</p>
+<ol>
+<li>判断是否需要用 <code>Scheduler</code> 切换线程来进行调用；</li>
+<li>创建 SinkDisposer，和 obserer 一起作为 <code>run(_:cancel:)</code> 的入参；</li>
+<li>执行 <code>run(_:cancel:)</code> 然后将结果保存到 sinkDisposer 中，并返回；</li>
+</ol>
+<p>对于存入 sinkDisposer 的执行结果我们在后面展开，先看 SinkDisposer 类。</p>
+<h3 id="sinkdisposer">SinkDisposer</h3>
+<blockquote>
+<p>The returned disposable needs to release all references once it was disposed.</p>
+</blockquote>
+<p>SinkDisposer 用于保证所有引用资源的最终释放。其声明如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">private</span> <span class="kr">final</span> <span class="kd">class</span> <span class="nc">SinkDisposer</span><span class="p">:</span> <span class="n">Cancelable</span> <span class="p">{</span>
+    <span class="kd">private</span> <span class="kd">enum</span> <span class="nc">DisposeState</span><span class="p">:</span> <span class="nb">Int32</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="n">disposed</span> <span class="p">=</span> <span class="mi">1</span>
+        <span class="k">case</span> <span class="n">sinkAndSubscriptionSet</span> <span class="p">=</span> <span class="mi">2</span>
+    <span class="p">}</span>
+
+    <span class="kd">private</span> <span class="kd">let</span> <span class="nv">_state</span> <span class="p">=</span> <span class="n">AtomicInt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="kd">private</span> <span class="kd">var</span> <span class="nv">_sink</span><span class="p">:</span> <span class="n">Disposable</span><span class="p">?</span>
+    <span class="kd">private</span> <span class="kd">var</span> <span class="nv">_subscription</span><span class="p">:</span> <span class="n">Disposable</span><span class="p">?</span>
+
+    <span class="kd">var</span> <span class="nv">isDisposed</span><span class="p">:</span> <span class="nb">Bool</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">isFlagSet</span><span class="p">(</span><span class="kc">self</span><span class="p">.</span><span class="n">_state</span><span class="p">,</span> <span class="n">DisposeState</span><span class="p">.</span><span class="n">disposed</span><span class="p">.</span><span class="n">rawValue</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="kd">func</span> <span class="nf">setSinkAndSubscription</span><span class="p">(</span><span class="n">sink</span><span class="p">:</span> <span class="n">Disposable</span><span class="p">,</span> <span class="n">subscription</span><span class="p">:</span> <span class="n">Disposable</span><span class="p">)</span> <span class="p">{</span> <span class="p">.</span><span class="p">.</span><span class="p">.</span> <span class="p">}</span>
+
+    <span class="kd">func</span> <span class="nf">dispose</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span> <span class="p">.</span><span class="p">.</span><span class="p">.</span> <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这里的 sink 与 subscription 先简单说明一下，后面会单独剖析。</p>
+<p><strong>Sink</strong>：主要功能就是连接序列，先将源事件流经过 transform 转换为新的流，再向观察者传递；</p>
+<p><strong>Subscription</strong>：则是流的订阅操作，如果是 Swift.Sequence 的序列它会递归调用；</p>
+<p>先看一下它的继承关系：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="o">|</span> <span class="o">---</span> <span class="n">SinkDisposer</span>
+    <span class="o">|</span> <span class="o">---</span> <span class="n">Cancelable</span>
+        <span class="o">|</span> <span class="o">---</span> <span class="n">Disposable</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>Cancelable，用于标识资源是否被释放：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">public</span> <span class="kd">protocol</span> <span class="nc">Cancelable</span> <span class="p">:</span> <span class="n">Disposable</span> <span class="p">{</span>
+    <span class="c1">//</span><span class="c1">/</span><span class="c1"> </span><span class="c1">W</span><span class="c1">a</span><span class="c1">s</span><span class="c1"> </span><span class="c1">r</span><span class="c1">e</span><span class="c1">s</span><span class="c1">o</span><span class="c1">u</span><span class="c1">r</span><span class="c1">c</span><span class="c1">e</span><span class="c1"> </span><span class="c1">d</span><span class="c1">i</span><span class="c1">s</span><span class="c1">p</span><span class="c1">o</span><span class="c1">s</span><span class="c1">e</span><span class="c1">d</span><span class="c1">.</span>
+    <span class="kd">var</span> <span class="nv">isDisposed</span><span class="p">:</span> <span class="nb">Bool</span> <span class="p">{</span> <span class="kr">get</span> <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>Disposable 则是用于释放资源:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">public</span> <span class="kd">protocol</span> <span class="nc">Disposable</span> <span class="p">{</span>
+    <span class="c1">//</span><span class="c1">/</span><span class="c1"> </span><span class="c1">D</span><span class="c1">i</span><span class="c1">s</span><span class="c1">p</span><span class="c1">o</span><span class="c1">s</span><span class="c1">e</span><span class="c1"> </span><span class="c1">r</span><span class="c1">e</span><span class="c1">s</span><span class="c1">o</span><span class="c1">u</span><span class="c1">r</span><span class="c1">c</span><span class="c1">e</span><span class="c1">.</span>
+    <span class="kd">func</span> <span class="nf">dispose</span><span class="p">(</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>那 sinkDisposer 对保存结果做了什么处理，又是如何来释放资源的呢？</p>
+<p>####setSinkAndSubscription</p>
+<p>实现如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kc">self</span><span class="p">.</span><span class="n">_sink</span> <span class="p">=</span> <span class="n">sink</span>
+<span class="kc">self</span><span class="p">.</span><span class="n">_subscription</span> <span class="p">=</span> <span class="n">subscription</span>
+
+<span class="kd">let</span> <span class="nv">previousState</span> <span class="p">=</span> <span class="n">fetchOr</span><span class="p">(</span><span class="kc">self</span><span class="p">.</span><span class="n">_state</span><span class="p">,</span> <span class="n">DisposeState</span><span class="p">.</span><span class="n">sinkAndSubscriptionSet</span><span class="p">.</span><span class="n">rawValue</span><span class="p">)</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">previousState</span> <span class="o">&amp;</span> <span class="n">DisposeState</span><span class="p">.</span><span class="n">sinkAndSubscriptionSet</span><span class="p">.</span><span class="n">rawValue</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+    <span class="n">rxFatalError</span><span class="p">(</span><span class="s">&#34;</span><span class="s">Sink and subscription were already set</span><span class="s">&#34;</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">previousState</span> <span class="o">&amp;</span> <span class="n">DisposeState</span><span class="p">.</span><span class="n">disposed</span><span class="p">.</span><span class="n">rawValue</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+    <span class="n">sink</span><span class="p">.</span><span class="n">dispose</span><span class="p">(</span><span class="p">)</span>
+    <span class="n">subscription</span><span class="p">.</span><span class="n">dispose</span><span class="p">(</span><span class="p">)</span>
+    <span class="kc">self</span><span class="p">.</span><span class="n">_sink</span> <span class="p">=</span> <span class="kc">nil</span>
+    <span class="kc">self</span><span class="p">.</span><span class="n">_subscription</span> <span class="p">=</span> <span class="kc">nil</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><ol>
+<li>保存 sink 和 subscription （通过声明可知，这两均为 Disposable）</li>
+<li>获取 previousState；</li>
+<li>如果 previousState 为 .sinkAndSubscriptionSet，则直接抛错来防止重复调用；</li>
+<li>如果 previousState 为 .disposed，则对 sink 和 subscription 执行 <code>dispose()</code> 以释放资源，同时将它们置 nil。</li>
+</ol>
+<p>这里，可能有小伙伴有疑问，一个 state 如何保存两个状态？来瞅一眼 <a href="https://github.com/ReactiveX/RxSwift/blob/master/Platform/AtomicInt.swift">AtomicInt</a> 简化后的部分实现：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kr">final</span> <span class="kd">class</span> <span class="nc">AtomicInt</span><span class="p">:</span> <span class="n">NSLock</span> <span class="p">{</span>
+    <span class="n">fileprivate</span> <span class="kd">var</span> <span class="nv">value</span><span class="p">:</span> <span class="nb">Int32</span>
+    <span class="kd">public</span> <span class="kd">init</span><span class="p">(</span><span class="kc">_</span> <span class="n">value</span><span class="p">:</span> <span class="nb">Int32</span> <span class="p">=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kc">self</span><span class="p">.</span><span class="n">value</span> <span class="p">=</span> <span class="n">value</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nf">fetchOr</span><span class="p">(</span><span class="kc">_</span> <span class="n">this</span><span class="p">:</span> <span class="n">AtomicInt</span><span class="p">,</span> <span class="kc">_</span> <span class="n">mask</span><span class="p">:</span> <span class="nb">Int32</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">Int32</span> <span class="p">{</span>
+    <span class="n">this</span><span class="p">.</span><span class="n">lock</span><span class="p">(</span><span class="p">)</span>
+    <span class="kd">let</span> <span class="nv">oldValue</span> <span class="p">=</span> <span class="n">this</span><span class="p">.</span><span class="n">value</span>
+    <span class="n">this</span><span class="p">.</span><span class="n">value</span> <span class="o">|=</span> <span class="n">mask</span>
+    <span class="n">this</span><span class="p">.</span><span class="n">unlock</span><span class="p">(</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">oldValue</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nf">increment</span><span class="p">(</span><span class="kc">_</span> <span class="n">this</span><span class="p">:</span> <span class="n">AtomicInt</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">Int32</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">add</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nf">decrement</span><span class="p">(</span><span class="kc">_</span> <span class="n">this</span><span class="p">:</span> <span class="n">AtomicInt</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">Int32</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">sub</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="p">.</span><span class="p">.</span><span class="p">.</span>
+</code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>说明：Atomic 中有返回值都的方法都有 <strong>@discardableResult</strong> 标记，只是这边简化了，同时所有方法都是
+<strong>@inline(__always)</strong> 标记的。</p>
+</blockquote>
+<p>首先，之前版本的 AtomicInt 是用 <a href="https://opensource.apple.com/source/xnu/xnu-201.5/libkern/libkern/OSAtomic.h.auto.html">OSAtomic.h</a> 的 API 来实现的，现在改成用 NSLock 了。</p>
+<p>这里看到 <em>位运算符</em> 大家应该知道它是怎么实现了吧。通过每个 bit 来保存一个 flag 从而提高了访问效率。</p>
+<p>接着我们看 <code>fetchOr(_: _: )</code> 它其实做了两件事情。1. 先取出当前 value 做为返回值；2. 将 mask 值保存到 value 中；</p>
+<p>by the way，前面提到过 RxSwift 内部的资源统计方法 <code>Resources.incrementTotal()</code>  就是用 <code>increment(_:)</code> 实现的。 <code>Resources.decrementTotal()</code> 同理。</p>
+<h4 id="dispose">dispose</h4>
+<p>理解了 setSinkAndSubscription 后 dispose 就不难了，我看实现：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">let</span> <span class="nv">previousState</span> <span class="p">=</span> <span class="n">fetchOr</span><span class="p">(</span><span class="kc">self</span><span class="p">.</span><span class="n">_state</span><span class="p">,</span> <span class="n">DisposeState</span><span class="p">.</span><span class="n">disposed</span><span class="p">.</span><span class="n">rawValue</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">previousState</span> <span class="o">&amp;</span> <span class="n">DisposeState</span><span class="p">.</span><span class="n">disposed</span><span class="p">.</span><span class="n">rawValue</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+    <span class="k">return</span>
+<span class="p">}</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">previousState</span> <span class="o">&amp;</span> <span class="n">DisposeState</span><span class="p">.</span><span class="n">sinkAndSubscriptionSet</span><span class="p">.</span><span class="n">rawValue</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+    <span class="k">guard</span> <span class="kd">let</span> <span class="nv">sink</span> <span class="p">=</span> <span class="kc">self</span><span class="p">.</span><span class="n">_sink</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="n">rxFatalError</span><span class="p">(</span><span class="s">&#34;</span><span class="s">Sink not set</span><span class="s">&#34;</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">guard</span> <span class="kd">let</span> <span class="nv">subscription</span> <span class="p">=</span> <span class="kc">self</span><span class="p">.</span><span class="n">_subscription</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="n">rxFatalError</span><span class="p">(</span><span class="s">&#34;</span><span class="s">Subscription not set</span><span class="s">&#34;</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="n">sink</span><span class="p">.</span><span class="n">dispose</span><span class="p">(</span><span class="p">)</span>
+    <span class="n">subscription</span><span class="p">.</span><span class="n">dispose</span><span class="p">(</span><span class="p">)</span>
+
+    <span class="kc">self</span><span class="p">.</span><span class="n">_sink</span> <span class="p">=</span> <span class="kc">nil</span>
+    <span class="kc">self</span><span class="p">.</span><span class="n">_subscription</span> <span class="p">=</span> <span class="kc">nil</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><ol>
+<li>先取出 previousState 并将 .disposed 值写入 _state;</li>
+<li>判断 previousState 为 disposed：
+<ol>
+<li>如果是则表明已经清理过，直接 return；</li>
+<li>否则对 sink 和 subscription 执行 <code>dispose()</code> 以释放资源，同时将它们置 nil。</li>
+</ol>
+</li>
+</ol>
+<p>RxSwift 通过 AutomicInt 的位运算，巧妙的用一个变量高效完成了多个状态的存储，最重要的是它保证了只有一次有效的 <code>dispose</code> 操作。还有很重要的一点，在释放资源后，sinkDisposer 都会主动将 sink 和 subscription 置 nil，这是为了解决<strong>循环引用</strong>。因为在 Sink 内部其实也引用了 sinkDisposer。</p>
+<h2 id="subscription">Subscription</h2>
+<p>Observable stream 的创建已经说完了，我们回到文章开头接着聊一聊订阅操作，下面这行代码：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="p">.</span><span class="n">subscribe</span><span class="p">(</span> <span class="p">{</span> <span class="bp">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span><span class="p">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>同 <code>of(_:)</code> 一样，订阅操作也是对 ObservableType 扩展实现的。具体见 <a href="https://github.com/ReactiveX/RxSwift/blob/master/RxSwift/ObservableType%2BExtensions.swift">ObservableType+Extensions.swift</a>，简化后代码如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">extension</span> <span class="nc">ObservableType</span> <span class="p">{</span>
+
+    <span class="kd">public</span> <span class="kd">func</span> <span class="nf">subscribe</span><span class="p">(</span><span class="kc">_</span> <span class="n">on</span><span class="p">:</span> <span class="p">@</span><span class="n">escaping</span> <span class="p">(</span><span class="n">Event</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">Void</span><span class="p">)</span>
+        <span class="p">-&gt;</span> <span class="n">Disposable</span> <span class="p">{</span>
+            <span class="kd">let</span> <span class="nv">observer</span> <span class="p">=</span> <span class="n">AnonymousObserver</span> <span class="p">{</span> <span class="n">e</span> <span class="k">in</span>
+                <span class="n">on</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="p">}</span>
+            <span class="k">return</span> <span class="kc">self</span><span class="p">.</span><span class="n">asObservable</span><span class="p">(</span><span class="p">)</span><span class="p">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">observer</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="kd">public</span> <span class="kd">func</span> <span class="nf">subscribe</span><span class="p">(</span><span class="n">onNext</span><span class="p">:</span> <span class="p">(</span><span class="p">(</span><span class="n">Element</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">Void</span><span class="p">)</span><span class="p">?</span> <span class="p">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">onError</span><span class="p">:</span> <span class="p">(</span><span class="p">(</span><span class="n">Swift</span><span class="p">.</span><span class="n">Error</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">Void</span><span class="p">)</span><span class="p">?</span> <span class="p">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">onCompleted</span><span class="p">:</span> <span class="p">(</span><span class="p">(</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">Void</span><span class="p">)</span><span class="p">?</span> <span class="p">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">onDisposed</span><span class="p">:</span> <span class="p">(</span><span class="p">(</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">Void</span><span class="p">)</span><span class="p">?</span> <span class="p">=</span> <span class="kc">nil</span><span class="p">)</span>
+        <span class="p">-&gt;</span> <span class="n">Disposable</span> <span class="p">{</span>
+        <span class="p">.</span><span class="p">.</span><span class="p">.</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>两个 subscribe 方法都是将订阅的操作存入 AnonymousObserver 中，然后通过 <code>asObservable()</code> 获取 producer 并最终调用 producer 的 <code>subscribe(_:)</code> 完成订阅。</p>
+<p>我们看看 <a href="https://github.com/ReactiveX/RxSwift/blob/master/RxSwift/Observers/AnonymousObserver.swift">AnonymousObserver</a> 是什么来头：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kr">final</span> <span class="kd">class</span> <span class="nc">AnonymousObserver</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span><span class="p">:</span> <span class="n">ObserverBase</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span> <span class="p">{</span>
+    <span class="kd">typealias</span> <span class="n">EventHandler</span> <span class="p">=</span> <span class="p">(</span><span class="n">Event</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">Void</span>
+    
+    <span class="kd">private</span> <span class="kd">let</span> <span class="nv">_eventHandler</span> <span class="p">:</span> <span class="n">EventHandler</span>
+    
+    <span class="kd">init</span><span class="p">(</span><span class="kc">_</span> <span class="n">eventHandler</span><span class="p">:</span> <span class="p">@</span><span class="n">escaping</span> <span class="n">EventHandler</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">//</span><span class="c1">/</span><span class="c1"> </span><span class="c1">资</span><span class="c1">源</span><span class="c1">统</span><span class="c1">计</span>
+        <span class="kc">self</span><span class="p">.</span><span class="n">_eventHandler</span> <span class="p">=</span> <span class="n">eventHandler</span>
+    <span class="p">}</span>
+
+    <span class="kr">override</span> <span class="kd">func</span> <span class="nf">onCore</span><span class="p">(</span><span class="kc">_</span> <span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="kc">self</span><span class="p">.</span><span class="n">_eventHandler</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>这里同样忽略了 <code>init()</code> 与 <code>deinit()</code> 的资源统计逻辑</p>
+</blockquote>
+<p>很简单，仅有一个 <code>_eventHandler</code> 属性保存订阅操作，然后在 <code>onCore(_:)</code> 中调用它。在翻它父类之前，看一眼它的继承关系：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="o">|</span> <span class="o">---</span> <span class="n">AnonymousObserver</span>
+    <span class="o">|</span> <span class="o">---</span> <span class="n">ObserverBase</span>
+        <span class="o">|</span> <span class="o">---</span> <span class="n">Disposable</span><span class="err">、</span><span class="n">ObserverType</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>Disposable 我们已经知道了，先来看 ObserverType：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">public</span> <span class="kd">protocol</span> <span class="nc">ObserverType</span> <span class="p">{</span>
+    <span class="n">associatedtype</span> <span class="n">Element</span>
+
+    <span class="kd">func</span> <span class="nf">on</span><span class="p">(</span><span class="kc">_</span> <span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="c1">//</span><span class="c1">/</span><span class="c1"> </span><span class="c1">C</span><span class="c1">o</span><span class="c1">n</span><span class="c1">v</span><span class="c1">e</span><span class="c1">n</span><span class="c1">i</span><span class="c1">e</span><span class="c1">n</span><span class="c1">c</span><span class="c1">e</span><span class="c1"> </span><span class="c1">A</span><span class="c1">P</span><span class="c1">I</span><span class="c1"> </span><span class="c1">e</span><span class="c1">x</span><span class="c1">t</span><span class="c1">e</span><span class="c1">n</span><span class="c1">s</span><span class="c1">i</span><span class="c1">o</span><span class="c1">n</span><span class="c1">s</span><span class="c1"> </span><span class="c1">t</span><span class="c1">o</span><span class="c1"> </span><span class="c1">p</span><span class="c1">r</span><span class="c1">o</span><span class="c1">v</span><span class="c1">i</span><span class="c1">d</span><span class="c1">e</span><span class="c1"> </span><span class="c1">a</span><span class="c1">l</span><span class="c1">t</span><span class="c1">e</span><span class="c1">r</span><span class="c1">n</span><span class="c1">a</span><span class="c1">t</span><span class="c1">e</span><span class="c1"> </span><span class="c1">n</span><span class="c1">e</span><span class="c1">x</span><span class="c1">t</span><span class="c1">,</span><span class="c1"> </span><span class="c1">e</span><span class="c1">r</span><span class="c1">r</span><span class="c1">o</span><span class="c1">r</span><span class="c1">,</span><span class="c1"> </span><span class="c1">c</span><span class="c1">o</span><span class="c1">m</span><span class="c1">p</span><span class="c1">l</span><span class="c1">e</span><span class="c1">t</span><span class="c1">e</span><span class="c1">d</span><span class="c1"> </span><span class="c1">e</span><span class="c1">v</span><span class="c1">e</span><span class="c1">n</span><span class="c1">t</span><span class="c1">s</span>
+<span class="kd">extension</span> <span class="nc">ObserverType</span> <span class="p">{</span>
+
+    <span class="kd">public</span> <span class="kd">func</span> <span class="nf">onNext</span><span class="p">(</span><span class="kc">_</span> <span class="n">element</span><span class="p">:</span> <span class="n">Element</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kc">self</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="p">.</span><span class="n">next</span><span class="p">(</span><span class="n">element</span><span class="p">)</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="kd">public</span> <span class="kd">func</span> <span class="nf">onCompleted</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kc">self</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="p">.</span><span class="n">completed</span><span class="p">)</span>
+    <span class="p">}</span>
+    
+    <span class="kd">public</span> <span class="kd">func</span> <span class="nf">onError</span><span class="p">(</span><span class="kc">_</span> <span class="n">error</span><span class="p">:</span> <span class="n">Swift</span><span class="p">.</span><span class="n">Error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kc">self</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="p">.</span><span class="n">error</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>声明了 <code>on(_:)</code> 方法，同时针对 Event 的类型提供了三个便利方法。Event 则是一个嵌套枚举类型：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">public</span> <span class="kd">enum</span> <span class="nc">Event</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span> <span class="p">{</span>
+    <span class="c1">//</span><span class="c1">/</span><span class="c1"> </span><span class="c1">N</span><span class="c1">e</span><span class="c1">x</span><span class="c1">t</span><span class="c1"> </span><span class="c1">e</span><span class="c1">l</span><span class="c1">e</span><span class="c1">m</span><span class="c1">e</span><span class="c1">n</span><span class="c1">t</span><span class="c1"> </span><span class="c1">i</span><span class="c1">s</span><span class="c1"> </span><span class="c1">p</span><span class="c1">r</span><span class="c1">o</span><span class="c1">d</span><span class="c1">u</span><span class="c1">c</span><span class="c1">e</span><span class="c1">d</span><span class="c1">.</span>
+    <span class="k">case</span> <span class="n">next</span><span class="p">(</span><span class="n">Element</span><span class="p">)</span>
+
+    <span class="c1">//</span><span class="c1">/</span><span class="c1"> </span><span class="c1">S</span><span class="c1">e</span><span class="c1">q</span><span class="c1">u</span><span class="c1">e</span><span class="c1">n</span><span class="c1">c</span><span class="c1">e</span><span class="c1"> </span><span class="c1">t</span><span class="c1">e</span><span class="c1">r</span><span class="c1">m</span><span class="c1">i</span><span class="c1">n</span><span class="c1">a</span><span class="c1">t</span><span class="c1">e</span><span class="c1">d</span><span class="c1"> </span><span class="c1">w</span><span class="c1">i</span><span class="c1">t</span><span class="c1">h</span><span class="c1"> </span><span class="c1">a</span><span class="c1">n</span><span class="c1"> </span><span class="c1">e</span><span class="c1">r</span><span class="c1">r</span><span class="c1">o</span><span class="c1">r</span><span class="c1">.</span>
+    <span class="k">case</span> <span class="n">error</span><span class="p">(</span><span class="n">Swift</span><span class="p">.</span><span class="n">Error</span><span class="p">)</span>
+
+    <span class="c1">//</span><span class="c1">/</span><span class="c1"> </span><span class="c1">S</span><span class="c1">e</span><span class="c1">q</span><span class="c1">u</span><span class="c1">e</span><span class="c1">n</span><span class="c1">c</span><span class="c1">e</span><span class="c1"> </span><span class="c1">c</span><span class="c1">o</span><span class="c1">m</span><span class="c1">p</span><span class="c1">l</span><span class="c1">e</span><span class="c1">t</span><span class="c1">e</span><span class="c1">d</span><span class="c1"> </span><span class="c1">s</span><span class="c1">u</span><span class="c1">c</span><span class="c1">c</span><span class="c1">e</span><span class="c1">s</span><span class="c1">s</span><span class="c1">f</span><span class="c1">u</span><span class="c1">l</span><span class="c1">l</span><span class="c1">y</span><span class="c1">.</span>
+    <span class="k">case</span> <span class="n">completed</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="observerbase">ObserverBase</h4>
+<p>我们来看 <a href="https://github.com/ReactiveX/RxSwift/blob/master/RxSwift/Observers/ObserverBase.swift">ObserverBase</a>：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">class</span> <span class="nc">ObserverBase</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span> <span class="p">:</span> <span class="n">Disposable</span><span class="p">,</span> <span class="n">ObserverType</span> <span class="p">{</span>
+    <span class="kd">private</span> <span class="kd">let</span> <span class="nv">_isStopped</span> <span class="p">=</span> <span class="n">AtomicInt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="kd">func</span> <span class="nf">on</span><span class="p">(</span><span class="kc">_</span> <span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">switch</span> <span class="n">event</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="p">.</span><span class="n">next</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">load</span><span class="p">(</span><span class="kc">self</span><span class="p">.</span><span class="n">_isStopped</span><span class="p">)</span> <span class="p">=</span><span class="p">=</span> <span class="mi">0</span> <span class="p">{</span>
+                <span class="kc">self</span><span class="p">.</span><span class="n">onCore</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+            <span class="p">}</span>
+        <span class="k">case</span> <span class="p">.</span><span class="n">error</span><span class="p">,</span> <span class="p">.</span><span class="n">completed</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">fetchOr</span><span class="p">(</span><span class="kc">self</span><span class="p">.</span><span class="n">_isStopped</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="p">=</span><span class="p">=</span> <span class="mi">0</span> <span class="p">{</span>
+                <span class="kc">self</span><span class="p">.</span><span class="n">onCore</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="kd">func</span> <span class="nf">onCore</span><span class="p">(</span><span class="kc">_</span> <span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">rxAbstractMethod</span><span class="p">(</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="kd">func</span> <span class="nf">dispose</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">fetchOr</span><span class="p">(</span><span class="kc">self</span><span class="p">.</span><span class="n">_isStopped</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>ObserverBase 利用 Atomic 声明的 _isStopped 属性作为哨兵，以保证资源被标记 _isStopped 后不会产生重复调用的问题。那么，如何做到的呢？</p>
+<p>通过判断 _isStopped 是否为 0 来表示资源是否可用。一旦调用 <code>dispose()</code> 会将其值置为 1，则资源不可用。</p>
+<p>另一种则在 <code>on</code> 方法内，实现逻辑如下：</p>
+<ol>
+<li>event 为 .next 事件：通过 <code>load(_:)</code> 取出 _isStopped 值并判断值是否为 0，是则执行 <code>onCore(event)</code> ；</li>
+<li>event 为 .error、.completed 事件：
+<ol>
+<li>通过 <code>fetchOr(_:)</code> 取出 _isStopped 当前值后并将其置为 1，以保证不再重入；</li>
+<li>判断 _isStopped 当前值是否为 0，是则执行 <code>onCore(event)</code> 。</li>
+</ol>
+</li>
+</ol>
+<p>因此 ObserverBase 核心功作用是保证暴露给子类的  <code>onCore(_:)</code>  在观察结束后不会被重复执行。也就是保证 AnonymousObserver 的 eventHandler 被正确执行。</p>
+<h2 id="sink">Sink</h2>
+<p><a href="https://github.com/ReactiveX/RxSwift/issues/817">What is a Sink ?</a></p>
+<blockquote>
+<p>It's an internal class used to implement the operators, that receives events and processes them. Beyond that, I think you'll have to go through the code to figure out how it works.</p>
+</blockquote>
+<p>Sink 接受 event 事件并进行相应的处理，实现了一系列的 Transform 等操作，比如 Map、Reduce、Filter。作为 Producer 背后的苦力一直默默付出。</p>
+<p>Sink 从哪里来的呢？我们还得从开头的例子 <code>Observable.of(1, 2, 3)</code> 返回的 ObservableSequence  说起:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kr">final</span> <span class="kd">private</span> <span class="kd">class</span> <span class="nc">ObservableSequence</span><span class="p">&lt;</span><span class="n">Sequence</span><span class="p">:</span> <span class="n">Swift</span><span class="p">.</span><span class="n">Sequence</span><span class="p">&gt;</span><span class="p">:</span> <span class="n">Producer</span><span class="p">&lt;</span><span class="n">Sequence</span><span class="p">.</span><span class="n">Element</span><span class="p">&gt;</span> <span class="p">{</span>
+    <span class="c1">//</span><span class="c1">/</span><span class="c1"> </span><span class="c1">i</span><span class="c1">n</span><span class="c1">i</span><span class="c1">t</span><span class="c1"> </span><span class="c1">.</span><span class="c1">.</span><span class="c1">.</span>
+   
+    <span class="kr">override</span> <span class="kd">func</span> <span class="nf">run</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">:</span> <span class="n">ObserverType</span><span class="p">&gt;</span><span class="p">(</span><span class="kc">_</span> <span class="n">observer</span><span class="p">:</span> <span class="n">Observer</span><span class="p">,</span> <span class="n">cancel</span><span class="p">:</span> <span class="n">Cancelable</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="p">(</span><span class="n">sink</span><span class="p">:</span> <span class="n">Disposable</span><span class="p">,</span> <span class="n">subscription</span><span class="p">:</span> <span class="n">Disposable</span><span class="p">)</span> <span class="k">where</span> <span class="n">Observer</span><span class="p">.</span><span class="n">Element</span> <span class="p">=</span><span class="p">=</span> <span class="n">Element</span> <span class="p">{</span>
+        <span class="kd">let</span> <span class="nv">sink</span> <span class="p">=</span> <span class="n">ObservableSequenceSink</span><span class="p">(</span><span class="n">parent</span><span class="p">:</span> <span class="kc">self</span><span class="p">,</span> <span class="n">observer</span><span class="p">:</span> <span class="n">observer</span><span class="p">,</span> <span class="n">cancel</span><span class="p">:</span> <span class="n">cancel</span><span class="p">)</span>
+        <span class="kd">let</span> <span class="nv">subscription</span> <span class="p">=</span> <span class="n">sink</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">sink</span><span class="p">:</span> <span class="n">sink</span><span class="p">,</span> <span class="n">subscription</span><span class="p">:</span> <span class="n">subscription</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>可知 Sink 由 Producer 生成的，在其初始化时将关键数据都存入 sink 对象：</p>
+<ul>
+<li>self 保存了 <strong>Swift.Sequence&lt;Int&gt;</strong> 序列；</li>
+<li>observer；</li>
+<li>cancel 为 Producer 的 subscribe 方法中生成的 SinkDisposer。</li>
+</ul>
+<p>Sink 创建完后会将执行 <code>run()</code> 的结果作为 subscription，同 sink 一起返回后存入 sinkDisposer 中。这也是前面提到的 sinkDisposer 和 sink 是有循环引用的问题，不过在 sinkDispoer 的 dispose 过程中做了 break。</p>
+<p>Sink 声明如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">class</span> <span class="nc">Sink</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">:</span> <span class="n">ObserverType</span><span class="p">&gt;</span> <span class="p">:</span> <span class="n">Disposable</span> <span class="p">{</span>
+    <span class="n">fileprivate</span> <span class="kd">let</span> <span class="nv">_observer</span><span class="p">:</span> <span class="n">Observer</span>
+    <span class="n">fileprivate</span> <span class="kd">let</span> <span class="nv">_cancel</span><span class="p">:</span> <span class="n">Cancelable</span> <span class="c1">//</span><span class="c1"> </span><span class="c1">s</span><span class="c1">i</span><span class="c1">n</span><span class="c1">k</span><span class="c1">D</span><span class="c1">i</span><span class="c1">s</span><span class="c1">p</span><span class="c1">o</span><span class="c1">s</span><span class="c1">e</span><span class="c1">r</span>
+    <span class="kd">private</span> <span class="kd">let</span> <span class="nv">_disposed</span> <span class="p">=</span> <span class="n">AtomicInt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="kr">final</span> <span class="kd">func</span> <span class="nf">forwardOn</span><span class="p">(</span><span class="kc">_</span> <span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">.</span><span class="n">Element</span><span class="p">&gt;</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="n">isFlagSet</span><span class="p">(</span><span class="kc">self</span><span class="p">.</span><span class="n">_disposed</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span>
+        <span class="p">}</span>
+        <span class="kc">self</span><span class="p">.</span><span class="n">_observer</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="kr">final</span> <span class="kd">func</span> <span class="nf">forwarder</span><span class="p">(</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">SinkForward</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">&gt;</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">SinkForward</span><span class="p">(</span><span class="n">forward</span><span class="p">:</span> <span class="kc">self</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="kr">final</span> <span class="kd">var</span> <span class="nv">disposed</span><span class="p">:</span> <span class="nb">Bool</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">isFlagSet</span><span class="p">(</span><span class="kc">self</span><span class="p">.</span><span class="n">_disposed</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="kd">func</span> <span class="nf">dispose</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">fetchOr</span><span class="p">(</span><span class="kc">self</span><span class="p">.</span><span class="n">_disposed</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="kc">self</span><span class="p">.</span><span class="n">_cancel</span><span class="p">.</span><span class="n">dispose</span><span class="p">(</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>又见到 AtomicInt，这次是修饰 _disposed 属性，各位自行理解。我们看核心方法：</p>
+<ol>
+<li><code>forwardOn(_:)</code> 用于转发，将 event 事件传递到 <code>Observer.on(_:)</code>；</li>
+<li><code>dispose()</code> 直接调用 sinkDisposer -&gt; <code>dispose()</code>;</li>
+</ol>
+<p><code>forwarder()</code>  返回的 SinkForward 是 Observer 对象，它将 sink 的 observer 做了包装，该方法主要用于 <code>timeout()</code> 方法。转发逻辑如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kr">final</span> <span class="kd">class</span> <span class="nc">SinkForward</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">:</span> <span class="n">ObserverType</span><span class="p">&gt;</span><span class="p">:</span> <span class="n">ObserverType</span> <span class="p">{</span>
+
+    <span class="kr">final</span> <span class="kd">func</span> <span class="nf">on</span><span class="p">(</span><span class="kc">_</span> <span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">switch</span> <span class="n">event</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="p">.</span><span class="n">next</span><span class="p">:</span>
+            <span class="kc">self</span><span class="p">.</span><span class="n">_forward</span><span class="p">.</span><span class="n">_observer</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+        <span class="k">case</span> <span class="p">.</span><span class="n">error</span><span class="p">,</span> <span class="p">.</span><span class="n">completed</span><span class="p">:</span>
+            <span class="kc">self</span><span class="p">.</span><span class="n">_forward</span><span class="p">.</span><span class="n">_observer</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+            <span class="kc">self</span><span class="p">.</span><span class="n">_forward</span><span class="p">.</span><span class="n">_cancel</span><span class="p">.</span><span class="n">dispose</span><span class="p">(</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>可见 Sink 与字面意思很相符，它不仅收集资源同时还加工以及转发事件。</p>
+<p>最后回到 ObservableSequenceSink 来看 <code>run()</code> 方法：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kr">final</span> <span class="kd">private</span> <span class="kd">class</span> <span class="nc">ObservableSequenceSink</span><span class="p">&lt;</span><span class="n">Sequence</span><span class="p">:</span> <span class="n">Swift</span><span class="p">.</span><span class="n">Sequence</span><span class="p">,</span> <span class="n">Observer</span><span class="p">:</span> <span class="n">ObserverType</span><span class="p">&gt;</span><span class="p">:</span> <span class="n">Sink</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">&gt;</span> <span class="k">where</span> <span class="n">Sequence</span><span class="p">.</span><span class="n">Element</span> <span class="p">=</span><span class="p">=</span> <span class="n">Observer</span><span class="p">.</span><span class="n">Element</span> <span class="p">{</span>
+    <span class="kd">typealias</span> <span class="n">Parent</span> <span class="p">=</span> <span class="n">ObservableSequence</span><span class="p">&lt;</span><span class="n">Sequence</span><span class="p">&gt;</span>
+
+    <span class="kd">private</span> <span class="kd">let</span> <span class="nv">_parent</span><span class="p">:</span> <span class="n">Parent</span>
+
+    <span class="kd">func</span> <span class="nf">run</span><span class="p">(</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">Disposable</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="kc">self</span><span class="p">.</span><span class="n">_parent</span><span class="p">.</span><span class="n">_scheduler</span><span class="p">.</span><span class="n">scheduleRecursive</span><span class="p">(</span><span class="kc">self</span><span class="p">.</span><span class="n">_parent</span><span class="p">.</span><span class="n">_elements</span><span class="p">.</span><span class="n">makeIterator</span><span class="p">(</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span> <span class="n">iterator</span><span class="p">,</span> <span class="n">recurse</span> <span class="k">in</span>
+            <span class="kd">var</span> <span class="nv">mutableIterator</span> <span class="p">=</span> <span class="n">iterator</span>
+            <span class="k">if</span> <span class="kd">let</span> <span class="nv">next</span> <span class="p">=</span> <span class="n">mutableIterator</span><span class="p">.</span><span class="n">next</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
+                <span class="kc">self</span><span class="p">.</span><span class="n">forwardOn</span><span class="p">(</span><span class="p">.</span><span class="n">next</span><span class="p">(</span><span class="n">next</span><span class="p">)</span><span class="p">)</span>
+                <span class="n">recurse</span><span class="p">(</span><span class="n">mutableIterator</span><span class="p">)</span>
+            <span class="p">}</span>
+            <span class="k">else</span> <span class="p">{</span>
+                <span class="kc">self</span><span class="p">.</span><span class="n">forwardOn</span><span class="p">(</span><span class="p">.</span><span class="n">completed</span><span class="p">)</span>
+                <span class="kc">self</span><span class="p">.</span><span class="n">dispose</span><span class="p">(</span><span class="p">)</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>_scheduler.scheduleRecursive</strong> 背后是 RxSwift 对于容器对象的线程调度，不展开。这里的 <code>run()</code>方法 做了几个事情：</p>
+<ol>
+<li>schedule 会在指定线程中调用 Swift.Sequence 的迭代器，以遍历每个元素。</li>
+<li>获取到元素后，将 next 事件不断转发给 Observer；</li>
+<li>迭代结束后，发送 completed 事件至 Observer 并调用 dispose 出发 sinkDisposer 的资源清理操作；</li>
+</ol>
+<p>至此，整个订阅流程梳理完毕。关于 Sink 再说明一下，本篇是以 Sequence 作为切入点，不同 Operator 背后的 Producer 所产生的 Sink 实现是有不少区别的，这里就不做展开。</p>
+<p>先贴一张脑图补一补：</p>
+<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gcvl07flwjj224o1smqh7.jpg" alt="rxswift"></p>
+<p>订阅相关的类图，回顾一下：</p>
+<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gd35tywfx7j223n0wogtr.jpg" alt="rxswift-subscription"></p>
+<h2 id="heading-1">总结</h2>
+<p>RxSwift 所展示的订阅流的处理，不仅充分利用了 Swift 语言本身的特性，如为协议添加默认实现、采用泛型来约束类的行为。还用到了经典的设计模式 <a href="https://www.wikiwand.com/en/Producer%E2%80%93consumer_problem">Producer–consumer</a>，通过多元化的 Producer 来轻松支持各种 operator 的实现。还有比如 OOP 思想将核心逻辑抽离封装以及类的设计，还有就是巧妙的运用了位运算来简化逻辑。</p>
+<p>由于篇幅有限，Schedule 的调度逻辑并未展开，还有就是 DisposeBag 通篇未提及，就当是思考作业啦。</p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">土土Edmond木</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2020-03-16
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/sourcecode/">SourceCode</a>
+          <a href="/tags/ios/">iOS</a>
+          <a href="/tags/reactive/">Reactive</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/sourcecode-ios/source-code-sdweb-2/">
+            <span class="next-text nav-default">源码浅析 SDWebImage 5.5.2 - WebP Plugin</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:chun574271939@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://twitter.com/looseyi" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="https://github.com/looseyi" class="iconfont icon-github" title="github"></a>
+      <a href="https://www.weibo.com/foreverclp" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="https://www.zhihu.com/people/tu-tu-edmondmu" class="iconfont icon-zhihu" title="zhihu"></a>
+  <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2019-12-11 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">土土Edmond木</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

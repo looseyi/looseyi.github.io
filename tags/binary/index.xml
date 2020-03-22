@@ -6,17 +6,26 @@
     <description>Recent content in Binary on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 21 Dec 2019 11:37:41 +2100</lastBuildDate>
+    <lastBuildDate>Mon, 06 Jan 2020 11:40:06 +2100</lastBuildDate>
     
 	<atom:link href="http://localhost:1313/tags/binary/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
+      <title>完善 Cocoapods-Binary 支持 Server 端缓存</title>
+      <link>http://localhost:1313/post/sourcecode-ios/cocoapods-binary-2/</link>
+      <pubDate>Mon, 06 Jan 2020 11:40:06 +2100</pubDate>
+      
+      <guid>http://localhost:1313/post/sourcecode-ios/cocoapods-binary-2/</guid>
+      <description>在开始之前，还是明确一下我们的目标，希望通过对 Cocoapods-binary 的改造使其支持 server 端缓存，从而达到 一处编译，处处使用 的 pods lib dependencies。同时会简单</description>
+    </item>
+    
+    <item>
       <title>浅析 Cocoapods-Binary 实现</title>
-      <link>http://localhost:1313/post/cocoapods-binary-1/</link>
+      <link>http://localhost:1313/post/sourcecode-ios/cocoapods-binary-1/</link>
       <pubDate>Sat, 21 Dec 2019 11:37:41 +2100</pubDate>
       
-      <guid>http://localhost:1313/post/cocoapods-binary-1/</guid>
+      <guid>http://localhost:1313/post/sourcecode-ios/cocoapods-binary-1/</guid>
       <description>背景 公司级别的项目在发展过程，不可避免会遇到项目过大，导致的编译和开发效率的降低。在如何提高编译速度，加快生产效率，各大厂都有各种尝试，可惜</description>
     </item>
     

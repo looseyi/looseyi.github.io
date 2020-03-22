@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>浅析 Cocoapods-Binary 实现 - </title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="土土Edmond木" /><meta name="description" content="背景 公司级别的项目在发展过程，不可避免会遇到项目过大，导致的编译和开发效率的降低。在如何提高编译速度，加快生产效率，各大厂都有各种尝试，可惜" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.62.0 with theme even" />
+
+
+<link rel="canonical" href="http://localhost:1313/post/sourcecode-ios/cocoapods-binary-1/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="浅析 Cocoapods-Binary 实现" />
+<meta property="og:description" content="背景 公司级别的项目在发展过程，不可避免会遇到项目过大，导致的编译和开发效率的降低。在如何提高编译速度，加快生产效率，各大厂都有各种尝试，可惜" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/post/sourcecode-ios/cocoapods-binary-1/" />
+<meta property="article:published_time" content="2019-12-21T11:37:41+21:00" />
+<meta property="article:modified_time" content="2019-12-21T11:37:41+21:00" />
+<meta itemprop="name" content="浅析 Cocoapods-Binary 实现">
+<meta itemprop="description" content="背景 公司级别的项目在发展过程，不可避免会遇到项目过大，导致的编译和开发效率的降低。在如何提高编译速度，加快生产效率，各大厂都有各种尝试，可惜">
+<meta itemprop="datePublished" content="2019-12-21T11:37:41&#43;21:00" />
+<meta itemprop="dateModified" content="2019-12-21T11:37:41&#43;21:00" />
+<meta itemprop="wordCount" content="1442">
+
+
+
+<meta itemprop="keywords" content="CocoaPods,iOS,Binary," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="浅析 Cocoapods-Binary 实现"/>
+<meta name="twitter:description" content="背景 公司级别的项目在发展过程，不可避免会遇到项目过大，导致的编译和开发效率的降低。在如何提高编译速度，加快生产效率，各大厂都有各种尝试，可惜"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Aha Moment</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Aha Moment</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">浅析 Cocoapods-Binary 实现</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2019-12-21 </span>
+        <div class="post-category">
+            <a href="/categories/ios/"> iOS </a>
+            <a href="/categories/cocoapods/"> CocoaPods </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#heading">背景</a></li>
+    <li><a href="#heading-1">思路</a></li>
+    <li><a href="#cocoapod-binary">CocoaPod-Binary</a>
+      <ul>
+        <li><a href="#main">Main</a></li>
+        <li><a href="#helper">Helper</a></li>
+        <li><a href="#room-build-framework">Room Build Framework</a></li>
+        <li><a href="#prebuild-installer">Prebuild Installer</a></li>
+        <li><a href="#integration">Integration</a></li>
+      </ul>
+    </li>
+    <li><a href="#heading-2">结果</a></li>
+    <li><a href="#heading-3">流程图</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="heading">背景</h2>
+<p>公司级别的项目在发展过程，不可避免会遇到项目过大，导致的编译和开发效率的降低。在如何提高编译速度，加快生产效率，各大厂都有各种尝试，可惜在业内没有一个成本低、效果好的开源方案。而作者所在的公司，由于业务线聚合，原有两条完全不同的交易线业务以组件的形式合并到主App，加剧了编译的问题。项目的完整编译时间从原有的5分钟，直接 double 到25分钟左右，同时 CI 的打包也不断的往30分钟的趋势奔去。</p>
+<h2 id="heading-1">思路</h2>
+<p>CocoaPods-Binar 是针对二进制化的一个整体的实践，而非像 CocoaPods-Packager 仅仅针对单个私有库的。所谓的二进制化，简单说来可以通过 podSpec 将 source 指向事先打包好的 binary 来提高编译效率，这个是目前的主流做法。当然也可以通过更改编译缓存如 CCache 或者换个编译器 Buck (FB) / Bazel (Google) 来实现分布式编译。微信团队的这篇 <a href="https://mp.weixin.qq.com/s/-wgBhE11xEXDS7Hqgq3FjA">微信编译速度优化</a> 有进行了比较完整的阐述。而本文的主角 CocoaPods-Binary 是通过将 dependencies 预编译成 binary 后缓存至本地，然后将原有的 Source Code link 到 binary 以几乎零成本的方式实现编译效率的提高。唯一缺点就是无法实现服务端缓存（这是我们需要改造的地方，不过这个可以通过定制化实现)，所谓的分布式的二进制编译。</p>
+<h2 id="cocoapod-binary">CocoaPod-Binary</h2>
+<p>最早发现这个 plugin 是在浏览官方 blog 时发现的，而且作者还是国内 developer 。该插件发布也有两年多，目前支持到 Pods 版本 1.6.x。我们先来看看类图构成：</p>
+<p><img src="https://user-gold-cdn.xitu.io/2019/12/21/16f28fd6d97d3ea7?w=2850&amp;h=1490&amp;f=png&amp;s=370440" alt=""></p>
+<p>CocoaPods 本身提供了比较不错的插件模版，如需要的话可以看这篇文章。CocoaPods-Binary 的核心代码都在 lib/cocoapods-binary 文件夹下。我们来看看整个插件的主要部件，及其对应的作用。</p>
+<h3 id="main">Main</h3>
+<p>作为整个插件的执行的入口，通过 CocoaPods 提供的 pre_install hook 在 pod install 的 prepare 阶段拦截到当前的 pod install context，进而 fork 出一份独立的 installer 以完成将预编译源码 clone 至 Pod/_Prebuild 目录下。</p>
+<h3 id="helper">Helper</h3>
+<p>主要对 Sandbox、Installer、Pod、Podfile Options 相关的类添加各种 attribute 状态来满足逻辑需要。例如，子类化 Sandbox &gt; PrebuildSandbox 来指定 generate frameworks 的地址、prebuild Pods 的地址，以及是否存在编译好的 framework 等；对 Podfile DSL 添加 binary、all_bianry 关键字来控制 binary 和源码的切换。</p>
+<h3 id="room-build-framework">Room Build Framework</h3>
+<p>核心类，通过 xcodebuild 将所有 :binary =&gt; true 的 dependencies 编译成 binary 和 dSYM，并输出到指定目录。这里针对 iOS 平台输出的 framework 多做了一步处理，当检测到是 platform 是 iOS 会分别对模拟器和真机设备单独编译，最后再利用 libo 将各自的 binary 和 dSYM 合并成一份输出。</p>
+<h3 id="prebuild-installer">Prebuild Installer</h3>
+<p>利用 ruby 语言的动态性，重载 Installer 的 run_plugins_post_install_hooks 以实现 pre_install 结束后触发 build framework 将 dependencies 打包成二进制包。对于 dependencies 是否需要进行预编译是通过检查生成的 framework 中是否存在 xxx_name 文件作为标识该 lib 是否已经完成编译过（xxx 为对应 lib 名称。</p>
+<h3 id="integration">Integration</h3>
+<p>在插件源码同步完预编译结束后，会将 install context 交还，进入 install 最后阶段。在这里将完成对 binary frameworks 的 symbol link 以替换原有 Pods 源码和 Embed 操作则会修改各个 pod.xcproject 配置，最后生成 project。</p>
+<h2 id="heading-2">结果</h2>
+<p>基本的模块介绍完，我们来看看，引入 CocoaPods-Binary 插件后 Pods 的文件构成：</p>
+<p><img src="https://user-gold-cdn.xitu.io/2019/12/21/16f28fe274deb12a?w=1218&amp;h=113&amp;f=png&amp;s=42173" alt=""></p>
+<p>_Prebuild 目录下则完整保存了一份 Pods 源代码，同时多出来的 GeneratedFrameworks 则缓存了预编译后的 binary 文件以及 dSYM 符号表。在最后的 integration 阶段 symbol link 替换完后源码则会被删除同时指向binary。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2019/12/21/16f28fe4bebba8af?w=805&amp;h=102&amp;f=png&amp;s=26338" alt=""></p>
+<p>至此，整个 pod install 就算完成了，那 CocoaPods有哪些限制呢？</p>
+<ul>
+<li>由于 CocoaPods 在 1.7.x 以上版本，修改了 framework 生成逻辑，不会把 bundle copy 至 framework，因此我们需要将 Pod 环境固定到 1.6.2；</li>
+<li>pod 要支持 binary，header ref 需要变更为 #import &lt;&gt;或者 @import 以符合 moduler 标准；</li>
+<li>统一 CI 和开发的 compiler 环境，如果项目支持 Swift，不同 compiler 编译产物有 Swift 版本兼容问题；</li>
+<li>最终的 binary size 会比使用源码的时候大一点，不建议最终上传 Store；</li>
+<li>建议 Git ignore Pods 文件夹，否则在 source code 与 binary 切换过程会有大量的 file change，增加 git 负担；</li>
+</ul>
+<h2 id="heading-3">流程图</h2>
+<p>无图无真相，简单的流程图希望能帮助各位理解 CocoaPods-Binary 作者的基本思路；</p>
+<p><img src="https://user-gold-cdn.xitu.io/2019/12/21/16f28fe79cec4bae?w=3891&amp;h=2218&amp;f=png&amp;s=435060" alt=""></p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">土土Edmond木</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2019-12-21
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/cocoapods/">CocoaPods</a>
+          <a href="/tags/ios/">iOS</a>
+          <a href="/tags/binary/">Binary</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/sourcecode-ios/cocoapods-binary-2/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">完善 Cocoapods-Binary 支持 Server 端缓存</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:chun574271939@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://twitter.com/looseyi" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="https://github.com/looseyi" class="iconfont icon-github" title="github"></a>
+      <a href="https://www.weibo.com/foreverclp" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="https://www.zhihu.com/people/tu-tu-edmondmu" class="iconfont icon-zhihu" title="zhihu"></a>
+  <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2019-12-11 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">土土Edmond木</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>
