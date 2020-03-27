@@ -48,7 +48,7 @@
 <meta itemprop="description" content="前言 ReactiveX 它是一个与语言无关的编程思想。作为成员框架之一 RxSwift 落地了大部分 ReactiveX 中关于流的操作。官方描述： An API for asynchronous programming with observable streams ReactiveX is a combination of the best ideas from the Observer pattern, the Iterator pattern,">
 <meta itemprop="datePublished" content="2020-03-16T23:10:58&#43;08:00" />
 <meta itemprop="dateModified" content="2020-03-16T23:10:58&#43;08:00" />
-<meta itemprop="wordCount" content="4163">
+<meta itemprop="wordCount" content="4363">
 
 
 
@@ -137,17 +137,20 @@
       </ul>
     </li>
     <li><a href="#observable">Observable</a></li>
-    <li><a href="#producer">Producer</a>
+  </ul>
+
+  <ul>
+    <li>
       <ul>
         <li><a href="#sinkdisposer">SinkDisposer</a></li>
       </ul>
     </li>
+    <li><a href="#sink">Sink</a></li>
     <li><a href="#subscription">Subscription</a>
       <ul>
         <li></li>
       </ul>
     </li>
-    <li><a href="#sink">Sink</a></li>
     <li><a href="#heading-1">总结</a></li>
   </ul>
 </nav>
@@ -158,17 +161,15 @@
 <p>ReactiveX 它是一个与语言无关的编程思想。作为成员框架之一 RxSwift 落地了大部分 ReactiveX 中关于流的操作。官方描述：</p>
 <blockquote>
 <p>An API for asynchronous programming with observable streams</p>
-</blockquote>
-<blockquote>
 <p>ReactiveX is a combination of the best ideas from the Observer pattern, the Iterator pattern, and functional programming</p>
 </blockquote>
-<p>本篇主要介绍 RxSwift 的内部流是如何传递及实现。关于响应式编程在 iOS 已经是一个很老的概念了，有很多好文章，比如 <a href="https://halfrost.com/tag/rac/">FRP</a> 系列。如果你在项目中犹豫使用哪个框架可以看看这两篇文章的分析：</p>
+<p>本篇主要介绍 RxSwift 的内部流是如何产生和订阅，这里默认大家是有 RxSwift 使用经验的。关于响应式编程在移动端已经是一个相对成熟的概念了，有很多好文章，比如 <a href="https://halfrost.com/tag/rac/">FRP</a> 系列。如果你在项目中犹豫使用哪个框架可以看看这两篇文章的分析：</p>
 <ul>
 <li><a href="https://dreampiggy.com/2016/11/17/FRP%E7%AE%80%E4%BB%8B%E2%80%94ReactiveCocoa%E3%80%81RxSwift%E3%80%81Bacon%E4%BB%A5%E5%8F%8A%E8%83%8C%E5%90%8E%E7%9A%84Functional/">FRP对比—ReactiveCocoa、RxSwift、Bacon以及背后的Functional</a></li>
 <li><a href="https://www.jianshu.com/p/2f83b766a081">iOS响应式编程：ReactiveCocoa vs RxSwift 选谁好</a></li>
 </ul>
 <h2 id="observable">Observable</h2>
-<p>既然一切皆流，那就从流的创建讲起。上代码：</p>
+<p>Rx 中的 Observable Stream(观察流)，为了方便这里简称为 <strong>流</strong>。流中的元数据可以有多个或者单个，这里统称为节点。既然一切皆流，那就从流的创建讲起，上代码：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt">1
@@ -179,7 +180,7 @@
     <span class="p">.</span><span class="n">subscribe</span><span class="p">(</span> <span class="p">{</span> <span class="bp">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span><span class="p">)</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>我们把 <strong>Swift.Sequence&lt;Int&gt;</strong> 序列转换为了 Observable 的观察流，<code>of(_:)</code>在 <a href="https://github.com/ReactiveX/RxSwift/blob/c6c0c540109678b96639c25e9c0ebe4a6d7a69a9/RxSwift/Observables/Sequence.swift">Sequence.swift</a> 的声明如下：</p>
+</div><p>我们看第一行，它把 <strong>Swift.Sequence&lt;Int&gt;</strong> 序列 <em>[1, 2, 3]</em> 转换为流，<a href="https://github.com/ReactiveX/RxSwift/blob/c6c0c540109678b96639c25e9c0ebe4a6d7a69a9/RxSwift/Observables/Sequence.swift">of(_:)</a> 方法的声明如下：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt">1
@@ -198,7 +199,8 @@
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>这里利用了 Swift 的 <a href="https://docs.swift.org/swift-book/LanguageGuide/Protocols.html#">Protcol Extesion</a> 来为 ObservableType 添加默认实现。把 Sequence&lt;Int&gt; 存入了 ObservableSequence 中返回。先看一下 Observable 相关的继承链：</p>
+</div><p>利用 Swift 的 <a href="https://docs.swift.org/swift-book/LanguageGuide/Protocols.html#">Protcol Extesion</a> 来为 ObservableType 添加默认了实现，它把 Sequence&lt;Int&gt; 存入了 ObservableSequence 中并返回。</p>
+<p>大概了解一下 ObservableSequence 的类关系：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt">1
@@ -209,13 +211,13 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-swift" data-lang="swift"><span class="o">|</span> <span class="o">---</span> <span class="n">ObservableSequence</span>
-    <span class="o">|</span> <span class="o">---</span> <span class="n">Producer</span>
-        <span class="o">|</span> <span class="o">---</span> <span class="n">Observable</span>
-            <span class="o">|</span> <span class="o">---</span> <span class="n">ObservableType</span>
-                <span class="o">|</span> <span class="o">---</span> <span class="n">ObservableConvertibleType</span>
+    <span class="o">|</span> <span class="o">---</span> <span class="n">Producer</span> 
+        <span class="o">|</span> <span class="o">---</span> <span class="n">Observable</span> <span class="p">(</span><span class="kd">class</span><span class="p">)</span>
+            <span class="o">|</span> <span class="o">---</span> <span class="n">ObservableType</span> <span class="p">(</span><span class="kr">Protocol</span><span class="p">)</span>
+                <span class="o">|</span> <span class="o">---</span> <span class="n">ObservableConvertibleType</span> <span class="p">(</span><span class="kr">Protocol</span><span class="p">)</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>从根协议 ObservableConvertibleType 说起，利用关联类型声明了泛型方法 asObservable:</p>
+</div><p>根协议 ObservableConvertibleType 利用关联类型声明了返回值为关联类型的泛型方法 <code>asObservable</code>:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt">1
@@ -232,7 +234,7 @@
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>ObservableType 则增加了 <code>subscribe(_:)</code> 方法：</p>
+</div><p>协议 ObservableType 则声明了 <code>subscribe(_:)</code> 方法：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -269,10 +271,8 @@
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>同时，利用 subscribe 方法完成了对 <code>asObservable()</code> 默认实现的扩展。</p>
-<p>关于上面的 temporary workaround 注释，翻了一下 <a href="https://github.com/ReactiveX/RxSwift/blob/master/RxSwift/ObservableType.swift">ObservableType.swift</a> 的 git history 是在 Swift 3.0 添加的。这种写法在 Swift 5.0 是可以 work 的。</p>
-<p>为什么可以这么写呢  ？</p>
-<p>我们先看 <code>creat(_:)</code> 的声明，在 <a href="https://github.com/ReactiveX/RxSwift/blob/master/RxSwift/Observables/Create.swift">Create.swift</a> 中定义：</p>
+</div><p>并利用 <code>subscribe(_:)</code> 方法完成了对 <code>asObservable()</code> 默认实现的扩展。</p>
+<p>关于注释  temporary workaround，翻了一下 <a href="https://github.com/ReactiveX/RxSwift/blob/master/RxSwift/ObservableType.swift">git history</a> 在 Swift 3.0 添加的。这种写法在 Swift 5.0 上是可以 work 的，不知为何注释了。那为什么可以这么写呢 ？稍微扯一下，可以看 <a href="https://github.com/ReactiveX/RxSwift/blob/master/RxSwift/Observables/Create.swift">creat(_:)</a> 的声明：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt">1
@@ -291,16 +291,16 @@
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>参数是 closure，而 closure 本质就是匿名函数，在 Swift 中函数作为一等公民，是可以直接作为入参的。因此，上面可以省略 closure 直接写成：</p>
+</div><p>其参数 subscribe 是一个 closure，而 closure 本质就是匿名函数。在 Swift 中函数作为一等公民，是可以直接作为参数传递的。因此，上面可以省略 closure 直接写成：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="k">return</span> <span class="n">Observable</span><span class="p">.</span><span class="n">create</span><span class="p">(</span><span class="kc">self</span><span class="p">.</span><span class="n">subscribe</span><span class="p">)</span>
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="n">Observable</span><span class="p">.</span><span class="n">create</span><span class="p">(</span><span class="kc">self</span><span class="p">.</span><span class="n">subscribe</span><span class="p">)</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>最后看 Observable ：</p>
+</div><p>再来 Observable ：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -327,12 +327,12 @@
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>作为一个抽象类，仅做了两件事：</p>
+</div><p>它仅做了两件事：</p>
 <ol>
-<li>将<code>subscribe(_:)</code>方法标记为空方法，并通过 <a href="https://swifter.tips/fatalerror/">fatalError</a> 强制要求子类去实现；</li>
+<li>将 <code>subscribe(_:)</code> 方法标记为抽象方法，并通过 <a href="https://swifter.tips/fatalerror/">fatalError</a> 来强制要求子类去实现；</li>
 <li>在 <code>asObservable() </code> 中将 self 直接 return。</li>
 </ol>
-<p>上面代码其实忽略了 <code>init()</code> 和 <code>deinit()</code> 的方法实现，RxSwift 在这两方法中引入了内部的资源统计，用于 debug，感兴趣的可以自行了解，实现如下:</p>
+<p>上面代码中没有列出 <code>init()</code> 和 <code>deinit()</code> 的实现，RxSwift 在这两方法中引入了内部的资源统计，用于 debug，实现如下，感兴趣的可以深究:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -359,8 +359,10 @@
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
-</div><h2 id="producer">Producer</h2>
-<p>前面 <code>of(_:)</code> 方法返回的 ObservableSequence 是 Producer 的具体子类。看一下 <a href="https://github.com/ReactiveX/RxSwift/blob/c6c0c540109678b96639c25e9c0ebe4a6d7a69a9/RxSwift/Observables/Producer.swift">Producer</a>：</p>
+</div><p>序列存储已经结束，流的创建才刚刚开始。先贴一张脑图补一补，其实每个流的变换操作背后都对应一个 ObservableType 的扩展。</p>
+<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gcvl07flwjj224o1smqh7.jpg" alt="rxswift"></p>
+<h1 id="producerhttpsgithubcomreactivexrxswiftblobc6c0c540109678b96639c25e9c0ebe4a6d7a69a9rxswiftobservablesproducerswift"><a href="https://github.com/ReactiveX/RxSwift/blob/c6c0c540109678b96639c25e9c0ebe4a6d7a69a9/RxSwift/Observables/Producer.swift">Producer</a></h1>
+<p>再来看本文的重点之一 Producer：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -394,15 +396,20 @@
 </code></pre></td></tr></table>
 </div>
 </div><blockquote>
-<p>Scheduler 是 RxSwift 中相关的线程调度，它会根据标识选择相应线程去处理任务，先忽略。</p>
+<p>注释的 Scheduler 是 RxSwift 中相关的线程调度，它会根据标识选择相应线程去处理任务，我们先忽略。</p>
 </blockquote>
-<p><code>run(_:cancel:)</code> 作为抽象方法，它是出发 Observable 订阅逻辑的，先忽略。主要看 <code>subscribe(_:)</code> 的内容：</p>
+<p>看字面意思也能猜出它的作用吧。同样为抽象类，它的角色更像是一个管理者。它管理着 Observable 的创建、订阅、回收。每个 Producer 实例则对应一条流水线，而 RxSwift 则可以看作大型工厂，通过 Producer 持续的生产和消费 Observable。</p>
+<p>###run(_:cancel:)</p>
+<p>它对应流的创建，也包括对每个节点发送 Event 事件。作为抽象方法，子类通过重载来提供流的多元化创建。同时 run 方法所返回的 sink 则保存了各个节点的元数据，subscription 则保存了流的订阅操作。详细会在 Sink 类作展开。</p>
+<p>###subscribe(_:)</p>
+<p>它通过 sinkDisposer 来统一回收流所引用的元数据以及订阅相关的资源。</p>
 <ol>
-<li>判断是否需要用 <code>Scheduler</code> 切换线程来进行调用；</li>
-<li>创建 SinkDisposer，和 obserer 一起作为 <code>run(_:cancel:)</code> 的入参；</li>
-<li>执行 <code>run(_:cancel:)</code> 然后将结果保存到 sinkDisposer 中，并返回；</li>
+<li>判断是否需要用 <code>scheduler</code> 切换到指定的线程，来进行订阅逻辑的处理；</li>
+<li>创建 sinkDisposer，同 obserer 一起作为 <code>run(_:cancel:)</code> 的入参；</li>
+<li>将执行 <code>run(_:cancel:)</code> 方法后的结果保存到 sinkDisposer 中，为之后的资源销毁做准备；</li>
+<li>最后返回 sinkDisposer；</li>
 </ol>
-<p>对于存入 sinkDisposer 的执行结果我们在后面展开，先看 SinkDisposer 类。</p>
+<p>那就先就近先看 SinkDisposer 类。</p>
 <h3 id="sinkdisposer">SinkDisposer</h3>
 <blockquote>
 <p>The returned disposable needs to release all references once it was disposed.</p>
@@ -450,10 +457,7 @@
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>这里的 sink 与 subscription 先简单说明一下，后面会单独剖析。</p>
-<p><strong>Sink</strong>：主要功能就是连接序列，先将源事件流经过 transform 转换为新的流，再向观察者传递；</p>
-<p><strong>Subscription</strong>：则是流的订阅操作，如果是 Swift.Sequence 的序列它会递归调用；</p>
-<p>先看一下它的继承关系：</p>
+</div><p>先分析它的继承关系：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt">1
@@ -464,21 +468,6 @@
 <pre class="chroma"><code class="language-swift" data-lang="swift"><span class="o">|</span> <span class="o">---</span> <span class="n">SinkDisposer</span>
     <span class="o">|</span> <span class="o">---</span> <span class="n">Cancelable</span>
         <span class="o">|</span> <span class="o">---</span> <span class="n">Disposable</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>Cancelable，用于标识资源是否被释放：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">public</span> <span class="kd">protocol</span> <span class="nc">Cancelable</span> <span class="p">:</span> <span class="n">Disposable</span> <span class="p">{</span>
-    <span class="c1">//</span><span class="c1">/</span><span class="c1"> </span><span class="c1">W</span><span class="c1">a</span><span class="c1">s</span><span class="c1"> </span><span class="c1">r</span><span class="c1">e</span><span class="c1">s</span><span class="c1">o</span><span class="c1">u</span><span class="c1">r</span><span class="c1">c</span><span class="c1">e</span><span class="c1"> </span><span class="c1">d</span><span class="c1">i</span><span class="c1">s</span><span class="c1">p</span><span class="c1">o</span><span class="c1">s</span><span class="c1">e</span><span class="c1">d</span><span class="c1">.</span>
-    <span class="kd">var</span> <span class="nv">isDisposed</span><span class="p">:</span> <span class="nb">Bool</span> <span class="p">{</span> <span class="kr">get</span> <span class="p">}</span>
-<span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>Disposable 则是用于释放资源:</p>
@@ -496,7 +485,22 @@
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>那 sinkDisposer 对保存结果做了什么处理，又是如何来释放资源的呢？</p>
+</div><p>Cancelable，用于标识资源是否被释放：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">public</span> <span class="kd">protocol</span> <span class="nc">Cancelable</span> <span class="p">:</span> <span class="n">Disposable</span> <span class="p">{</span>
+    <span class="c1">//</span><span class="c1">/</span><span class="c1"> </span><span class="c1">W</span><span class="c1">a</span><span class="c1">s</span><span class="c1"> </span><span class="c1">r</span><span class="c1">e</span><span class="c1">s</span><span class="c1">o</span><span class="c1">u</span><span class="c1">r</span><span class="c1">c</span><span class="c1">e</span><span class="c1"> </span><span class="c1">d</span><span class="c1">i</span><span class="c1">s</span><span class="c1">p</span><span class="c1">o</span><span class="c1">s</span><span class="c1">e</span><span class="c1">d</span><span class="c1">.</span>
+    <span class="kd">var</span> <span class="nv">isDisposed</span><span class="p">:</span> <span class="nb">Bool</span> <span class="p">{</span> <span class="kr">get</span> <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>那 sinkDisposer 对保存结果做了什么处理，又是如何来释放资源的呢？主要靠下面这个方法。</p>
 <p>####setSinkAndSubscription</p>
 <p>实现如下：</p>
 <div class="highlight"><div class="chroma">
@@ -534,10 +538,10 @@
 </code></pre></td></tr></table>
 </div>
 </div><ol>
-<li>保存 sink 和 subscription （通过声明可知，这两均为 Disposable）</li>
-<li>获取 previousState；</li>
-<li>如果 previousState 为 .sinkAndSubscriptionSet，则直接抛错来防止重复调用；</li>
-<li>如果 previousState 为 .disposed，则对 sink 和 subscription 执行 <code>dispose()</code> 以释放资源，同时将它们置 nil。</li>
+<li>保存 sink 和 subscription （均为 Disposable）</li>
+<li>获取 previousState （当前资源的状态是否被标示为已清理或已设置) ；</li>
+<li>如果 previousState 为 .sinkAndSubscriptionSet，则已设置过资源，直接抛错来防止重复调用；</li>
+<li>如果 previousState 为 .disposed，则资源已不可用，会对 sink 和 subscription 执行 <code>dispose()</code> 以释放资源，同时将它们置 nil。</li>
 </ol>
 <p>这里，可能有小伙伴有疑问，一个 state 如何保存两个状态？来瞅一眼 <a href="https://github.com/ReactiveX/RxSwift/blob/master/Platform/AtomicInt.swift">AtomicInt</a> 简化后的部分实现：</p>
 <div class="highlight"><div class="chroma">
@@ -598,12 +602,16 @@
 <p>说明：Atomic 中有返回值都的方法都有 <strong>@discardableResult</strong> 标记，只是这边简化了，同时所有方法都是
 <strong>@inline(__always)</strong> 标记的。</p>
 </blockquote>
-<p>首先，之前版本的 AtomicInt 是用 <a href="https://opensource.apple.com/source/xnu/xnu-201.5/libkern/libkern/OSAtomic.h.auto.html">OSAtomic.h</a> 的 API 来实现的，现在改成用 NSLock 了。</p>
-<p>这里看到 <em>位运算符</em> 大家应该知道它是怎么实现了吧。通过每个 bit 来保存一个 flag 从而提高了访问效率。</p>
-<p>接着我们看 <code>fetchOr(_: _: )</code> 它其实做了两件事情。1. 先取出当前 value 做为返回值；2. 将 mask 值保存到 value 中；</p>
+<p>之前版本的 AtomicInt 是用 <a href="https://opensource.apple.com/source/xnu/xnu-201.5/libkern/libkern/OSAtomic.h.auto.html">OSAtomic.h</a> 的 API 来实现的，现在改成用 NSLock 了。</p>
+<p>这里看到 <em>位运算符</em> 大家应该知道它是怎么实现了吧。它通过每个 bit 来保存一个 flag 从而提高了访问效率。</p>
+<p>接着我们看 <code>fetchOr(_:_:)</code> 它其实做了两件事情。</p>
+<ol>
+<li>先取出当前 value 做为返回值；</li>
+<li>将 mask 值保存到 value 中；</li>
+</ol>
 <p>by the way，前面提到过 RxSwift 内部的资源统计方法 <code>Resources.incrementTotal()</code>  就是用 <code>increment(_:)</code> 实现的。 <code>Resources.decrementTotal()</code> 同理。</p>
 <h4 id="dispose">dispose</h4>
-<p>理解了 setSinkAndSubscription 后 dispose 就不难了，我看实现：</p>
+<p>理解了 setSinkAndSubscription 后 dispose 就不难了，实现如下：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -660,8 +668,191 @@
 </li>
 </ol>
 <p>RxSwift 通过 AutomicInt 的位运算，巧妙的用一个变量高效完成了多个状态的存储，最重要的是它保证了只有一次有效的 <code>dispose</code> 操作。还有很重要的一点，在释放资源后，sinkDisposer 都会主动将 sink 和 subscription 置 nil，这是为了解决<strong>循环引用</strong>。因为在 Sink 内部其实也引用了 sinkDisposer。</p>
+<h2 id="sink">Sink</h2>
+<p>项目中的 issue 有一个简单描述 <a href="https://github.com/ReactiveX/RxSwift/issues/817">What is a Sink ?</a></p>
+<blockquote>
+<p>It's an internal class used to implement the operators, that receives events and processes them.</p>
+</blockquote>
+<p>Sink，接受 Event 事件并进行相应处理或者将其转发，是实现各种运算符的内部类，比如 Map、Reduce、Filter 运算符等。作为 Producer 背后的苦力一直默默付出。</p>
+<p>Sink 从哪里来的呢？继续以开头的 <code>Observable.of(1, 2, 3)</code> 为例，看 ObservableSequence 的 run 方法实现：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kr">final</span> <span class="kd">private</span> <span class="kd">class</span> <span class="nc">ObservableSequence</span><span class="p">&lt;</span><span class="n">Sequence</span><span class="p">:</span> <span class="n">Swift</span><span class="p">.</span><span class="n">Sequence</span><span class="p">&gt;</span><span class="p">:</span> <span class="n">Producer</span><span class="p">&lt;</span><span class="n">Sequence</span><span class="p">.</span><span class="n">Element</span><span class="p">&gt;</span> <span class="p">{</span>
+    <span class="c1">//</span><span class="c1">/</span><span class="c1"> </span><span class="c1">i</span><span class="c1">n</span><span class="c1">i</span><span class="c1">t</span><span class="c1"> </span><span class="c1">.</span><span class="c1">.</span><span class="c1">.</span>
+   
+    <span class="kr">override</span> <span class="kd">func</span> <span class="nf">run</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">:</span> <span class="n">ObserverType</span><span class="p">&gt;</span><span class="p">(</span><span class="kc">_</span> <span class="n">observer</span><span class="p">:</span> <span class="n">Observer</span><span class="p">,</span> <span class="n">cancel</span><span class="p">:</span> <span class="n">Cancelable</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="p">(</span><span class="n">sink</span><span class="p">:</span> <span class="n">Disposable</span><span class="p">,</span> <span class="n">subscription</span><span class="p">:</span> <span class="n">Disposable</span><span class="p">)</span> <span class="k">where</span> <span class="n">Observer</span><span class="p">.</span><span class="n">Element</span> <span class="p">=</span><span class="p">=</span> <span class="n">Element</span> <span class="p">{</span>
+        <span class="kd">let</span> <span class="nv">sink</span> <span class="p">=</span> <span class="n">ObservableSequenceSink</span><span class="p">(</span><span class="n">parent</span><span class="p">:</span> <span class="kc">self</span><span class="p">,</span> <span class="n">observer</span><span class="p">:</span> <span class="n">observer</span><span class="p">,</span> <span class="n">cancel</span><span class="p">:</span> <span class="n">cancel</span><span class="p">)</span>
+        <span class="kd">let</span> <span class="nv">subscription</span> <span class="p">=</span> <span class="n">sink</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">sink</span><span class="p">:</span> <span class="n">sink</span><span class="p">,</span> <span class="n">subscription</span><span class="p">:</span> <span class="n">subscription</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>在其初始化时将关键数据都保存起来：</p>
+<ul>
+<li>self 为 Swift.Sequence&lt;Int&gt;</li>
+<li>observer</li>
+<li>cancel 为 SinkDisposer</li>
+</ul>
+<p>Sink 创建完后会将执行 <code>run()</code> 的结果作为 subscription，同 sink 一起返回后存入 sinkDisposer 中。这也是前面提到的有循环引用的情况，不过在 sinkDispoer 的 dispose 过程中做了 break。</p>
+<p>Sink 声明如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">class</span> <span class="nc">Sink</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">:</span> <span class="n">ObserverType</span><span class="p">&gt;</span> <span class="p">:</span> <span class="n">Disposable</span> <span class="p">{</span>
+    <span class="n">fileprivate</span> <span class="kd">let</span> <span class="nv">_observer</span><span class="p">:</span> <span class="n">Observer</span>
+    <span class="n">fileprivate</span> <span class="kd">let</span> <span class="nv">_cancel</span><span class="p">:</span> <span class="n">Cancelable</span> <span class="c1">//</span><span class="c1"> </span><span class="c1">s</span><span class="c1">i</span><span class="c1">n</span><span class="c1">k</span><span class="c1">D</span><span class="c1">i</span><span class="c1">s</span><span class="c1">p</span><span class="c1">o</span><span class="c1">s</span><span class="c1">e</span><span class="c1">r</span>
+    <span class="kd">private</span> <span class="kd">let</span> <span class="nv">_disposed</span> <span class="p">=</span> <span class="n">AtomicInt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="kr">final</span> <span class="kd">func</span> <span class="nf">forwardOn</span><span class="p">(</span><span class="kc">_</span> <span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">.</span><span class="n">Element</span><span class="p">&gt;</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="n">isFlagSet</span><span class="p">(</span><span class="kc">self</span><span class="p">.</span><span class="n">_disposed</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span>
+        <span class="p">}</span>
+        <span class="kc">self</span><span class="p">.</span><span class="n">_observer</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="kr">final</span> <span class="kd">func</span> <span class="nf">forwarder</span><span class="p">(</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">SinkForward</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">&gt;</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">SinkForward</span><span class="p">(</span><span class="n">forward</span><span class="p">:</span> <span class="kc">self</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="kr">final</span> <span class="kd">var</span> <span class="nv">disposed</span><span class="p">:</span> <span class="nb">Bool</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">isFlagSet</span><span class="p">(</span><span class="kc">self</span><span class="p">.</span><span class="n">_disposed</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="kd">func</span> <span class="nf">dispose</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">fetchOr</span><span class="p">(</span><span class="kc">self</span><span class="p">.</span><span class="n">_disposed</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="kc">self</span><span class="p">.</span><span class="n">_cancel</span><span class="p">.</span><span class="n">dispose</span><span class="p">(</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>又见到 AtomicInt，这次是修饰 _disposed 属性，各位自行理解。我们看核心方法：</p>
+<ol>
+<li><code>forwardOn(_:)</code> 用于转发，将 event 事件传递到 <code>Observer.on(_:)</code>；</li>
+<li><code>dispose()</code> 直接调用 sinkDisposer -&gt; <code>dispose()</code>;</li>
+</ol>
+<p><code>forwarder()</code>  返回的 SinkForward 是 Observer 对象，它将 sink 的 observer 做了包装，该方法主要用于 <code>timeout()</code> 方法。转发逻辑如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kr">final</span> <span class="kd">class</span> <span class="nc">SinkForward</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">:</span> <span class="n">ObserverType</span><span class="p">&gt;</span><span class="p">:</span> <span class="n">ObserverType</span> <span class="p">{</span>
+
+    <span class="kr">final</span> <span class="kd">func</span> <span class="nf">on</span><span class="p">(</span><span class="kc">_</span> <span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">switch</span> <span class="n">event</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="p">.</span><span class="n">next</span><span class="p">:</span>
+            <span class="kc">self</span><span class="p">.</span><span class="n">_forward</span><span class="p">.</span><span class="n">_observer</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+        <span class="k">case</span> <span class="p">.</span><span class="n">error</span><span class="p">,</span> <span class="p">.</span><span class="n">completed</span><span class="p">:</span>
+            <span class="kc">self</span><span class="p">.</span><span class="n">_forward</span><span class="p">.</span><span class="n">_observer</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+            <span class="kc">self</span><span class="p">.</span><span class="n">_forward</span><span class="p">.</span><span class="n">_cancel</span><span class="p">.</span><span class="n">dispose</span><span class="p">(</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>它不仅收集资源同时还加工以及转发事件。最后回到 ObservableSequenceSink 来看 <code>run()</code> 方法：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kr">final</span> <span class="kd">private</span> <span class="kd">class</span> <span class="nc">ObservableSequenceSink</span><span class="p">&lt;</span><span class="n">Sequence</span><span class="p">:</span> <span class="n">Swift</span><span class="p">.</span><span class="n">Sequence</span><span class="p">,</span> <span class="n">Observer</span><span class="p">:</span> <span class="n">ObserverType</span><span class="p">&gt;</span><span class="p">:</span> <span class="n">Sink</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">&gt;</span> <span class="k">where</span> <span class="n">Sequence</span><span class="p">.</span><span class="n">Element</span> <span class="p">=</span><span class="p">=</span> <span class="n">Observer</span><span class="p">.</span><span class="n">Element</span> <span class="p">{</span>
+    <span class="kd">typealias</span> <span class="n">Parent</span> <span class="p">=</span> <span class="n">ObservableSequence</span><span class="p">&lt;</span><span class="n">Sequence</span><span class="p">&gt;</span>
+
+    <span class="kd">private</span> <span class="kd">let</span> <span class="nv">_parent</span><span class="p">:</span> <span class="n">Parent</span>
+
+    <span class="kd">func</span> <span class="nf">run</span><span class="p">(</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">Disposable</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="kc">self</span><span class="p">.</span><span class="n">_parent</span><span class="p">.</span><span class="n">_scheduler</span><span class="p">.</span><span class="n">scheduleRecursive</span><span class="p">(</span><span class="kc">self</span><span class="p">.</span><span class="n">_parent</span><span class="p">.</span><span class="n">_elements</span><span class="p">.</span><span class="n">makeIterator</span><span class="p">(</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span> <span class="n">iterator</span><span class="p">,</span> <span class="n">recurse</span> <span class="k">in</span>
+            <span class="kd">var</span> <span class="nv">mutableIterator</span> <span class="p">=</span> <span class="n">iterator</span>
+            <span class="k">if</span> <span class="kd">let</span> <span class="nv">next</span> <span class="p">=</span> <span class="n">mutableIterator</span><span class="p">.</span><span class="n">next</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
+                <span class="kc">self</span><span class="p">.</span><span class="n">forwardOn</span><span class="p">(</span><span class="p">.</span><span class="n">next</span><span class="p">(</span><span class="n">next</span><span class="p">)</span><span class="p">)</span>
+                <span class="n">recurse</span><span class="p">(</span><span class="n">mutableIterator</span><span class="p">)</span>
+            <span class="p">}</span>
+            <span class="k">else</span> <span class="p">{</span>
+                <span class="kc">self</span><span class="p">.</span><span class="n">forwardOn</span><span class="p">(</span><span class="p">.</span><span class="n">completed</span><span class="p">)</span>
+                <span class="kc">self</span><span class="p">.</span><span class="n">dispose</span><span class="p">(</span><span class="p">)</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>_scheduler.scheduleRecursive</strong> 背后是 RxSwift 对于容器对象的线程调度，也不展开。这里的 <code>run()</code>方法 做了几个事情：</p>
+<ol>
+<li>Scheduler 会在指定线程中调用 Swift.Sequence 的迭代器，以遍历每个元素。</li>
+<li>获取到元素后，将 next 事件不断转发给 Observer；</li>
+<li>迭代结束后，发送 completed 事件至 Observer 并调用 dispose 出发 sinkDisposer 的资源清理操作；</li>
+</ol>
+<p>关于 Sink 再说明一下，本篇是以 Sequence 作为切入点，不同 Operator 背后的 Producer 所产生的 Sink 实现是有不少区别的，比如 Just 流只产生单个节点，则直接在重载的 subscribe 方法里发送 Event 然后就调用 dispose 结束了。因此，每个 operator 的实现会有比较大的出路，但是整体流程是由这些内部类来限制和保证的。</p>
 <h2 id="subscription">Subscription</h2>
-<p>Observable stream 的创建已经说完了，我们回到文章开头接着聊一聊订阅操作，下面这行代码：</p>
+<p>我们回到文章开头接着聊一聊订阅：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt">1
@@ -670,7 +861,7 @@
 <pre class="chroma"><code class="language-swift" data-lang="swift"><span class="p">.</span><span class="n">subscribe</span><span class="p">(</span> <span class="p">{</span> <span class="bp">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span><span class="p">)</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>同 <code>of(_:)</code> 一样，订阅操作也是对 ObservableType 扩展实现的。具体见 <a href="https://github.com/ReactiveX/RxSwift/blob/master/RxSwift/ObservableType%2BExtensions.swift">ObservableType+Extensions.swift</a>，简化后代码如下：</p>
+</div><p>同 <code>of(_:)</code> 一样，订阅也是对 <a href="https://github.com/ReactiveX/RxSwift/blob/master/RxSwift/ObservableType%2BExtensions.swift">ObservableType 扩展</a>来实现的。简化后如下：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -707,7 +898,7 @@
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>两个 subscribe 方法都是将订阅的操作存入 AnonymousObserver 中，然后通过 <code>asObservable()</code> 获取 producer 并最终调用 producer 的 <code>subscribe(_:)</code> 完成订阅。</p>
+</div><p>两个 subscribe 方法都是将订阅的操作存入 AnonymousObserver 中，然后通过 <code>asObservable()</code> 获取 producer 并最终其 <code>subscribe(_:)</code> 以完成订阅。</p>
 <p>我们看看 <a href="https://github.com/ReactiveX/RxSwift/blob/master/RxSwift/Observers/AnonymousObserver.swift">AnonymousObserver</a> 是什么来头：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -731,7 +922,7 @@
     <span class="kd">typealias</span> <span class="n">EventHandler</span> <span class="p">=</span> <span class="p">(</span><span class="n">Event</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">Void</span>
     
     <span class="kd">private</span> <span class="kd">let</span> <span class="nv">_eventHandler</span> <span class="p">:</span> <span class="n">EventHandler</span>
-    
+    <span class="c1">//</span><span class="c1">/</span><span class="c1"> </span><span class="c1">这</span><span class="c1">里</span><span class="c1">同</span><span class="c1">样</span><span class="c1">忽</span><span class="c1">略</span><span class="c1">了</span><span class="c1"> </span><span class="c1">`</span><span class="c1">i</span><span class="c1">n</span><span class="c1">i</span><span class="c1">t</span><span class="c1">(</span><span class="c1">)</span><span class="c1">`</span><span class="c1"> </span><span class="c1">与</span><span class="c1"> </span><span class="c1">`</span><span class="c1">d</span><span class="c1">e</span><span class="c1">i</span><span class="c1">n</span><span class="c1">i</span><span class="c1">t</span><span class="c1">(</span><span class="c1">)</span><span class="c1">`</span><span class="c1"> </span><span class="c1">的</span><span class="c1">资</span><span class="c1">源</span><span class="c1">统</span><span class="c1">计</span><span class="c1">逻</span><span class="c1">辑</span>
     <span class="kd">init</span><span class="p">(</span><span class="kc">_</span> <span class="n">eventHandler</span><span class="p">:</span> <span class="p">@</span><span class="n">escaping</span> <span class="n">EventHandler</span><span class="p">)</span> <span class="p">{</span>
         <span class="c1">//</span><span class="c1">/</span><span class="c1"> </span><span class="c1">资</span><span class="c1">源</span><span class="c1">统</span><span class="c1">计</span>
         <span class="kc">self</span><span class="p">.</span><span class="n">_eventHandler</span> <span class="p">=</span> <span class="n">eventHandler</span>
@@ -743,10 +934,7 @@
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
-</div><blockquote>
-<p>这里同样忽略了 <code>init()</code> 与 <code>deinit()</code> 的资源统计逻辑</p>
-</blockquote>
-<p>很简单，仅有一个 <code>_eventHandler</code> 属性保存订阅操作，然后在 <code>onCore(_:)</code> 中调用它。在翻它父类之前，看一眼它的继承关系：</p>
+</div><p>很简单，仅有一个 <code>_eventHandler</code> 属性保存订阅操作，然后在 <code>onCore(_:)</code> 中调用它。在翻它父类之前，看一眼它的继承关系：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt">1
@@ -759,7 +947,7 @@
         <span class="o">|</span> <span class="o">---</span> <span class="n">Disposable</span><span class="err">、</span><span class="n">ObserverType</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>Disposable 我们已经知道了，先来看 ObserverType：</p>
+</div><p>Disposable 我们已经知道了，看 ObserverType：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -891,9 +1079,9 @@
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>ObserverBase 利用 Atomic 声明的 _isStopped 属性作为哨兵，以保证资源被标记 _isStopped 后不会产生重复调用的问题。那么，如何做到的呢？</p>
+</div><p>ObserverBase 利用 Atomic 声明的 _isStopped 属性作为哨兵，以保证资源被标记 _isStopped 后不会产生重复调用的。那么，如何做到的呢？</p>
 <p>通过判断 _isStopped 是否为 0 来表示资源是否可用。一旦调用 <code>dispose()</code> 会将其值置为 1，则资源不可用。</p>
-<p>另一种则在 <code>on</code> 方法内，实现逻辑如下：</p>
+<p>另一种情况则在 <code>on</code> 方法内，实现逻辑如下：</p>
 <ol>
 <li>event 为 .next 事件：通过 <code>load(_:)</code> 取出 _isStopped 值并判断值是否为 0，是则执行 <code>onCore(event)</code> ；</li>
 <li>event 为 .error、.completed 事件：
@@ -904,196 +1092,10 @@
 </li>
 </ol>
 <p>因此 ObserverBase 核心功作用是保证暴露给子类的  <code>onCore(_:)</code>  在观察结束后不会被重复执行。也就是保证 AnonymousObserver 的 eventHandler 被正确执行。</p>
-<h2 id="sink">Sink</h2>
-<p><a href="https://github.com/ReactiveX/RxSwift/issues/817">What is a Sink ?</a></p>
-<blockquote>
-<p>It's an internal class used to implement the operators, that receives events and processes them. Beyond that, I think you'll have to go through the code to figure out how it works.</p>
-</blockquote>
-<p>Sink 接受 event 事件并进行相应的处理，实现了一系列的 Transform 等操作，比如 Map、Reduce、Filter。作为 Producer 背后的苦力一直默默付出。</p>
-<p>Sink 从哪里来的呢？我们还得从开头的例子 <code>Observable.of(1, 2, 3)</code> 返回的 ObservableSequence  说起:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span><span class="lnt">9
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kr">final</span> <span class="kd">private</span> <span class="kd">class</span> <span class="nc">ObservableSequence</span><span class="p">&lt;</span><span class="n">Sequence</span><span class="p">:</span> <span class="n">Swift</span><span class="p">.</span><span class="n">Sequence</span><span class="p">&gt;</span><span class="p">:</span> <span class="n">Producer</span><span class="p">&lt;</span><span class="n">Sequence</span><span class="p">.</span><span class="n">Element</span><span class="p">&gt;</span> <span class="p">{</span>
-    <span class="c1">//</span><span class="c1">/</span><span class="c1"> </span><span class="c1">i</span><span class="c1">n</span><span class="c1">i</span><span class="c1">t</span><span class="c1"> </span><span class="c1">.</span><span class="c1">.</span><span class="c1">.</span>
-   
-    <span class="kr">override</span> <span class="kd">func</span> <span class="nf">run</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">:</span> <span class="n">ObserverType</span><span class="p">&gt;</span><span class="p">(</span><span class="kc">_</span> <span class="n">observer</span><span class="p">:</span> <span class="n">Observer</span><span class="p">,</span> <span class="n">cancel</span><span class="p">:</span> <span class="n">Cancelable</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="p">(</span><span class="n">sink</span><span class="p">:</span> <span class="n">Disposable</span><span class="p">,</span> <span class="n">subscription</span><span class="p">:</span> <span class="n">Disposable</span><span class="p">)</span> <span class="k">where</span> <span class="n">Observer</span><span class="p">.</span><span class="n">Element</span> <span class="p">=</span><span class="p">=</span> <span class="n">Element</span> <span class="p">{</span>
-        <span class="kd">let</span> <span class="nv">sink</span> <span class="p">=</span> <span class="n">ObservableSequenceSink</span><span class="p">(</span><span class="n">parent</span><span class="p">:</span> <span class="kc">self</span><span class="p">,</span> <span class="n">observer</span><span class="p">:</span> <span class="n">observer</span><span class="p">,</span> <span class="n">cancel</span><span class="p">:</span> <span class="n">cancel</span><span class="p">)</span>
-        <span class="kd">let</span> <span class="nv">subscription</span> <span class="p">=</span> <span class="n">sink</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">sink</span><span class="p">:</span> <span class="n">sink</span><span class="p">,</span> <span class="n">subscription</span><span class="p">:</span> <span class="n">subscription</span><span class="p">)</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>可知 Sink 由 Producer 生成的，在其初始化时将关键数据都存入 sink 对象：</p>
-<ul>
-<li>self 保存了 <strong>Swift.Sequence&lt;Int&gt;</strong> 序列；</li>
-<li>observer；</li>
-<li>cancel 为 Producer 的 subscribe 方法中生成的 SinkDisposer。</li>
-</ul>
-<p>Sink 创建完后会将执行 <code>run()</code> 的结果作为 subscription，同 sink 一起返回后存入 sinkDisposer 中。这也是前面提到的 sinkDisposer 和 sink 是有循环引用的问题，不过在 sinkDispoer 的 dispose 过程中做了 break。</p>
-<p>Sink 声明如下：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">class</span> <span class="nc">Sink</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">:</span> <span class="n">ObserverType</span><span class="p">&gt;</span> <span class="p">:</span> <span class="n">Disposable</span> <span class="p">{</span>
-    <span class="n">fileprivate</span> <span class="kd">let</span> <span class="nv">_observer</span><span class="p">:</span> <span class="n">Observer</span>
-    <span class="n">fileprivate</span> <span class="kd">let</span> <span class="nv">_cancel</span><span class="p">:</span> <span class="n">Cancelable</span> <span class="c1">//</span><span class="c1"> </span><span class="c1">s</span><span class="c1">i</span><span class="c1">n</span><span class="c1">k</span><span class="c1">D</span><span class="c1">i</span><span class="c1">s</span><span class="c1">p</span><span class="c1">o</span><span class="c1">s</span><span class="c1">e</span><span class="c1">r</span>
-    <span class="kd">private</span> <span class="kd">let</span> <span class="nv">_disposed</span> <span class="p">=</span> <span class="n">AtomicInt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-
-    <span class="kr">final</span> <span class="kd">func</span> <span class="nf">forwardOn</span><span class="p">(</span><span class="kc">_</span> <span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">.</span><span class="n">Element</span><span class="p">&gt;</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="n">isFlagSet</span><span class="p">(</span><span class="kc">self</span><span class="p">.</span><span class="n">_disposed</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">return</span>
-        <span class="p">}</span>
-        <span class="kc">self</span><span class="p">.</span><span class="n">_observer</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
-    <span class="p">}</span>
-
-    <span class="kr">final</span> <span class="kd">func</span> <span class="nf">forwarder</span><span class="p">(</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">SinkForward</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">&gt;</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="n">SinkForward</span><span class="p">(</span><span class="n">forward</span><span class="p">:</span> <span class="kc">self</span><span class="p">)</span>
-    <span class="p">}</span>
-
-    <span class="kr">final</span> <span class="kd">var</span> <span class="nv">disposed</span><span class="p">:</span> <span class="nb">Bool</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="n">isFlagSet</span><span class="p">(</span><span class="kc">self</span><span class="p">.</span><span class="n">_disposed</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="p">}</span>
-
-    <span class="kd">func</span> <span class="nf">dispose</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">fetchOr</span><span class="p">(</span><span class="kc">self</span><span class="p">.</span><span class="n">_disposed</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="kc">self</span><span class="p">.</span><span class="n">_cancel</span><span class="p">.</span><span class="n">dispose</span><span class="p">(</span><span class="p">)</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>又见到 AtomicInt，这次是修饰 _disposed 属性，各位自行理解。我们看核心方法：</p>
-<ol>
-<li><code>forwardOn(_:)</code> 用于转发，将 event 事件传递到 <code>Observer.on(_:)</code>；</li>
-<li><code>dispose()</code> 直接调用 sinkDisposer -&gt; <code>dispose()</code>;</li>
-</ol>
-<p><code>forwarder()</code>  返回的 SinkForward 是 Observer 对象，它将 sink 的 observer 做了包装，该方法主要用于 <code>timeout()</code> 方法。转发逻辑如下：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kr">final</span> <span class="kd">class</span> <span class="nc">SinkForward</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">:</span> <span class="n">ObserverType</span><span class="p">&gt;</span><span class="p">:</span> <span class="n">ObserverType</span> <span class="p">{</span>
-
-    <span class="kr">final</span> <span class="kd">func</span> <span class="nf">on</span><span class="p">(</span><span class="kc">_</span> <span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">switch</span> <span class="n">event</span> <span class="p">{</span>
-        <span class="k">case</span> <span class="p">.</span><span class="n">next</span><span class="p">:</span>
-            <span class="kc">self</span><span class="p">.</span><span class="n">_forward</span><span class="p">.</span><span class="n">_observer</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
-        <span class="k">case</span> <span class="p">.</span><span class="n">error</span><span class="p">,</span> <span class="p">.</span><span class="n">completed</span><span class="p">:</span>
-            <span class="kc">self</span><span class="p">.</span><span class="n">_forward</span><span class="p">.</span><span class="n">_observer</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
-            <span class="kc">self</span><span class="p">.</span><span class="n">_forward</span><span class="p">.</span><span class="n">_cancel</span><span class="p">.</span><span class="n">dispose</span><span class="p">(</span><span class="p">)</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>可见 Sink 与字面意思很相符，它不仅收集资源同时还加工以及转发事件。</p>
-<p>最后回到 ObservableSequenceSink 来看 <code>run()</code> 方法：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kr">final</span> <span class="kd">private</span> <span class="kd">class</span> <span class="nc">ObservableSequenceSink</span><span class="p">&lt;</span><span class="n">Sequence</span><span class="p">:</span> <span class="n">Swift</span><span class="p">.</span><span class="n">Sequence</span><span class="p">,</span> <span class="n">Observer</span><span class="p">:</span> <span class="n">ObserverType</span><span class="p">&gt;</span><span class="p">:</span> <span class="n">Sink</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">&gt;</span> <span class="k">where</span> <span class="n">Sequence</span><span class="p">.</span><span class="n">Element</span> <span class="p">=</span><span class="p">=</span> <span class="n">Observer</span><span class="p">.</span><span class="n">Element</span> <span class="p">{</span>
-    <span class="kd">typealias</span> <span class="n">Parent</span> <span class="p">=</span> <span class="n">ObservableSequence</span><span class="p">&lt;</span><span class="n">Sequence</span><span class="p">&gt;</span>
-
-    <span class="kd">private</span> <span class="kd">let</span> <span class="nv">_parent</span><span class="p">:</span> <span class="n">Parent</span>
-
-    <span class="kd">func</span> <span class="nf">run</span><span class="p">(</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">Disposable</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="kc">self</span><span class="p">.</span><span class="n">_parent</span><span class="p">.</span><span class="n">_scheduler</span><span class="p">.</span><span class="n">scheduleRecursive</span><span class="p">(</span><span class="kc">self</span><span class="p">.</span><span class="n">_parent</span><span class="p">.</span><span class="n">_elements</span><span class="p">.</span><span class="n">makeIterator</span><span class="p">(</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span> <span class="n">iterator</span><span class="p">,</span> <span class="n">recurse</span> <span class="k">in</span>
-            <span class="kd">var</span> <span class="nv">mutableIterator</span> <span class="p">=</span> <span class="n">iterator</span>
-            <span class="k">if</span> <span class="kd">let</span> <span class="nv">next</span> <span class="p">=</span> <span class="n">mutableIterator</span><span class="p">.</span><span class="n">next</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
-                <span class="kc">self</span><span class="p">.</span><span class="n">forwardOn</span><span class="p">(</span><span class="p">.</span><span class="n">next</span><span class="p">(</span><span class="n">next</span><span class="p">)</span><span class="p">)</span>
-                <span class="n">recurse</span><span class="p">(</span><span class="n">mutableIterator</span><span class="p">)</span>
-            <span class="p">}</span>
-            <span class="k">else</span> <span class="p">{</span>
-                <span class="kc">self</span><span class="p">.</span><span class="n">forwardOn</span><span class="p">(</span><span class="p">.</span><span class="n">completed</span><span class="p">)</span>
-                <span class="kc">self</span><span class="p">.</span><span class="n">dispose</span><span class="p">(</span><span class="p">)</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p><strong>_scheduler.scheduleRecursive</strong> 背后是 RxSwift 对于容器对象的线程调度，不展开。这里的 <code>run()</code>方法 做了几个事情：</p>
-<ol>
-<li>schedule 会在指定线程中调用 Swift.Sequence 的迭代器，以遍历每个元素。</li>
-<li>获取到元素后，将 next 事件不断转发给 Observer；</li>
-<li>迭代结束后，发送 completed 事件至 Observer 并调用 dispose 出发 sinkDisposer 的资源清理操作；</li>
-</ol>
-<p>至此，整个订阅流程梳理完毕。关于 Sink 再说明一下，本篇是以 Sequence 作为切入点，不同 Operator 背后的 Producer 所产生的 Sink 实现是有不少区别的，这里就不做展开。</p>
-<p>先贴一张脑图补一补：</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gcvl07flwjj224o1smqh7.jpg" alt="rxswift"></p>
-<p>订阅相关的类图，回顾一下：</p>
+<p>最后，回顾一下订阅相关流程：</p>
 <p><img src="http://ww1.sinaimg.cn/large/8157560cly1gd35tywfx7j223n0wogtr.jpg" alt="rxswift-subscription"></p>
 <h2 id="heading-1">总结</h2>
-<p>RxSwift 所展示的订阅流的处理，不仅充分利用了 Swift 语言本身的特性，如为协议添加默认实现、采用泛型来约束类的行为。还用到了经典的设计模式 <a href="https://www.wikiwand.com/en/Producer%E2%80%93consumer_problem">Producer–consumer</a>，通过多元化的 Producer 来轻松支持各种 operator 的实现。还有比如 OOP 思想将核心逻辑抽离封装以及类的设计，还有就是巧妙的运用了位运算来简化逻辑。</p>
+<p>RxSwift 所展示的订阅流的处理，不仅充分利用了 Swift 语言本身的特性，如为协议添加默认实现、采用泛型来约束类的行为、天然支持链式调用等。通过经典的设计模式 <a href="https://www.wikiwand.com/en/Producer%E2%80%93consumer_problem">Producer–consumer</a>，以多元化的 Producer 来轻松支持各种 operator 的实现。还有就是巧妙的运用了位运算来简化逻辑。</p>
 <p>由于篇幅有限，Schedule 的调度逻辑并未展开，还有就是 DisposeBag 通篇未提及，就当是思考作业啦。</p>
 
     </div>
