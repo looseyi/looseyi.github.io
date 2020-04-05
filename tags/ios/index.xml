@@ -6,10 +6,19 @@
     <description>Recent content in iOS on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Mon, 16 Mar 2020 23:10:58 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 29 Mar 2020 15:10:58 +0800</lastBuildDate>
     
 	<atom:link href="http://localhost:1313/tags/ios/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>浅析 Cocoapods-Packager 实现</title>
+      <link>http://localhost:1313/post/sourcecode-ios/cocoapods-packager/</link>
+      <pubDate>Sun, 29 Mar 2020 15:10:58 +0800</pubDate>
+      
+      <guid>http://localhost:1313/post/sourcecode-ios/cocoapods-packager/</guid>
+      <description>介绍 CocoaPods plugin which allows you to generate a framework or static library from a podspec. This plugin is for CocoaPods developers, who need to distribute their Pods not only via CocoaPods, but also as frameworks or static libraries for people who do not use Pods. 作为 CococaPods 的官方插件之一，CocoaPods Packager 为 Pod</description>
+    </item>
     
     <item>
       <title>源码浅析 RxSwift 5.0 - Subscription</title>

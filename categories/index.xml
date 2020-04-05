@@ -6,7 +6,7 @@
     <description>Recent content in Categories on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 21 Dec 2019 11:37:41 +2100</lastBuildDate>
+    <lastBuildDate>Sun, 29 Mar 2020 15:10:58 +0800</lastBuildDate>
     
 	<atom:link href="http://localhost:1313/categories/index.xml" rel="self" type="application/rss+xml" />
     
@@ -14,7 +14,7 @@
     <item>
       <title>CocoaPods</title>
       <link>http://localhost:1313/categories/cocoapods/</link>
-      <pubDate>Sat, 21 Dec 2019 11:37:41 +2100</pubDate>
+      <pubDate>Sun, 29 Mar 2020 15:10:58 +0800</pubDate>
       
       <guid>http://localhost:1313/categories/cocoapods/</guid>
       <description></description>
@@ -23,9 +23,27 @@
     <item>
       <title>iOS</title>
       <link>http://localhost:1313/categories/ios/</link>
-      <pubDate>Sat, 21 Dec 2019 11:37:41 +2100</pubDate>
+      <pubDate>Sun, 29 Mar 2020 15:10:58 +0800</pubDate>
       
       <guid>http://localhost:1313/categories/ios/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Swift</title>
+      <link>http://localhost:1313/categories/swift/</link>
+      <pubDate>Mon, 16 Mar 2020 23:10:58 +0800</pubDate>
+      
+      <guid>http://localhost:1313/categories/swift/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Objc</title>
+      <link>http://localhost:1313/categories/objc/</link>
+      <pubDate>Wed, 11 Mar 2020 23:08:12 +0800</pubDate>
+      
+      <guid>http://localhost:1313/categories/objc/</guid>
       <description></description>
     </item>
     

@@ -3,21 +3,77 @@
   
   <url>
     <loc>http://localhost:1313/</loc>
-    <lastmod>2020-03-16T23:10:58+08:00</lastmod>
+    <lastmod>2020-03-29T15:10:58+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://localhost:1313/categories/</loc>
+    <lastmod>2020-03-29T15:10:58+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://localhost:1313/tags/cocoapods/</loc>
+    <lastmod>2020-03-29T15:10:58+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://localhost:1313/categories/cocoapods/</loc>
+    <lastmod>2020-03-29T15:10:58+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>http://localhost:1313/tags/ios/</loc>
-    <lastmod>2020-03-16T23:10:58+08:00</lastmod>
+    <lastmod>2020-03-29T15:10:58+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://localhost:1313/categories/ios/</loc>
+    <lastmod>2020-03-29T15:10:58+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://localhost:1313/tags/packager/</loc>
+    <lastmod>2020-03-29T15:10:58+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>http://localhost:1313/post/</loc>
-    <lastmod>2020-03-16T23:10:58+08:00</lastmod>
+    <lastmod>2020-03-29T15:10:58+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://localhost:1313/tags/sourcecode/</loc>
+    <lastmod>2020-03-29T15:10:58+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://localhost:1313/tags/</loc>
+    <lastmod>2020-03-29T15:10:58+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://localhost:1313/post/sourcecode-ios/cocoapods-packager/</loc>
+    <lastmod>2020-03-29T15:10:58+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -30,14 +86,7 @@
   </url>
   
   <url>
-    <loc>http://localhost:1313/tags/sourcecode/</loc>
-    <lastmod>2020-03-16T23:10:58+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>http://localhost:1313/tags/</loc>
+    <loc>http://localhost:1313/categories/swift/</loc>
     <lastmod>2020-03-16T23:10:58+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -52,6 +101,13 @@
   
   <url>
     <loc>http://localhost:1313/tags/cache/</loc>
+    <lastmod>2020-03-11T23:08:12+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://localhost:1313/categories/objc/</loc>
     <lastmod>2020-03-11T23:08:12+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -86,36 +142,8 @@
   </url>
   
   <url>
-    <loc>http://localhost:1313/tags/cocoapods/</loc>
-    <lastmod>2020-01-06T11:40:06+21:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
     <loc>http://localhost:1313/post/sourcecode-ios/cocoapods-binary-2/</loc>
     <lastmod>2020-01-06T11:40:06+21:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>http://localhost:1313/categories/</loc>
-    <lastmod>2019-12-21T11:37:41+21:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>http://localhost:1313/categories/cocoapods/</loc>
-    <lastmod>2019-12-21T11:37:41+21:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>http://localhost:1313/categories/ios/</loc>
-    <lastmod>2019-12-21T11:37:41+21:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>

@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>浅析 Cocoapods-Packager 实现 - </title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="土土Edmond木" /><meta name="description" content="介绍 CocoaPods plugin which allows you to generate a framework or static library from a podspec. This plugin is for CocoaPods developers, who need to distribute their Pods not only via CocoaPods, but also as frameworks or static libraries for people who do not use Pods. 作为 CococaPods 的官方插件之一，CocoaPods Packager 为 Pod" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.62.0 with theme even" />
+
+
+<link rel="canonical" href="http://localhost:1313/post/sourcecode-ios/cocoapods-packager/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="浅析 Cocoapods-Packager 实现" />
+<meta property="og:description" content="介绍 CocoaPods plugin which allows you to generate a framework or static library from a podspec. This plugin is for CocoaPods developers, who need to distribute their Pods not only via CocoaPods, but also as frameworks or static libraries for people who do not use Pods. 作为 CococaPods 的官方插件之一，CocoaPods Packager 为 Pod" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/post/sourcecode-ios/cocoapods-packager/" />
+<meta property="article:published_time" content="2020-03-29T15:10:58+08:00" />
+<meta property="article:modified_time" content="2020-03-29T15:10:58+08:00" />
+<meta itemprop="name" content="浅析 Cocoapods-Packager 实现">
+<meta itemprop="description" content="介绍 CocoaPods plugin which allows you to generate a framework or static library from a podspec. This plugin is for CocoaPods developers, who need to distribute their Pods not only via CocoaPods, but also as frameworks or static libraries for people who do not use Pods. 作为 CococaPods 的官方插件之一，CocoaPods Packager 为 Pod">
+<meta itemprop="datePublished" content="2020-03-29T15:10:58&#43;08:00" />
+<meta itemprop="dateModified" content="2020-03-29T15:10:58&#43;08:00" />
+<meta itemprop="wordCount" content="6032">
+
+
+
+<meta itemprop="keywords" content="CocoaPods,iOS,Packager,SourceCode," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="浅析 Cocoapods-Packager 实现"/>
+<meta name="twitter:description" content="介绍 CocoaPods plugin which allows you to generate a framework or static library from a podspec. This plugin is for CocoaPods developers, who need to distribute their Pods not only via CocoaPods, but also as frameworks or static libraries for people who do not use Pods. 作为 CococaPods 的官方插件之一，CocoaPods Packager 为 Pod"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Aha Moment</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Aha Moment</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">浅析 Cocoapods-Packager 实现</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-03-29 </span>
+        <div class="post-category">
+            <a href="/categories/ios/"> iOS </a>
+            <a href="/categories/cocoapods/"> CocoaPods </a>
+            </div>
+          <span class="more-meta"> 约 6032 字 </span>
+          <span class="more-meta"> 预计阅读 13 分钟 </span>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#heading">介绍</a></li>
+    <li><a href="#cocoapods-plugins">CocoaPods Plugins</a>
+      <ul>
+        <li><a href="#what-can-cocoapods-plugins-do">What can CocoaPods Plugins do?</a></li>
+        <li><a href="#rubygems">RubyGems</a></li>
+        <li><a href="#cocoapods-plugins-1">CocoaPods Plugins</a></li>
+      </ul>
+    </li>
+    <li><a href="#builder">Builder</a>
+      <ul>
+        <li><a href="#build-dynamic-framework">build_dynamic_framework</a></li>
+        <li><a href="#heading-1">总结</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="heading">介绍</h2>
+<blockquote>
+<p>CocoaPods plugin which allows you to generate a framework or static library from a podspec.</p>
+<p>This plugin is for CocoaPods <em>developers</em>, who need to distribute their Pods not only via CocoaPods, but also as frameworks or static libraries for people who do not use Pods.</p>
+</blockquote>
+<p>作为 CococaPods 的官方插件之一，CocoaPods Packager 为 Pod 提供了 <strong>package</strong> 命令来生成 framework or static library。你可以仅凭一个 podspec 文件就能完成一个 framework 或 library 的生成。</p>
+<p>那 Packager 的使用场景有哪些？网上有特别多详细的使用说明文档，而分析实现的比较少。这也是这篇文章的初衷，想知道它是如何 work 的。本身插件也不是很复杂，这里会更挖一些细节。之前简单写了一篇文章：<a href="https://juejin.im/post/5dfdfcc76fb9a0165835acc6">浅析 Cocoapods-Binary 实现</a>，主要是这两个插件的核心逻辑类似，感兴趣的可以拿来对比。它们的区别在于 package 的对象是针对单个 pod 还是整个 project 的。</p>
+<h2 id="cocoapods-plugins">CocoaPods Plugins</h2>
+<p>这次我们先简单谈一谈 CococaPods 的插件原理。作为一款社区产品，仅有的少数核心开发者是无法满足大量开发者的各种需求。因此，在 <a href="https://blog.cocoapods.org/CocoaPods-0.28/">2013 CcocoaPods 开始支持 Plugins</a> 扩展，使得大家可以自行支持所需要的功能。</p>
+<h3 id="what-can-cocoapods-plugins-do">What can CocoaPods Plugins do?</h3>
+<ul>
+<li>可以 Hook pod install 过程，包括 pre_install 与 post_install；</li>
+<li>可以添加新的 pod 命令；</li>
+<li>Ruby 作为 dynamic language，你完全可以随心所欲；</li>
+</ul>
+<h3 id="rubygems">RubyGems</h3>
+<p>开始解释源码钱，需要说一说包管理，不得不提 RubyGems 和 Bundler。CocoaPods 背后的原型就是基于它们俩，当然也会参照其他语言的包管理工具如 npm、Gradle。</p>
+<p><a href="https://rubygems.org/"><strong>Gems</strong></a></p>
+<blockquote>
+<p>RubyGems is a hosted ruby library service. It centralizes where you look for a library, and installing ruby libraries / apps.</p>
+</blockquote>
+<p><a href="https://bundler.io/"><strong>Bundler</strong></a></p>
+<blockquote>
+<p>Bundler provides a consistent environment for Ruby projects by tracking and installing the exact gems and versions that are needed.</p>
+<p>Bundler is an exit from dependency hell, and ensures that the gems you need are present in development, staging, and production. Starting work on a project is as simple as bundle install.</p>
+</blockquote>
+<p>RubyGems 是为 ruby library 提供集中代码托管的服务。Bundler 则是针对当前项目来管理 Gem 版本的工具，</p>
+<p>Bundler 依据项目中的 <a href="https://bundler.io/v2.0/gemfile.html">Gemfiles</a> 文件来管理 Gem，就好比 CocoaPods 通过 Podfile 来管理 Pod 的版本一样。Gemfile 长这样：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">source</span> <span class="s1">&#39;https://gems.example.com&#39;</span> <span class="k">do</span>
+  <span class="n">gem</span> <span class="s1">&#39;cocoapods&#39;</span><span class="p">,</span> <span class="s1">&#39;1.8.4&#39;</span>
+  <span class="n">gem</span> <span class="s1">&#39;another_gem&#39;</span><span class="p">,</span> <span class="ss">:git</span> <span class="o">=</span><span class="o">&gt;</span> <span class="s1">&#39;https://looseyi.github.io.git&#39;</span><span class="p">,</span> <span class="ss">:branch</span> <span class="o">=</span><span class="o">&gt;</span> <span class="s1">&#39;master&#39;</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>很熟悉的感觉，有木有。是的，Podfile 的 DSL 和 Gemfile 如出一辙。</p>
+<p>那什么情况会用到 Gemfile 呢？比如，公司级项目中可以通过 gemfile 来统一 CocoaPods 的版本，不然大家各自为政会导致提交代码会因为 CocoaPods 版本不同导致对项目的配置产生各种差异，导致最终的 PR 有大量 conflict 或 change，当然还可以管理 CocoaPods 的插件版本，可以指向你自己的定制版本。</p>
+<p>Bundle 的使用也很简单，在 <code>gem install bundler</code> 后，通过添加 <code>bundle exec</code> 前缀来执行 pod 命令。这时会读取安装在本地 .bundle/ 目录或全局目录下所指定的 Gem 包来执行 pod 命令。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">bundle</span> <span class="n">install</span> <span class="c1">#安装 gemfile 中的包</span>
+<span class="n">bundle</span> <span class="nb">exec</span> <span class="n">pod</span> <span class="n">install</span> 
+</code></pre></td></tr></table>
+</div>
+</div><p><strong><a href="https://guides.rubygems.org/what-is-a-gem/">Gem</a></strong></p>
+<blockquote>
+<p>The software package is called a “gem” which contains a packaged Ruby application or library.</p>
+</blockquote>
+<p>Gem 则是包含 Ruby 代码的 application 或者 library，而它就是我们今天的主角，CocoaPods Plugin 背后的支柱。应该说 CocoaPods Plugin 本质上就是 Gem。</p>
+<p>那我们来看一眼 Gem 的文件结构：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-powershell" data-lang="powershell"><span class="n">tree</span> <span class="n">CocoaPods</span> <span class="n">-L</span> <span class="n">2</span>
+<span class="n">CocoaPods</span>
+<span class="err">├</span><span class="err">─</span><span class="err">─</span> <span class="n">Rakefile</span>
+<span class="err">├</span><span class="err">─</span><span class="err">─</span> <span class="n">cocoapods</span><span class="p">.</span><span class="n">gemspec</span>
+<span class="err">├</span><span class="err">─</span><span class="err">─</span> <span class="n">bin</span>
+<span class="err">│</span>   <span class="err">├</span><span class="err">─</span><span class="err">─</span> <span class="n">pod</span>
+<span class="err">│</span>   <span class="err">└</span><span class="err">─</span><span class="err">─</span> <span class="n">sandbox</span><span class="n">-pod</span>
+<span class="err">├</span><span class="err">─</span><span class="err">─</span> <span class="n">lib</span>
+<span class="err">│</span>   <span class="err">├</span><span class="err">─</span><span class="err">─</span> <span class="n">cocoapods</span>
+<span class="err">│</span>   <span class="err">├</span><span class="err">─</span><span class="err">─</span> <span class="p">.</span><span class="p">.</span><span class="p">.</span>
+<span class="err">└</span><span class="err">─</span><span class="err">─</span> <span class="n">spec</span>
+<span class="err">│</span>   <span class="err">├</span><span class="err">─</span><span class="err">─</span> <span class="n">cocoapods</span><span class="n">-integration</span><span class="n">-specs</span>
+<span class="err">│</span>   <span class="p">.</span><span class="p">.</span><span class="p">.</span>
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>bin：可执行文件目录，当 gem install 的时候，会被加载到用户的 <strong>PATH</strong> 路径下；</li>
+<li>lib：gem 的源代码目录；</li>
+<li>sepc：gem 的测试代码目录；</li>
+<li>Rakefile：是自动化测试程序 <a href="https://rubygems.org/gems/rake">rake</a> 的配置文件，也可用于生成代码或者其他任务；</li>
+<li>gemspec：描述了 gem 的关键信息，下面会提到；</li>
+</ul>
+<p><a href="https://guides.rubygems.org/specification-reference/"><strong>GemSpec</strong></a></p>
+<blockquote>
+<p>The gemspec specifies the information about a gem such as its name, version, description, authors and homepage.</p>
+</blockquote>
+<p>既然 CocoaPods 也是 Gem，它的 GemSpec 包含哪些信息呢：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="no">Gem</span><span class="o">::</span><span class="no">Specification</span><span class="o">.</span><span class="n">new</span> <span class="k">do</span> <span class="o">|</span><span class="n">s</span><span class="o">|</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">name</span>     <span class="o">=</span> <span class="s2">&#34;</span><span class="s2">cocoapods</span><span class="s2">&#34;</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">version</span>  <span class="o">=</span> <span class="no">Pod</span><span class="o">::</span><span class="no">VERSION</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">files</span> <span class="o">=</span> <span class="no">Dir</span><span class="o">[</span><span class="s2">&#34;</span><span class="s2">lib/**/*.rb</span><span class="s2">&#34;</span><span class="o">]</span> <span class="o">+</span> <span class="sx">%w{</span><span class="sx"> bin/pod bin/sandbox-pod README.md LICENSE CHANGELOG.md </span><span class="sx">}</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">executables</span>   <span class="o">=</span> <span class="sx">%w{</span><span class="sx"> pod sandbox-pod </span><span class="sx">}</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">require_paths</span> <span class="o">=</span> <span class="sx">%w{</span><span class="sx"> lib </span><span class="sx">}</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">add_runtime_dependency</span> <span class="s1">&#39;cocoapods-core&#39;</span><span class="p">,</span>        <span class="s2">&#34;</span><span class="s2">= </span><span class="si">#{</span><span class="no">Pod</span><span class="o">::</span><span class="no">VERSION</span><span class="si">}</span><span class="s2">&#34;</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">add_runtime_dependency</span> <span class="s1">&#39;claide&#39;</span><span class="p">,</span>                <span class="s1">&#39;&gt;= 1.0.2&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt; 2.0&#39;</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">add_runtime_dependency</span> <span class="s1">&#39;xcodeproj&#39;</span><span class="p">,</span>             <span class="s1">&#39;&gt;= 1.14.0&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt; 2.0&#39;</span>
+  <span class="o">...</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>依据那么熟悉的感觉，如果你有搞过 Pod library 的话。PodSpec 类比 Gemspec，就不多介绍了。</p>
+<h3 id="cocoapods-plugins-1">CocoaPods Plugins</h3>
+<p>了解完 Gem，再看 Plugins 会清晰很多。作为 CocoaPods 的 Plugin，CocoaPods 为我们提供了方便生成 plugin 模版的命令。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-powershell" data-lang="powershell"><span class="n">pod</span> <span class="n">plugins</span> <span class="n">create</span> <span class="n">NAME</span> <span class="no">[TEMPLATE_URL]</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>生成 plugin 模版的文件目录与 gem 相差无几，这里直接贴 cocoapods-packager 的文件目录：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-powershell" data-lang="powershell"><span class="n">cocoapods</span><span class="n">-packager</span>
+<span class="err">├</span><span class="err">─</span><span class="err">─</span> <span class="n">Gemfile</span>
+<span class="err">├</span><span class="err">─</span><span class="err">─</span> <span class="n">Rakefile</span>
+<span class="err">├</span><span class="err">─</span><span class="err">─</span> <span class="n">cocoapods</span><span class="n">-packager</span><span class="p">.</span><span class="n">gemspec</span>
+<span class="err">├</span><span class="err">─</span><span class="err">─</span> <span class="n">lib</span>
+<span class="err">│</span>   <span class="err">├</span><span class="err">─</span><span class="err">─</span> <span class="n">cocoapods</span><span class="n">-packager</span>
+<span class="err">│</span>   <span class="err">├</span><span class="err">─</span><span class="err">─</span> <span class="n">cocoapods_packager</span><span class="p">.</span><span class="n">rb</span>
+<span class="err">│</span>   <span class="err">├</span><span class="err">─</span><span class="err">─</span> <span class="n">cocoapods_plugin</span><span class="p">.</span><span class="n">rb</span>
+<span class="err">│</span>   <span class="err">└</span><span class="err">─</span><span class="err">─</span> <span class="n">pod</span>
+<span class="err">└</span><span class="err">─</span><span class="err">─</span> <span class="n">spec</span>
+    <span class="err">├</span><span class="err">─</span><span class="err">─</span> <span class="n">command</span>
+    <span class="err">├</span><span class="err">─</span><span class="err">─</span> <span class="n">fixtures</span>
+    <span class="err">├</span><span class="err">─</span><span class="err">─</span> <span class="n">integration</span>
+    <span class="err">├</span><span class="err">─</span><span class="err">─</span> <span class="n">spec_helper</span><span class="p">.</span><span class="n">rb</span>
+    <span class="err">└</span><span class="err">─</span><span class="err">─</span> <span class="n">unit</span>
+<span class="p">.</span><span class="p">.</span><span class="p">.</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>确实没啥特别的，只不过会在 gemfile 中，帮你指定好 cocoapods 的依赖，以及根据提供的 NAME 来生成通用文件。</p>
+<p>###CocoaPods Packager</p>
+<p>接下来我们提到的文件都是在 lib 文件夹下，即 Packager 的源代码所在地。开始前照例看一下脑图，有一个整体的认识：</p>
+<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gdbb24p0iuj22ma1jw19j.jpg" alt="cocoapods-packager"></p>
+<p>这里基本对应了 Packager 的主要文件，作者已经分的比较清楚了，整个 Package 的入口是 <code>/lib/pod/command/package.rb</code> 文件，对应脑图的 Command Run 分类。各个分类下面对应的就是各个文件内部提供的主要方法，接下来我们就从 Package 文件说起。</p>
+<p>##Package</p>
+<p>本文 Demo 所展示的是基于 Packager 内部提供的测试 spec 来做示例，启动命令如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">bundle <span class="nb">exec</span> pod package <span class="si">${</span><span class="nv">workspaceRoot</span><span class="si">}</span>/cocoapods-packager/spec/fixtures/KFData.podspec --dynamic
+</code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p><em>PS：调试所用的工具是 VSCode，如果你没有用过，绝对不要错过了。</em></p>
+</blockquote>
+<p>执行上面代码前，我们需要先在 <code>package.rb</code> 的 <code>initialize</code> 方法内打个断点。然后我们来看 Package 类：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">module</span> <span class="nn">Pod</span>
+    <span class="k">class</span> <span class="nc">Command</span>
+      <span class="k">class</span> <span class="nc">Package</span> <span class="o">&lt;</span> <span class="no">Command</span>
+         <span class="c1"># functions ...</span>
+    <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>Package Command 继承自 CocoaPods 内部所提供的命令工具模块 <a href="https://github.com/CocoaPods/CLAide">CLAide</a>::Command。所有扩展 Pod 的命令都需要继承它，同时需要重载它的 <code>options</code>、<code>validate</code>、<code>initialize</code> 和 <code>run</code> 四个方法。</p>
+<p>###options</p>
+<blockquote>
+<p>A list of option name and description tuples.</p>
+</blockquote>
+<p>执行命令所需的可选参数，是 [Array&lt;Array&gt;] 的元组，由参数和对应的描述组成，选项如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">options</span>
+    <span class="o">[</span>
+        <span class="o">[</span><span class="s1">&#39;--force&#39;</span><span class="p">,</span>     <span class="s1">&#39;Overwrite existing files.&#39;</span><span class="o">]</span><span class="p">,</span>
+        <span class="o">[</span><span class="s1">&#39;--no-mangle&#39;</span><span class="p">,</span> <span class="s1">&#39;Do not mangle symbols of depedendant Pods.&#39;</span><span class="o">]</span><span class="p">,</span>
+        <span class="o">[</span><span class="s1">&#39;--embedded&#39;</span><span class="p">,</span>  <span class="s1">&#39;Generate embedded frameworks.&#39;</span><span class="o">]</span><span class="p">,</span>
+        <span class="o">[</span><span class="s1">&#39;--library&#39;</span><span class="p">,</span>   <span class="s1">&#39;Generate static libraries.&#39;</span><span class="o">]</span><span class="p">,</span>
+        <span class="o">[</span><span class="s1">&#39;--dynamic&#39;</span><span class="p">,</span>   <span class="s1">&#39;Generate dynamic framework.&#39;</span><span class="o">]</span><span class="p">,</span>
+        <span class="o">[</span><span class="s1">&#39;--local&#39;</span><span class="p">,</span>     <span class="s1">&#39;Use local state rather than published versions.&#39;</span><span class="o">]</span><span class="p">,</span>
+        <span class="o">[</span><span class="s1">&#39;--bundle-identifier&#39;</span><span class="p">,</span> <span class="s1">&#39;Bundle identifier for dynamic framework&#39;</span><span class="o">]</span><span class="p">,</span>
+        <span class="o">[</span><span class="s1">&#39;--exclude-deps&#39;</span><span class="p">,</span> <span class="s1">&#39;Exclude symbols from dependencies.&#39;</span><span class="o">]</span><span class="p">,</span>
+        <span class="o">[</span><span class="s1">&#39;--configuration&#39;</span><span class="p">,</span> <span class="s1">&#39;Build the specified configuration (e.g. Debug). Defaults to Release&#39;</span><span class="o">]</span><span class="p">,</span>
+        <span class="o">[</span><span class="s1">&#39;--subspecs&#39;</span><span class="p">,</span> <span class="s1">&#39;Only include the given subspecs&#39;</span><span class="o">]</span><span class="p">,</span>
+        <span class="o">[</span><span class="s1">&#39;--spec-sources=private,https://github.com/CocoaPods/Specs.git&#39;</span><span class="p">,</span> <span class="s1">&#39;The sources to pull dependent &#39;</span> <span class="p">\</span>
+            <span class="s1">&#39;pods from (defaults to https://github.com/CocoaPods/Specs.git)&#39;</span><span class="o">]</span>
+    <span class="o">]</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>###validate</p>
+<p>校验所传参数有效性，如果参数中带有 <code>--help</code> 选项，则会直接抛出帮助提示。它会在 run 方法执行前被调用。重载前需要先调用 <code>super</code>，代码如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nc"></span><span class="o"></span><span class="nf">validate!</span>
+    <span class="k">super</span>
+    <span class="n">help!</span> <span class="s1">&#39;A podspec name or path is required.&#39;</span> <span class="k">unless</span> <span class="vi">@spec</span>
+    <span class="n">help!</span> <span class="s1">&#39;podspec has binary-only depedencies, mangling not possible.&#39;</span> <span class="k">if</span> <span class="vi">@mangle</span> <span class="o">&amp;&amp;</span> <span class="n">binary_only?</span><span class="p">(</span><span class="vi">@spec</span><span class="p">)</span>
+    <span class="n">help!</span> <span class="s1">&#39;--bundle-identifier option can only be used for dynamic frameworks&#39;</span> <span class="k">if</span> <span class="vi">@bundle_identifier</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="vi">@dynamic</span>
+    <span class="o">...</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>###initialize</p>
+<p>解析参数，然后初始化打包所需的变量。这里着重介绍几个核心参数：</p>
+<ul>
+<li>@config：xcodebuild configuration，值为 <em>Debug</em>、<em>Release</em>，当然也可以自定义，默认为 <em>Release</em>；</li>
+<li>@package_type：所生成的包类型，可以是静态库或者动态库，默认为 static_framework;</li>
+<li>@subspecs：支持所打出的包仅包含部分的 subspec，如果对 subspes 有兴趣，请转<a href="https://guides.cocoapods.org/syntax/podspec.html#group_subspecs">官方文档</a>；</li>
+<li>@exclude_deps：打包的时候踢除 dependencies 的符号表，配合 <code>--no-mangle</code> 一起使用，解决静态库打包时有其他静态库依赖的问题；</li>
+<li>@mangle：是否开自动修改类名等符号，默认开启。</li>
+</ul>
+<p>这里稍微展开一下 <strong>@package_type</strong> ，它其实是由多个参数来决定的，<code>--embeded</code>、<code>--dynamic</code>、<code>--library</code>：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">if</span> <span class="vi">@embedded</span>
+    <span class="ss">:static_framework</span>
+<span class="k">elsif</span> <span class="vi">@dynamic</span>
+    <span class="ss">:dynamic_framework</span>
+<span class="k">elsif</span> <span class="vi">@library</span>
+    <span class="ss">:static_library</span>
+<span class="k">else</span>
+    <span class="ss">:static_framework</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>可能有部分同学对于 framework 和 libray 的概念比较模糊，这里再说一句，详细可以看 <a href="https://developer.apple.com/library/archive/documentation/MacOSX/Conceptual/BPFrameworks/Concepts/WhatAreFrameworks.html">Apple Doc</a>:</p>
+<blockquote>
+<p>A <em>framework</em> is a hierarchical directory that encapsulates shared resources, such as a dynamic shared library, nib files, image files, localized strings, header files, and reference documentation in a single package.</p>
+</blockquote>
+<p>简单来说 framework 就一文件夹，你要说和 Bundle 一样也无妨。它是静态库还是动态库，重点看它所包含的 library 类型。如果包含的是 static share library 那就是 static_framework。如果包含的是 dynamic share library 则是 dynamic_framework。而我们平时说的 <code>libxxx.a</code> 则是静态库。</p>
+<p>###run</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"> <span class="k">if</span> <span class="vi">@spec</span><span class="o">.</span><span class="n">nil?</span>
+     <span class="n">help!</span> <span class="s2">&#34;</span><span class="s2">Unable to find a podspec with path or name `</span><span class="si">#{</span><span class="vi">@name</span><span class="si">}</span><span class="s2">`.</span><span class="s2">&#34;</span>
+     <span class="k">return</span>
+ <span class="k">end</span>
+
+ <span class="n">target_dir</span><span class="p">,</span> <span class="n">work_dir</span> <span class="o">=</span> <span class="n">create_working_directory</span>
+ <span class="k">return</span> <span class="k">if</span> <span class="n">target_dir</span><span class="o">.</span><span class="n">nil?</span>
+ <span class="n">build_package</span>
+
+ <span class="sb">`</span><span class="sb">mv &#34;</span><span class="si">#{</span><span class="n">work_dir</span><span class="si">}</span><span class="sb">&#34; &#34;</span><span class="si">#{</span><span class="n">target_dir</span><span class="si">}</span><span class="sb">&#34;</span><span class="sb">`</span>
+ <span class="no">Dir</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="vi">@source_dir</span><span class="p">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><code>run</code> 方法作为入口比较简单，首先就是检查是否取到所要编译的 podspec 文件。然后针对它创建对应的 <code>working_directory</code> 和 <code>target_directory</code>。</p>
+<p>working_directory 为打包所在的临时目录，like this：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">/var/folders/zn/1p8f0yls66b5788lshsjrd6c0000gn/T/cocoapods-rp699asa
+</code></pre></td></tr></table>
+</div>
+</div><p>target_directory 为最终生成 package 的所在目录，是当前 source code 目录下新开的：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="si">${</span><span class="nv">workspaceRoot</span><span class="si">}</span>/KFData-1.0.5
+</code></pre></td></tr></table>
+</div>
+</div><p>在 <code>create_working_directory</code> 后，会主动切换当前 ruby 的运行目录至 <code>working_directory</code> 目录下，正式开始编译。<code>build_package</code> 结束后，将编译产物 copy 到 <code>target_directory</code> 下，同时切换回最初执行命令所在目录 <code>@source_dir</code> 。</p>
+<p>###build_package</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">builder</span> <span class="o">=</span> <span class="no">SpecBuilder</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="vi">@spec</span><span class="p">,</span> <span class="vi">@source</span><span class="p">,</span> <span class="vi">@embedded</span><span class="p">,</span> <span class="vi">@dynamic</span><span class="p">)</span>
+<span class="n">newspec</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">spec_metadata</span>
+
+<span class="vi">@spec</span><span class="o">.</span><span class="n">available_platforms</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">platform</span><span class="o">|</span>
+    <span class="n">build_in_sandbox</span><span class="p">(</span><span class="n">platform</span><span class="p">)</span>
+
+    <span class="n">newspec</span> <span class="o">+=</span> <span class="n">builder</span><span class="o">.</span><span class="n">spec_platform</span><span class="p">(</span><span class="n">platform</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="n">newspec</span> <span class="o">+=</span> <span class="n">builder</span><span class="o">.</span><span class="n">spec_close</span>
+<span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="vi">@spec</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.podspec&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">file</span><span class="o">|</span> <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">newspec</span><span class="p">)</span> <span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>首先，创建一个 <a href="https://github.com/CocoaPods/cocoapods-packager/blob/461686593c521796c723fe5f1c460e2aa2adbe55/lib/cocoapods-packager/spec_builder.rb">SpecBuilder</a>，其作用是用于生成描述最终产物的 podspec 文件，SpecBuilder 就是一个模版文件生成器。bundler 调用 <code>spec_metadata</code> 方法遍历指定的 <code>podspec</code> 文件复刻出对应的配置并返回新生成的 <code>podspec</code> 文件。</p>
+<p>然后，根据 target 所支持的 platform，iOS / Mac / Watch 依次执行 <code>build_in_sandbox</code> 编译，同时将 platform 信息写入 newspec，以 iOS 为例：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">s</span><span class="o">.</span><span class="n">ios</span><span class="o">.</span><span class="n">deployment_target</span>    <span class="o">=</span> <span class="s1">&#39;8.0&#39;</span>
+<span class="n">s</span><span class="o">.</span><span class="n">ios</span><span class="o">.</span><span class="n">vendored_framework</span>   <span class="o">=</span> <span class="s1">&#39;ios/A.embeddedframework/A.framework&#39;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>最后，将 <code>podspec</code>  写入 <code>target_directory</code> 编译结束。</p>
+<p>###build_in_sandbox</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">config</span><span class="o">.</span><span class="n">installation_root</span>  <span class="o">=</span> <span class="no">Pathname</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="no">Dir</span><span class="o">.</span><span class="n">pwd</span><span class="p">)</span>
+<span class="n">config</span><span class="o">.</span><span class="n">sandbox_root</span>       <span class="o">=</span> <span class="s1">&#39;Pods&#39;</span>
+
+<span class="n">static_sandbox</span> <span class="o">=</span> <span class="n">build_static_sandbox</span><span class="p">(</span><span class="vi">@dynamic</span><span class="p">)</span>
+<span class="n">static_installer</span> <span class="o">=</span> <span class="n">install_pod</span><span class="p">(</span><span class="n">platform</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">static_sandbox</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vi">@dynamic</span>
+    <span class="n">dynamic_sandbox</span> <span class="o">=</span> <span class="n">build_dynamic_sandbox</span><span class="p">(</span><span class="n">static_sandbox</span><span class="p">,</span> <span class="n">static_installer</span><span class="p">)</span>
+    <span class="n">install_dynamic_pod</span><span class="p">(</span><span class="n">dynamic_sandbox</span><span class="p">,</span> <span class="n">static_sandbox</span><span class="p">,</span> <span class="n">static_installer</span><span class="p">,</span> <span class="n">platform</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="k">begin</span>
+    <span class="n">perform_build</span><span class="p">(</span><span class="n">platform</span><span class="p">,</span> <span class="n">static_sandbox</span><span class="p">,</span> <span class="n">dynamic_sandbox</span><span class="p">,</span> <span class="n">static_installer</span><span class="p">)</span>
+<span class="k">ensure</span> <span class="c1"># in case the build fails; see Builder#xcodebuild.</span>
+    <span class="no">Pathname</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">sandbox_root</span><span class="p">)</span><span class="o">.</span><span class="n">rmtree</span>
+    <span class="no">FileUtils</span><span class="o">.</span><span class="n">rm_f</span><span class="p">(</span><span class="s1">&#39;Podfile.lock&#39;</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>Config</strong></p>
+<p>首先， config 与 <strong>initialize</strong> 的属性 @config 完全是两个东西，@config 只是一个 &lsquo;Debug&rsquo; or &lsquo;Release&rsquo; 的字符串，而这里的 config 是  <code>Pod::Config</code> 的实例，默认读取自 <code>~/.cocoapods/config.yaml</code> 目录下的配置。</p>
+<p>Package 在这里指定了 config 的安装目录 <code>working_dirctory</code> 和沙盒目录 <code>./Pods</code>。<a href="https://github.com/CocoaPods/CocoaPods/blob/master/lib/cocoapods/config.rb"><strong>Config</strong></a> 类是保存在 <code>/path/to/cocoapods/lib/cocoapods/config.rb</code> 中。它非常重要，包括我们 CocoaPods 平时的 install 过程以及这个 Package 的 build 过程均是读取的全局的 config。作为全局需要访问的对象，一定是个 share instance 咯。在 CocoaPods 中是这么实现的；</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">instance</span>
+    <span class="vi">@instance</span> <span class="o">||</span><span class="o">=</span> <span class="kp">new</span>
+<span class="k">end</span>
+
+<span class="k">module</span> <span class="nn">Mixin</span>
+    <span class="k">def</span> <span class="nc"></span><span class="o"></span><span class="nf">config</span>
+      <span class="no">Config</span><span class="o">.</span><span class="n">instance</span>
+    <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>各个模块通过 include 来引入，比如 Command 类中：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="kp">include</span> <span class="no">Config</span><span class="o">::</span><span class="no">Mixin</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>然后就能愉快的使用了。</p>
+<p>有了 config 之后，就可以创建沙盒来执行 pod install。install 过程会针对 static 和 dynamic 分别 install 一次。最后，基于安装后的工程，创建 builder 开始最终的构建操作。沙盒创建和 install 是在 <code>pod_utils.rb</code> ，build 在 <code>builder.rb</code> 中，接下来会单独展开。</p>
+<p>##Pod Utils</p>
+<p>整个 pods_utils 文件均声明为 Package 的 private 方法，主要做的是 build sandbox 和 pod install。install 会区分 static 和 dynamic。按照 <code>build_in_sandbox</code> 调用顺序展开聊聊。</p>
+<p>###build_static_sandbox</p>
+<p>通过 Pathname 先生成 <code>static_sandbox_root</code> ，然后返回 <code>Sandbox.new(static_sandbox_root)</code>。static_sandbox_root 会根据参数 dynamic 来判断，是否需要创建二级目录 <code>/static</code>：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">if</span> <span class="n">dynamic</span>
+    <span class="no">Pathname</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">sandbox_root</span> <span class="o">+</span> <span class="s1">&#39;/Static&#39;</span><span class="p">)</span>
+<span class="k">else</span>
+    <span class="no">Pathname</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">sandbox_root</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这么区分是由于，如果为动态库，还会生成一个 dynamic sandbox，其 path 为：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">dynamic_sandbox_root</span> <span class="o">=</span> <span class="no">Pathname</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">sandbox_root</span> <span class="o">+</span> <span class="s1">&#39;/Dynamic&#39;</span><span class="p">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>介绍一下 <a href="https://github.com/CocoaPods/CocoaPods/blob/master/lib/cocoapods/sandbox.rb">SandBox</a> ，其定义如下：</p>
+<blockquote>
+<p>The sandbox provides support for the directory that CocoaPods uses for an installation. In this directory the Pods projects, the support files and the sources of the Pods are stored.</p>
+</blockquote>
+<p>所以，sandbox 就是用于管理 pod install 目录。</p>
+<p>###install_pod</p>
+<p>既然是 pod install 当然需要来一个 podfile 了。package 会根据指定的 spec 来手动创建 podfile。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nc"></span><span class="o"></span><span class="nf">podfile_from_spec</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">spec_name</span><span class="p">,</span> <span class="n">platform_name</span><span class="p">,</span> <span class="n">deployment_target</span><span class="p">,</span> <span class="n">subspecs</span><span class="p">,</span> <span class="n">sources</span><span class="p">)</span>
+  <span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="p">}</span>
+  <span class="k">if</span> <span class="n">path</span>
+    <span class="k">if</span> <span class="vi">@local</span>
+        <span class="n">options</span><span class="o">[</span><span class="ss">:path</span><span class="o">]</span> <span class="o">=</span> <span class="n">path</span>
+    <span class="k">else</span>
+        <span class="n">options</span><span class="o">[</span><span class="ss">:podspec</span><span class="o">]</span> <span class="o">=</span> <span class="n">path</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+  <span class="n">options</span><span class="o">[</span><span class="ss">:subspecs</span><span class="o">]</span> <span class="o">=</span> <span class="n">subspecs</span> <span class="k">if</span> <span class="n">subspecs</span>
+  <span class="no">Pod</span><span class="o">::</span><span class="no">Podfile</span><span class="o">.</span><span class="n">new</span> <span class="k">do</span>
+    <span class="n">sources</span><span class="o">.</span><span class="n">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">s</span><span class="o">|</span> <span class="n">source</span> <span class="n">s</span> <span class="p">}</span>
+    <span class="n">platform</span><span class="p">(</span><span class="n">platform_name</span><span class="p">,</span> <span class="n">deployment_target</span><span class="p">)</span>
+    <span class="n">pod</span><span class="p">(</span><span class="n">spec_name</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
+
+    <span class="n">install!</span><span class="p">(</span><span class="s1">&#39;cocoapods&#39;</span><span class="p">,</span> <span class="ss">integrate_targets</span><span class="p">:</span> <span class="kp">false</span><span class="p">,</span> <span class="ss">deterministic_uuids</span><span class="p">:</span> <span class="kp">false</span><span class="p">)</span>
+    <span class="n">target</span><span class="p">(</span><span class="s1">&#39;packager&#39;</span><span class="p">)</span> <span class="k">do</span> 
+        <span class="n">inherit!</span> <span class="ss">:complete</span> 
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>我们知道 Podfile 作为 DSL 文件，其每一行配置背后都对应具体的方法，上面的这个就是简化版的 podfile 对应的命令，options 就是我们配置的 <code>pod</code> 方法所需的参数，对应的是：<code>pod(spec_name, options)</code>。反转过来对对应的 podfile DSL 应该是这样的：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">platform</span> <span class="ss">:ios</span><span class="p">,</span> <span class="s1">&#39;8.0&#39;</span>
+<span class="n">target</span> <span class="s1">&#39;packager&#39;</span> <span class="k">do</span>
+    <span class="n">pod</span> <span class="s2">&#34;</span><span class="si">#{</span><span class="n">spec_name</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">,</span> <span class="ss">:path</span> <span class="o">=</span><span class="o">&gt;</span> <span class="s2">&#34;</span><span class="si">#{</span><span class="n">path</span><span class="si">}</span><span class="s2">&#34;</span><span class="c1"># or :podspec =&gt; &#34;#{path}&#34;</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这里如果参数中指定了 path 则不会通过 spec 指定的  <code>source</code> 去download 源码下来。</p>
+<p>接着就是 pod install 了：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="c1"># podfile = podfile_from_spec  </span>
+<span class="o">...</span>
+<span class="n">static_installer</span> <span class="o">=</span> <span class="no">Installer</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">sandbox</span><span class="p">,</span> <span class="n">podfile</span><span class="p">)</span>
+<span class="n">static_installer</span><span class="o">.</span><span class="n">install!</span>
+
+<span class="k">unless</span> <span class="n">static_installer</span><span class="o">.</span><span class="n">nil?</span>
+    <span class="n">static_installer</span><span class="o">.</span><span class="n">pods_project</span><span class="o">.</span><span class="n">targets</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">target</span><span class="o">|</span>
+    <span class="n">target</span><span class="o">.</span><span class="n">build_configurations</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">build_settings</span><span class="o">[</span><span class="s1">&#39;CLANG_MODULES_AUTOLINK&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="s1">&#39;NO&#39;</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">build_settings</span><span class="o">[</span><span class="s1">&#39;GCC_GENERATE_DEBUGGING_SYMBOLS&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="s1">&#39;NO&#39;</span>
+    <span class="k">end</span>
+    <span class="k">end</span>
+    <span class="n">static_installer</span><span class="o">.</span><span class="n">pods_project</span><span class="o">.</span><span class="n">save</span>
+<span class="k">end</span>
+
+<span class="n">static_installer</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这里重点就是 build_settings 的两个配置。当 static_installer install 成功后会修改它们，作用是为了支持后续dynamic_framework 的编译。<code>GCC_GENERATE_DEBUGGING_SYMBOLS</code> 这个 config 应该都知道吧？</p>
+<p>我们来看另一个 <strong>CLANG_MODULES_AUTOLINK</strong>，在 stackoverflow 上有一个<a href="https://stackoverflow.com/questions/42646716/how-is-a-blank-new-cocoa-app-project-linking-with-the-system-frameworks">解释</a>:</p>
+<blockquote>
+<p>When you create a new project, Xcode will set the <code>Link Frameworks Automatically</code> flag to YES. Then the clang linking flag will be set to <code>CLANG_MODULES_AUTOLINK = YES</code>. With this option, clang will linking the framework for you automatically.</p>
+</blockquote>
+<p>就是为了避免 install 后，项目 autolink。</p>
+<p>###install_dynamic_pod</p>
+<p><code>build_dynamic_sandbox</code> 前面已经说过了，我们直接看动态库的 install：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="c1"># 1 Create a dynamic target for only the spec pod.</span>
+<span class="n">dynamic_target</span> <span class="o">=</span> <span class="n">build_dynamic_target</span><span class="p">(</span><span class="n">dynamic_sandbox</span><span class="p">,</span> <span class="n">static_installer</span><span class="p">,</span> <span class="n">platform</span><span class="p">)</span>
+
+<span class="c1"># 2. Build a new xcodeproj in the dynamic_sandbox with only the spec pod as a target.</span>
+<span class="n">project</span> <span class="o">=</span> <span class="n">prepare_pods_project</span><span class="p">(</span><span class="n">dynamic_sandbox</span><span class="p">,</span> <span class="n">dynamic_target</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">static_installer</span><span class="p">)</span>
+
+<span class="c1"># 3. Copy the source directory for the dynamic framework from the static sandbox.</span>
+<span class="n">copy_dynamic_target</span><span class="p">(</span><span class="n">static_sandbox</span><span class="p">,</span> <span class="n">dynamic_target</span><span class="p">,</span> <span class="n">dynamic_sandbox</span><span class="p">)</span>
+
+<span class="c1"># 4. Create the file references.</span>
+<span class="n">install_file_references</span><span class="p">(</span><span class="n">dynamic_sandbox</span><span class="p">,</span> <span class="o">[</span><span class="n">dynamic_target</span><span class="o">]</span><span class="p">,</span> <span class="n">project</span><span class="p">)</span>
+
+<span class="c1"># 5. Install the target.</span>
+<span class="n">install_library</span><span class="p">(</span><span class="n">dynamic_sandbox</span><span class="p">,</span> <span class="n">dynamic_target</span><span class="p">,</span> <span class="n">project</span><span class="p">)</span>
+
+<span class="c1"># 6. Write the actual .xcodeproj to the dynamic sandbox.</span>
+<span class="n">write_pod_project</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">dynamic_sandbox</span><span class="p">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>内部分了 6 个方法，还附带了详细的注释。需要注意的是，整个 install_dynamic_pod 是基于 install_pod 所生成的 <code>static_installer</code> 来修改的。这里比较复杂，一步步来。</p>
+<p>###build_dynamic_target</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="c1"># 1</span>
+<span class="n">spec_targets</span> <span class="o">=</span> <span class="n">static_installer</span><span class="o">.</span><span class="n">pod_targets</span><span class="o">.</span><span class="n">select</span> <span class="k">do</span> <span class="o">|</span><span class="n">target</span><span class="o">|</span>
+<span class="n">target</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="vi">@spec</span><span class="o">.</span><span class="n">name</span>
+<span class="k">end</span>
+<span class="n">static_target</span> <span class="o">=</span> <span class="n">spec_targets</span><span class="o">[</span><span class="mi">0</span><span class="o"></span><span class="o">]</span>
+<span class="c1"># 2</span>
+<span class="n">file_accessors</span> <span class="o">=</span> <span class="n">create_file_accessors</span><span class="p">(</span><span class="n">static_target</span><span class="p">,</span> <span class="n">dynamic_sandbox</span><span class="p">)</span>
+<span class="c1"># 3</span>
+<span class="n">archs</span> <span class="o">=</span> <span class="o">[</span><span class="o">]</span>
+<span class="n">dynamic_target</span> <span class="o">=</span> <span class="no">Pod</span><span class="o">::</span><span class="no">PodTarget</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">dynamic_sandbox</span><span class="p">,</span> <span class="kp">true</span><span class="p">,</span> <span class="n">static_target</span><span class="o">.</span><span class="n">user_build_configurations</span><span class="p">,</span> <span class="n">archs</span><span class="p">,</span> <span class="n">platform</span><span class="p">,</span> <span class="n">static_target</span><span class="o">.</span><span class="n">specs</span><span class="p">,</span> <span class="n">static_target</span><span class="o">.</span><span class="n">target_definitions</span><span class="p">,</span> <span class="n">file_accessors</span><span class="p">)</span>
+<span class="n">dynamic_target</span>
+</code></pre></td></tr></table>
+</div>
+</div><ol>
+<li>
+<p>通过 select <code>static_installer.pod_targets </code> 筛选出 static_target，所过滤掉的是 target 是 spec 的第三方依赖。这里是过滤了 <code>QueryKit</code>；</p>
+</li>
+<li>
+<p>针对每个 subspec 生成相应的 <a href="https://rubydoc.info/gems/cocoapods/Pod/Sandbox/FileAccessor">FileAccessory</a> :</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="o">&lt;</span><span class="no">Pod</span><span class="o">::</span><span class="no">Sandbox</span><span class="o">::</span><span class="no">FileAccessor</span> <span class="n">spec</span><span class="o">=</span><span class="no">KFData</span> <span class="n">platform</span><span class="o">=</span><span class="n">osx</span> <span class="n">root</span><span class="o">=</span><span class="o">...</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="no">Pod</span><span class="o">::</span><span class="no">Sandbox</span><span class="o">::</span><span class="no">FileAccessor</span> <span class="n">spec</span><span class="o">=</span><span class="no">KFData</span><span class="o">/</span><span class="no">Attribute</span> <span class="n">platform</span><span class="o">=</span><span class="n">osx</span> <span class="n">root</span><span class="o">=</span><span class="o">...</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="no">Pod</span><span class="o">::</span><span class="no">Sandbox</span><span class="o">::</span><span class="no">FileAccessor</span> <span class="n">spec</span><span class="o">=</span><span class="no">KFData</span><span class="o">/</span><span class="no">Core</span> <span class="n">platform</span><span class="o">=</span><span class="n">osx</span> <span class="n">root</span><span class="o">=</span><span class="o">...</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="no">Pod</span><span class="o">::</span><span class="no">Sandbox</span><span class="o">::</span><span class="no">FileAccessor</span> <span class="n">spec</span><span class="o">=</span><span class="no">KFData</span><span class="o">/</span><span class="no">Essentials</span> <span class="n">platform</span><span class="o">=</span><span class="n">osx</span> <span class="n">root</span><span class="o">=</span><span class="o">...</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="no">Pod</span><span class="o">::</span><span class="no">Sandbox</span><span class="o">::</span><span class="no">FileAccessor</span> <span class="n">spec</span><span class="o">=</span><span class="no">KFData</span><span class="o">/</span><span class="no">Manager</span> <span class="n">platform</span><span class="o">=</span><span class="n">osx</span> <span class="n">root</span><span class="o">=</span><span class="o">...</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="no">Pod</span><span class="o">::</span><span class="no">Sandbox</span><span class="o">::</span><span class="no">FileAccessor</span> <span class="n">spec</span><span class="o">=</span><span class="no">KFData</span><span class="o">/</span><span class="no">Store</span> <span class="n">platform</span><span class="o">=</span><span class="n">osx</span> <span class="n">root</span><span class="o">=</span><span class="o">...</span><span class="o">&gt;</span>
+</code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>创建 PodTarget。</p>
+</li>
+</ol>
+<p>###prepare_pods_project</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="c1"># Create a new pods project</span>
+<span class="n">pods_project</span> <span class="o">=</span> <span class="no">Pod</span><span class="o">::</span><span class="no">Project</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">dynamic_sandbox</span><span class="o">.</span><span class="n">project_path</span><span class="p">)</span>
+
+<span class="c1"># Update build configurations</span>
+<span class="n">installer</span><span class="o">.</span><span class="n">analysis_result</span><span class="o">.</span><span class="n">all_user_build_configurations</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="nb">name</span><span class="p">,</span> <span class="n">type</span><span class="o">|</span>
+  <span class="n">pods_project</span><span class="o">.</span><span class="n">add_build_configuration</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">type</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="c1"># Add the pod group for only the dynamic framework</span>
+<span class="n">local</span> <span class="o">=</span> <span class="n">dynamic_sandbox</span><span class="o">.</span><span class="n">local?</span><span class="p">(</span><span class="n">spec_name</span><span class="p">)</span>
+<span class="n">path</span> <span class="o">=</span> <span class="n">dynamic_sandbox</span><span class="o">.</span><span class="n">pod_dir</span><span class="p">(</span><span class="n">spec_name</span><span class="p">)</span>
+<span class="n">was_absolute</span> <span class="o">=</span> <span class="n">dynamic_sandbox</span><span class="o">.</span><span class="n">local_path_was_absolute?</span><span class="p">(</span><span class="n">spec_name</span><span class="p">)</span>
+<span class="n">pods_project</span><span class="o">.</span><span class="n">add_pod_group</span><span class="p">(</span><span class="n">spec_name</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">local</span><span class="p">,</span> <span class="n">was_absolute</span><span class="p">)</span>
+<span class="n">pods_project</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>创建 Pod::Project，然后将 static project 中的 user configuration 复制过来，最后为 target 新建 Pods Group，这里的 group 是 <a href="https://www.rubydoc.info/gems/cocoapods/0.38.0/Pod/Project">PBXGroup</a>。什么是 PBXGroup 呢？看下面的分组就明白的了：</p>
+<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gdi3kh8vf2j20ey084dr5.jpg" alt="pbxgroup"></p>
+<p>我们平时说看到的 Dependencies、Frameworks、Pods、Products、Target Support Files 他们在 CocoaPods 中都是对应了 PBXGroup。</p>
+<p>###copy_dynamic_target</p>
+<p>从 static sandbox 中 cp 到 dynamic sandbox 目录下。</p>
+<p>###install_file_references</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">installer</span> <span class="o">=</span> <span class="no">Pod</span><span class="o">::</span><span class="no">Installer</span><span class="o">::</span><span class="no">Xcode</span><span class="o">::</span><span class="no">PodsProjectGenerator</span><span class="o">::</span><span class="no">FileReferencesInstaller</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">dynamic_sandbox</span><span class="p">,</span> <span class="n">pod_targets</span><span class="p">,</span> <span class="n">pods_project</span><span class="p">)</span>
+<span class="n">installer</span><span class="o">.</span><span class="n">install!</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>通过 <a href="https://www.rubydoc.info/gems/cocoapods/0.38.0/Pod/Installer/FileReferencesInstaller">FileReferencesInstaller</a> 为 dynamic target 生成文件引用，为最后的 project 写入做准备。FileReferencesInstaller 说明：</p>
+<blockquote>
+<p>Controller class responsible of installing the file references of the specifications in the Pods project.</p>
+</blockquote>
+<p>###install_library</p>
+<p>将 dynamic_target 写入新建的 project，同时会 install 依赖的 system framework。</p>
+<p>###write_pod_project</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">dynamic_project</span><span class="o">.</span><span class="n">pods</span><span class="o">.</span><span class="n">remove_from_project</span> <span class="k">if</span> <span class="n">dynamic_project</span><span class="o">.</span><span class="n">pods</span><span class="o">.</span><span class="n">empty?</span>
+<span class="n">dynamic_project</span><span class="o">.</span><span class="n">development_pods</span><span class="o">.</span><span class="n">remove_from_project</span> <span class="k">if</span> <span class="n">dynamic_project</span><span class="o">.</span><span class="n">development_pods</span><span class="o">.</span><span class="n">empty?</span>
+<span class="n">dynamic_project</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="ss">:groups_position</span> <span class="o">=</span><span class="o">&gt;</span> <span class="ss">:below</span><span class="p">)</span>
+<span class="n">dynamic_project</span><span class="o">.</span><span class="n">recreate_user_schemes</span><span class="p">(</span><span class="kp">false</span><span class="p">)</span>
+
+<span class="c1"># Edit search paths so that we can find our dependency headers</span>
+<span class="n">dynamic_project</span><span class="o">.</span><span class="n">targets</span><span class="o">.</span><span class="n">first</span><span class="o">.</span><span class="n">build_configuration_list</span><span class="o">.</span><span class="n">build_configurations</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+<span class="n">config</span><span class="o">.</span><span class="n">build_settings</span><span class="o">[</span><span class="s1">&#39;HEADER_SEARCH_PATHS&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="s2">&#34;</span><span class="s2">$(inherited) </span><span class="si">#{</span><span class="no">Dir</span><span class="o">.</span><span class="n">pwd</span><span class="si">}</span><span class="s2">/Pods/Static/Headers/**</span><span class="s2">&#34;</span>
+<span class="n">config</span><span class="o">.</span><span class="n">build_settings</span><span class="o">[</span><span class="s1">&#39;USER_HEADER_SEARCH_PATHS&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="s2">&#34;</span><span class="s2">$(inherited) </span><span class="si">#{</span><span class="no">Dir</span><span class="o">.</span><span class="n">pwd</span><span class="si">}</span><span class="s2">/Pods/Static/Headers/**</span><span class="s2">&#34;</span>
+<span class="n">config</span><span class="o">.</span><span class="n">build_settings</span><span class="o">[</span><span class="s1">&#39;OTHER_LDFLAGS&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="s1">&#39;$(inherited) -ObjC&#39;</span>
+<span class="k">end</span>
+<span class="n">dynamic_project</span><span class="o">.</span><span class="n">save</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>最后，将 project 写入 dynamic sandbox，修改 Search Path 保证能查询到依赖的 header 引用。</p>
+<h2 id="builder">Builder</h2>
+<p>继 project 创建和 pod install 后，Package 中的 <code>perform_build</code> 先将所需参数传入以创建 Builder，开始执行 <code>builder.build(@package_type)</code>。build 会依据 package_type 分为三种：</p>
+<ul>
+<li>build_static_library</li>
+<li>build_static_framework</li>
+<li>build_dynamic_framework</li>
+</ul>
+<p>这三个方法区别其实不大，就是 framework 的方法多了资源 copy 的过程。这里以 build_dynamic_framework 为例。</p>
+<h3 id="build-dynamic-framework">build_dynamic_framework</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">defines</span> <span class="o">=</span> <span class="n">compile</span>
+<span class="n">build_sim_libraries</span><span class="p">(</span><span class="n">defines</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vi">@bundle_identifier</span>
+<span class="n">defines</span> <span class="o">=</span> <span class="s2">&#34;</span><span class="si">#{</span><span class="n">defines</span><span class="si">}</span><span class="s2"> PRODUCT_BUNDLE_IDENTIFIER=&#39;</span><span class="si">#{</span><span class="vi">@bundle_identifier</span><span class="si">}</span><span class="s2">&#39;</span><span class="s2">&#34;</span>
+<span class="k">end</span>
+
+<span class="n">output</span> <span class="o">=</span> <span class="s2">&#34;</span><span class="si">#{</span><span class="vi">@dynamic_sandbox_root</span><span class="si">}</span><span class="s2">/build/</span><span class="si">#{</span><span class="vi">@spec</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.framework/</span><span class="si">#{</span><span class="vi">@spec</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#34;</span>
+
+<span class="n">clean_directory_for_dynamic_build</span>
+<span class="k">if</span> <span class="vi">@platform</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="ss">:ios</span>
+<span class="n">build_dynamic_framework_for_ios</span><span class="p">(</span><span class="n">defines</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
+<span class="k">else</span>
+<span class="n">build_dynamic_framework_for_mac</span><span class="p">(</span><span class="n">defines</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="n">copy_resources</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>首先是先执行 <code>compile</code> 构建 <code>Pods-packager</code> ，成功后返回 defines。<strong>compile</strong> 实现如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">defines</span> <span class="o">=</span> <span class="s2">&#34;</span><span class="s2">GCC_PREPROCESSOR_DEFINITIONS=&#39;$(inherited) PodsDummy_Pods_</span><span class="si">#{</span><span class="vi">@spec</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">=PodsDummy_PodPackage_</span><span class="si">#{</span><span class="vi">@spec</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;</span><span class="s2">&#34;</span>
+<span class="n">defines</span> <span class="o">&lt;&lt;</span> <span class="s1">&#39; &#39;</span> <span class="o">&lt;&lt;</span> <span class="vi">@spec</span><span class="o">.</span><span class="n">consumer</span><span class="p">(</span><span class="vi">@platform</span><span class="p">)</span><span class="o">.</span><span class="n">compiler_flags</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+<span class="k">if</span> <span class="vi">@platform</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="ss">:ios</span>
+    <span class="n">options</span> <span class="o">=</span> <span class="n">ios_build_options</span>
+<span class="k">end</span>
+<span class="n">xcodebuild</span><span class="p">(</span><span class="n">defines</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
+<span class="k">if</span> <span class="vi">@mangle</span>
+    <span class="k">return</span> <span class="n">build_with_mangling</span><span class="p">(</span><span class="n">options</span><span class="p">)</span>
+<span class="k">end</span>
+<span class="n">defines</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>如果没有指定 <code>--no-mangle</code> 则正常执行 xcodebuild，否则转入 <code>build_with_mangling</code>。</p>
+<p>build_with_mangling 内部也是调用 xcodebuild，区别在于它生成的 defines 不同。mangling 会遍历 sandbox build 目录下的 libxxx.a 静态库来查找，核心方法如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">defines</span> <span class="o">=</span> <span class="no">Symbols</span><span class="o">.</span><span class="n">mangle_for_pod_dependencies</span><span class="p">(</span><span class="vi">@spec</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="vi">@static_sandbox_root</span><span class="p">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><a href="https://github.com/CocoaPods/cocoapods-packager/blob/master/lib/cocoapods-packager/mangle.rb">mangle.rb</a> 的描述如下：</p>
+<blockquote>
+<p>performs symbol aliasing，for each dependency:</p>
+<p>​    - determine symbols for classes and global constants</p>
+<p>​    - alias each symbol to Pod#{pod_name}_#{symbol}</p>
+<p>​    - put defines into <code>GCC_PREPROCESSOR_DEFINITIONS</code> for passing to Xcode</p>
+</blockquote>
+<p>mangling 也称为 namespacing，会把类名和全局常量改成 <code>Pod#{pod_name}_#{symbol}</code> 的形式。以我们调试的 KFData 的 PodsDummy_KFData 类为例：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">no-mangle: PodsDummy_KFData
+mangling: PodKFData_PodsDummy_KFData
+</code></pre></td></tr></table>
+</div>
+</div><p>就是统一在类前面添加了前缀，目的是为了避免静态库中的符号表冲突。比如，我们打包的 KFData 依赖了 QueryKit 那生成的 libKFData.a 静态库会有一份 QueryKit 的 copy，而此时如果在主工程里也直接引用了 QueryKit 那就会产生类似 <code>duplicate symbols for architecture x86_64</code> 的错误。</p>
+<p>你可以 <code>nm</code> 工具来查看 class 的 symbol：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">nm -gU KFData.framework/KFData <span class="p">|</span> grep <span class="s2">&#34;_OBJC_CLASS_\$.*KF.*&#34;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>在查这个问题时，还填补了一个疑惑很久的问题：<a href="https://stackoverflow.com/questions/39160655/why-do-cocoapod-create-a-dummy-class-for-every-pod">Why do cocoapod create a dummy class for every pod?</a> CocoPods 上 <a href="https://github.com/CocoaPods/CocoaPods/issues/3410">issue_3410</a> 也有详细讨论</p>
+<p><strong>build_sim_libraries</strong></p>
+<p>由于 simulator 自由 iOS 有，实现比较简单，参数是前面 compile 返回的 defines。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">if</span> <span class="vi">@platform</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="ss">:ios</span>
+    <span class="n">xcodebuild</span><span class="p">(</span><span class="n">defines</span><span class="p">,</span> <span class="s1">&#39;-sdk iphonesimulator&#39;</span><span class="p">,</span> <span class="s1">&#39;build-sim&#39;</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>build_dynamic_framework_for_ios</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="c1"># Specify frameworks to link and search paths</span>
+<span class="n">linker_flags</span> <span class="o">=</span> <span class="n">static_linker_flags_in_sandbox</span>
+<span class="n">defines</span> <span class="o">=</span> <span class="s2">&#34;</span><span class="si">#{</span><span class="n">defines</span><span class="si">}</span><span class="s2"> OTHER_LDFLAGS=&#39;$(inherited) </span><span class="si">#{</span><span class="n">linker_flags</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39;</span><span class="s2">&#34;</span>
+
+<span class="c1"># Build Target Dynamic Framework for both device and Simulator</span>
+<span class="n">device_defines</span> <span class="o">=</span> <span class="s2">&#34;</span><span class="si">#{</span><span class="n">defines</span><span class="si">}</span><span class="s2"> LIBRARY_SEARCH_PATHS=</span><span class="se">\&#34;</span><span class="si">#{</span><span class="no">Dir</span><span class="o">.</span><span class="n">pwd</span><span class="si">}</span><span class="s2">/</span><span class="si">#{</span><span class="vi">@static_sandbox_root</span><span class="si">}</span><span class="s2">/build</span><span class="se">\&#34;</span><span class="s2">&#34;</span>
+<span class="n">device_options</span> <span class="o">=</span> <span class="n">ios_build_options</span> <span class="o">&lt;&lt;</span> <span class="s1">&#39; -sdk iphoneos&#39;</span>
+<span class="n">xcodebuild</span><span class="p">(</span><span class="n">device_defines</span><span class="p">,</span> <span class="n">device_options</span><span class="p">,</span> <span class="s1">&#39;build&#39;</span><span class="p">,</span> <span class="vi">@spec</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">to_s</span><span class="p">,</span> <span class="vi">@dynamic_sandbox_root</span><span class="o">.</span><span class="n">to_s</span><span class="p">)</span>
+
+<span class="n">sim_defines</span> <span class="o">=</span> <span class="s2">&#34;</span><span class="si">#{</span><span class="n">defines</span><span class="si">}</span><span class="s2"> LIBRARY_SEARCH_PATHS=</span><span class="se">\&#34;</span><span class="si">#{</span><span class="no">Dir</span><span class="o">.</span><span class="n">pwd</span><span class="si">}</span><span class="s2">/</span><span class="si">#{</span><span class="vi">@static_sandbox_root</span><span class="si">}</span><span class="s2">/build-sim</span><span class="se">\&#34;</span><span class="s2"> ONLY_ACTIVE_ARCH=NO</span><span class="s2">&#34;</span>
+<span class="n">xcodebuild</span><span class="p">(</span><span class="n">sim_defines</span><span class="p">,</span> <span class="s1">&#39;-sdk iphonesimulator&#39;</span><span class="p">,</span> <span class="s1">&#39;build-sim&#39;</span><span class="p">,</span> <span class="vi">@spec</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">to_s</span><span class="p">,</span> <span class="vi">@dynamic_sandbox_root</span><span class="o">.</span><span class="n">to_s</span><span class="p">)</span>
+
+<span class="c1"># Combine architectures</span>
+<span class="sb">`</span><span class="sb">lipo </span><span class="si">#{</span><span class="vi">@dynamic_sandbox_root</span><span class="si">}</span><span class="sb">/build/</span><span class="si">#{</span><span class="vi">@spec</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="sb">.framework/</span><span class="si">#{</span><span class="vi">@spec</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="sb"> </span><span class="si">#{</span><span class="vi">@dynamic_sandbox_root</span><span class="si">}</span><span class="sb">/build-sim/</span><span class="si">#{</span><span class="vi">@spec</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="sb">.framework/</span><span class="si">#{</span><span class="vi">@spec</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="sb"> -create -output </span><span class="si">#{</span><span class="n">output</span><span class="si">}</span><span class="sb">`</span>
+
+<span class="no">FileUtils</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="vi">@platform</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">to_s</span><span class="p">)</span>
+<span class="sb">`</span><span class="sb">mv </span><span class="si">#{</span><span class="vi">@dynamic_sandbox_root</span><span class="si">}</span><span class="sb">/build/</span><span class="si">#{</span><span class="vi">@spec</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="sb">.framework </span><span class="si">#{</span><span class="vi">@platform</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="sb">`</span>
+<span class="sb">`</span><span class="sb">mv </span><span class="si">#{</span><span class="vi">@dynamic_sandbox_root</span><span class="si">}</span><span class="sb">/build/</span><span class="si">#{</span><span class="vi">@spec</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="sb">.framework.dSYM </span><span class="si">#{</span><span class="vi">@platform</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="sb">`</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>上面贴的代码看去很多，更多的是参数拼接的工作，主要做了三件事：</p>
+<ul>
+<li>xcodebuild 模拟器支持的 framework;</li>
+<li>xcodebuild 真机支持的 framework;</li>
+<li>lipo 合并👆生成的 framework 输出到 <code>#{working_directory}/ios</code> ;</li>
+</ul>
+<p>build_dynamic_framework_for_mac 省去 simulator build 这一步，也就没有 lipo 操作，更简单。这里就不列出了。</p>
+<p>最后就是 resource、header、license 等相关资源的 copy。至此大致流程就结束了，用简单流程来回顾一下：</p>
+<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gdj2fkwc7oj22bu1gs7f7.jpg" alt="cocoapods-packager"></p>
+<h3 id="heading-1">总结</h3>
+<p>cocoapods-packager 的逻辑还是比较简单的，整个熟悉过程困难还是在于对 CocoaPods 的 API 和作用并不是和了解，导致很多调用需要查资料或者看 CocoaPods 源码才能了大致理解。内部实现还是围绕 xcodebuild 来展开的，通过生成 podfile 及 pod install 来构建 project 环境，算是对 CocoaPods 的深度集成了。</p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">土土Edmond木</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2020-03-29
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/cocoapods/">CocoaPods</a>
+          <a href="/tags/ios/">iOS</a>
+          <a href="/tags/packager/">Packager</a>
+          <a href="/tags/sourcecode/">SourceCode</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/sourcecode-ios/source-code-rxswift/">
+            <span class="next-text nav-default">源码浅析 RxSwift 5.0 - Subscription</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+    <script src="https://utteranc.es/client.js"
+            repo="looseyi/looseyi.github.io"
+            issue-term="pathname"
+            theme="github-light"
+            crossorigin="anonymous"
+            async>
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/utterance">comments powered by utterances.</a></noscript>
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:chun574271939@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://twitter.com/looseyi" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="https://github.com/looseyi" class="iconfont icon-github" title="github"></a>
+      <a href="https://www.weibo.com/foreverclp" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="https://www.zhihu.com/people/tu-tu-edmondmu" class="iconfont icon-zhihu" title="zhihu"></a>
+  <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2019-12-11 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">土土Edmond木</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-62789092-1', 'auto');
+	ga('set', 'anonymizeIp', true);
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>
