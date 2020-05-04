@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>The Core of SDWebImage v5.6 Architecture - </title>
+  <title>The Architecture of SDWebImage v5.6 - </title>
   <meta name="renderer" content="webkit" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
@@ -38,22 +38,22 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 
 
-<meta property="og:title" content="The Core of SDWebImage v5.6 Architecture" />
+<meta property="og:title" content="The Architecture of SDWebImage v5.6" />
 <meta property="og:description" content="This article is based on SDWebImage 5.6. Why i write this article, cause i found that SD&#39;s API is constantly iterating, and many of the structures are different from earlier versions. Here is to make a record. We will start from the top of the API&#39;s level list below, force on the entire framework&#39;s data flow. 5.0 Migration Guid It is highly recommended to watch the official migration document, which" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="http://localhost:1313/post/sourcecode-ios/source-code-sdweb-en1/" />
-<meta property="article:published_time" content="2020-02-22T23:08:12+08:00" />
-<meta property="article:modified_time" content="2020-02-22T23:08:12+08:00" />
-<meta itemprop="name" content="The Core of SDWebImage v5.6 Architecture">
+<meta property="article:published_time" content="2020-04-12T23:08:12+17:00" />
+<meta property="article:modified_time" content="2020-04-12T23:08:12+17:00" />
+<meta itemprop="name" content="The Architecture of SDWebImage v5.6">
 <meta itemprop="description" content="This article is based on SDWebImage 5.6. Why i write this article, cause i found that SD&#39;s API is constantly iterating, and many of the structures are different from earlier versions. Here is to make a record. We will start from the top of the API&#39;s level list below, force on the entire framework&#39;s data flow. 5.0 Migration Guid It is highly recommended to watch the official migration document, which">
-<meta itemprop="datePublished" content="2020-02-22T23:08:12&#43;08:00" />
-<meta itemprop="dateModified" content="2020-02-22T23:08:12&#43;08:00" />
-<meta itemprop="wordCount" content="5682">
+<meta itemprop="datePublished" content="2020-04-12T23:08:12&#43;17:00" />
+<meta itemprop="dateModified" content="2020-04-12T23:08:12&#43;17:00" />
+<meta itemprop="wordCount" content="5660">
 
 
 
-<meta itemprop="keywords" content="SourceCode,iOS,cache,SourceCode," /><meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="The Core of SDWebImage v5.6 Architecture"/>
+<meta itemprop="keywords" content="Source Code,iOS,Cache," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="The Architecture of SDWebImage v5.6"/>
 <meta name="twitter:description" content="This article is based on SDWebImage 5.6. Why i write this article, cause i found that SD&#39;s API is constantly iterating, and many of the structures are different from earlier versions. Here is to make a record. We will start from the top of the API&#39;s level list below, force on the entire framework&#39;s data flow. 5.0 Migration Guid It is highly recommended to watch the official migration document, which"/>
 
 <!--[if lte IE 9]>
@@ -117,15 +117,16 @@
           <article class="post">
     
     <header class="post-header">
-      <h1 class="post-title">The Core of SDWebImage v5.6 Architecture</h1>
+      <h1 class="post-title">The Architecture of SDWebImage v5.6</h1>
 
       <div class="post-meta">
-        <span class="post-time"> 2020-02-22 </span>
+        <span class="post-time"> 2020-04-12 </span>
         <div class="post-category">
             <a href="/categories/ios/"> iOS </a>
             <a href="/categories/objc/"> Objc </a>
+            <a href="/categories/en/"> En </a>
             </div>
-          <span class="more-meta"> 约 5682 字 </span>
+          <span class="more-meta"> 约 5660 字 </span>
           <span class="more-meta"> 预计阅读 12 分钟 </span>
         
       </div>
@@ -269,7 +270,7 @@
 <blockquote>
 <p>Calling an API from a non-main queue that is executing on the main thread will lead to issues if the library (like VektorKit) relies on checking for execution on the main queue.</p>
 </blockquote>
-<p>Cause **tasks in the main queue must be put into the main thread to execute **.</p>
+<p>Cause <strong>tasks in the main queue must be put into the main thread to execute</strong>.</p>
 <p>Compared to the category of UIImageView, UIButton needs to store images under different <code>UIControlState</code> and backgrounImage, and SD associate has an internal dictionary <code> (NSMutableDictionary &lt;NSString *, NSURL *&gt; *) sd_imageURLStorage</code> to store the images.</p>
 <p>All view category's <code>setImageUrl:</code> finally refer to the following method:</p>
 <div class="highlight"><div class="chroma">
@@ -408,7 +409,7 @@
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
-</div><p><code>loadOperations</code> and <code>prefetchOperations</code> All use **NSPointerArray **, which uses its [NSPointerFunctionsWeakMemory](apple-reference-documentation: // hcx77yk4jV) feature and can store <code> Null</code> values, although its performance is not very good, see: <a href="https://objccn.io/issue-7-1/">basic collection Class</a></p>
+</div><p><code>loadOperations</code> and <code>prefetchOperations</code> All use <strong>NSPointerArray</strong>, which uses its [NSPointerFunctionsWeakMemory](apple-reference-documentation: // hcx77yk4jV) feature and can store <code> Null</code> values, although its performance is not very good, see: <a href="https://objccn.io/issue-7-1/">basic collection Class</a></p>
 <p>Another important thing is that PrefetchToken use the <a href="https://zhuanlan.zhihu.com/p/45566448">c++11 memory_order_relaxed</a> to ensure the thread-safe。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -627,7 +628,7 @@
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>What you need to pay attention to is that the access to requestModifier has **priority **, and the priority obtained through imageContext is higher than the downloader. This kind of method not only satisfies the controllability of the caller, but also supports the global configuration, which is suitable for all ages.</p>
+</div><p>What you need to pay attention to is that the access to requestModifier has <strong>priority</strong>, and the priority obtained through imageContext is higher than the downloader. This kind of method not only satisfies the controllability of the caller, but also supports the global configuration, which is suitable for all ages.</p>
 <p>Similarly, <code>id &lt;SDWebImageDownloaderResponseModifier&gt; responseModifier</code> and<code> id &lt;SDWebImageDownloaderDecryptor&gt; decryptor</code> are also the same approach.</p>
 <p>After that, the confirmed responseModifier and decryptor will be saved in imageContext again for later use.</p>
 <p>Finally, remove operationClass from downloaderConfig to create operation:</p>
@@ -733,7 +734,7 @@
                                 <span class="nf">context:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">SDWebImageContext</span> <span class="o">*</span><span class="p">)</span><span class="nv">context</span><span class="p">;</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>There is nothing special about initialization. You should noted that the <code>nullable session</code> passed here is saved with unownedSessin, which is different from the **ownedSession ** generated by default internally. If the session is empty during initialization, the ownedSession will be created at <code>start</code>.</p>
+</div><p>There is nothing special about initialization. You should noted that the <code>nullable session</code> passed here is saved with unownedSessin, which is different from the <strong>ownedSession</strong> generated by default internally. If the session is empty during initialization, the ownedSession will be created at <code>start</code>.</p>
 <p>Then the problem is coming, because we need to observe the various states of the session, we need to set up the delegate.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -769,10 +770,10 @@
 </div><p>Then, as a real consumer operation trigger the download task. The entire download process including start, end, and cancellation will send corresponding notifications.</p>
 <ol>
 <li>
-<p>In **didReceiveResponse **, <code>response.expectedContentLength</code> will be saved as expectedSize. Then call <code>modifiedResponseWithResponse:</code> to save the edited response.</p>
+<p>In <strong>didReceiveResponse</strong>, <code>response.expectedContentLength</code> will be saved as expectedSize. Then call <code>modifiedResponseWithResponse:</code> to save the edited response.</p>
 </li>
 <li>
-<p>Every time **didReceiveData ** will append data to imageData: <code>[self.imageData appendData: data]</code>, update receivedSize<code>self.receivedSize = self.imageData.length</code>. Finally, when receivedSize bigger then expectedSize, which means the download task is completed,  and move to the next stage. If you support <code>SDWebImageDownloaderProgressiveLoad</code>, you will be able to decoding while downloading in coderQueue:</p>
+<p>Every time <strong>didReceiveData</strong> will append data to imageData: <code>[self.imageData appendData: data]</code>, update receivedSize<code>self.receivedSize = self.imageData.length</code>. Finally, when receivedSize bigger then expectedSize, which means the download task is completed,  and move to the next stage. If you support <code>SDWebImageDownloaderProgressiveLoad</code>, you will be able to decoding while downloading in coderQueue:</p>
 </li>
 </ol>
 <div class="highlight"><div class="chroma">
@@ -803,7 +804,7 @@
 <span class="p">}</span><span class="p">)</span><span class="p">;</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>​		Otherwise, the decoding operation will be completed when **didCompleteWithError **: <code>SDImageLoaderDecodeImageData</code>, but you need to decrypt it before decoding:</p>
+</div><p>​		Otherwise, the decoding operation will be completed when <strong>didCompleteWithError</strong>: <code>SDImageLoaderDecodeImageData</code>, but you need to decrypt it before decoding:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt">1
@@ -872,7 +873,7 @@
 </span><span class="c1"></span><span class="p">-</span> <span class="p">(</span><span class="n">nullable</span> <span class="kt">instancetype</span><span class="p">)</span><span class="nf">initWithCachePath:</span><span class="p">(</span><span class="n">nonnull</span> <span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">cachePath</span> <span class="nf">config:</span><span class="p">(</span><span class="n">nonnull</span> <span class="n">SDImageCacheConfig</span> <span class="o">*</span><span class="p">)</span><span class="nv">config</span><span class="p">;</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>As a cache protocol, their interface declarations are basically the same, all of which are CURD for data. The difference is that MemoryCache Protocl operates on the **id ** type (NSCache's limitation), and DiskCache is on NSData.</p>
+</div><p>As a cache protocol, their interface declarations are basically the same, all of which are CURD for data. The difference is that MemoryCache Protocl operates on the <strong>id</strong> type (NSCache's limitation), and DiskCache is on NSData.</p>
 <h3 id="sdmemorycache">SDMemoryCache</h3>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -896,8 +897,8 @@
 <span class="k">@end</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>Internally, **NSCache ** is the implementation for SDMemoryCache, and add **NSMapTable &lt;KeyType, ObjectType&gt; * weakCache ** property, which use semaphore lock to ensure thread safety. The weak-cache is a feature added only on the <em>iOS / tvOS</em> platform, because on macOS, NSCache will not clear the corresponding cache, when receiving system memory warning. WeakCache uses strong-weak references without additional memory overhead and does not affect the life cycle of the object.</p>
-<p>The role of weakCache is to restore the cache. It is controlled by the **shouldUseWeakMemoryCache ** switch of CacheConfig. For details, you can check the <a href="https://github.com/SDWebImage/SDWebImage/blob/master/SDWebImage/Core/SDImageCacheConfig.h">CacheConfig</a>.</p>
+</div><p>Internally, <strong>NSCache</strong> is the implementation for SDMemoryCache, and add <strong>NSMapTable &lt;KeyType, ObjectType&gt; * weakCache</strong> property, which use semaphore lock to ensure thread safety. The weak-cache is a feature added only on the <em>iOS / tvOS</em> platform, because on macOS, NSCache will not clear the corresponding cache, when receiving system memory warning. WeakCache uses strong-weak references without additional memory overhead and does not affect the life cycle of the object.</p>
+<p>The role of weakCache is to restore the cache. It is controlled by the <strong>shouldUseWeakMemoryCache</strong> switch of CacheConfig. For details, you can check the <a href="https://github.com/SDWebImage/SDWebImage/blob/master/SDWebImage/Core/SDImageCacheConfig.h">CacheConfig</a>.</p>
 <p>First, look at how <em>objectForKey</em> is implemented:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -957,7 +958,7 @@
 <li>According to <code>cacheConfig.maxDiskSize</code> to delete the data cached on the disk, clean up to 1/2 of maxDiskSize.</li>
 </ol>
 <p>By the way, SDDiskCache, like <strong><a href="https://github.com/ibireme/YYCache/blob/master/YYCache/YYKVStorage.h">YYKVStorage</a></strong>, also supports adding extendData to UIImage to store additional information, for example, the zoom ratio of the picture, <a href="https://sspai.com/post/55279">URL rich link</a>, time And other data.</p>
-<p>However, **YYKVStorage **store the extended_data field by the <em><strong>manifest</strong></em> table in the database. SDDiskCache solution is a different way, by use system API &lt;sys/xattr.h&gt; **setxattr **, **getxattr **, **listxattr ** to save extendData, which is really amazing. One more thing, the corresponding key is <em>SDDiskCacheExtendedAttributeName</em>.</p>
+<p>However, <strong>YYKVStorage</strong> store the extended_data field by the <em><strong>manifest</strong></em> table in the database. SDDiskCache solution is a different way, by use system API &lt;sys/xattr.h&gt; <strong>setxattr</strong>, <strong>getxattr</strong>, <strong>listxattr</strong> to save extendData, which is really amazing. One more thing, the corresponding key is <em>SDDiskCacheExtendedAttributeName</em>.</p>
 <h3 id="sdimagecache">SDImageCache</h3>
 <p>It is also a protocold class, which is responsible for scheduling SDMemoryCache and SDDiskCache, and its Properties are as follows:</p>
 <div class="highlight"><div class="chroma">
@@ -1229,8 +1230,8 @@
 </code></pre></td></tr></table>
 </div>
 </div><p>For large amounts of temporary memory operations, SD will put it into autoreleasepool to ensure that the memory can be released in time.</p>
-<p><strong>Special emphasis</strong>, once the code is executed here, there must be disk querying operations, so if you don't have to get imageData, you can use **SDImageCacheQueryMemoryData ** to improve query efficiency.</p>
-<p>One more thing, the conversion logic of <code>SDTransformedKeyForKey</code> is the transformerKey of **SDImageTransformer **, which is spliced behind the image key in order. E.g:</p>
+<p><strong>Special emphasis</strong>, once the code is executed here, there must be disk querying operations, so if you don't have to get imageData, you can use <strong>SDImageCacheQueryMemoryData</strong> to improve query efficiency.</p>
+<p>One more thing, the conversion logic of <code>SDTransformedKeyForKey</code> is the transformerKey of <strong>SDImageTransformer</strong>, which is spliced behind the image key in order. E.g:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt">1
@@ -1280,9 +1281,9 @@
 </code></pre></td></tr></table>
 </div>
 </div><p>Let's briefly talk about the three left APIs cacheKeyFilter, cacheSerializer and optionsProcessor, the rest of which have been mentioned above.</p>
-<p>**SDWebImageCacheKeyFilter **</p>
+<p><strong>SDWebImageCacheKeyFilter</strong></p>
 <p>By default, the <code>URL.absoluteString</code> is used as cacheKey, and if fileter is set, cacheKey will be replaced by <code>cacheKeyForURL:</code>;</p>
-<p>**SDWebImageCacheSerializer **</p>
+<p><strong>SDWebImageCacheSerializer</strong></p>
 <p>By default, ImageCache will directly cache downloadData, and when we use other image formats for transmission, such as WEBP format, then the data with WEBP format will be storaged to the disk directly. This will cause a problem, every time when we query the image from the disk, we have to repeat the decoding operation. The CacheSerializer can directly convert downloadData to JPEG / PNG format NSData cache, thereby improving access efficiency.</p>
 <p><strong>SDWebImageOptionsProcessor</strong></p>
 <p>Used to control the global parameters in SDWebImageOptions and SDWebImageContext. E.g::</p>
@@ -1392,9 +1393,9 @@
 <li>If yes, and options is SDWebImageRetryFailed, directly return operation and retun;</li>
 <li>If pass, the operation will be stored in <code>runningOperations</code>. Enclose options and imageContext in <strong>SDWebImageOptionsResult</strong>.</li>
 </ul>
-<p>then will update imageContext, mainly store the transformer, cacheKeyFilter, cacheSerializer as the global default setting, and then call **optionsProcessor ** to fulfill user's custom options to modify imageContext again.</p>
+<p>then will update imageContext, mainly store the transformer, cacheKeyFilter, cacheSerializer as the global default setting, and then call <strong>optionsProcessor</strong> to fulfill user's custom options to modify imageContext again.</p>
 <p>If you see here from the front,  you should have an impression of this routine. The priority logic of requestModifer in the previous ImageLoader is similar to this, but the implementation is somewhat different. Finally, transfer to CacheProcess.</p>
-<p>The operation of **loadImage ** is a combineOperation, which is a combination of cache and loader operation tasks, so that it can clean up the cache query and download tasks in one step. The statement is as follows:</p>
+<p>The operation of <strong>loadImage</strong> is a combineOperation, which is a combination of cache and loader operation tasks, so that it can clean up the cache query and download tasks in one step. The statement is as follows:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt">1
@@ -1419,7 +1420,7 @@
 </div>
 </div><p>The cancel method provided by it will gradually check two types of opration and then call the cancel operation one by one.</p>
 <p>####CallCacheProcessForOperation</p>
-<p>First check the value of  **SDWebImageFromLoaderOnly ** to determine whether need to start the download task directly.</p>
+<p>First check the value of  <strong>SDWebImageFromLoaderOnly</strong> to determine whether need to start the download task directly.</p>
 <p>If yes, forward to downloadProcess.</p>
 <p>Otherwise, create a query task through <code>imageCache</code> and save it to combineOperation's cacheOperation:</p>
 <div class="highlight"><div class="chroma">
@@ -1467,7 +1468,7 @@
 <li>check whether the imageLoader <strong>canRequestImageForURL</strong>;</li>
 </ul>
 <ol>
-<li>If shouldDownload is NO, close the download task. And perform <strong>callCompletionBlockForOperation</strong> and <strong>safelyRemoveOperationFromRunning</strong>. By the way, if cacheImage exists, it will be returned with completionBlock.</li>
+<li>If shouldDownload is NO, close the download task. And perform <strong>callCompletionBlockForOperation</strong> and<strong>safelyRemoveOperationFromRunning</strong>. By the way, if cacheImage exists, it will be returned with completionBlock.</li>
 <li>If shouldDownload is YES, create a new download task and save it in combineOperation's loaderOperation. Before creating a new task, if cacheImage exist and SDWebImageRefreshCached is set, the cacheImage will be stored in imageContext (if not will create a imageContext).</li>
 <li>After downloading, return to callBack, there are several situations to deal with:
 <ul>
@@ -1579,7 +1580,7 @@
   <p class="copyright-item">
     <span class="item-title">上次更新</span>
     <span class="item-content">
-        2020-02-22
+        2020-04-12
         
     </span>
   </p>
@@ -1588,19 +1589,18 @@
 </div>
 <footer class="post-footer">
       <div class="post-tags">
-          <a href="/tags/sourcecode/">SourceCode</a>
+          <a href="/tags/source-code/">Source Code</a>
           <a href="/tags/ios/">iOS</a>
-          <a href="/tags/cache/">cache</a>
-          <a href="/tags/sourcecode/">SourceCode</a>
+          <a href="/tags/cache/">Cache</a>
           </div>
       <nav class="post-nav">
-        <a class="prev" href="/post/sourcecode-ios/source-code-sdweb-2/">
+        <a class="prev" href="/post/sourcecode-ios/source-code-lumberjack/">
             <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">源码浅析 SDWebImage 5.5.2 - WebP Plugin</span>
+            <span class="prev-text nav-default">源码浅析 - CocoaLumberjack 3.6 之 DDLog</span>
             <span class="prev-text nav-mobile">上一篇</span>
           </a>
-        <a class="next" href="/post/sourcecode-ios/source-code-sdweb-1/">
-            <span class="next-text nav-default">源码浅析 SDWebImage 5.6</span>
+        <a class="next" href="/post/sourcecode-ios/cocoapods-packager/">
+            <span class="next-text nav-default">浅析 Cocoapods-Packager 实现</span>
             <span class="next-text nav-mobile">下一篇</span>
             <i class="iconfont icon-right"></i>
           </a>

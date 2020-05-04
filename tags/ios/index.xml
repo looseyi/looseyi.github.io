@@ -6,10 +6,28 @@
     <description>Recent content in iOS on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 29 Mar 2020 15:10:58 +0800</lastBuildDate>
+    <lastBuildDate>Mon, 04 May 2020 18:20:00 +0800</lastBuildDate>
     
 	<atom:link href="http://localhost:1313/tags/ios/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>源码浅析 - CocoaLumberjack 3.6 之 DDLog</title>
+      <link>http://localhost:1313/post/sourcecode-ios/source-code-lumberjack/</link>
+      <pubDate>Mon, 04 May 2020 18:20:00 +0800</pubDate>
+      
+      <guid>http://localhost:1313/post/sourcecode-ios/source-code-lumberjack/</guid>
+      <description>介绍 CocoaLumberjack is a fast &amp;amp; simple, yet powerful &amp;amp; flexible logging framework for Mac and iOS. 先扯一下 lumberjack 这个单词，对应的就是它的 logo，一位伐木工，好想知道作者对用意啊，是基础建设的意思吗？ 写这篇</description>
+    </item>
+    
+    <item>
+      <title>The Architecture of SDWebImage v5.6</title>
+      <link>http://localhost:1313/post/sourcecode-ios/source-code-sdweb-en1/</link>
+      <pubDate>Sun, 12 Apr 2020 23:08:12 +1700</pubDate>
+      
+      <guid>http://localhost:1313/post/sourcecode-ios/source-code-sdweb-en1/</guid>
+      <description>This article is based on SDWebImage 5.6. Why i write this article, cause i found that SD&#39;s API is constantly iterating, and many of the structures are different from earlier versions. Here is to make a record. We will start from the top of the API&#39;s level list below, force on the entire framework&#39;s data flow. 5.0 Migration Guid It is highly recommended to watch the official migration document, which</description>
+    </item>
     
     <item>
       <title>浅析 Cocoapods-Packager 实现</title>
@@ -36,15 +54,6 @@
       
       <guid>http://localhost:1313/post/sourcecode-ios/source-code-sdweb-2/</guid>
       <description>本文基于 SDWebImage 5.5.2。重读的原因也是由于发现它的 API 在不断迭代，许多结构已经不同与早期版本，同时也是为了做一个记录。整体分析可以查看上一篇文章</description>
-    </item>
-    
-    <item>
-      <title>The Core of SDWebImage v5.6 Architecture</title>
-      <link>http://localhost:1313/post/sourcecode-ios/source-code-sdweb-en1/</link>
-      <pubDate>Sat, 22 Feb 2020 23:08:12 +0800</pubDate>
-      
-      <guid>http://localhost:1313/post/sourcecode-ios/source-code-sdweb-en1/</guid>
-      <description>This article is based on SDWebImage 5.6. Why i write this article, cause i found that SD&#39;s API is constantly iterating, and many of the structures are different from earlier versions. Here is to make a record. We will start from the top of the API&#39;s level list below, force on the entire framework&#39;s data flow. 5.0 Migration Guid It is highly recommended to watch the official migration document, which</description>
     </item>
     
     <item>

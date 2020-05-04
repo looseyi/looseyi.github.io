@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>WebImage on </title>
+    <link>http://localhost:1313/tags/webimage/</link>
+    <description>Recent content in WebImage on </description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Wed, 11 Mar 2020 23:08:12 +0800</lastBuildDate>
+    
+	<atom:link href="http://localhost:1313/tags/webimage/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>源码浅析 SDWebImage 5.5.2 - WebP Plugin</title>
+      <link>http://localhost:1313/post/sourcecode-ios/source-code-sdweb-2/</link>
+      <pubDate>Wed, 11 Mar 2020 23:08:12 +0800</pubDate>
+      
+      <guid>http://localhost:1313/post/sourcecode-ios/source-code-sdweb-2/</guid>
+      <description>本文基于 SDWebImage 5.5.2。重读的原因也是由于发现它的 API 在不断迭代，许多结构已经不同与早期版本，同时也是为了做一个记录。整体分析可以查看上一篇文章</description>
+    </item>
+    
+  </channel>
+</rss>

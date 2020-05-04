@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Objc on </title>
-    <link>http://localhost:1313/categories/objc/</link>
-    <description>Recent content in Objc on </description>
+    <title>En on </title>
+    <link>http://localhost:1313/categories/en/</link>
+    <description>Recent content in En on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <lastBuildDate>Sun, 12 Apr 2020 23:08:12 +1700</lastBuildDate>
     
-	<atom:link href="http://localhost:1313/categories/objc/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://localhost:1313/categories/en/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -18,15 +18,6 @@
       
       <guid>http://localhost:1313/post/sourcecode-ios/source-code-sdweb-en1/</guid>
       <description>This article is based on SDWebImage 5.6. Why i write this article, cause i found that SD&#39;s API is constantly iterating, and many of the structures are different from earlier versions. Here is to make a record. We will start from the top of the API&#39;s level list below, force on the entire framework&#39;s data flow. 5.0 Migration Guid It is highly recommended to watch the official migration document, which</description>
-    </item>
-    
-    <item>
-      <title>源码浅析 SDWebImage 5.5.2 - WebP Plugin</title>
-      <link>http://localhost:1313/post/sourcecode-ios/source-code-sdweb-2/</link>
-      <pubDate>Wed, 11 Mar 2020 23:08:12 +0800</pubDate>
-      
-      <guid>http://localhost:1313/post/sourcecode-ios/source-code-sdweb-2/</guid>
-      <description>本文基于 SDWebImage 5.5.2。重读的原因也是由于发现它的 API 在不断迭代，许多结构已经不同与早期版本，同时也是为了做一个记录。整体分析可以查看上一篇文章</description>
     </item>
     
   </channel>
