@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>浅析 Cocoapods-Packager 实现 on </title>
+    <link>http://looseyi.github.io/post/sourcecode-ios/cocoapods-packager/</link>
+    <description>Recent content in 浅析 Cocoapods-Packager 实现 on </description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sun, 29 Mar 2020 15:10:58 +0800</lastBuildDate>
+    
+	<atom:link href="http://looseyi.github.io/post/sourcecode-ios/cocoapods-packager/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+  </channel>
+</rss>

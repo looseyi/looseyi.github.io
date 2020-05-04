@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>浅析 Cocoapods-Binary 实现 on </title>
+    <link>http://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-1/</link>
+    <description>Recent content in 浅析 Cocoapods-Binary 实现 on </description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sat, 21 Dec 2019 11:37:41 +2100</lastBuildDate>
+    
+	<atom:link href="http://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-1/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+  </channel>
+</rss>

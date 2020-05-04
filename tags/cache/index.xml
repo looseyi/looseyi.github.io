@@ -1,49 +1,49 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>cache on </title>
-    <link>http://localhost:1313/tags/cache/</link>
-    <description>Recent content in cache on </description>
+    <title>Cache on </title>
+    <link>http://looseyi.github.io/tags/cache/</link>
+    <description>Recent content in Cache on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <lastBuildDate>Sun, 12 Apr 2020 23:08:12 +1700</lastBuildDate>
     
-	<atom:link href="http://localhost:1313/tags/cache/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://looseyi.github.io/tags/cache/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>The Architecture of SDWebImage v5.6</title>
-      <link>http://localhost:1313/post/sourcecode-ios/source-code-sdweb-en1/</link>
+      <link>http://looseyi.github.io/post/sourcecode-ios/source-code-sdweb-en1/</link>
       <pubDate>Sun, 12 Apr 2020 23:08:12 +1700</pubDate>
       
-      <guid>http://localhost:1313/post/sourcecode-ios/source-code-sdweb-en1/</guid>
+      <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-sdweb-en1/</guid>
       <description>This article is based on SDWebImage 5.6. Why i write this article, cause i found that SD&#39;s API is constantly iterating, and many of the structures are different from earlier versions. Here is to make a record. We will start from the top of the API&#39;s level list below, force on the entire framework&#39;s data flow. 5.0 Migration Guid It is highly recommended to watch the official migration document, which</description>
     </item>
     
     <item>
       <title>源码浅析 SDWebImage 5.5.2 - WebP Plugin</title>
-      <link>http://localhost:1313/post/sourcecode-ios/source-code-sdweb-2/</link>
+      <link>http://looseyi.github.io/post/sourcecode-ios/source-code-sdweb-2/</link>
       <pubDate>Wed, 11 Mar 2020 23:08:12 +0800</pubDate>
       
-      <guid>http://localhost:1313/post/sourcecode-ios/source-code-sdweb-2/</guid>
+      <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-sdweb-2/</guid>
       <description>本文基于 SDWebImage 5.5.2。重读的原因也是由于发现它的 API 在不断迭代，许多结构已经不同与早期版本，同时也是为了做一个记录。整体分析可以查看上一篇文章</description>
     </item>
     
     <item>
       <title>源码浅析 SDWebImage 5.6</title>
-      <link>http://localhost:1313/post/sourcecode-ios/source-code-sdweb-1/</link>
+      <link>http://looseyi.github.io/post/sourcecode-ios/source-code-sdweb-1/</link>
       <pubDate>Sat, 22 Feb 2020 23:08:12 +0800</pubDate>
       
-      <guid>http://localhost:1313/post/sourcecode-ios/source-code-sdweb-1/</guid>
+      <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-sdweb-1/</guid>
       <description>本文基于 SDWebImage 5.6。重读的原因也是由于发现它的 API 在不断迭代，许多结构已经不同与早期版本，同时也是为了做一个记录。阅读顺序也会依据 API 执行顺序进行</description>
     </item>
     
     <item>
       <title>源码浅析 - MMKV iOS</title>
-      <link>http://localhost:1313/post/sourcecode-ios/source-code-mmkv/</link>
+      <link>http://looseyi.github.io/post/sourcecode-ios/source-code-mmkv/</link>
       <pubDate>Sat, 08 Feb 2020 23:23:47 +0800</pubDate>
       
-      <guid>http://localhost:1313/post/sourcecode-ios/source-code-mmkv/</guid>
+      <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-mmkv/</guid>
       <description>MMKV（官方介绍） MMKV 是基于 mmap 内存映射的 key-value 组件，底层序列化/反序列化使用 protobuf 实现，性能高，稳定性强。从 2015 年中至今在微信上使用，其性能和稳定性经</description>
     </item>
     

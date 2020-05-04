@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>En on </title>
-    <link>http://localhost:1313/categories/en/</link>
+    <link>http://looseyi.github.io/categories/en/</link>
     <description>Recent content in En on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <lastBuildDate>Sun, 12 Apr 2020 23:08:12 +1700</lastBuildDate>
     
-	<atom:link href="http://localhost:1313/categories/en/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://looseyi.github.io/categories/en/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>The Architecture of SDWebImage v5.6</title>
-      <link>http://localhost:1313/post/sourcecode-ios/source-code-sdweb-en1/</link>
+      <link>http://looseyi.github.io/post/sourcecode-ios/source-code-sdweb-en1/</link>
       <pubDate>Sun, 12 Apr 2020 23:08:12 +1700</pubDate>
       
-      <guid>http://localhost:1313/post/sourcecode-ios/source-code-sdweb-en1/</guid>
+      <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-sdweb-en1/</guid>
       <description>This article is based on SDWebImage 5.6. Why i write this article, cause i found that SD&#39;s API is constantly iterating, and many of the structures are different from earlier versions. Here is to make a record. We will start from the top of the API&#39;s level list below, force on the entire framework&#39;s data flow. 5.0 Migration Guid It is highly recommended to watch the official migration document, which</description>
     </item>
     

@@ -1,190 +1,190 @@
-<?xml-stylesheet type="text/xsl" href="http://localhost:1313/sitemap.xsl"?>
+<?xml-stylesheet type="text/xsl" href="http://looseyi.github.io/sitemap.xsl"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>http://localhost:1313/</loc>
+    <loc>http://looseyi.github.io/</loc>
     <lastmod>2020-05-04T18:20:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>http://localhost:1313/categories/</loc>
+    <loc>http://looseyi.github.io/categories/</loc>
     <lastmod>2020-05-04T18:20:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>http://localhost:1313/tags/ios/</loc>
+    <loc>http://looseyi.github.io/tags/ios/</loc>
     <lastmod>2020-05-04T18:20:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>http://localhost:1313/categories/ios/</loc>
+    <loc>http://looseyi.github.io/categories/ios/</loc>
     <lastmod>2020-05-04T18:20:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>http://localhost:1313/tags/logger/</loc>
+    <loc>http://looseyi.github.io/tags/logger/</loc>
     <lastmod>2020-05-04T18:20:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>http://localhost:1313/post/</loc>
+    <loc>http://looseyi.github.io/post/</loc>
     <lastmod>2020-05-04T18:20:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>http://localhost:1313/tags/source-code/</loc>
+    <loc>http://looseyi.github.io/tags/source-code/</loc>
     <lastmod>2020-05-04T18:20:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>http://localhost:1313/tags/</loc>
+    <loc>http://looseyi.github.io/tags/</loc>
     <lastmod>2020-05-04T18:20:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>http://localhost:1313/post/sourcecode-ios/source-code-lumberjack/</loc>
+    <loc>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack/</loc>
     <lastmod>2020-05-04T18:20:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>http://localhost:1313/tags/cache/</loc>
+    <loc>http://looseyi.github.io/tags/cache/</loc>
     <lastmod>2020-04-12T23:08:12+17:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>http://localhost:1313/categories/en/</loc>
+    <loc>http://looseyi.github.io/categories/en/</loc>
     <lastmod>2020-04-12T23:08:12+17:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>http://localhost:1313/categories/objc/</loc>
+    <loc>http://looseyi.github.io/categories/objc/</loc>
     <lastmod>2020-04-12T23:08:12+17:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>http://localhost:1313/post/sourcecode-ios/source-code-sdweb-en1/</loc>
+    <loc>http://looseyi.github.io/post/sourcecode-ios/source-code-sdweb-en1/</loc>
     <lastmod>2020-04-12T23:08:12+17:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>http://localhost:1313/categories/cocoapods/</loc>
+    <loc>http://looseyi.github.io/categories/cocoapods/</loc>
     <lastmod>2020-03-29T15:10:58+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>http://localhost:1313/tags/cocoapods/</loc>
+    <loc>http://looseyi.github.io/tags/cocoapods/</loc>
     <lastmod>2020-03-29T15:10:58+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>http://localhost:1313/tags/packager/</loc>
+    <loc>http://looseyi.github.io/tags/packager/</loc>
     <lastmod>2020-03-29T15:10:58+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>http://localhost:1313/post/sourcecode-ios/cocoapods-packager/</loc>
+    <loc>http://looseyi.github.io/post/sourcecode-ios/cocoapods-packager/</loc>
     <lastmod>2020-03-29T15:10:58+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>http://localhost:1313/tags/reactive/</loc>
+    <loc>http://looseyi.github.io/tags/reactive/</loc>
     <lastmod>2020-03-16T23:10:58+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>http://localhost:1313/categories/swift/</loc>
+    <loc>http://looseyi.github.io/categories/swift/</loc>
     <lastmod>2020-03-16T23:10:58+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>http://localhost:1313/post/sourcecode-ios/source-code-rxswift/</loc>
+    <loc>http://looseyi.github.io/post/sourcecode-ios/source-code-rxswift/</loc>
     <lastmod>2020-03-16T23:10:58+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>http://localhost:1313/tags/webimage/</loc>
+    <loc>http://looseyi.github.io/tags/webimage/</loc>
     <lastmod>2020-03-11T23:08:12+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>http://localhost:1313/post/sourcecode-ios/source-code-sdweb-2/</loc>
+    <loc>http://looseyi.github.io/post/sourcecode-ios/source-code-sdweb-2/</loc>
     <lastmod>2020-03-11T23:08:12+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>http://localhost:1313/post/sourcecode-ios/source-code-sdweb-1/</loc>
+    <loc>http://looseyi.github.io/post/sourcecode-ios/source-code-sdweb-1/</loc>
     <lastmod>2020-02-22T23:08:12+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>http://localhost:1313/post/sourcecode-ios/source-code-mmkv/</loc>
+    <loc>http://looseyi.github.io/post/sourcecode-ios/source-code-mmkv/</loc>
     <lastmod>2020-02-08T23:23:47+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>http://localhost:1313/tags/binary/</loc>
+    <loc>http://looseyi.github.io/tags/binary/</loc>
     <lastmod>2020-01-06T11:40:06+21:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>http://localhost:1313/post/sourcecode-ios/cocoapods-binary-2/</loc>
+    <loc>http://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-2/</loc>
     <lastmod>2020-01-06T11:40:06+21:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>http://localhost:1313/post/sourcecode-ios/cocoapods-binary-1/</loc>
+    <loc>http://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-1/</loc>
     <lastmod>2019-12-21T11:37:41+21:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>

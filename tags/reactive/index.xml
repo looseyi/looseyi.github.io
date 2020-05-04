@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Reactive on </title>
-    <link>http://localhost:1313/tags/reactive/</link>
+    <link>http://looseyi.github.io/tags/reactive/</link>
     <description>Recent content in Reactive on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <lastBuildDate>Mon, 16 Mar 2020 23:10:58 +0800</lastBuildDate>
     
-	<atom:link href="http://localhost:1313/tags/reactive/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://looseyi.github.io/tags/reactive/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>源码浅析 RxSwift 5.0 - Subscription</title>
-      <link>http://localhost:1313/post/sourcecode-ios/source-code-rxswift/</link>
+      <link>http://looseyi.github.io/post/sourcecode-ios/source-code-rxswift/</link>
       <pubDate>Mon, 16 Mar 2020 23:10:58 +0800</pubDate>
       
-      <guid>http://localhost:1313/post/sourcecode-ios/source-code-rxswift/</guid>
+      <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-rxswift/</guid>
       <description>前言 ReactiveX 它是一个与语言无关的编程思想。作为成员框架之一 RxSwift 落地了大部分 ReactiveX 中关于流的操作。官方描述： An API for asynchronous programming with observable streams ReactiveX is a combination of the best ideas from the Observer pattern, the Iterator pattern,</description>
     </item>
     
