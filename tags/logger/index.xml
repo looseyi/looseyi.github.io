@@ -6,17 +6,26 @@
     <description>Recent content in Logger on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Mon, 04 May 2020 18:20:00 +0800</lastBuildDate>
+    <lastBuildDate>Fri, 08 May 2020 23:20:00 +0800</lastBuildDate>
     
 	<atom:link href="http://looseyi.github.io/tags/logger/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>源码浅析 - CocoaLumberjack 3.6 之 DDLog</title>
-      <link>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack/</link>
+      <title>浅析 - CocoaLumberjack 3.6 之 FileLogger</title>
+      <link>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-2/</link>
+      <pubDate>Fri, 08 May 2020 23:20:00 +0800</pubDate>
+      
+      <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-2/</guid>
+      <description>DDFileLogger 继续上一篇：CocoaLumberjack 之 DDLog，重点介绍了 lumberjack 的核心管理类 DDLog 以及两个核心协议 DDLogger 和 DDLogFormatter。还涉及</description>
+    </item>
+    
+    <item>
+      <title>浅析 - CocoaLumberjack 3.6 之 DDLog</title>
+      <link>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-1/</link>
       <pubDate>Mon, 04 May 2020 18:20:00 +0800</pubDate>
       
-      <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack/</guid>
+      <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-1/</guid>
       <description>介绍 CocoaLumberjack is a fast &amp;amp; simple, yet powerful &amp;amp; flexible logging framework for Mac and iOS. 先扯一下 lumberjack 这个单词，对应的就是它的 logo，一位伐木工，好想知道作者对用意啊，是基础建设的意思吗？ 写这篇</description>
     </item>
     

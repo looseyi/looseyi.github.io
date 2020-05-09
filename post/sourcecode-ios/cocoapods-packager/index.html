@@ -144,6 +144,22 @@
         <li><a href="#what-can-cocoapods-plugins-do">What can CocoaPods Plugins do?</a></li>
         <li><a href="#rubygems">RubyGems</a></li>
         <li><a href="#cocoapods-plugins-1">CocoaPods Plugins</a></li>
+        <li><a href="#cocoapods-packager">CocoaPods Packager</a></li>
+        <li><a href="#options">options</a></li>
+        <li><a href="#validate">validate</a></li>
+        <li><a href="#initialize">initialize</a></li>
+        <li><a href="#run">run</a></li>
+        <li><a href="#build-package">build_package</a></li>
+        <li><a href="#build-in-sandbox">build_in_sandbox</a></li>
+        <li><a href="#build-static-sandbox">build_static_sandbox</a></li>
+        <li><a href="#install-pod">install_pod</a></li>
+        <li><a href="#install-dynamic-pod">install_dynamic_pod</a></li>
+        <li><a href="#build-dynamic-target">build_dynamic_target</a></li>
+        <li><a href="#prepare-pods-project">prepare_pods_project</a></li>
+        <li><a href="#copy-dynamic-target">copy_dynamic_target</a></li>
+        <li><a href="#install-file-references">install_file_references</a></li>
+        <li><a href="#install-library">install_library</a></li>
+        <li><a href="#write-pod-project">write_pod_project</a></li>
       </ul>
     </li>
     <li><a href="#builder">Builder</a>
@@ -341,7 +357,7 @@
 </code></pre></td></tr></table>
 </div>
 </div><p>确实没啥特别的，只不过会在 gemfile 中，帮你指定好 cocoapods 的依赖，以及根据提供的 NAME 来生成通用文件。</p>
-<p>###CocoaPods Packager</p>
+<h3 id="cocoapods-packager">CocoaPods Packager</h3>
 <p>接下来我们提到的文件都是在 lib 文件夹下，即 Packager 的源代码所在地。开始前照例看一下脑图，有一个整体的认识：</p>
 <p><img src="http://ww1.sinaimg.cn/large/8157560cly1gdbb24p0iuj22ma1jw19j.jpg" alt="cocoapods-packager"></p>
 <p>这里基本对应了 Packager 的主要文件，作者已经分的比较清楚了，整个 Package 的入口是 <code>/lib/pod/command/package.rb</code> 文件，对应脑图的 Command Run 分类。各个分类下面对应的就是各个文件内部提供的主要方法，接下来我们就从 Package 文件说起。</p>
@@ -378,7 +394,7 @@
 </code></pre></td></tr></table>
 </div>
 </div><p>Package Command 继承自 CocoaPods 内部所提供的命令工具模块 <a href="https://github.com/CocoaPods/CLAide">CLAide</a>::Command。所有扩展 Pod 的命令都需要继承它，同时需要重载它的 <code>options</code>、<code>validate</code>、<code>initialize</code> 和 <code>run</code> 四个方法。</p>
-<p>###options</p>
+<h3 id="options">options</h3>
 <blockquote>
 <p>A list of option name and description tuples.</p>
 </blockquote>
@@ -421,7 +437,7 @@
 <span class="k">end</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>###validate</p>
+</div><h3 id="validate">validate</h3>
 <p>校验所传参数有效性，如果参数中带有 <code>--help</code> 选项，则会直接抛出帮助提示。它会在 run 方法执行前被调用。重载前需要先调用 <code>super</code>，代码如下：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -443,7 +459,7 @@
 <span class="k">end</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>###initialize</p>
+</div><h3 id="initialize">initialize</h3>
 <p>解析参数，然后初始化打包所需的变量。这里着重介绍几个核心参数：</p>
 <ul>
 <li>@config：xcodebuild configuration，值为 <em>Debug</em>、<em>Release</em>，当然也可以自定义，默认为 <em>Release</em>；</li>
@@ -482,7 +498,7 @@
 <p>A <em>framework</em> is a hierarchical directory that encapsulates shared resources, such as a dynamic shared library, nib files, image files, localized strings, header files, and reference documentation in a single package.</p>
 </blockquote>
 <p>简单来说 framework 就一文件夹，你要说和 Bundle 一样也无妨。它是静态库还是动态库，重点看它所包含的 library 类型。如果包含的是 static share library 那就是 static_framework。如果包含的是 dynamic share library 则是 dynamic_framework。而我们平时说的 <code>libxxx.a</code> 则是静态库。</p>
-<p>###run</p>
+<h3 id="run">run</h3>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -531,7 +547,7 @@
 </code></pre></td></tr></table>
 </div>
 </div><p>在 <code>create_working_directory</code> 后，会主动切换当前 ruby 的运行目录至 <code>working_directory</code> 目录下，正式开始编译。<code>build_package</code> 结束后，将编译产物 copy 到 <code>target_directory</code> 下，同时切换回最初执行命令所在目录 <code>@source_dir</code> 。</p>
-<p>###build_package</p>
+<h3 id="build-package">build_package</h3>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -573,7 +589,7 @@
 </code></pre></td></tr></table>
 </div>
 </div><p>最后，将 <code>podspec</code>  写入 <code>target_directory</code> 编译结束。</p>
-<p>###build_in_sandbox</p>
+<h3 id="build-in-sandbox">build_in_sandbox</h3>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -654,7 +670,7 @@
 <p>有了 config 之后，就可以创建沙盒来执行 pod install。install 过程会针对 static 和 dynamic 分别 install 一次。最后，基于安装后的工程，创建 builder 开始最终的构建操作。沙盒创建和 install 是在 <code>pod_utils.rb</code> ，build 在 <code>builder.rb</code> 中，接下来会单独展开。</p>
 <p>##Pod Utils</p>
 <p>整个 pods_utils 文件均声明为 Package 的 private 方法，主要做的是 build sandbox 和 pod install。install 会区分 static 和 dynamic。按照 <code>build_in_sandbox</code> 调用顺序展开聊聊。</p>
-<p>###build_static_sandbox</p>
+<h3 id="build-static-sandbox">build_static_sandbox</h3>
 <p>通过 Pathname 先生成 <code>static_sandbox_root</code> ，然后返回 <code>Sandbox.new(static_sandbox_root)</code>。static_sandbox_root 会根据参数 dynamic 来判断，是否需要创建二级目录 <code>/static</code>：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -686,7 +702,7 @@
 <p>The sandbox provides support for the directory that CocoaPods uses for an installation. In this directory the Pods projects, the support files and the sources of the Pods are stored.</p>
 </blockquote>
 <p>所以，sandbox 就是用于管理 pod install 目录。</p>
-<p>###install_pod</p>
+<h3 id="install-pod">install_pod</h3>
 <p>既然是 pod install 当然需要来一个 podfile 了。package 会根据指定的 spec 来手动创建 podfile。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -797,7 +813,7 @@
 <p>When you create a new project, Xcode will set the <code>Link Frameworks Automatically</code> flag to YES. Then the clang linking flag will be set to <code>CLANG_MODULES_AUTOLINK = YES</code>. With this option, clang will linking the framework for you automatically.</p>
 </blockquote>
 <p>就是为了避免 install 后，项目 autolink。</p>
-<p>###install_dynamic_pod</p>
+<h3 id="install-dynamic-pod">install_dynamic_pod</h3>
 <p><code>build_dynamic_sandbox</code> 前面已经说过了，我们直接看动态库的 install：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -840,7 +856,7 @@
 </code></pre></td></tr></table>
 </div>
 </div><p>内部分了 6 个方法，还附带了详细的注释。需要注意的是，整个 install_dynamic_pod 是基于 install_pod 所生成的 <code>static_installer</code> 来修改的。这里比较复杂，一步步来。</p>
-<p>###build_dynamic_target</p>
+<h3 id="build-dynamic-target">build_dynamic_target</h3>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -898,7 +914,7 @@
 <p>创建 PodTarget。</p>
 </li>
 </ol>
-<p>###prepare_pods_project</p>
+<h3 id="prepare-pods-project">prepare_pods_project</h3>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -936,9 +952,9 @@
 </div><p>创建 Pod::Project，然后将 static project 中的 user configuration 复制过来，最后为 target 新建 Pods Group，这里的 group 是 <a href="https://www.rubydoc.info/gems/cocoapods/0.38.0/Pod/Project">PBXGroup</a>。什么是 PBXGroup 呢？看下面的分组就明白的了：</p>
 <p><img src="http://ww1.sinaimg.cn/large/8157560cly1gdi3kh8vf2j20ey084dr5.jpg" alt="pbxgroup"></p>
 <p>我们平时说看到的 Dependencies、Frameworks、Pods、Products、Target Support Files 他们在 CocoaPods 中都是对应了 PBXGroup。</p>
-<p>###copy_dynamic_target</p>
+<h3 id="copy-dynamic-target">copy_dynamic_target</h3>
 <p>从 static sandbox 中 cp 到 dynamic sandbox 目录下。</p>
-<p>###install_file_references</p>
+<h3 id="install-file-references">install_file_references</h3>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt">1
@@ -953,9 +969,9 @@
 <blockquote>
 <p>Controller class responsible of installing the file references of the specifications in the Pods project.</p>
 </blockquote>
-<p>###install_library</p>
+<h3 id="install-library">install_library</h3>
 <p>将 dynamic_target 写入新建的 project，同时会 install 依赖的 system framework。</p>
-<p>###write_pod_project</p>
+<h3 id="write-pod-project">write_pod_project</h3>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -1202,7 +1218,7 @@ mangling: PodKFData_PodsDummy_KFData
             <span class="prev-text nav-mobile">上一篇</span>
           </a>
         <a class="next" href="/post/sourcecode-ios/source-code-rxswift/">
-            <span class="next-text nav-default">源码浅析 RxSwift 5.0 - Subscription</span>
+            <span class="next-text nav-default">浅析 RxSwift 5.0 - Subscription</span>
             <span class="next-text nav-mobile">下一篇</span>
             <i class="iconfont icon-right"></i>
           </a>

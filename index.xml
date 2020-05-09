@@ -6,17 +6,35 @@
     <description>Recent content on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Mon, 04 May 2020 18:20:00 +0800</lastBuildDate>
+    <lastBuildDate>Fri, 08 May 2020 23:20:00 +0800</lastBuildDate>
     
 	<atom:link href="http://looseyi.github.io/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>源码浅析 - CocoaLumberjack 3.6 之 DDLog</title>
-      <link>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack/</link>
+      <title>浅析 - CocoaLumberjack 3.6 之 FileLogger</title>
+      <link>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-2/</link>
+      <pubDate>Fri, 08 May 2020 23:20:00 +0800</pubDate>
+      
+      <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-2/</guid>
+      <description>DDFileLogger 继续上一篇：CocoaLumberjack 之 DDLog，重点介绍了 lumberjack 的核心管理类 DDLog 以及两个核心协议 DDLogger 和 DDLogFormatter。还涉及</description>
+    </item>
+    
+    <item>
+      <title>浅析 - MMKV 1.1 / iOS</title>
+      <link>http://looseyi.github.io/post/sourcecode-ios/source-code-mmkv/</link>
+      <pubDate>Tue, 05 May 2020 23:23:47 +0800</pubDate>
+      
+      <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-mmkv/</guid>
+      <description>#介绍 MMKV is an efficient, small, easy-to-use mobile key-value storage framework used in the WeChat application. It&#39;s currently available on Android, iOS/macOS, Win32 and POSIX. MMKV 作为一个精简易用且性能强悍的全平台 K-V 存储框架，有如下特点： 高效： 利用 mmap 直接将文件映射</description>
+    </item>
+    
+    <item>
+      <title>浅析 - CocoaLumberjack 3.6 之 DDLog</title>
+      <link>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-1/</link>
       <pubDate>Mon, 04 May 2020 18:20:00 +0800</pubDate>
       
-      <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack/</guid>
+      <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-1/</guid>
       <description>介绍 CocoaLumberjack is a fast &amp;amp; simple, yet powerful &amp;amp; flexible logging framework for Mac and iOS. 先扯一下 lumberjack 这个单词，对应的就是它的 logo，一位伐木工，好想知道作者对用意啊，是基础建设的意思吗？ 写这篇</description>
     </item>
     
@@ -39,7 +57,7 @@
     </item>
     
     <item>
-      <title>源码浅析 RxSwift 5.0 - Subscription</title>
+      <title>浅析 RxSwift 5.0 - Subscription</title>
       <link>http://looseyi.github.io/post/sourcecode-ios/source-code-rxswift/</link>
       <pubDate>Mon, 16 Mar 2020 23:10:58 +0800</pubDate>
       
@@ -48,7 +66,7 @@
     </item>
     
     <item>
-      <title>源码浅析 SDWebImage 5.5.2 - WebP Plugin</title>
+      <title>浅析 SDWebImage 5.5.2 - WebP Plugin</title>
       <link>http://looseyi.github.io/post/sourcecode-ios/source-code-sdweb-2/</link>
       <pubDate>Wed, 11 Mar 2020 23:08:12 +0800</pubDate>
       
@@ -57,21 +75,12 @@
     </item>
     
     <item>
-      <title>源码浅析 SDWebImage 5.6</title>
+      <title>浅析 SDWebImage 5.6</title>
       <link>http://looseyi.github.io/post/sourcecode-ios/source-code-sdweb-1/</link>
       <pubDate>Sat, 22 Feb 2020 23:08:12 +0800</pubDate>
       
       <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-sdweb-1/</guid>
       <description>本文基于 SDWebImage 5.6。重读的原因也是由于发现它的 API 在不断迭代，许多结构已经不同与早期版本，同时也是为了做一个记录。阅读顺序也会依据 API 执行顺序进行</description>
-    </item>
-    
-    <item>
-      <title>源码浅析 - MMKV iOS</title>
-      <link>http://looseyi.github.io/post/sourcecode-ios/source-code-mmkv/</link>
-      <pubDate>Sat, 08 Feb 2020 23:23:47 +0800</pubDate>
-      
-      <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-mmkv/</guid>
-      <description>MMKV（官方介绍） MMKV 是基于 mmap 内存映射的 key-value 组件，底层序列化/反序列化使用 protobuf 实现，性能高，稳定性强。从 2015 年中至今在微信上使用，其性能和稳定性经</description>
     </item>
     
     <item>
