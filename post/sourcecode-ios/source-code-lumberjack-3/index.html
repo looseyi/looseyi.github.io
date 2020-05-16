@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>浅析 - CocoaLumberjack 3.6 之 DatabaseLogger - </title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="土土Edmond木" /><meta name="description" content="前言 这是 DDLog 源码阅读的最后一篇。本篇重点介绍 DDLogger 对数据库存储的支持，原理应该和 FileLogger 一样，log 磁盘存储的频率，过期 log 的淘汰策略，以及 log 存储的缓存策" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.62.0 with theme even" />
+
+
+<link rel="canonical" href="http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-3/" />
+  <link href="http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-3/index.xml" rel="alternate" type="application/rss+xml" title="" />
+  <link href="http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-3/index.xml" rel="feed" type="application/rss+xml" title="" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="浅析 - CocoaLumberjack 3.6 之 DatabaseLogger" />
+<meta property="og:description" content="前言 这是 DDLog 源码阅读的最后一篇。本篇重点介绍 DDLogger 对数据库存储的支持，原理应该和 FileLogger 一样，log 磁盘存储的频率，过期 log 的淘汰策略，以及 log 存储的缓存策" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-3/" />
+<meta property="article:published_time" content="2020-05-16T00:00:00+08:00" />
+<meta property="article:modified_time" content="2020-05-16T00:00:00+08:00" />
+<meta itemprop="name" content="浅析 - CocoaLumberjack 3.6 之 DatabaseLogger">
+<meta itemprop="description" content="前言 这是 DDLog 源码阅读的最后一篇。本篇重点介绍 DDLogger 对数据库存储的支持，原理应该和 FileLogger 一样，log 磁盘存储的频率，过期 log 的淘汰策略，以及 log 存储的缓存策">
+<meta itemprop="datePublished" content="2020-05-16T00:00:00&#43;08:00" />
+<meta itemprop="dateModified" content="2020-05-16T00:00:00&#43;08:00" />
+<meta itemprop="wordCount" content="4321">
+
+
+
+<meta itemprop="keywords" content="Source Code,iOS,Logger," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="浅析 - CocoaLumberjack 3.6 之 DatabaseLogger"/>
+<meta name="twitter:description" content="前言 这是 DDLog 源码阅读的最后一篇。本篇重点介绍 DDLogger 对数据库存储的支持，原理应该和 FileLogger 一样，log 磁盘存储的频率，过期 log 的淘汰策略，以及 log 存储的缓存策"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Aha Moment</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Aha Moment</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">浅析 - CocoaLumberjack 3.6 之 DatabaseLogger</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-05-16 </span>
+        <div class="post-category">
+            <a href="/categories/ios/"> iOS </a>
+            </div>
+          <span class="more-meta"> 约 4321 字 </span>
+          <span class="more-meta"> 预计阅读 9 分钟 </span>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#heading">前言</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#timer-">Timer 的生命周期</a>
+      <ul>
+        <li><a href="#createsuspendedsavetimer">createSuspendedSaveTimer</a></li>
+        <li><a href="#updateandresumesavetimer">updateAndResumeSaveTimer</a></li>
+        <li><a href="#destroysavetimer">destroySaveTimer</a></li>
+        <li><a href="#createandstartdeletetimer">createAndStartDeleteTimer</a></li>
+        <li><a href="#updatedeletetimer">updateDeleteTimer</a></li>
+        <li><a href="#destroydeletetimer">destroyDeleteTimer</a></li>
+      </ul>
+    </li>
+    <li><a href="#configuration">Configuration</a>
+      <ul>
+        <li><a href="#setsavethreshold">setSaveThreshold</a></li>
+        <li><a href="#setsaveinterval">setSaveInterval</a></li>
+        <li><a href="#setmaxage">setMaxAge</a></li>
+        <li><a href="#setdeleteinterval">setDeleteInterval</a></li>
+      </ul>
+    </li>
+    <li><a href="#save--delete">Save & Delete</a>
+      <ul>
+        <li><a href="#public-api">Public API</a></li>
+        <li><a href="#performsaveandsuspendsavetimer">performSaveAndSuspendSaveTimer</a></li>
+        <li><a href="#performdelete">performDelete</a></li>
+      </ul>
+    </li>
+    <li><a href="#ddlogger">DDLogger</a>
+      <ul>
+        <li><a href="#didaddlogger">didAddLogger</a></li>
+        <li><a href="#willremovelogger">willRemoveLogger</a></li>
+        <li><a href="#logmessage">logMessage</a></li>
+        <li><a href="#flush">flush</a></li>
+      </ul>
+    </li>
+  </ul>
+
+  <ul>
+    <li><a href="#db-log">db_log</a></li>
+    <li><a href="#db-save">db_save</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="heading">前言</h2>
+<p>这是 DDLog 源码阅读的最后一篇。本篇重点介绍 DDLogger 对数据库存储的支持，原理应该和 FileLogger 一样，log 磁盘存储的频率，过期 log 的淘汰策略，以及 log 存储的缓存策略等。</p>
+<p>开始之前，建议大家回顾前两篇文章，很多基本的概念本篇会直接忽略。</p>
+<p>上篇：<a href="https://juejin.im/post/5eafe0796fb9a0438c2550e3">《浅析 CocoaLumberjack 之 DDLog》</a></p>
+<p>中篇：<a href="https://juejin.im/post/5eb6dc6bf265da7bf1691c13">《浅析 CocoaLumberjack 之 FileLogger》</a></p>
+<h1 id="ddabstractdatabaselogger">DDAbstractDatabaseLogger</h1>
+<p>作为抽象类，你可以自由的根据项目所使用的数据库类型来提供具体的子类实现。DDLog 在 Demo 中提供了 FMDBLogger 和 CoreDataLogger 的实践，会在后面稍微介绍。 因此，dbLogger 主要是保证 log entify (message 对应的 SQL) 的读写策略。来看几个暴露 property 的声明，先来看第一组：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">@property</span> <span class="p">(</span><span class="k">assign</span><span class="p">,</span> <span class="k">readwrite</span><span class="p">)</span> <span class="n">NSUInteger</span> <span class="n">saveThreshold</span><span class="p">;</span> <span class="c1">// 500
+</span><span class="c1"></span><span class="k">@property</span> <span class="p">(</span><span class="k">assign</span><span class="p">,</span> <span class="k">readwrite</span><span class="p">)</span> <span class="n">NSTimeInterval</span> <span class="n">saveInterval</span><span class="p">;</span> <span class="c1">// 60s
+</span></code></pre></td></tr></table>
+</div>
+</div><p>这两个是用于控制 entities 写入磁盘的频率。毕竟我们不能针对每一条 log 都执行 SQL 插入语句 (I/O 操作）。</p>
+<ul>
+<li>saveThreshold：当前未处理 entities 数量的阈值，默认 500 条；</li>
+<li>saveInterval：执行下一次写入的时间间隔；</li>
+</ul>
+<p>我们可以通过将这两个的值归零的方式来表示🈲️止对应的控制。当然，这里不建议将两个值都置零。</p>
+<p>另外三个主要用于控制已保存 entities 的清除频率，毕竟我们可不愿用户发现磁盘被我们给写满了。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">@property</span> <span class="p">(</span><span class="k">assign</span><span class="p">,</span> <span class="k">readwrite</span><span class="p">)</span> <span class="n">NSTimeInterval</span> <span class="n">maxAge</span><span class="p">;</span> <span class="c1">// 7 day
+</span><span class="c1"></span><span class="k">@property</span> <span class="p">(</span><span class="k">assign</span><span class="p">,</span> <span class="k">readwrite</span><span class="p">)</span> <span class="n">NSTimeInterval</span> <span class="n">deleteInterval</span><span class="p">;</span> <span class="c1">// 5 min
+</span><span class="c1"></span><span class="k">@property</span> <span class="p">(</span><span class="k">assign</span><span class="p">,</span> <span class="k">readwrite</span><span class="p">)</span> <span class="kt">BOOL</span> <span class="n">deleteOnEverySave</span><span class="p">;</span> <span class="c1">// NO
+</span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>maxAge：日志最多保留时长，默认为 7 天；</li>
+<li>deleteInterval：过期日志删除的频率，默认为 5 分钟；</li>
+<li>deleteOnEverySave：另外一个可选项，用于控制每次日志写入时，是否需要进行过期日志的清除。</li>
+</ul>
+<p>同样，<code>maxAge</code> 和 <code>deleteInterval</code> 也可通过置零来 disable 其功能。</p>
+<h2 id="timer-">Timer 的生命周期</h2>
+<p>既然是跟踪日志的写入和擦除，timer 是少不了的。dbLogger 分别针对 save 和 delete 操作都分配了一个 <code>dispatch_source_t</code>  作为 timer。对应的创建、更新、销毁的方法如下：</p>
+<table>
+<thead>
+<tr>
+<th align="center">Save</th>
+<th align="center">Delete</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">createSuspendedSaveTimer</td>
+<td align="center">createAndStartDeleteTimer</td>
+</tr>
+<tr>
+<td align="center">updateAndResumeSaveTimer</td>
+<td align="center">updateDeleteTimer</td>
+</tr>
+<tr>
+<td align="center">destroySaveTimer</td>
+<td align="center">destroyDeleteTimer</td>
+</tr>
+</tbody>
+</table>
+<h3 id="createsuspendedsavetimer">createSuspendedSaveTimer</h3>
+<p>SaveTimer 在执行 log 写入操作的时候会先暂停，在写入结束后重新恢复计时。这里 DDLog 使用了 <strong>_saveTimerSuspended</strong> 作为标识 (为 NSInteger 类型) ，标记 timer 的状态。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(</span><span class="p">(</span><span class="n">_saveTimer</span> <span class="o">=</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="p">(</span><span class="n">_saveInterval</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">_saveTimer</span> <span class="o">=</span> <span class="n">dispatch_source_create</span><span class="p">(</span><span class="n">DISPATCH_SOURCE_TYPE_TIMER</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">self</span><span class="p">.</span><span class="n">loggerQueue</span><span class="p">)</span><span class="p">;</span>
+
+    <span class="n">dispatch_source_set_event_handler</span><span class="p">(</span><span class="n">_saveTimer</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span> 
+        <span class="k">@autoreleasepool</span> <span class="p">{</span> <span class="p">[</span><span class="nb">self</span> <span class="n">performSaveAndSuspendSaveTimer</span><span class="p">]</span><span class="p">;</span> <span class="p">}</span> 
+    <span class="p">}</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">_saveTimerSuspended</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><code>_saveInterval &gt; 0.0</code> 表明开启了 ⏲️ 检查 log 写入任务；</li>
+<li>为 timer 设置了定时回调 <code>performSaveAndSuspendSaveTimer</code> ；</li>
+</ul>
+<p><strong>_saveTimerSuspended</strong>  的值有三种类型，分别对应 dispatch_source_t 的三个状态：</p>
+<table>
+<thead>
+<tr>
+<th align="center">value</th>
+<th align="center">description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">-1</td>
+<td align="center">创建时的初始状态： inactivited</td>
+</tr>
+<tr>
+<td align="center">0</td>
+<td align="center">被激活状态：actived / resumed</td>
+</tr>
+<tr>
+<td align="center">1</td>
+<td align="center">被挂起状态：suspended</td>
+</tr>
+</tbody>
+</table>
+<p>所以 timer 被 create 时是处于未激活的暂停状态。</p>
+<h3 id="updateandresumesavetimer">updateAndResumeSaveTimer</h3>
+<p>激活或恢复 SaveTimer，恢复前会检查 <strong>_unsavedTime</strong> 是否大于 0，<code>_unsavedTime</code> 为每次执行 <strong>logMessage</strong> 时所记录的当前时间。<code>_unsavedTime</code> 也就是 timer 恢复的 startTime。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(</span><span class="p">(</span><span class="n">_saveTimer</span> <span class="o">!</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="p">(</span><span class="n">_saveInterval</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="p">(</span><span class="n">_unsavedTime</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">uint64_t</span> <span class="n">interval</span> <span class="o">=</span> <span class="p">(</span><span class="n">uint64_t</span><span class="p">)</span><span class="p">(</span><span class="n">_saveInterval</span> <span class="o">*</span> <span class="p">(</span><span class="n">NSTimeInterval</span><span class="p">)</span> <span class="n">NSEC_PER_SEC</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">dispatch_time_t</span> <span class="n">startTime</span> <span class="o">=</span> <span class="n">dispatch_time</span><span class="p">(</span><span class="n">_unsavedTime</span><span class="p">,</span> <span class="p">(</span><span class="n">int64_t</span><span class="p">)</span><span class="n">interval</span><span class="p">)</span><span class="p">;</span>
+
+    <span class="n">dispatch_source_set_timer</span><span class="p">(</span><span class="n">_saveTimer</span><span class="p">,</span> <span class="n">startTime</span><span class="p">,</span> <span class="n">interval</span><span class="p">,</span> <span class="mi">1ull</span> <span class="o">*</span> <span class="n">NSEC_PER_SEC</span><span class="p">)</span><span class="p">;</span>
+    <span class="c1">//... 激活 timer
+</span><span class="c1"></span><span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>激活计时器会重置 timer 的 startTime 和 interval。</p>
+<p>恢复 timer 的逻辑，这里对不同版本的 GCD API 做了兼容性的适配。在 <strong>macOS 10.12, iOS 10.0</strong> 之后，新出了 <strong>dispatch_activate</strong> API 区别于原有的 <strong>dispatch_resume</strong>。这里面有一个坑需要注意一下，先来看看这两个方法的文档描述：</p>
+<p><strong>dispatch_activate</strong></p>
+<blockquote>
+<p>Suspends the invocation of blocks on a dispatch object.</p>
+</blockquote>
+<p>新生成的 queue 或 source 默认为 inactive 状态，它们必须设置为 active 后其关联的 event handler 才可能被invoke。</p>
+<p>对于未激活的 dispatch objc 我们可以通过 <code>dispatch_set_target_queue()</code> 来更新初始化时绑定的  queue，一旦为 active 话，这么做就可能导致 crash，坑点 1。另外，dispatch_activate 对已激活的 dispatch objc 是没有副作用的。</p>
+<p><strong>dispatch_resume</strong></p>
+<blockquote>
+<p>Resumes the invocation of blocks on a dispatch object.</p>
+</blockquote>
+<p>dispatch source 通过 <code>dispatch_suspend()</code> 时，会增加内部的 suspension count，resume 则是相反操作。当 suspension count 清空后，注册的 event handler 才能被再次触发。</p>
+<p>为了向后兼容，对于 inactive 的 source 调用 dispatch_resume 的效果与 dispatch_active 一致。对于 inactive 的  source 建议使用 dispatch_activate 来激活。</p>
+<p>如果对 suspension count 为 0 且为 inactive 状态的 source 执行 dispatch_resume，则会触发断言被强制退出。</p>
+<p>激活 Timer 实现如下，所以下面这段代码对不同版本的 timer 的不同状态做了区分。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(</span><span class="p">@</span><span class="n">available</span><span class="p">(</span><span class="n">macOS</span> <span class="mf">10.12</span><span class="p">,</span> <span class="n">iOS</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">tvOS</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">watchOS</span> <span class="mf">3.0</span><span class="p">,</span> <span class="o">*</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">_saveTimerSuspended</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="c1">/// inactive
+</span><span class="c1"></span>        <span class="n">dispatch_activate</span><span class="p">(</span><span class="n">_saveTimer</span><span class="p">)</span><span class="p">;</span>
+        <span class="n">_saveTimerSuspended</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">_saveTimerSuspended</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="c1">/// active
+</span><span class="c1"></span>        <span class="n">dispatch_resume</span><span class="p">(</span><span class="n">_saveTimer</span><span class="p">)</span><span class="p">;</span>
+        <span class="n">_saveTimerSuspended</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">_saveTimerSuspended</span> <span class="o">!</span><span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="c1">/// inactive
+</span><span class="c1"></span>        <span class="n">dispatch_resume</span><span class="p">(</span><span class="n">_saveTimer</span><span class="p">)</span><span class="p">;</span>
+        <span class="n">_saveTimerSuspended</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="destroysavetimer">destroySaveTimer</h3>
+<p>销毁 timer。首先执行 <code>dispatch_source_cancel</code> 将 timer 标记为 cacneled 以取消之后的 event handler 的执行。之后将 timer 状态标记为 actived，否则在 release inactive 的 source 会导致 crash。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(</span><span class="p">@</span><span class="n">available</span><span class="p">(</span><span class="n">macOS</span> <span class="mf">10.12</span><span class="p">,</span> <span class="n">iOS</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">tvOS</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">watchOS</span> <span class="mf">3.0</span><span class="p">,</span> <span class="o">*</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">_saveTimerSuspended</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">dispatch_activate</span><span class="p">(</span><span class="n">_saveTimer</span><span class="p">)</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">_saveTimerSuspended</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">dispatch_resume</span><span class="p">(</span><span class="n">_saveTimer</span><span class="p">)</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">_saveTimerSuspended</span> <span class="o">!</span><span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">dispatch_resume</span><span class="p">(</span><span class="n">_saveTimer</span><span class="p">)</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>最后释放：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="cp">#</span><span class="cp">if !OS_OBJECT_USE_OBJC</span><span class="cp">
+</span><span class="cp"></span><span class="n">dispatch_release</span><span class="p">(</span><span class="n">_saveTimer</span><span class="p">)</span><span class="p">;</span>
+<span class="cp">#</span><span class="cp">endif</span><span class="cp">
+</span><span class="cp"></span><span class="n">_saveTimer</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="n">_saveTimerSuspended</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="createandstartdeletetimer">createAndStartDeleteTimer</h3>
+<p>Delete Timer 的逻辑就比较简单一些。由于 log 清除的逻辑不需要像写入一样，在每次 logMessage 的时候都重新更新 startTime 并恢复为 active 状态。同时 Delete Timer 在初始化的时候就保证了其为 active 状态。所以 Delete Timer 在 update 的时候，也不需要再确保状态为 active。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(</span><span class="p">(</span><span class="n">_deleteTimer</span> <span class="o">=</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="p">(</span><span class="n">_deleteInterval</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="p">(</span><span class="n">_maxAge</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">_deleteTimer</span> <span class="o">=</span> <span class="n">dispatch_source_create</span><span class="p">(</span><span class="n">DISPATCH_SOURCE_TYPE_TIMER</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">self</span><span class="p">.</span><span class="n">loggerQueue</span><span class="p">)</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">_deleteTimer</span> <span class="o">!</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">dispatch_source_set_event_handler</span><span class="p">(</span><span class="n">_deleteTimer</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span> 
+           <span class="k">@autoreleasepool</span> <span class="p">{</span> <span class="p">[</span><span class="nb">self</span> <span class="n">performDelete</span><span class="p">]</span><span class="p">;</span> <span class="p">}</span> 
+        <span class="p">}</span><span class="p">)</span><span class="p">;</span>
+
+        <span class="p">[</span><span class="nb">self</span> <span class="n">updateDeleteTimer</span><span class="p">]</span><span class="p">;</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="p">@</span><span class="n">available</span><span class="p">(</span><span class="n">macOS</span> <span class="mf">10.12</span><span class="p">,</span> <span class="n">iOS</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">tvOS</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">watchOS</span> <span class="mf">3.0</span><span class="p">,</span> <span class="o">*</span><span class="p">)</span><span class="p">)</span>
+            <span class="n">dispatch_activate</span><span class="p">(</span><span class="n">_deleteTimer</span><span class="p">)</span><span class="p">;</span>
+        <span class="k">else</span>
+            <span class="nf">dispatch_resume</span><span class="p">(</span><span class="n">_deleteTimer</span><span class="p">)</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="updatedeletetimer">updateDeleteTimer</h3>
+<p>更新 Delete Timer 时，会检查是否执行过一次清除操作。如果有，会以上次清楚的时间戳作为 startTime。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(</span><span class="p">(</span><span class="n">_deleteTimer</span> <span class="o">!</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="p">(</span><span class="n">_deleteInterval</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="p">(</span><span class="n">_maxAge</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">int64_t</span> <span class="n">interval</span> <span class="o">=</span> <span class="p">(</span><span class="n">int64_t</span><span class="p">)</span><span class="p">(</span><span class="n">_deleteInterval</span> <span class="o">*</span> <span class="p">(</span><span class="n">NSTimeInterval</span><span class="p">)</span> <span class="n">NSEC_PER_SEC</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">dispatch_time_t</span> <span class="n">startTime</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">_lastDeleteTime</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">startTime</span> <span class="o">=</span> <span class="n">dispatch_time</span><span class="p">(</span><span class="n">_lastDeleteTime</span><span class="p">,</span> <span class="n">interval</span><span class="p">)</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="n">startTime</span> <span class="o">=</span> <span class="n">dispatch_time</span><span class="p">(</span><span class="n">DISPATCH_TIME_NOW</span><span class="p">,</span> <span class="n">interval</span><span class="p">)</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">dispatch_source_set_timer</span><span class="p">(</span><span class="n">_deleteTimer</span><span class="p">,</span> <span class="n">startTime</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64_t</span><span class="p">)</span><span class="n">interval</span><span class="p">,</span> <span class="mi">1ull</span> <span class="o">*</span> <span class="n">NSEC_PER_SEC</span><span class="p">)</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="destroydeletetimer">destroyDeleteTimer</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(</span><span class="n">_deleteTimer</span> <span class="o">!</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">dispatch_source_cancel</span><span class="p">(</span><span class="n">_deleteTimer</span><span class="p">)</span><span class="p">;</span>
+    <span class="cp">#</span><span class="cp">if !OS_OBJECT_USE_OBJC</span><span class="cp">
+</span><span class="cp"></span>    <span class="n">dispatch_release</span><span class="p">(</span><span class="n">_deleteTimer</span><span class="p">)</span><span class="p">;</span>
+    <span class="cp">#</span><span class="cp">endif</span><span class="cp">
+</span><span class="cp"></span>    <span class="n">_deleteTimer</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="configuration">Configuration</h2>
+<p>dbLogger 对写入和清除操作控制策略的属性进行了重载。这几个 Access 方法的 getter 和 setter 都是线程安全的，它们都是在 loggingQueue 和  loggerQueue 中来执行操作的，具体可以看 <a href="https://juejin.im/post/5eafe0796fb9a0438c2550e3">DDLog 上篇</a>。getter 只是取值，因此这里主要聊聊，其值更新时有哪些操作。</p>
+<h3 id="setsavethreshold">setSaveThreshold</h3>
+<p>更新 saveThreshold 后，需要检查当前未写入的 entities 数是否超过新赋值的阈值。如果超出需要主动执行写入操作并更新 SaveTimer：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(</span><span class="p">(</span><span class="nb">self</span><span class="o">-</span><span class="o">&gt;</span><span class="n">_unsavedCount</span> <span class="o">&gt;</span><span class="o">=</span> <span class="nb">self</span><span class="o">-</span><span class="o">&gt;</span><span class="n">_saveThreshold</span><span class="p">)</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="p">(</span><span class="nb">self</span><span class="o">-</span><span class="o">&gt;</span><span class="n">_saveThreshold</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">[</span><span class="nb">self</span> <span class="n">performSaveAndSuspendSaveTimer</span><span class="p">]</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="setsaveinterval">setSaveInterval</h3>
+<p>更新下一次执行 log entries 的时间间隔。<strong>又出现新知识点了</strong>，这里作者使用了 <strong><a href="https://en.cppreference.com/w/c/numeric/math/islessgreater">islessgreater</a></strong> 宏来判断 saveInterval 是否有变化。这个 islessgreater 是 C99 标准中推荐的浮点数比较的宏:</p>
+<blockquote>
+<p>The built-in operator&lt; and operator&gt; for floating-point numbers may raise <a href="https://en.cppreference.com/w/c/numeric/fenv/FE_exceptions">FE_INVALID</a> if one or both of the arguments is NaN. This function is a &ldquo;quiet&rdquo; version of the expression x &lt; y || x &gt; y. The macro does not evaluate x and y twice.</p>
+</blockquote>
+<p>使用它能避免因为值为 NaN 而出现的异常。关于浮点数的对比，这里有一篇不错的文章：<a href="https://floating-point-gui.de/errors/comparison/">comparison</a>。</p>
+<p>由于 saveInterval 是否为 0 是用于控制定时写入功能，因此，更新后有三种情况需要处理：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(</span><span class="nb">self</span><span class="o">-</span><span class="o">&gt;</span><span class="n">_saveInterval</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">self</span><span class="o">-</span><span class="o">&gt;</span><span class="n">_saveTimer</span> <span class="o">=</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+
+        <span class="p">[</span><span class="nb">self</span> <span class="n">createSuspendedSaveTimer</span><span class="p">]</span><span class="p">;</span>
+        <span class="p">[</span><span class="nb">self</span> <span class="n">updateAndResumeSaveTimer</span><span class="p">]</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+
+        <span class="p">[</span><span class="nb">self</span> <span class="n">updateAndResumeSaveTimer</span><span class="p">]</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nb">self</span><span class="o">-</span><span class="o">&gt;</span><span class="n">_saveTimer</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="p">[</span><span class="nb">self</span> <span class="n">destroySaveTimer</span><span class="p">]</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>需要开启定时写入且 timer 为 NULL；需要创建 SaveTimer 并激活它；</li>
+<li>需要开启定时写入且 timer 存在；激活并恢复 SaveTimer；</li>
+<li>无需定时写入：销毁 Timer；</li>
+</ul>
+<h3 id="setmaxage">setMaxAge</h3>
+<p>maxAge 的情况更多一些，有四种 case。在更新 maxAge 前，保留了旧值用于对比，同样用到了 islessgreater。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="kt">BOOL</span> <span class="n">shouldDeleteNow</span> <span class="o">=</span> <span class="nb">NO</span><span class="p">;</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">oldMaxAge</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">newMaxAge</span> <span class="o">&lt;</span><span class="o">=</span> <span class="mf">0.0</span><span class="p">)</span> <span class="p">{</span> <span class="c1">/// 1
+</span><span class="c1"></span>        <span class="p">[</span><span class="nb">self</span> <span class="n">destroyDeleteTimer</span><span class="p">]</span><span class="p">;</span>
+       
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">oldMaxAge</span> <span class="o">&gt;</span> <span class="n">newMaxAge</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">shouldDeleteNow</span> <span class="o">=</span> <span class="nb">YES</span><span class="p">;</span> <span class="c1">/// 4
+</span><span class="c1"></span>    <span class="p">}</span>
+<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">newMaxAge</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">shouldDeleteNow</span> <span class="o">=</span> <span class="nb">YES</span><span class="p">;</span> <span class="c1">/// 2
+</span><span class="c1"></span><span class="p">}</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">shouldDeleteNow</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">[</span><span class="nb">self</span> <span class="n">performDelete</span><span class="p">]</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nb">self</span><span class="o">-</span><span class="o">&gt;</span><span class="n">_deleteTimer</span><span class="p">)</span> <span class="p">{</span>
+        <span class="p">[</span><span class="nb">self</span> <span class="n">updateDeleteTimer</span><span class="p">]</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="p">[</span><span class="nb">self</span> <span class="n">createAndStartDeleteTimer</span><span class="p">]</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><ol>
+<li>maxAge 检查从开启变为关闭状态，此时只需要销毁 Delete Timer；</li>
+<li>maxAge 检查从关闭变为开启状态，需要立即清理过期日志，并初始化 Delete Timer</li>
+<li>日志保留时长增加，do nothing；</li>
+<li>日志保留时长减少，需要立即清理；</li>
+</ol>
+<h3 id="setdeleteinterval">setDeleteInterval</h3>
+<p>deleteInterval 同 saveInterval 对 timer 的操作逻辑相同，就不展开了。</p>
+<h2 id="save--delete">Save &amp; Delete</h2>
+<p>既然做为抽象类，肯定需要有几个方法暴露给子类去实现，要不就是通过 protocol 让 delegate 去实现。这里 ddLogger 预留了四个虚方法：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="p">-</span> <span class="p">(</span><span class="kt">BOOL</span><span class="p">)</span><span class="nf">db_log:</span><span class="p">(</span><span class="n">__unused</span> <span class="n">DDLogMessage</span> <span class="o">*</span><span class="p">)</span><span class="nv">logMessage</span> <span class="p">{</span>
+	<span class="c1">// Return YES if an item was added to the buffer.
+</span><span class="c1"></span>	<span class="c1">// Return NO if the logMessage was ignored.
+</span><span class="c1"></span>	<span class="k">return</span> <span class="nb">NO</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">db_save</span> <span class="p">{</span><span class="p">}</span>
+<span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">db_delete</span> <span class="p">{</span><span class="p">}</span>
+<span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">db_saveAndDelete</span> <span class="p">{</span><span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="public-api">Public API</h3>
+<p>dbLogger 为用户主动执行写入和清除提供了两个方法 <strong>savePendingLogEntries</strong> 和 <strong>deleteOldLogEntries</strong>。</p>
+<p>作为 logger 的公共方法，其执行必须在 loggerQueue 中，以 <code>savePendingLogEntries</code> 为例：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="n">dispatch_block_t</span> <span class="n">block</span> <span class="o">=</span> <span class="o">^</span><span class="p">{</span>
+     <span class="k">@autoreleasepool</span> <span class="p">{</span>
+         <span class="p">[</span><span class="nb">self</span> <span class="n">performSaveAndSuspendSaveTimer</span><span class="p">]</span><span class="p">;</span>
+     <span class="p">}</span>
+ <span class="p">}</span><span class="p">;</span>
+
+ <span class="k">if</span> <span class="p">(</span><span class="p">[</span><span class="nb">self</span> <span class="n">isOnInternalLoggerQueue</span><span class="p">]</span><span class="p">)</span> <span class="p">{</span>
+     <span class="n">block</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+ <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+     <span class="n">dispatch_async</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">loggerQueue</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span><span class="p">;</span>
+ <span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><code>performSaveAndSuspendSaveTimer</code> 则是其对应的 private method，同样的 <code>deleteOldLogEntries</code> 对应的 private method 为 <code>performDelete</code> 。</p>
+<h3 id="performsaveandsuspendsavetimer">performSaveAndSuspendSaveTimer</h3>
+<p>从方法名可知这里做了两件事：执行日志写入和挂起 SaveTimer。</p>
+<p>写入前确保存在未写入日志，然后依据 _deleteOnEverySave 区分是否需要在每次写入的同时进行清楚操作：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(</span><span class="n">_unsavedCount</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">_deleteOnEverySave</span><span class="p">)</span> <span class="p">{</span>
+        <span class="p">[</span><span class="nb">self</span> <span class="n">db_saveAndDelete</span><span class="p">]</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="p">[</span><span class="nb">self</span> <span class="n">db_save</span><span class="p">]</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="c1">/// 写入结束重置状态；
+</span><span class="c1"></span><span class="n">_unsavedCount</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="n">_unsavedTime</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>接着将 timer 挂起，等待下一次的 logMessage 以刷新 timer：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(</span><span class="n">_saveTimer</span> <span class="o">!</span><span class="o">=</span> <span class="nb">NULL</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">_saveTimerSuspended</span> <span class="o">=</span><span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">dispatch_suspend</span><span class="p">(</span><span class="n">_saveTimer</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">_saveTimerSuspended</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>需要注意，这里使用 <strong>_saveTimerSuspended</strong> 作为标记，防止多次执行 <strong>dispatch_suspend</strong> 操作，同时也保证了 source 是处于 active 状态。前面在 dispatch source 的状态变更中提到，source 内部维护一个 suspension count，多次执行会导致 count 增大。这里算是一鱼多吃了，👍。</p>
+<h3 id="performdelete">performDelete</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(</span><span class="n">_maxAge</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">[</span><span class="nb">self</span> <span class="n">db_delete</span><span class="p">]</span><span class="p">;</span>
+
+    <span class="n">_lastDeleteTime</span> <span class="o">=</span> <span class="n">dispatch_time</span><span class="p">(</span><span class="n">DISPATCH_TIME_NOW</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>开启清楚操作的话就执行 delete，结束后更新 <code>_lastDeleteTime</code>。</p>
+<h2 id="ddlogger">DDLogger</h2>
+<p>在遵循 DDLogger 的方法中基本也是维护 timer 的状态，触发 save 操作。</p>
+<h3 id="didaddlogger">didAddLogger</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="p">[</span><span class="nb">self</span> <span class="n">createSuspendedSaveTimer</span><span class="p">]</span><span class="p">;</span>
+<span class="p">[</span><span class="nb">self</span> <span class="n">createAndStartDeleteTimer</span><span class="p">]</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="willremovelogger">willRemoveLogger</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="p">[</span><span class="nb">self</span> <span class="n">performSaveAndSuspendSaveTimer</span><span class="p">]</span><span class="p">;</span>
+
+<span class="p">[</span><span class="nb">self</span> <span class="n">destroySaveTimer</span><span class="p">]</span><span class="p">;</span>
+<span class="p">[</span><span class="nb">self</span> <span class="n">destroyDeleteTimer</span><span class="p">]</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="logmessage">logMessage</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(</span><span class="p">[</span><span class="nb">self</span> <span class="nl">db_log</span><span class="p">:</span><span class="n">logMessage</span><span class="p">]</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* 更新 save timer */</span>  <span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>logMessage 方法是用户产生 new log 所触发的，包含了关键的 log message。在 FileLogger 中时将 message 转换为 NSData 调用 <code>lt_logData</code> 来写入文件，而这里则会将 message 转换为 log entity 以期写入 DB 中。<strong>db_log</strong> 所做的真是和 <code>lt_logData</code> 一致的。</p>
+<p>不过这里留了一个开关，就是 db_log 的返回值。如果返回 NO 则意味着改条 log 被丢弃，我们也不需要更新 timer 的 startTime 或者触发 save 操作。</p>
+<p>更新逻辑如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="kt">BOOL</span> <span class="n">firstUnsavedEntry</span> <span class="o">=</span> <span class="p">(</span><span class="o">+</span><span class="o">+</span><span class="n">_unsavedCount</span> <span class="o">=</span><span class="o">=</span> <span class="mi">1</span><span class="p">)</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="p">(</span><span class="n">_unsavedCount</span> <span class="o">&gt;</span><span class="o">=</span> <span class="n">_saveThreshold</span><span class="p">)</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="p">(</span><span class="n">_saveThreshold</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">[</span><span class="nb">self</span> <span class="n">performSaveAndSuspendSaveTimer</span><span class="p">]</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">firstUnsavedEntry</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">_unsavedTime</span> <span class="o">=</span> <span class="n">dispatch_time</span><span class="p">(</span><span class="n">DISPATCH_TIME_NOW</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="p">;</span>
+    <span class="p">[</span><span class="nb">self</span> <span class="n">updateAndResumeSaveTimer</span><span class="p">]</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="flush">flush</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="p">[</span><span class="nb">self</span> <span class="n">performSaveAndSuspendSaveTimer</span><span class="p">]</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>该方法是当应用退出或崩溃时主动调用，以及时保存还在 pendding 状态的 log entities。</p>
+<h1 id="fmdblogger">FMDBLogger</h1>
+<p>简单介绍一下 FMDBLogger，它是通过 FMDB 提供的 API 将 log message 写入数据库。</p>
+<p>这里每条 DDLogMessage 对应为 FMDBLogEntry，它简单存储了 context、flag、message、timestamp。数据库建表和校验就不说了，主要围绕重载的几个方法。</p>
+<h2 id="db-log">db_log</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="n">FMDBLogEntry</span> <span class="o">*</span><span class="n">logEntry</span> <span class="o">=</span> <span class="p">[</span><span class="p">[</span><span class="n">FMDBLogEntry</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithLogMessage</span><span class="p">:</span><span class="n">logMessage</span><span class="p">]</span><span class="p">;</span>
+<span class="p">[</span><span class="n">pendingLogEntries</span> <span class="nl">addObject</span><span class="p">:</span><span class="n">logEntry</span><span class="p">]</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这里并没有直接将 logEntry 插入 db，而是添加到缓冲列表中。我们真的需要这个缓冲区吗？</p>
+<p>来看 SQLite 作者的回答：<a href="https://www.sqlite.org/faq.html#q19"><strong>(19) INSERT is really slow - I can only do few dozen INSERTs per second</strong></a></p>
+<blockquote>
+<p>Actually, SQLite will easily do 50,000 or more <a href="https://www.sqlite.org/lang_insert.html">INSERT</a> statements per second on an average desktop computer. But it will only do a few dozen transactions per second. Transaction speed is limited by the rotational speed of your disk drive. A transaction normally requires two complete rotations of the disk platter, which on a 7200RPM disk drive limits you to about 60 transactions per second.</p>
+<p>Transaction speed is limited by disk drive speed because (by default) SQLite actually waits until the data really is safely stored on the disk surface before the transaction is complete. That way, if you suddenly lose power or if your OS crashes, your data is still safe. For details, read about <a href="https://www.sqlite.org/atomiccommit.html">atomic commit in SQLite.</a>.</p>
+<p>By default, each INSERT statement is its own transaction. But if you surround multiple INSERT statements with <a href="https://www.sqlite.org/lang_transaction.html">BEGIN</a>&hellip;<a href="https://www.sqlite.org/lang_transaction.html">COMMIT</a> then all the inserts are grouped into a single transaction. The time needed to commit the transaction is amortized over all the enclosed insert statements and so the time per insert statement is greatly reduced.</p>
+</blockquote>
+<p>也就是说，我们可以通过将多条插入语句用 <code>BEGIN ... COMMIT</code> 的方法包裹起来作为单独的事务来提交，效率将会有巨大的提升。</p>
+<h2 id="db-save">db_save</h2>
+<p>最终尝试将 pendingLogEntries 作为事务执行的方法。会先检查 pendingLogEntries count 以及 database 是否正在执行事务，来判断是否需要使用  <code>BEGIN ... COMMIT</code> 。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="kt">BOOL</span> <span class="n">saveOnlyTransaction</span> <span class="o">=</span> <span class="o">!</span><span class="p">[</span><span class="n">database</span> <span class="n">inTransaction</span><span class="p">]</span><span class="p">;</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">saveOnlyTransaction</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">[</span><span class="n">database</span> <span class="n">beginTransaction</span><span class="p">]</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/* INSERT INTO logs &amp; remove pendingLogEntries  */</span> 
+
+<span class="k">if</span> <span class="p">(</span><span class="n">saveOnlyTransaction</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">[</span><span class="n">database</span> <span class="n">commit</span><span class="p">]</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="p">[</span><span class="n">database</span> <span class="n">hadError</span><span class="p">]</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">NSLog</span><span class="p">(</span><span class="s">@&#34;</span><span class="s">%@: Error inserting log entries: code(%d): %@</span><span class="s">&#34;</span><span class="p">,</span>
+                <span class="p">[</span><span class="nb">self</span> <span class="k">class</span><span class="p">]</span><span class="p">,</span> <span class="p">[</span><span class="n">database</span> <span class="n">lastErrorCode</span><span class="p">]</span><span class="p">,</span> <span class="p">[</span><span class="n">database</span> <span class="n">lastErrorMessage</span><span class="p">]</span><span class="p">)</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>可以看到这里的事务并非强制执行的，因此还是有优化空间的。比如通过串行队列来保证每次 save 都能在 transaction 中完成。</p>
+<p><strong>db_delete</strong> 与 <strong>db_saveAndDelete</strong> 就不展开了。</p>
+<h1 id="the-end">The End</h1>
+<p>DDLog 所提供的 Demo 中还有 CoreDataLogger、WebSocketLogger 等自定义 logger 的扩展。比如，通过 WebSocketLogger 我们可以将日志直接输出到浏览器上来时时预览和校验日志或检查埋点数据等等。</p>
+<p>通过这些 Demo 我们对 DDLog 的需求完全可以通过 Logger 的扩展来实现。比如，通过 mmap 来存储日志。这方面 Xlog 和 logan 目前就是这么实现的。而基于微信现有提供的 MMKV，我们用 Logger 简单扩展就能实现高效存储。</p>
+<p>DDLog 中可以看到其对 dispatch source 的安全使用，包括 queue 和 timer 和多线程的处理；对 NSProxy 的巧妙使用来为 fileHandler 添加 buffer 支持；对系统的 log system 的了解，以及代码的健壮性，日志更新存储策略等等。非常值得一看。</p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">土土Edmond木</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2020-05-16
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/source-code/">Source Code</a>
+          <a href="/tags/ios/">iOS</a>
+          <a href="/tags/logger/">Logger</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/sourcecode-ios/source-code-lumberjack-2/">
+            <span class="next-text nav-default">浅析 - CocoaLumberjack 3.6 之 FileLogger</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+    <script src="https://utteranc.es/client.js"
+            repo="looseyi/looseyi.github.io"
+            issue-term="pathname"
+            theme="github-light"
+            crossorigin="anonymous"
+            async>
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/utterance">comments powered by utterances.</a></noscript>
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:chun574271939@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://twitter.com/looseyi" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="https://github.com/looseyi" class="iconfont icon-github" title="github"></a>
+      <a href="https://www.weibo.com/foreverclp" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="https://www.zhihu.com/people/tu-tu-edmondmu" class="iconfont icon-zhihu" title="zhihu"></a>
+  <a href="http://looseyi.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2019-12-11 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">土土Edmond木</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-62789092-1', 'auto');
+	ga('set', 'anonymizeIp', true);
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>

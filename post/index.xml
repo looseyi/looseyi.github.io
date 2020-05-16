@@ -6,10 +6,19 @@
     <description>Recent content in Posts on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Fri, 08 May 2020 23:20:00 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 16 May 2020 00:00:00 +0800</lastBuildDate>
     
 	<atom:link href="http://looseyi.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>浅析 - CocoaLumberjack 3.6 之 DatabaseLogger</title>
+      <link>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-3/</link>
+      <pubDate>Sat, 16 May 2020 00:00:00 +0800</pubDate>
+      
+      <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-3/</guid>
+      <description>前言 这是 DDLog 源码阅读的最后一篇。本篇重点介绍 DDLogger 对数据库存储的支持，原理应该和 FileLogger 一样，log 磁盘存储的频率，过期 log 的淘汰策略，以及 log 存储的缓存策</description>
+    </item>
     
     <item>
       <title>浅析 - CocoaLumberjack 3.6 之 FileLogger</title>

@@ -3,56 +3,63 @@
   
   <url>
     <loc>http://looseyi.github.io/</loc>
-    <lastmod>2020-05-08T23:20:00+08:00</lastmod>
+    <lastmod>2020-05-16T00:00:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>http://looseyi.github.io/categories/</loc>
-    <lastmod>2020-05-08T23:20:00+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>http://looseyi.github.io/categories/ios/</loc>
-    <lastmod>2020-05-08T23:20:00+08:00</lastmod>
+    <lastmod>2020-05-16T00:00:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>http://looseyi.github.io/tags/ios/</loc>
-    <lastmod>2020-05-08T23:20:00+08:00</lastmod>
+    <lastmod>2020-05-16T00:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/categories/ios/</loc>
+    <lastmod>2020-05-16T00:00:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>http://looseyi.github.io/tags/logger/</loc>
-    <lastmod>2020-05-08T23:20:00+08:00</lastmod>
+    <lastmod>2020-05-16T00:00:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>http://looseyi.github.io/post/</loc>
-    <lastmod>2020-05-08T23:20:00+08:00</lastmod>
+    <lastmod>2020-05-16T00:00:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>http://looseyi.github.io/tags/source-code/</loc>
-    <lastmod>2020-05-08T23:20:00+08:00</lastmod>
+    <lastmod>2020-05-16T00:00:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>http://looseyi.github.io/tags/</loc>
-    <lastmod>2020-05-08T23:20:00+08:00</lastmod>
+    <lastmod>2020-05-16T00:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-3/</loc>
+    <lastmod>2020-05-16T00:00:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -107,14 +114,14 @@
   </url>
   
   <url>
-    <loc>http://looseyi.github.io/tags/cocoapods/</loc>
+    <loc>http://looseyi.github.io/categories/cocoapods/</loc>
     <lastmod>2020-03-29T15:10:58+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>http://looseyi.github.io/categories/cocoapods/</loc>
+    <loc>http://looseyi.github.io/tags/cocoapods/</loc>
     <lastmod>2020-03-29T15:10:58+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
