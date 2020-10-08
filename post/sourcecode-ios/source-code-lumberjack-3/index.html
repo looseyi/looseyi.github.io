@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.62.0 with theme even" />
+<meta name="generator" content="Hugo 0.71.1 with theme even" />
 
 
 <link rel="canonical" href="http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-3/" />
@@ -50,7 +50,7 @@
 <meta itemprop="description" content="前言 这是 DDLog 源码阅读的最后一篇。本篇重点介绍 DDLogger 对数据库存储的支持，原理应该和 FileLogger 一样，log 磁盘存储的频率，过期 log 的淘汰策略，以及 log 存储的缓存策">
 <meta itemprop="datePublished" content="2020-05-16T00:00:00&#43;08:00" />
 <meta itemprop="dateModified" content="2020-05-16T00:00:00&#43;08:00" />
-<meta itemprop="wordCount" content="4321">
+<meta itemprop="wordCount" content="4323">
 
 
 
@@ -126,7 +126,7 @@
         <div class="post-category">
             <a href="/categories/ios/"> iOS </a>
             </div>
-          <span class="more-meta"> 约 4321 字 </span>
+          <span class="more-meta"> 约 4323 字 </span>
           <span class="more-meta"> 预计阅读 9 分钟 </span>
         
       </div>
@@ -137,11 +137,11 @@
   <div class="post-toc-content always-active">
     <nav id="TableOfContents">
   <ul>
-    <li><a href="#heading">前言</a></li>
+    <li><a href="#前言">前言</a></li>
   </ul>
 
   <ul>
-    <li><a href="#timer-">Timer 的生命周期</a>
+    <li><a href="#timer-的生命周期">Timer 的生命周期</a>
       <ul>
         <li><a href="#createsuspendedsavetimer">createSuspendedSaveTimer</a></li>
         <li><a href="#updateandresumesavetimer">updateAndResumeSaveTimer</a></li>
@@ -159,7 +159,7 @@
         <li><a href="#setdeleteinterval">setDeleteInterval</a></li>
       </ul>
     </li>
-    <li><a href="#save--delete">Save & Delete</a>
+    <li><a href="#save--delete">Save &amp; Delete</a>
       <ul>
         <li><a href="#public-api">Public API</a></li>
         <li><a href="#performsaveandsuspendsavetimer">performSaveAndSuspendSaveTimer</a></li>
@@ -177,14 +177,14 @@
   </ul>
 
   <ul>
-    <li><a href="#db-log">db_log</a></li>
-    <li><a href="#db-save">db_save</a></li>
+    <li><a href="#db_log">db_log</a></li>
+    <li><a href="#db_save">db_save</a></li>
   </ul>
 </nav>
   </div>
 </div>
     <div class="post-content">
-      <h2 id="heading">前言</h2>
+      <h2 id="前言">前言</h2>
 <p>这是 DDLog 源码阅读的最后一篇。本篇重点介绍 DDLogger 对数据库存储的支持，原理应该和 FileLogger 一样，log 磁盘存储的频率，过期 log 的淘汰策略，以及 log 存储的缓存策略等。</p>
 <p>开始之前，建议大家回顾前两篇文章，很多基本的概念本篇会直接忽略。</p>
 <p>上篇：<a href="https://juejin.im/post/5eafe0796fb9a0438c2550e3">《浅析 CocoaLumberjack 之 DDLog》</a></p>
@@ -226,7 +226,7 @@
 <li>deleteOnEverySave：另外一个可选项，用于控制每次日志写入时，是否需要进行过期日志的清除。</li>
 </ul>
 <p>同样，<code>maxAge</code> 和 <code>deleteInterval</code> 也可通过置零来 disable 其功能。</p>
-<h2 id="timer-">Timer 的生命周期</h2>
+<h2 id="timer-的生命周期">Timer 的生命周期</h2>
 <p>既然是跟踪日志的写入和擦除，timer 是少不了的。dbLogger 分别针对 save 和 delete 操作都分配了一个 <code>dispatch_source_t</code>  作为 timer。对应的创建、更新、销毁的方法如下：</p>
 <table>
 <thead>
@@ -264,12 +264,12 @@
 </span><span class="lnt">8
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(</span><span class="p">(</span><span class="n">_saveTimer</span> <span class="o">=</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="p">(</span><span class="n">_saveInterval</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">_saveTimer</span> <span class="o">=</span> <span class="n">dispatch_source_create</span><span class="p">(</span><span class="n">DISPATCH_SOURCE_TYPE_TIMER</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">self</span><span class="p">.</span><span class="n">loggerQueue</span><span class="p">)</span><span class="p">;</span>
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">((</span><span class="n">_saveTimer</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">_saveInterval</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">))</span> <span class="p">{</span>
+    <span class="n">_saveTimer</span> <span class="o">=</span> <span class="n">dispatch_source_create</span><span class="p">(</span><span class="n">DISPATCH_SOURCE_TYPE_TIMER</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">self</span><span class="p">.</span><span class="n">loggerQueue</span><span class="p">);</span>
 
     <span class="n">dispatch_source_set_event_handler</span><span class="p">(</span><span class="n">_saveTimer</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span> 
-        <span class="k">@autoreleasepool</span> <span class="p">{</span> <span class="p">[</span><span class="nb">self</span> <span class="n">performSaveAndSuspendSaveTimer</span><span class="p">]</span><span class="p">;</span> <span class="p">}</span> 
-    <span class="p">}</span><span class="p">)</span><span class="p">;</span>
+        <span class="k">@autoreleasepool</span> <span class="p">{</span> <span class="p">[</span><span class="nb">self</span> <span class="n">performSaveAndSuspendSaveTimer</span><span class="p">];</span> <span class="p">}</span> 
+    <span class="p">});</span>
     <span class="n">_saveTimerSuspended</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
@@ -315,11 +315,11 @@
 </span><span class="lnt">7
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(</span><span class="p">(</span><span class="n">_saveTimer</span> <span class="o">!</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="p">(</span><span class="n">_saveInterval</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="p">(</span><span class="n">_unsavedTime</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">uint64_t</span> <span class="n">interval</span> <span class="o">=</span> <span class="p">(</span><span class="n">uint64_t</span><span class="p">)</span><span class="p">(</span><span class="n">_saveInterval</span> <span class="o">*</span> <span class="p">(</span><span class="n">NSTimeInterval</span><span class="p">)</span> <span class="n">NSEC_PER_SEC</span><span class="p">)</span><span class="p">;</span>
-    <span class="n">dispatch_time_t</span> <span class="n">startTime</span> <span class="o">=</span> <span class="n">dispatch_time</span><span class="p">(</span><span class="n">_unsavedTime</span><span class="p">,</span> <span class="p">(</span><span class="n">int64_t</span><span class="p">)</span><span class="n">interval</span><span class="p">)</span><span class="p">;</span>
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">((</span><span class="n">_saveTimer</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">_saveInterval</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">_unsavedTime</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">))</span> <span class="p">{</span>
+    <span class="n">uint64_t</span> <span class="n">interval</span> <span class="o">=</span> <span class="p">(</span><span class="n">uint64_t</span><span class="p">)(</span><span class="n">_saveInterval</span> <span class="o">*</span> <span class="p">(</span><span class="n">NSTimeInterval</span><span class="p">)</span> <span class="n">NSEC_PER_SEC</span><span class="p">);</span>
+    <span class="n">dispatch_time_t</span> <span class="n">startTime</span> <span class="o">=</span> <span class="n">dispatch_time</span><span class="p">(</span><span class="n">_unsavedTime</span><span class="p">,</span> <span class="p">(</span><span class="n">int64_t</span><span class="p">)</span><span class="n">interval</span><span class="p">);</span>
 
-    <span class="n">dispatch_source_set_timer</span><span class="p">(</span><span class="n">_saveTimer</span><span class="p">,</span> <span class="n">startTime</span><span class="p">,</span> <span class="n">interval</span><span class="p">,</span> <span class="mi">1ull</span> <span class="o">*</span> <span class="n">NSEC_PER_SEC</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">dispatch_source_set_timer</span><span class="p">(</span><span class="n">_saveTimer</span><span class="p">,</span> <span class="n">startTime</span><span class="p">,</span> <span class="n">interval</span><span class="p">,</span> <span class="mi">1ull</span> <span class="o">*</span> <span class="n">NSEC_PER_SEC</span><span class="p">);</span>
     <span class="c1">//... 激活 timer
 </span><span class="c1"></span><span class="p">}</span>
 </code></pre></td></tr></table>
@@ -358,17 +358,17 @@
 </span><span class="lnt">14
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(</span><span class="p">@</span><span class="n">available</span><span class="p">(</span><span class="n">macOS</span> <span class="mf">10.12</span><span class="p">,</span> <span class="n">iOS</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">tvOS</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">watchOS</span> <span class="mf">3.0</span><span class="p">,</span> <span class="o">*</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(@</span><span class="n">available</span><span class="p">(</span><span class="n">macOS</span> <span class="mf">10.12</span><span class="p">,</span> <span class="n">iOS</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">tvOS</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">watchOS</span> <span class="mf">3.0</span><span class="p">,</span> <span class="o">*</span><span class="p">))</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">_saveTimerSuspended</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="c1">/// inactive
-</span><span class="c1"></span>        <span class="n">dispatch_activate</span><span class="p">(</span><span class="n">_saveTimer</span><span class="p">)</span><span class="p">;</span>
+</span><span class="c1"></span>        <span class="n">dispatch_activate</span><span class="p">(</span><span class="n">_saveTimer</span><span class="p">);</span>
         <span class="n">_saveTimerSuspended</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
     <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">_saveTimerSuspended</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="c1">/// active
-</span><span class="c1"></span>        <span class="n">dispatch_resume</span><span class="p">(</span><span class="n">_saveTimer</span><span class="p">)</span><span class="p">;</span>
+</span><span class="c1"></span>        <span class="n">dispatch_resume</span><span class="p">(</span><span class="n">_saveTimer</span><span class="p">);</span>
         <span class="n">_saveTimerSuspended</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
     <span class="p">}</span>
 <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">_saveTimerSuspended</span> <span class="o">!</span><span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="c1">/// inactive
-</span><span class="c1"></span>        <span class="n">dispatch_resume</span><span class="p">(</span><span class="n">_saveTimer</span><span class="p">)</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">_saveTimerSuspended</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="c1">/// inactive
+</span><span class="c1"></span>        <span class="n">dispatch_resume</span><span class="p">(</span><span class="n">_saveTimer</span><span class="p">);</span>
         <span class="n">_saveTimerSuspended</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
     <span class="p">}</span>
 <span class="p">}</span>
@@ -391,15 +391,15 @@
 </span><span class="lnt">11
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(</span><span class="p">@</span><span class="n">available</span><span class="p">(</span><span class="n">macOS</span> <span class="mf">10.12</span><span class="p">,</span> <span class="n">iOS</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">tvOS</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">watchOS</span> <span class="mf">3.0</span><span class="p">,</span> <span class="o">*</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(@</span><span class="n">available</span><span class="p">(</span><span class="n">macOS</span> <span class="mf">10.12</span><span class="p">,</span> <span class="n">iOS</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">tvOS</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">watchOS</span> <span class="mf">3.0</span><span class="p">,</span> <span class="o">*</span><span class="p">))</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">_saveTimerSuspended</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">dispatch_activate</span><span class="p">(</span><span class="n">_saveTimer</span><span class="p">)</span><span class="p">;</span>
+        <span class="n">dispatch_activate</span><span class="p">(</span><span class="n">_saveTimer</span><span class="p">);</span>
     <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">_saveTimerSuspended</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">dispatch_resume</span><span class="p">(</span><span class="n">_saveTimer</span><span class="p">)</span><span class="p">;</span>
+        <span class="n">dispatch_resume</span><span class="p">(</span><span class="n">_saveTimer</span><span class="p">);</span>
     <span class="p">}</span>
 <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">_saveTimerSuspended</span> <span class="o">!</span><span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">dispatch_resume</span><span class="p">(</span><span class="n">_saveTimer</span><span class="p">)</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">_saveTimerSuspended</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">dispatch_resume</span><span class="p">(</span><span class="n">_saveTimer</span><span class="p">);</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
@@ -414,9 +414,9 @@
 </span><span class="lnt">5
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="cp">#</span><span class="cp">if !OS_OBJECT_USE_OBJC</span><span class="cp">
-</span><span class="cp"></span><span class="n">dispatch_release</span><span class="p">(</span><span class="n">_saveTimer</span><span class="p">)</span><span class="p">;</span>
-<span class="cp">#</span><span class="cp">endif</span><span class="cp">
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="cp">#if !OS_OBJECT_USE_OBJC
+</span><span class="cp"></span><span class="n">dispatch_release</span><span class="p">(</span><span class="n">_saveTimer</span><span class="p">);</span>
+<span class="cp">#endif
 </span><span class="cp"></span><span class="n">_saveTimer</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
 <span class="n">_saveTimerSuspended</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 </code></pre></td></tr></table>
@@ -443,26 +443,26 @@
 </span><span class="lnt">16
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(</span><span class="p">(</span><span class="n">_deleteTimer</span> <span class="o">=</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="p">(</span><span class="n">_deleteInterval</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="p">(</span><span class="n">_maxAge</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">_deleteTimer</span> <span class="o">=</span> <span class="n">dispatch_source_create</span><span class="p">(</span><span class="n">DISPATCH_SOURCE_TYPE_TIMER</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">self</span><span class="p">.</span><span class="n">loggerQueue</span><span class="p">)</span><span class="p">;</span>
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">((</span><span class="n">_deleteTimer</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">_deleteInterval</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">_maxAge</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">))</span> <span class="p">{</span>
+    <span class="n">_deleteTimer</span> <span class="o">=</span> <span class="n">dispatch_source_create</span><span class="p">(</span><span class="n">DISPATCH_SOURCE_TYPE_TIMER</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">self</span><span class="p">.</span><span class="n">loggerQueue</span><span class="p">);</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="n">_deleteTimer</span> <span class="o">!</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">_deleteTimer</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
         <span class="n">dispatch_source_set_event_handler</span><span class="p">(</span><span class="n">_deleteTimer</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span> 
-           <span class="k">@autoreleasepool</span> <span class="p">{</span> <span class="p">[</span><span class="nb">self</span> <span class="n">performDelete</span><span class="p">]</span><span class="p">;</span> <span class="p">}</span> 
-        <span class="p">}</span><span class="p">)</span><span class="p">;</span>
+           <span class="k">@autoreleasepool</span> <span class="p">{</span> <span class="p">[</span><span class="nb">self</span> <span class="n">performDelete</span><span class="p">];</span> <span class="p">}</span> 
+        <span class="p">});</span>
 
-        <span class="p">[</span><span class="nb">self</span> <span class="n">updateDeleteTimer</span><span class="p">]</span><span class="p">;</span>
+        <span class="p">[</span><span class="nb">self</span> <span class="n">updateDeleteTimer</span><span class="p">];</span>
 
-        <span class="k">if</span> <span class="p">(</span><span class="p">@</span><span class="n">available</span><span class="p">(</span><span class="n">macOS</span> <span class="mf">10.12</span><span class="p">,</span> <span class="n">iOS</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">tvOS</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">watchOS</span> <span class="mf">3.0</span><span class="p">,</span> <span class="o">*</span><span class="p">)</span><span class="p">)</span>
-            <span class="n">dispatch_activate</span><span class="p">(</span><span class="n">_deleteTimer</span><span class="p">)</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(@</span><span class="n">available</span><span class="p">(</span><span class="n">macOS</span> <span class="mf">10.12</span><span class="p">,</span> <span class="n">iOS</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">tvOS</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">watchOS</span> <span class="mf">3.0</span><span class="p">,</span> <span class="o">*</span><span class="p">))</span>
+            <span class="n">dispatch_activate</span><span class="p">(</span><span class="n">_deleteTimer</span><span class="p">);</span>
         <span class="k">else</span>
-            <span class="nf">dispatch_resume</span><span class="p">(</span><span class="n">_deleteTimer</span><span class="p">)</span><span class="p">;</span>
+            <span class="nf">dispatch_resume</span><span class="p">(</span><span class="n">_deleteTimer</span><span class="p">);</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
 </div><h3 id="updatedeletetimer">updateDeleteTimer</h3>
-<p>更新 Delete Timer 时，会检查是否执行过一次清除操作。如果有，会以上次清楚的时间戳作为 startTime。</p>
+<p>更新 Delete Timer 时，会检查是否执行过一次清除操作。如果有，会以上次清除的时间戳作为 startTime。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -479,17 +479,17 @@
 </span><span class="lnt">12
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(</span><span class="p">(</span><span class="n">_deleteTimer</span> <span class="o">!</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="p">(</span><span class="n">_deleteInterval</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="p">(</span><span class="n">_maxAge</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">int64_t</span> <span class="n">interval</span> <span class="o">=</span> <span class="p">(</span><span class="n">int64_t</span><span class="p">)</span><span class="p">(</span><span class="n">_deleteInterval</span> <span class="o">*</span> <span class="p">(</span><span class="n">NSTimeInterval</span><span class="p">)</span> <span class="n">NSEC_PER_SEC</span><span class="p">)</span><span class="p">;</span>
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">((</span><span class="n">_deleteTimer</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">_deleteInterval</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">_maxAge</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">))</span> <span class="p">{</span>
+    <span class="n">int64_t</span> <span class="n">interval</span> <span class="o">=</span> <span class="p">(</span><span class="n">int64_t</span><span class="p">)(</span><span class="n">_deleteInterval</span> <span class="o">*</span> <span class="p">(</span><span class="n">NSTimeInterval</span><span class="p">)</span> <span class="n">NSEC_PER_SEC</span><span class="p">);</span>
     <span class="n">dispatch_time_t</span> <span class="n">startTime</span><span class="p">;</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="n">_lastDeleteTime</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">startTime</span> <span class="o">=</span> <span class="n">dispatch_time</span><span class="p">(</span><span class="n">_lastDeleteTime</span><span class="p">,</span> <span class="n">interval</span><span class="p">)</span><span class="p">;</span>
+        <span class="n">startTime</span> <span class="o">=</span> <span class="n">dispatch_time</span><span class="p">(</span><span class="n">_lastDeleteTime</span><span class="p">,</span> <span class="n">interval</span><span class="p">);</span>
     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-        <span class="n">startTime</span> <span class="o">=</span> <span class="n">dispatch_time</span><span class="p">(</span><span class="n">DISPATCH_TIME_NOW</span><span class="p">,</span> <span class="n">interval</span><span class="p">)</span><span class="p">;</span>
+        <span class="n">startTime</span> <span class="o">=</span> <span class="n">dispatch_time</span><span class="p">(</span><span class="n">DISPATCH_TIME_NOW</span><span class="p">,</span> <span class="n">interval</span><span class="p">);</span>
     <span class="p">}</span>
 
-    <span class="n">dispatch_source_set_timer</span><span class="p">(</span><span class="n">_deleteTimer</span><span class="p">,</span> <span class="n">startTime</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64_t</span><span class="p">)</span><span class="n">interval</span><span class="p">,</span> <span class="mi">1ull</span> <span class="o">*</span> <span class="n">NSEC_PER_SEC</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">dispatch_source_set_timer</span><span class="p">(</span><span class="n">_deleteTimer</span><span class="p">,</span> <span class="n">startTime</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64_t</span><span class="p">)</span><span class="n">interval</span><span class="p">,</span> <span class="mi">1ull</span> <span class="o">*</span> <span class="n">NSEC_PER_SEC</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -505,11 +505,11 @@
 </span><span class="lnt">7
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(</span><span class="n">_deleteTimer</span> <span class="o">!</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">dispatch_source_cancel</span><span class="p">(</span><span class="n">_deleteTimer</span><span class="p">)</span><span class="p">;</span>
-    <span class="cp">#</span><span class="cp">if !OS_OBJECT_USE_OBJC</span><span class="cp">
-</span><span class="cp"></span>    <span class="n">dispatch_release</span><span class="p">(</span><span class="n">_deleteTimer</span><span class="p">)</span><span class="p">;</span>
-    <span class="cp">#</span><span class="cp">endif</span><span class="cp">
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(</span><span class="n">_deleteTimer</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">dispatch_source_cancel</span><span class="p">(</span><span class="n">_deleteTimer</span><span class="p">);</span>
+    <span class="cp">#if !OS_OBJECT_USE_OBJC
+</span><span class="cp"></span>    <span class="n">dispatch_release</span><span class="p">(</span><span class="n">_deleteTimer</span><span class="p">);</span>
+    <span class="cp">#endif
 </span><span class="cp"></span>    <span class="n">_deleteTimer</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
@@ -525,8 +525,8 @@
 </span><span class="lnt">3
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(</span><span class="p">(</span><span class="nb">self</span><span class="o">-</span><span class="o">&gt;</span><span class="n">_unsavedCount</span> <span class="o">&gt;</span><span class="o">=</span> <span class="nb">self</span><span class="o">-</span><span class="o">&gt;</span><span class="n">_saveThreshold</span><span class="p">)</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="p">(</span><span class="nb">self</span><span class="o">-</span><span class="o">&gt;</span><span class="n">_saveThreshold</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
-    <span class="p">[</span><span class="nb">self</span> <span class="n">performSaveAndSuspendSaveTimer</span><span class="p">]</span><span class="p">;</span>
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">((</span><span class="nb">self</span><span class="o">-&gt;</span><span class="n">_unsavedCount</span> <span class="o">&gt;=</span> <span class="nb">self</span><span class="o">-&gt;</span><span class="n">_saveThreshold</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="nb">self</span><span class="o">-&gt;</span><span class="n">_saveThreshold</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">))</span> <span class="p">{</span>
+    <span class="p">[</span><span class="nb">self</span> <span class="n">performSaveAndSuspendSaveTimer</span><span class="p">];</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -554,18 +554,18 @@
 </span><span class="lnt">13
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(</span><span class="nb">self</span><span class="o">-</span><span class="o">&gt;</span><span class="n">_saveInterval</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nb">self</span><span class="o">-</span><span class="o">&gt;</span><span class="n">_saveTimer</span> <span class="o">=</span><span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(</span><span class="nb">self</span><span class="o">-&gt;</span><span class="n">_saveInterval</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">self</span><span class="o">-&gt;</span><span class="n">_saveTimer</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
 
-        <span class="p">[</span><span class="nb">self</span> <span class="n">createSuspendedSaveTimer</span><span class="p">]</span><span class="p">;</span>
-        <span class="p">[</span><span class="nb">self</span> <span class="n">updateAndResumeSaveTimer</span><span class="p">]</span><span class="p">;</span>
+        <span class="p">[</span><span class="nb">self</span> <span class="n">createSuspendedSaveTimer</span><span class="p">];</span>
+        <span class="p">[</span><span class="nb">self</span> <span class="n">updateAndResumeSaveTimer</span><span class="p">];</span>
     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
 
-        <span class="p">[</span><span class="nb">self</span> <span class="n">updateAndResumeSaveTimer</span><span class="p">]</span><span class="p">;</span>
+        <span class="p">[</span><span class="nb">self</span> <span class="n">updateAndResumeSaveTimer</span><span class="p">];</span>
     <span class="p">}</span>
-<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nb">self</span><span class="o">-</span><span class="o">&gt;</span><span class="n">_saveTimer</span><span class="p">)</span> <span class="p">{</span>
+<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nb">self</span><span class="o">-&gt;</span><span class="n">_saveTimer</span><span class="p">)</span> <span class="p">{</span>
 
-    <span class="p">[</span><span class="nb">self</span> <span class="n">destroySaveTimer</span><span class="p">]</span><span class="p">;</span>
+    <span class="p">[</span><span class="nb">self</span> <span class="n">destroySaveTimer</span><span class="p">];</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -605,8 +605,8 @@
 <pre class="chroma"><code class="language-objc" data-lang="objc"><span class="kt">BOOL</span> <span class="n">shouldDeleteNow</span> <span class="o">=</span> <span class="nb">NO</span><span class="p">;</span>
 
 <span class="k">if</span> <span class="p">(</span><span class="n">oldMaxAge</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">newMaxAge</span> <span class="o">&lt;</span><span class="o">=</span> <span class="mf">0.0</span><span class="p">)</span> <span class="p">{</span> <span class="c1">/// 1
-</span><span class="c1"></span>        <span class="p">[</span><span class="nb">self</span> <span class="n">destroyDeleteTimer</span><span class="p">]</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">newMaxAge</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">)</span> <span class="p">{</span> <span class="c1">/// 1
+</span><span class="c1"></span>        <span class="p">[</span><span class="nb">self</span> <span class="n">destroyDeleteTimer</span><span class="p">];</span>
        
     <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">oldMaxAge</span> <span class="o">&gt;</span> <span class="n">newMaxAge</span><span class="p">)</span> <span class="p">{</span>
         <span class="n">shouldDeleteNow</span> <span class="o">=</span> <span class="nb">YES</span><span class="p">;</span> <span class="c1">/// 4
@@ -616,12 +616,12 @@
 </span><span class="c1"></span><span class="p">}</span>
 
 <span class="k">if</span> <span class="p">(</span><span class="n">shouldDeleteNow</span><span class="p">)</span> <span class="p">{</span>
-    <span class="p">[</span><span class="nb">self</span> <span class="n">performDelete</span><span class="p">]</span><span class="p">;</span>
+    <span class="p">[</span><span class="nb">self</span> <span class="n">performDelete</span><span class="p">];</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="nb">self</span><span class="o">-</span><span class="o">&gt;</span><span class="n">_deleteTimer</span><span class="p">)</span> <span class="p">{</span>
-        <span class="p">[</span><span class="nb">self</span> <span class="n">updateDeleteTimer</span><span class="p">]</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">self</span><span class="o">-&gt;</span><span class="n">_deleteTimer</span><span class="p">)</span> <span class="p">{</span>
+        <span class="p">[</span><span class="nb">self</span> <span class="n">updateDeleteTimer</span><span class="p">];</span>
     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-        <span class="p">[</span><span class="nb">self</span> <span class="n">createAndStartDeleteTimer</span><span class="p">]</span><span class="p">;</span>
+        <span class="p">[</span><span class="nb">self</span> <span class="n">createAndStartDeleteTimer</span><span class="p">];</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
@@ -653,9 +653,9 @@
 </span><span class="c1"></span>	<span class="c1">// Return NO if the logMessage was ignored.
 </span><span class="c1"></span>	<span class="k">return</span> <span class="nb">NO</span><span class="p">;</span>
 <span class="p">}</span>
-<span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">db_save</span> <span class="p">{</span><span class="p">}</span>
-<span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">db_delete</span> <span class="p">{</span><span class="p">}</span>
-<span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">db_saveAndDelete</span> <span class="p">{</span><span class="p">}</span>
+<span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">db_save</span> <span class="p">{}</span>
+<span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">db_delete</span> <span class="p">{}</span>
+<span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">db_saveAndDelete</span> <span class="p">{}</span>
 </code></pre></td></tr></table>
 </div>
 </div><h3 id="public-api">Public API</h3>
@@ -678,21 +678,21 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-objc" data-lang="objc"><span class="n">dispatch_block_t</span> <span class="n">block</span> <span class="o">=</span> <span class="o">^</span><span class="p">{</span>
      <span class="k">@autoreleasepool</span> <span class="p">{</span>
-         <span class="p">[</span><span class="nb">self</span> <span class="n">performSaveAndSuspendSaveTimer</span><span class="p">]</span><span class="p">;</span>
+         <span class="p">[</span><span class="nb">self</span> <span class="n">performSaveAndSuspendSaveTimer</span><span class="p">];</span>
      <span class="p">}</span>
- <span class="p">}</span><span class="p">;</span>
+ <span class="p">};</span>
 
- <span class="k">if</span> <span class="p">(</span><span class="p">[</span><span class="nb">self</span> <span class="n">isOnInternalLoggerQueue</span><span class="p">]</span><span class="p">)</span> <span class="p">{</span>
-     <span class="n">block</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+ <span class="k">if</span> <span class="p">([</span><span class="nb">self</span> <span class="n">isOnInternalLoggerQueue</span><span class="p">])</span> <span class="p">{</span>
+     <span class="n">block</span><span class="p">();</span>
  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-     <span class="n">dispatch_async</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">loggerQueue</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span><span class="p">;</span>
+     <span class="n">dispatch_async</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">loggerQueue</span><span class="p">,</span> <span class="n">block</span><span class="p">);</span>
  <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
 </div><p><code>performSaveAndSuspendSaveTimer</code> 则是其对应的 private method，同样的 <code>deleteOldLogEntries</code> 对应的 private method 为 <code>performDelete</code> 。</p>
 <h3 id="performsaveandsuspendsavetimer">performSaveAndSuspendSaveTimer</h3>
 <p>从方法名可知这里做了两件事：执行日志写入和挂起 SaveTimer。</p>
-<p>写入前确保存在未写入日志，然后依据 _deleteOnEverySave 区分是否需要在每次写入的同时进行清楚操作：</p>
+<p>写入前确保存在未写入日志，然后依据 _deleteOnEverySave 区分是否需要在每次写入的同时进行清除操作：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -709,9 +709,9 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(</span><span class="n">_unsavedCount</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">_deleteOnEverySave</span><span class="p">)</span> <span class="p">{</span>
-        <span class="p">[</span><span class="nb">self</span> <span class="n">db_saveAndDelete</span><span class="p">]</span><span class="p">;</span>
+        <span class="p">[</span><span class="nb">self</span> <span class="n">db_saveAndDelete</span><span class="p">];</span>
     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-        <span class="p">[</span><span class="nb">self</span> <span class="n">db_save</span><span class="p">]</span><span class="p">;</span>
+        <span class="p">[</span><span class="nb">self</span> <span class="n">db_save</span><span class="p">];</span>
     <span class="p">}</span>
 <span class="p">}</span>
 <span class="c1">/// 写入结束重置状态；
@@ -728,8 +728,8 @@
 </span><span class="lnt">4
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(</span><span class="n">_saveTimer</span> <span class="o">!</span><span class="o">=</span> <span class="nb">NULL</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">_saveTimerSuspended</span> <span class="o">=</span><span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">dispatch_suspend</span><span class="p">(</span><span class="n">_saveTimer</span><span class="p">)</span><span class="p">;</span>
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(</span><span class="n">_saveTimer</span> <span class="o">!=</span> <span class="nb">NULL</span> <span class="o">&amp;&amp;</span> <span class="n">_saveTimerSuspended</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">dispatch_suspend</span><span class="p">(</span><span class="n">_saveTimer</span><span class="p">);</span>
     <span class="n">_saveTimerSuspended</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
@@ -746,13 +746,13 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(</span><span class="n">_maxAge</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span> <span class="p">{</span>
-    <span class="p">[</span><span class="nb">self</span> <span class="n">db_delete</span><span class="p">]</span><span class="p">;</span>
+    <span class="p">[</span><span class="nb">self</span> <span class="n">db_delete</span><span class="p">];</span>
 
-    <span class="n">_lastDeleteTime</span> <span class="o">=</span> <span class="n">dispatch_time</span><span class="p">(</span><span class="n">DISPATCH_TIME_NOW</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">_lastDeleteTime</span> <span class="o">=</span> <span class="n">dispatch_time</span><span class="p">(</span><span class="n">DISPATCH_TIME_NOW</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>开启清楚操作的话就执行 delete，结束后更新 <code>_lastDeleteTime</code>。</p>
+</div><p>开启清除操作的话就执行 delete，结束后更新 <code>_lastDeleteTime</code>。</p>
 <h2 id="ddlogger">DDLogger</h2>
 <p>在遵循 DDLogger 的方法中基本也是维护 timer 的状态，触发 save 操作。</p>
 <h3 id="didaddlogger">didAddLogger</h3>
@@ -762,8 +762,8 @@
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="p">[</span><span class="nb">self</span> <span class="n">createSuspendedSaveTimer</span><span class="p">]</span><span class="p">;</span>
-<span class="p">[</span><span class="nb">self</span> <span class="n">createAndStartDeleteTimer</span><span class="p">]</span><span class="p">;</span>
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="p">[</span><span class="nb">self</span> <span class="n">createSuspendedSaveTimer</span><span class="p">];</span>
+<span class="p">[</span><span class="nb">self</span> <span class="n">createAndStartDeleteTimer</span><span class="p">];</span>
 </code></pre></td></tr></table>
 </div>
 </div><h3 id="willremovelogger">willRemoveLogger</h3>
@@ -775,10 +775,10 @@
 </span><span class="lnt">4
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="p">[</span><span class="nb">self</span> <span class="n">performSaveAndSuspendSaveTimer</span><span class="p">]</span><span class="p">;</span>
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="p">[</span><span class="nb">self</span> <span class="n">performSaveAndSuspendSaveTimer</span><span class="p">];</span>
 
-<span class="p">[</span><span class="nb">self</span> <span class="n">destroySaveTimer</span><span class="p">]</span><span class="p">;</span>
-<span class="p">[</span><span class="nb">self</span> <span class="n">destroyDeleteTimer</span><span class="p">]</span><span class="p">;</span>
+<span class="p">[</span><span class="nb">self</span> <span class="n">destroySaveTimer</span><span class="p">];</span>
+<span class="p">[</span><span class="nb">self</span> <span class="n">destroyDeleteTimer</span><span class="p">];</span>
 </code></pre></td></tr></table>
 </div>
 </div><h3 id="logmessage">logMessage</h3>
@@ -787,7 +787,7 @@
 <pre class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(</span><span class="p">[</span><span class="nb">self</span> <span class="nl">db_log</span><span class="p">:</span><span class="n">logMessage</span><span class="p">]</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* 更新 save timer */</span>  <span class="p">}</span>
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">([</span><span class="nb">self</span> <span class="nl">db_log</span><span class="p">:</span><span class="n">logMessage</span><span class="p">])</span> <span class="p">{</span> <span class="cm">/* 更新 save timer */</span>  <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>logMessage 方法是用户产生 new log 所触发的，包含了关键的 log message。在 FileLogger 中时将 message 转换为 NSData 调用 <code>lt_logData</code> 来写入文件，而这里则会将 message 转换为 log entity 以期写入 DB 中。<strong>db_log</strong> 所做的真是和 <code>lt_logData</code> 一致的。</p>
@@ -804,12 +804,12 @@
 </span><span class="lnt">7
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="kt">BOOL</span> <span class="n">firstUnsavedEntry</span> <span class="o">=</span> <span class="p">(</span><span class="o">+</span><span class="o">+</span><span class="n">_unsavedCount</span> <span class="o">=</span><span class="o">=</span> <span class="mi">1</span><span class="p">)</span><span class="p">;</span>
-<span class="k">if</span> <span class="p">(</span><span class="p">(</span><span class="n">_unsavedCount</span> <span class="o">&gt;</span><span class="o">=</span> <span class="n">_saveThreshold</span><span class="p">)</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="p">(</span><span class="n">_saveThreshold</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
-    <span class="p">[</span><span class="nb">self</span> <span class="n">performSaveAndSuspendSaveTimer</span><span class="p">]</span><span class="p">;</span>
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="kt">BOOL</span> <span class="n">firstUnsavedEntry</span> <span class="o">=</span> <span class="p">(</span><span class="o">++</span><span class="n">_unsavedCount</span> <span class="o">==</span> <span class="mi">1</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">((</span><span class="n">_unsavedCount</span> <span class="o">&gt;=</span> <span class="n">_saveThreshold</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">_saveThreshold</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">))</span> <span class="p">{</span>
+    <span class="p">[</span><span class="nb">self</span> <span class="n">performSaveAndSuspendSaveTimer</span><span class="p">];</span>
 <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">firstUnsavedEntry</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">_unsavedTime</span> <span class="o">=</span> <span class="n">dispatch_time</span><span class="p">(</span><span class="n">DISPATCH_TIME_NOW</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="p">;</span>
-    <span class="p">[</span><span class="nb">self</span> <span class="n">updateAndResumeSaveTimer</span><span class="p">]</span><span class="p">;</span>
+    <span class="n">_unsavedTime</span> <span class="o">=</span> <span class="n">dispatch_time</span><span class="p">(</span><span class="n">DISPATCH_TIME_NOW</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="p">[</span><span class="nb">self</span> <span class="n">updateAndResumeSaveTimer</span><span class="p">];</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -819,22 +819,22 @@
 <pre class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="p">[</span><span class="nb">self</span> <span class="n">performSaveAndSuspendSaveTimer</span><span class="p">]</span><span class="p">;</span>
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="p">[</span><span class="nb">self</span> <span class="n">performSaveAndSuspendSaveTimer</span><span class="p">];</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>该方法是当应用退出或崩溃时主动调用，以及时保存还在 pendding 状态的 log entities。</p>
 <h1 id="fmdblogger">FMDBLogger</h1>
 <p>简单介绍一下 FMDBLogger，它是通过 FMDB 提供的 API 将 log message 写入数据库。</p>
 <p>这里每条 DDLogMessage 对应为 FMDBLogEntry，它简单存储了 context、flag、message、timestamp。数据库建表和校验就不说了，主要围绕重载的几个方法。</p>
-<h2 id="db-log">db_log</h2>
+<h2 id="db_log">db_log</h2>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="n">FMDBLogEntry</span> <span class="o">*</span><span class="n">logEntry</span> <span class="o">=</span> <span class="p">[</span><span class="p">[</span><span class="n">FMDBLogEntry</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithLogMessage</span><span class="p">:</span><span class="n">logMessage</span><span class="p">]</span><span class="p">;</span>
-<span class="p">[</span><span class="n">pendingLogEntries</span> <span class="nl">addObject</span><span class="p">:</span><span class="n">logEntry</span><span class="p">]</span><span class="p">;</span>
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="n">FMDBLogEntry</span> <span class="o">*</span><span class="n">logEntry</span> <span class="o">=</span> <span class="p">[[</span><span class="n">FMDBLogEntry</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithLogMessage</span><span class="p">:</span><span class="n">logMessage</span><span class="p">];</span>
+<span class="p">[</span><span class="n">pendingLogEntries</span> <span class="nl">addObject</span><span class="p">:</span><span class="n">logEntry</span><span class="p">];</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>这里并没有直接将 logEntry 插入 db，而是添加到缓冲列表中。我们真的需要这个缓冲区吗？</p>
@@ -845,7 +845,7 @@
 <p>By default, each INSERT statement is its own transaction. But if you surround multiple INSERT statements with <a href="https://www.sqlite.org/lang_transaction.html">BEGIN</a>&hellip;<a href="https://www.sqlite.org/lang_transaction.html">COMMIT</a> then all the inserts are grouped into a single transaction. The time needed to commit the transaction is amortized over all the enclosed insert statements and so the time per insert statement is greatly reduced.</p>
 </blockquote>
 <p>也就是说，我们可以通过将多条插入语句用 <code>BEGIN ... COMMIT</code> 的方法包裹起来作为单独的事务来提交，效率将会有巨大的提升。</p>
-<h2 id="db-save">db_save</h2>
+<h2 id="db_save">db_save</h2>
 <p>最终尝试将 pendingLogEntries 作为事务执行的方法。会先检查 pendingLogEntries count 以及 database 是否正在执行事务，来判断是否需要使用  <code>BEGIN ... COMMIT</code> 。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -867,20 +867,20 @@
 </span><span class="lnt">16
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="kt">BOOL</span> <span class="n">saveOnlyTransaction</span> <span class="o">=</span> <span class="o">!</span><span class="p">[</span><span class="n">database</span> <span class="n">inTransaction</span><span class="p">]</span><span class="p">;</span>
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="kt">BOOL</span> <span class="n">saveOnlyTransaction</span> <span class="o">=</span> <span class="o">!</span><span class="p">[</span><span class="n">database</span> <span class="n">inTransaction</span><span class="p">];</span>
 
 <span class="k">if</span> <span class="p">(</span><span class="n">saveOnlyTransaction</span><span class="p">)</span> <span class="p">{</span>
-    <span class="p">[</span><span class="n">database</span> <span class="n">beginTransaction</span><span class="p">]</span><span class="p">;</span>
+    <span class="p">[</span><span class="n">database</span> <span class="n">beginTransaction</span><span class="p">];</span>
 <span class="p">}</span>
 
 <span class="cm">/* INSERT INTO logs &amp; remove pendingLogEntries  */</span> 
 
 <span class="k">if</span> <span class="p">(</span><span class="n">saveOnlyTransaction</span><span class="p">)</span> <span class="p">{</span>
-    <span class="p">[</span><span class="n">database</span> <span class="n">commit</span><span class="p">]</span><span class="p">;</span>
+    <span class="p">[</span><span class="n">database</span> <span class="n">commit</span><span class="p">];</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="p">[</span><span class="n">database</span> <span class="n">hadError</span><span class="p">]</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">NSLog</span><span class="p">(</span><span class="s">@&#34;</span><span class="s">%@: Error inserting log entries: code(%d): %@</span><span class="s">&#34;</span><span class="p">,</span>
-                <span class="p">[</span><span class="nb">self</span> <span class="k">class</span><span class="p">]</span><span class="p">,</span> <span class="p">[</span><span class="n">database</span> <span class="n">lastErrorCode</span><span class="p">]</span><span class="p">,</span> <span class="p">[</span><span class="n">database</span> <span class="n">lastErrorMessage</span><span class="p">]</span><span class="p">)</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">([</span><span class="n">database</span> <span class="n">hadError</span><span class="p">])</span> <span class="p">{</span>
+        <span class="n">NSLog</span><span class="p">(</span><span class="s">@&#34;%@: Error inserting log entries: code(%d): %@&#34;</span><span class="p">,</span>
+                <span class="p">[</span><span class="nb">self</span> <span class="k">class</span><span class="p">],</span> <span class="p">[</span><span class="n">database</span> <span class="n">lastErrorCode</span><span class="p">],</span> <span class="p">[</span><span class="n">database</span> <span class="n">lastErrorMessage</span><span class="p">]);</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
@@ -916,7 +916,11 @@
           <a href="/tags/logger/">Logger</a>
           </div>
       <nav class="post-nav">
-        
+        <a class="prev" href="/post/sourcecode-ios/source-code-mmkv/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">浅析 - 微信 MMKV 1.1.1</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
         <a class="next" href="/post/sourcecode-ios/source-code-lumberjack-2/">
             <span class="next-text nav-default">浅析 - CocoaLumberjack 3.6 之 FileLogger</span>
             <span class="next-text nav-mobile">下一篇</span>

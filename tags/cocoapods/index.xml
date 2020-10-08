@@ -6,10 +6,46 @@
     <description>Recent content in CocoaPods on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 29 Mar 2020 15:10:58 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 17 Sep 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="http://looseyi.github.io/tags/cocoapods/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>4. Podfile 的解析逻辑</title>
+      <link>http://looseyi.github.io/post/sourcecode-cocoapods/04-cocoapods-podfile/</link>
+      <pubDate>Thu, 17 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/post/sourcecode-cocoapods/04-cocoapods-podfile/</guid>
+      <description>本文知识目录 引子 在上文 CocoaPods 命令解析 中，我们通过对 CLAide 的源码分析，了解了 CocoaPods 是如何处理 pod 命令，多级命令又是如何组织和嵌套的，并解释了命令行输出所代表</description>
+    </item>
+    
+    <item>
+      <title>3. CocoaPods 命令解析 - CLAide</title>
+      <link>http://looseyi.github.io/post/sourcecode-cocoapods/03-cocoapods-claide/</link>
+      <pubDate>Wed, 02 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/post/sourcecode-cocoapods/03-cocoapods-claide/</guid>
+      <description>本文知识目录 引子 在上文 整体把握 CocoaPods 核心组件 中，我们通过对 pod install 的流程的介绍，引出 CocoaPods 的各个核心组件的角色分工和其主要作用，希望通过对这些组件的使用</description>
+    </item>
+    
+    <item>
+      <title>2. 整体把握 CocoaPods 核心组件</title>
+      <link>http://looseyi.github.io/post/sourcecode-cocoapods/02-cocoapods-corecomponents/</link>
+      <pubDate>Mon, 17 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/post/sourcecode-cocoapods/02-cocoapods-corecomponents/</guid>
+      <description>本文知识目录 引子 在上文 版本管理工具及 Ruby 工具链环境 中，我们聊到如何统一管理团队小伙伴的 CocoaPods 生产环境及使用到的 Ruby 工具链。今天让我们将目光转到 CocoaPods 身上</description>
+    </item>
+    
+    <item>
+      <title>1. 版本管理工具及 Ruby 工具链环境</title>
+      <link>http://looseyi.github.io/post/sourcecode-cocoapods/01-cocoapods-toolchains/</link>
+      <pubDate>Wed, 10 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/post/sourcecode-cocoapods/01-cocoapods-toolchains/</guid>
+      <description>1. 版本管理工具及 Ruby 工具链环境 CocoaPods 历险记这个专题是 Edmond 和冬瓜 是对于 iOS / macOS 工程中版本管理工具 CocoaPods 的实现细节、原理、源码、实践与经验的分享记录，旨在帮助</description>
+    </item>
     
     <item>
       <title>浅析 Cocoapods-Packager 实现</title>
@@ -30,12 +66,12 @@
     </item>
     
     <item>
-      <title>浅析 Cocoapods-Binary 实现</title>
+      <title>浅析 cocoapods-binary</title>
       <link>http://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-1/</link>
       <pubDate>Sat, 21 Dec 2019 11:37:41 +2100</pubDate>
       
       <guid>http://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-1/</guid>
-      <description>背景 公司级别的项目在发展过程，不可避免会遇到项目过大，导致的编译和开发效率的降低。在如何提高编译速度，加快生产效率，各大厂都有各种尝试，可惜</description>
+      <description>#介绍 cocoapods-binary 最早是在 CocoaPods 的 Blog 中发现的：pre-compiling dependencies。虽非官方出品，但却是国内程序员的力作，medium 原版介</description>
     </item>
     
   </channel>

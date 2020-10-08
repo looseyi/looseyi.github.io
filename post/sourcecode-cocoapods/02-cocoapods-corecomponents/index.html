@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>2. 整体把握 CocoaPods 核心组件 - </title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="土土Edmond木" /><meta name="description" content="本文知识目录 引子 在上文 版本管理工具及 Ruby 工具链环境 中，我们聊到如何统一管理团队小伙伴的 CocoaPods 生产环境及使用到的 Ruby 工具链。今天让我们将目光转到 CocoaPods 身上" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.71.1 with theme even" />
+
+
+<link rel="canonical" href="http://looseyi.github.io/post/sourcecode-cocoapods/02-cocoapods-corecomponents/" />
+  <link href="http://looseyi.github.io/post/sourcecode-cocoapods/02-cocoapods-corecomponents/index.xml" rel="alternate" type="application/rss+xml" title="" />
+  <link href="http://looseyi.github.io/post/sourcecode-cocoapods/02-cocoapods-corecomponents/index.xml" rel="feed" type="application/rss+xml" title="" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="2. 整体把握 CocoaPods 核心组件" />
+<meta property="og:description" content="本文知识目录 引子 在上文 版本管理工具及 Ruby 工具链环境 中，我们聊到如何统一管理团队小伙伴的 CocoaPods 生产环境及使用到的 Ruby 工具链。今天让我们将目光转到 CocoaPods 身上" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://looseyi.github.io/post/sourcecode-cocoapods/02-cocoapods-corecomponents/" />
+<meta property="article:published_time" content="2020-08-17T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-08-17T00:00:00+00:00" />
+<meta itemprop="name" content="2. 整体把握 CocoaPods 核心组件">
+<meta itemprop="description" content="本文知识目录 引子 在上文 版本管理工具及 Ruby 工具链环境 中，我们聊到如何统一管理团队小伙伴的 CocoaPods 生产环境及使用到的 Ruby 工具链。今天让我们将目光转到 CocoaPods 身上">
+<meta itemprop="datePublished" content="2020-08-17T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2020-08-17T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="5911">
+
+
+
+<meta itemprop="keywords" content="CocoaPods,iOS," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="2. 整体把握 CocoaPods 核心组件"/>
+<meta name="twitter:description" content="本文知识目录 引子 在上文 版本管理工具及 Ruby 工具链环境 中，我们聊到如何统一管理团队小伙伴的 CocoaPods 生产环境及使用到的 Ruby 工具链。今天让我们将目光转到 CocoaPods 身上"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Aha Moment</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Aha Moment</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">2. 整体把握 CocoaPods 核心组件</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-08-17 </span>
+        <div class="post-category">
+            <a href="/categories/ios/"> iOS </a>
+            <a href="/categories/cocoapods/"> CocoaPods </a>
+            </div>
+          <span class="more-meta"> 约 5911 字 </span>
+          <span class="more-meta"> 预计阅读 12 分钟 </span>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#cocoapods-依赖总览">CocoaPods 依赖总览</a></li>
+    <li><a href="#组件构成和对应职责">组件构成和对应职责</a>
+      <ul>
+        <li><a href="#claide">CLAide</a></li>
+        <li><a href="#cocoapods-core">cocoapods-core</a></li>
+        <li><a href="#cocoapods-downloader">cocoapods-downloader</a></li>
+        <li><a href="#molinillo">Molinillo</a></li>
+        <li><a href="#xcodeproj">Xcodeproj</a></li>
+        <li><a href="#cocoapods-plugins">cocoapods-plugins</a></li>
+      </ul>
+    </li>
+  </ul>
+
+  <ul>
+    <li><a href="#命令入口">命令入口</a></li>
+    <li><a href="#执行功能主体">执行功能主体</a>
+      <ul>
+        <li><a href="#0x1-install-环境准备prepare">0x1 Install 环境准备（prepare）</a></li>
+        <li><a href="#0x2-解决依赖冲突resolve_dependencies">0x2 解决依赖冲突（resolve_dependencies）</a></li>
+        <li><a href="#0x3-下载依赖文件download_dependencies">0x3 下载依赖文件（download_dependencies）</a></li>
+        <li><a href="#0x4-验证-targets-validate_targets">0x4 验证 targets (validate_targets)</a></li>
+        <li><a href="#0x5-生成工程-integrate">0x5 生成工程 (Integrate)</a></li>
+        <li><a href="#0x6-写入依赖-write_lockfiles">0x6 写入依赖 (write_lockfiles)</a></li>
+        <li><a href="#0x7-结束回调perform_post_install_action">0x7 结束回调（perform_post_install_action）</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h1 id="本文知识目录">本文知识目录</h1>
+<p><img src="http://ww1.sinaimg.cn/large/8157560cly1ghshm3sakwj21ki0ywn33.jpg" alt="CocoaPods-Perview"></p>
+<h1 id="引子">引子</h1>
+<p>在上文 <a href="https://zhuanlan.zhihu.com/p/147537112">版本管理工具及 Ruby 工具链环境</a> 中，我们聊到如何统一管理团队小伙伴的 CocoaPods 生产环境及使用到的 Ruby 工具链。今天让我们将目光转到 CocoaPods 身上，一起来聊聊它的主要构成，以及各个组件在整个 Pods 工作流的关系。</p>
+<blockquote>
+<p>为了整体把握 <em>CocoaPods</em> 这个项目，建议大家去入门一下 Ruby 这门脚本语言。另外本文基于 CocoaPods 1.9.2 版本。</p>
+</blockquote>
+<h1 id="cocoapods-的核心组件">CocoaPods 的核心组件</h1>
+<p>作为包管理工具，CocoaPods 随着 Apple 生态的蓬勃发展也在不断迭代和进化，并且各部分核心功能也都演化出相对独立的组件。这些功能独立的组件，均拆分出一个个独立的 Gem 包，而 CocoaPods 则是这些组件的“集大成者”。</p>
+<h2 id="cocoapods-依赖总览">CocoaPods 依赖总览</h2>
+<p>我们知道在 Pod 管理的项目中，<code>Podfile</code> 文件里描述了它所依赖的 dependencies，类似的 Gem 的依赖可以在 <code>Gemfile</code> 中查看。那 CocoaPods 的 <code>Gemfile</code> 有哪些依赖呢？</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="no">SKIP_UNRELEASED_VERSIONS</span> <span class="o">=</span> <span class="kp">false</span>
+<span class="c1"># ...</span>
+
+<span class="n">source</span> <span class="s1">&#39;https://rubygems.org&#39;</span>
+<span class="n">gemspec</span>
+<span class="n">gem</span> <span class="s1">&#39;json&#39;</span><span class="p">,</span> <span class="ss">:git</span> <span class="o">=&gt;</span> <span class="s1">&#39;https://github.com/segiddins/json.git&#39;</span><span class="p">,</span> <span class="ss">:branch</span> <span class="o">=&gt;</span> <span class="s1">&#39;seg-1.7.7-ruby-2.2&#39;</span>
+
+<span class="n">group</span> <span class="ss">:development</span> <span class="k">do</span>
+  <span class="n">cp_gem</span> <span class="s1">&#39;claide&#39;</span><span class="p">,</span>                <span class="s1">&#39;CLAide&#39;</span>
+  <span class="n">cp_gem</span> <span class="s1">&#39;cocoapods-core&#39;</span><span class="p">,</span>        <span class="s1">&#39;Core&#39;</span><span class="p">,</span> <span class="s1">&#39;1-9-stable&#39;</span>
+  <span class="n">cp_gem</span> <span class="s1">&#39;cocoapods-deintegrate&#39;</span><span class="p">,</span> <span class="s1">&#39;cocoapods-deintegrate&#39;</span>
+  <span class="n">cp_gem</span> <span class="s1">&#39;cocoapods-downloader&#39;</span><span class="p">,</span>  <span class="s1">&#39;cocoapods-downloader&#39;</span>
+  <span class="n">cp_gem</span> <span class="s1">&#39;cocoapods-plugins&#39;</span><span class="p">,</span>     <span class="s1">&#39;cocoapods-plugins&#39;</span>
+  <span class="n">cp_gem</span> <span class="s1">&#39;cocoapods-search&#39;</span><span class="p">,</span>      <span class="s1">&#39;cocoapods-search&#39;</span>
+  <span class="n">cp_gem</span> <span class="s1">&#39;cocoapods-stats&#39;</span><span class="p">,</span>       <span class="s1">&#39;cocoapods-stats&#39;</span>
+  <span class="n">cp_gem</span> <span class="s1">&#39;cocoapods-trunk&#39;</span><span class="p">,</span>       <span class="s1">&#39;cocoapods-trunk&#39;</span>
+  <span class="n">cp_gem</span> <span class="s1">&#39;cocoapods-try&#39;</span><span class="p">,</span>         <span class="s1">&#39;cocoapods-try&#39;</span>
+  <span class="n">cp_gem</span> <span class="s1">&#39;molinillo&#39;</span><span class="p">,</span>             <span class="s1">&#39;Molinillo&#39;</span>
+  <span class="n">cp_gem</span> <span class="s1">&#39;nanaimo&#39;</span><span class="p">,</span>               <span class="s1">&#39;Nanaimo&#39;</span>
+  <span class="n">cp_gem</span> <span class="s1">&#39;xcodeproj&#39;</span><span class="p">,</span>             <span class="s1">&#39;Xcodeproj&#39;</span>
+   
+  <span class="n">gem</span> <span class="s1">&#39;cocoapods-dependencies&#39;</span><span class="p">,</span> <span class="s1">&#39;~&gt; 1.0.beta.1&#39;</span>
+  <span class="c1"># ...</span>
+  <span class="c1"># Integration tests</span>
+  <span class="n">gem</span> <span class="s1">&#39;diffy&#39;</span>
+  <span class="n">gem</span> <span class="s1">&#39;clintegracon&#39;</span>
+  <span class="c1"># Code Quality</span>
+  <span class="n">gem</span> <span class="s1">&#39;inch_by_inch&#39;</span>
+  <span class="n">gem</span> <span class="s1">&#39;rubocop&#39;</span>
+  <span class="n">gem</span> <span class="s1">&#39;danger&#39;</span>
+<span class="k">end</span>
+
+<span class="n">group</span> <span class="ss">:debugging</span> <span class="k">do</span>
+  <span class="n">gem</span> <span class="s1">&#39;cocoapods_debug&#39;</span>
+
+  <span class="n">gem</span> <span class="s1">&#39;rb-fsevent&#39;</span>
+  <span class="n">gem</span> <span class="s1">&#39;kicker&#39;</span>
+  <span class="n">gem</span> <span class="s1">&#39;awesome_print&#39;</span>
+  <span class="n">gem</span> <span class="s1">&#39;ruby-prof&#39;</span><span class="p">,</span> <span class="ss">:platforms</span> <span class="o">=&gt;</span> <span class="o">[</span><span class="ss">:ruby</span><span class="o">]</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>上面的 <code>Gemfile</code> 中我们看到很多通过 <code>cp_gem</code> 装载的 Gem 库，其方法如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">cp_gem</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">repo_name</span><span class="p">,</span> <span class="n">branch</span> <span class="o">=</span> <span class="s1">&#39;master&#39;</span><span class="p">,</span> <span class="ss">path</span><span class="p">:</span> <span class="kp">false</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">gem</span> <span class="nb">name</span> <span class="k">if</span> <span class="no">SKIP_UNRELEASED_VERSIONS</span>
+  <span class="n">opts</span> <span class="o">=</span> <span class="k">if</span> <span class="n">path</span>
+           <span class="p">{</span> <span class="ss">:path</span> <span class="o">=&gt;</span> <span class="s2">&#34;../</span><span class="si">#{</span><span class="n">repo_name</span><span class="si">}</span><span class="s2">&#34;</span> <span class="p">}</span>
+         <span class="k">else</span>
+           <span class="n">url</span> <span class="o">=</span> <span class="s2">&#34;https://github.com/CocoaPods/</span><span class="si">#{</span><span class="n">repo_name</span><span class="si">}</span><span class="s2">.git&#34;</span>
+           <span class="p">{</span> <span class="ss">:git</span> <span class="o">=&gt;</span> <span class="n">url</span><span class="p">,</span> <span class="ss">:branch</span> <span class="o">=&gt;</span> <span class="n">branch</span> <span class="p">}</span>
+         <span class="k">end</span>
+  <span class="n">gem</span> <span class="nb">name</span><span class="p">,</span> <span class="n">opts</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>它是用于方便开发和调试，当 <em><code>**SKIP_UNRELEASED_VERSIONS**</code></em> 为 <code>false &amp;&amp; path</code> 为 <code>true</code> 时会使用与本地的 <em>CocoaPods</em> 项目同级目录下的 git 仓库，否则会使用对应的项目直接通过 Gem 加载。</p>
+<p>通过简单的目录分割和 <code>Gemfile</code> 管理，就实现了最基本又最直观的<strong>热插拔</strong>，对组件开发十分友好。所以你只要将多个仓库如下图方式排列，即可实现跨仓库组件开发：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="err">$</span> <span class="n">ls</span> <span class="o">-</span><span class="n">l</span>
+<span class="n">lrwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span>  <span class="mi">1</span> <span class="n">gua</span>  <span class="n">staff</span>    <span class="mi">31</span> <span class="no">Jul</span> <span class="mi">30</span> <span class="mi">21</span><span class="p">:</span><span class="mi">34</span> <span class="no">CocoaPods</span>
+<span class="n">lrwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span>  <span class="mi">1</span> <span class="n">gua</span>  <span class="n">staff</span>    <span class="mi">26</span> <span class="no">Jul</span> <span class="mi">31</span> <span class="mi">13</span><span class="p">:</span><span class="mi">27</span> <span class="no">Core</span> 
+<span class="n">lrwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span>  <span class="mi">1</span> <span class="n">gua</span>  <span class="n">staff</span>    <span class="mi">31</span> <span class="no">Jul</span> <span class="mi">31</span> <span class="mi">10</span><span class="p">:</span><span class="mi">14</span> <span class="no">Molinillo</span> 
+<span class="n">lrwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span>  <span class="mi">1</span> <span class="n">gua</span>  <span class="n">staff</span>    <span class="mi">31</span> <span class="no">Aug</span> <span class="mi">15</span> <span class="mi">11</span><span class="p">:</span><span class="mi">32</span> <span class="no">Xcodeproj</span> 
+<span class="n">lrwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span>  <span class="mi">1</span> <span class="n">gua</span>  <span class="n">staff</span>    <span class="mi">42</span> <span class="no">Jul</span> <span class="mi">31</span> <span class="mi">10</span><span class="p">:</span><span class="mi">14</span> <span class="n">cocoapods</span><span class="o">-</span><span class="n">downloader</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="组件构成和对应职责">组件构成和对应职责</h2>
+<p>通过上面对于 <code>Gemfile</code> 的简单分析，可以看出 <em>CocoaPods</em> 不仅仅是一个仓库那么简单，它作为一个三方库版本管理工具，对自身组件的管理和组件化也是十分讲究的。我们继续来看这份 <code>Gemfile</code> 中的核心开发组件：</p>
+<p><img src="http://ww1.sinaimg.cn/large/8157560cly1ghshm3q88lj20jg0g0myv.jpg" alt="00-Core Components"></p>
+<h3 id="claide">CLAide</h3>
+<blockquote>
+<p>The CLAide gem is a simple command line parser, which provides an API that allows you to quickly create a full featured command-line interface.</p>
+</blockquote>
+<p><a href="https://github.com/CocoaPods/CLAide">CLAide</a> 虽然是一个简单的命令行解释器，但它提供了功能齐全的命令行界面和 API。它不仅负责解析我们使用到的 <code>Pods</code> 命令，如：<code>pod install</code>, <code>pod update</code> 等，还可用于封装常用的一些脚本，将其打包成简单的命令行小工具。</p>
+<blockquote>
+<p>PS: 所谓命令行解释器就是从标准输入或者文件中读取命令并执行的程序。详见 <a href="https://www.wikiwand.com/en/Command-line_argument_parsing">Wiki</a>。</p>
+</blockquote>
+<h3 id="cocoapods-core">cocoapods-core</h3>
+<blockquote>
+<p>The CocoaPods-Core gem provides support to work with the models of CocoaPods, for example the Podspecs or the Podfile.</p>
+</blockquote>
+<p><a href="https://github.com/CocoaPods/Core">CocoaPods-Core</a> 用于 CocoaPods 中模板文件的解析，包括 <code>Podfile</code>、<code>.podspec</code>，以及所有的 <code>.lock</code> 文件中特殊的 YAML 文件。</p>
+<h3 id="cocoapods-downloader">cocoapods-downloader</h3>
+<blockquote>
+<p>The Cocoapods-downloader gem is a small library that provides downloaders for various source control types (HTTP/SVN/Git/Mercurial). It can deal with tags, commits, revisions, branches, extracting files from zips and almost anything these source control system would use.</p>
+</blockquote>
+<p><a href="https://github.com/CocoaPods/cocoapods-downloader">Cocoapods-Downloader</a> 是用于下载源码的小工具，它支持各种类型的版本管理工具，包括 HTTP / SVN / Git / Mercurial。它可以提供 <code>tags</code>、<code>commites</code>，<code>revisions</code>，<code>branches</code> 以及 <code>zips</code> 文件的下载和解压缩操作。</p>
+<h3 id="molinillo">Molinillo</h3>
+<blockquote>
+<p>The Molinillo gem is a generic dependency resolution algorithm, used in CocoaPods, Bundler and RubyGems.</p>
+</blockquote>
+<p><a href="https://github.com/CocoaPods/Molinillo/blob/master/ARCHITECTURE.md">Molinillo</a> 是 CocoaPods 对于依赖仲裁算法的封装，它是一个具有前向检察的回溯算法。不仅在 <code>Pods</code> 中，<code>Bundler</code> 和 <code>RubyGems</code> 也是使用的这一套仲裁算法。</p>
+<h3 id="xcodeproj">Xcodeproj</h3>
+<blockquote>
+<p>The Xcodeproj gem lets you create and modify Xcode projects from Ruby. Script boring management tasks or build Xcode-friendly libraries. Also includes support for Xcode workspaces (.xcworkspace) and configuration files (.xcconfig).</p>
+</blockquote>
+<p><a href="https://github.com/CocoaPods/Xcodeproj">Xcodeproj</a> 可通过 Ruby 来操作 Xcode 项目的创建和编辑等。可友好的支持 Xcode 项目的脚本管理和 libraries 构建，以及 Xcode 工作空间 (.xcworkspace)  和配置文件 <code>.xcconfig</code> 的管理。</p>
+<h3 id="cocoapods-plugins">cocoapods-plugins</h3>
+<blockquote>
+<p>CocoaPods plugin which shows info about available CocoaPods plugins or helps you get started developing a new plugin. Yeah, it&rsquo;s very meta.</p>
+</blockquote>
+<p><code>cocoapods-plugins</code> 插件管理功能，其中有 <code>pod plugin</code> 全套命令，支持对于 CocoaPods 插件的列表一览（list）、搜索（search）、创建（create）功能。</p>
+<p>当然，上面还有很多组件这里就不一一介绍了。通过查看 <code>Gemfile</code> 可以看出 Pod 对于组件的拆分粒度是比较细微的，通过对各种组件的组合达到现在的完整版本。这些组件中，笔者的了解也十分有限，不过我们会在之后的一系列文章来逐一介绍学习。</p>
+<h1 id="cocoapods-初探">CocoaPods 初探</h1>
+<p>接下来，结合 <code>pod install</code> 安装流程来展示各个组件在 <code>Pods</code> 工作流中的上下游关系。</p>
+<h2 id="命令入口">命令入口</h2>
+<p>每当我们输入 <code>pod xxx</code> 命令时，系统会首先调用 <code>pod</code> 命令。所有的命令都是在 <code>/bin</code> 目录下存放的脚本，当然 Ruby 环境的也不例外。我们可以通过 <code>which pod</code> 来查看命令所在位置：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">$ which pod
+/Users/edmond/.rvm/gems/ruby-2.6.1/bin/pod
+</code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>这里的显示路径不是 <code>/usr/local/bin/pod</code> 的原因是因为使用 <em>RVM</em> 进行版本控制的。</p>
+</blockquote>
+<p>我们通过 <code>cat</code> 命令来查看一下这个入口脚本执行了什么</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">$ cat /Users/edmond/.rvm/gems/ruby-2.6.1/bin/pod
+</code></pre></td></tr></table>
+</div>
+</div><p>输出如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="ch">#!/usr/bin/env ruby_executable_hooks</span>
+
+<span class="nb">require</span> <span class="s1">&#39;rubygems&#39;</span>
+<span class="n">version</span> <span class="o">=</span> <span class="s2">&#34;&gt;= 0.a&#34;</span>
+
+<span class="n">str</span> <span class="o">=</span> <span class="no">ARGV</span><span class="o">.</span><span class="n">first</span>
+<span class="k">if</span> <span class="n">str</span>
+  <span class="n">str</span> <span class="o">=</span> <span class="n">str</span><span class="o">.</span><span class="n">b</span><span class="o">[</span><span class="sr">/\A_(.*)_\z/</span><span class="p">,</span> <span class="mi">1</span><span class="o">]</span>
+  <span class="k">if</span> <span class="n">str</span> <span class="ow">and</span> <span class="no">Gem</span><span class="o">::</span><span class="no">Version</span><span class="o">.</span><span class="n">correct?</span><span class="p">(</span><span class="n">str</span><span class="p">)</span>
+    <span class="n">version</span> <span class="o">=</span> <span class="n">str</span>
+    <span class="no">ARGV</span><span class="o">.</span><span class="n">shift</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">if</span> <span class="no">Gem</span><span class="o">.</span><span class="n">respond_to?</span><span class="p">(</span><span class="ss">:activate_bin_path</span><span class="p">)</span>
+    <span class="nb">load</span> <span class="no">Gem</span><span class="o">.</span><span class="n">activate_bin_path</span><span class="p">(</span><span class="s1">&#39;cocoapods&#39;</span><span class="p">,</span> <span class="s1">&#39;pod&#39;</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+<span class="k">else</span>
+    <span class="n">gem</span> <span class="s2">&#34;cocoapods&#34;</span><span class="p">,</span> <span class="n">version</span>
+    <span class="nb">load</span> <span class="no">Gem</span><span class="o">.</span><span class="n">bin_path</span><span class="p">(</span><span class="s2">&#34;cocoapods&#34;</span><span class="p">,</span> <span class="s2">&#34;pod&#34;</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>程序 CocoaPods 是作为 Gem 被安装的，此脚本用于唤起 CocoaPods。逻辑比较简单，就是一个单纯的命令转发。<code>Gem.activate_bin_path</code> 和 <code>Gem.bin_path</code> 用于找到 CocoaPods 的安装目录 <code>cocoapods/bin</code>，最终加载该目录下的 <code>/pod</code> 文件:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="ch">#!/usr/bin/env ruby</span>
+<span class="c1"># ... 忽略一些对于编码处理的代码</span>
+
+<span class="nb">require</span> <span class="s1">&#39;cocoapods&#39;</span>
+
+<span class="c1"># 这里手动输出一下调用栈，来关注一下</span>
+<span class="nb">puts</span> <span class="nb">caller</span>
+
+<span class="c1"># 如果环境配置中指定了 ruby-prof 配置文件，会对执行命令过程进行性能监控</span>
+<span class="k">if</span> <span class="n">profile_filename</span> <span class="o">=</span> <span class="no">ENV</span><span class="o">[</span><span class="s1">&#39;COCOAPODS_PROFILE&#39;</span><span class="o">]</span>
+  <span class="nb">require</span> <span class="s1">&#39;ruby-prof&#39;</span>
+  <span class="c1"># 依据配置文件类型加载不同的 reporter 解析器</span>
+  <span class="c1"># ...</span>
+  <span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">profile_filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">io</span><span class="o">|</span>
+    <span class="n">reporter</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="no">RubyProf</span><span class="o">.</span><span class="n">profile</span> <span class="p">{</span> <span class="no">Pod</span><span class="o">::</span><span class="no">Command</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="no">ARGV</span><span class="p">)</span> <span class="p">})</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">io</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">else</span>
+  <span class="no">Pod</span><span class="o">::</span><span class="no">Command</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="no">ARGV</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>一起来查看一下 <code>pod</code> 命令的输出结果：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">$ pod
+/Users/edmond/.rvm/gems/ruby-2.6.1/bin/pod:24:in <span class="sb">`</span>load<span class="s1">&#39;
+</span><span class="s1">/Users/edmond/.rvm/gems/ruby-2.6.1/bin/pod:24:in `&lt;main&gt;&#39;</span>
+/Users/edmond/.rvm/gems/ruby-2.6.1/bin/ruby_executable_hooks:24:in <span class="sb">`</span>eval<span class="s1">&#39;
+</span><span class="s1">/Users/edmond/.rvm/gems/ruby-2.6.1/bin/ruby_executable_hooks:24:in `&lt;main&gt;&#39;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>ruby_executable_hooks 通过 <code>bin</code> 目录下的 <code>pod</code> 入口唤醒，再通过 <a href="https://www.infoq.com/articles/eval-options-in-ruby/">eval</a> 的手段调起我们需要的 CocoaPods 工程。这是 RVM 的自身行为，它利用了 <a href="https://github.com/rvm/executable-hooks">executable-hook</a> 来注入 Gems 插件来定制扩展。</p>
+<blockquote>
+<p>PS：大多数动态语言都支持 <code>eval</code> 这一神奇的函数。打  Lisp 开始就支持了，它通过接受一个字符串类型作为参数，将其解析成语句并混合在当前作用域内运行。详细可以参考这篇 <a href="https://ruby-china.org/topics/31465">文章</a>。</p>
+</blockquote>
+<p>在入口的最后部分，通过调用 <code>Pod::Command.run(ARGV)</code>，实例化了一个 <code>CLAide::Command</code> 对象，开始我们的 <strong>CLAide 命令解析阶段</strong>。这里不对 <code>CLAide</code> 这个命令解析工具做过多的分析，这个是后面系列文章的内容。这里我们仅仅需要知道：</p>
+<blockquote>
+<p>每个 CLAide  命令的执行，最终都会对应到具体 Command Class 的 <code>run</code> 方法。</p>
+</blockquote>
+<p>Pod 命令对应的 run 方法实现如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">module</span> <span class="nn">Pod</span>
+  <span class="k">class</span> <span class="nc">Command</span>
+    <span class="k">class</span> <span class="nc">Install</span> <span class="o">&lt;</span> <span class="no">Command</span>
+      <span class="c1"># ... </span>
+      <span class="k">def</span> <span class="nf">run</span>
+        <span class="c1"># 判断是否存在 Podfile 文件，如果存在则进行 Podfile 的初始化</span>
+        <span class="n">verify_podfile_exists!</span>
+        <span class="c1"># 从 Config 中获取一个 Instraller 实例</span>
+        <span class="n">installer</span> <span class="o">=</span> <span class="n">installer_for_config</span>
+        <span class="c1"># 默认是不执行 update</span>
+        <span class="n">installer</span><span class="o">.</span><span class="n">repo_update</span> <span class="o">=</span> <span class="n">repo_update?</span><span class="p">(</span><span class="ss">:default</span> <span class="o">=&gt;</span> <span class="kp">false</span><span class="p">)</span>
+        <span class="n">installer</span><span class="o">.</span><span class="n">update</span> <span class="o">=</span> <span class="kp">false</span>
+        <span class="n">installer</span><span class="o">.</span><span class="n">deployment</span> <span class="o">=</span> <span class="vi">@deployment</span>
+        <span class="c1"># install 的真正过程</span>
+        <span class="n">installer</span><span class="o">.</span><span class="n">install!</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>上述所见的 <code>Command::Install</code> 类对应的命令为 <code>pod install</code>。<code>pod install</code> 过程是依赖于 <code>Podfile</code> 文件的，所以在入口处会做检测，如果不存在 <code>Podfile</code> 则直接抛出 <strong>No &lsquo;Podfile&rsquo; found in the project directory</strong> 的异常 警告并结束命令。</p>
+<h2 id="执行功能主体">执行功能主体</h2>
+<p>在 <code>installer</code> 实例组装完成之后，调用其 <code>install!</code> 方法，这时候才进入了我们 <code>pod install</code> 命令的主体部分，流程如下图：</p>
+<p><img src="http://ww1.sinaimg.cn/large/8157560cly1ghshm3qdsuj20jg0g075y.jpg" alt="01-pod install.png"></p>
+<p>对应的实现如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">install!</span>
+    <span class="n">prepare</span>
+    <span class="n">resolve_dependencies</span>
+    <span class="n">download_dependencies</span>
+    <span class="n">validate_targets</span>
+    <span class="k">if</span> <span class="n">installation_options</span><span class="o">.</span><span class="n">skip_pods_project_generation?</span>
+        <span class="n">show_skip_pods_project_generation_message</span>
+    <span class="k">else</span>
+        <span class="n">integrate</span>
+    <span class="k">end</span>
+    <span class="n">write_lockfiles</span>
+    <span class="n">perform_post_install_actions</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">integrate</span>
+    <span class="n">generate_pods_project</span>
+    <span class="k">if</span> <span class="n">installation_options</span><span class="o">.</span><span class="n">integrate_targets?</span>
+        <span class="n">integrate_user_project</span>
+    <span class="k">else</span>
+        <span class="no">UI</span><span class="o">.</span><span class="n">section</span> <span class="s1">&#39;Skipping User Project Integration&#39;</span>
+    <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="0x1-install-环境准备prepare">0x1 Install 环境准备（prepare）</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">prepare</span>
+  <span class="c1"># 如果检测出当前目录是 Pods，直接 raise 终止</span>
+  <span class="k">if</span> <span class="no">Dir</span><span class="o">.</span><span class="n">pwd</span><span class="o">.</span><span class="n">start_with?</span><span class="p">(</span><span class="n">sandbox</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">to_path</span><span class="p">)</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="s1">&#39;Command should be run from a directory outside Pods directory.&#39;</span>
+    <span class="n">message</span> <span class="o">&lt;&lt;</span> <span class="s2">&#34;</span><span class="se">\n\n\t</span><span class="s2">Current directory is </span><span class="si">#{</span><span class="no">UI</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="no">Pathname</span><span class="o">.</span><span class="n">pwd</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s2">&#34;</span>
+    <span class="k">raise</span> <span class="no">Informative</span><span class="p">,</span> <span class="n">message</span>
+  <span class="k">end</span>
+  <span class="no">UI</span><span class="o">.</span><span class="n">message</span> <span class="s1">&#39;Preparing&#39;</span> <span class="k">do</span>
+    <span class="c1"># 如果 lock 文件的 CocoaPods 主版本和当前版本不同，将以新版本的配置对 xcodeproj 工程文件进行更新</span>
+    <span class="n">deintegrate_if_different_major_version</span>
+    <span class="c1"># 对 sandbox(Pods) 目录建立子目录结构</span>
+    <span class="n">sandbox</span><span class="o">.</span><span class="n">prepare</span>
+    <span class="c1"># 检测 PluginManager 是否有 pre-install 的 plugin</span>
+    <span class="n">ensure_plugins_are_installed!</span>
+    <span class="c1"># 执行插件中 pre-install 的所有 hooks 方法</span>
+    <span class="n">run_plugins_pre_install_hooks</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>在 <code>prepare</code> 阶段会将 <code>pod install</code> 的环境准备完成，包括<strong>版本一致性</strong>、<strong>目录结构</strong>以及将 <em>pre-install</em> 的装载插件脚本全部取出，并执行对应的 <code>pre_install</code> hook。</p>
+<h3 id="0x2-解决依赖冲突resolve_dependencies">0x2 解决依赖冲突（resolve_dependencies）</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">resolve_dependencies</span>
+    <span class="c1"># 获取 Sources</span>
+    <span class="n">plugin_sources</span> <span class="o">=</span> <span class="n">run_source_provider_hooks</span>
+    <span class="c1"># 创建一个 Analyzer</span>
+    <span class="n">analyzer</span> <span class="o">=</span> <span class="n">create_analyzer</span><span class="p">(</span><span class="n">plugin_sources</span><span class="p">)</span>
+
+    <span class="c1"># 如果带有 repo_update **标记**</span>
+    <span class="no">UI</span><span class="o">.</span><span class="n">section</span> <span class="s1">&#39;Updating local specs repositories&#39;</span> <span class="k">do</span>
+        <span class="c1"># 执行 Analyzer 的更新 Repo 操作</span>
+        <span class="n">analyzer</span><span class="o">.</span><span class="n">update_repositories</span>
+    <span class="k">end</span> <span class="k">if</span> <span class="n">repo_update?</span>
+
+    <span class="no">UI</span><span class="o">.</span><span class="n">section</span> <span class="s1">&#39;Analyzing dependencies&#39;</span> <span class="k">do</span>
+        <span class="c1"># 从 analyzer 取出最新的分析结果，@analysis_result，@aggregate_targets，@pod_targets</span>
+        <span class="n">analyze</span><span class="p">(</span><span class="n">analyzer</span><span class="p">)</span>
+        <span class="c1"># 拼写错误降级识别，白名单过滤</span>
+        <span class="n">validate_build_configurations</span>
+    <span class="k">end</span>
+
+    <span class="c1"># 如果 deployment? 为 true，会验证 podfile &amp; lockfile 是否需要更新</span>
+    <span class="no">UI</span><span class="o">.</span><span class="n">section</span> <span class="s1">&#39;Verifying no changes&#39;</span> <span class="k">do</span>
+        <span class="n">verify_no_podfile_changes!</span>
+        <span class="n">verify_no_lockfile_changes!</span>
+    <span class="k">end</span> <span class="k">if</span> <span class="n">deployment?</span>
+ 
+    <span class="n">analyzer</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>依赖解析过程就是通过 <code>Podfile</code>、<code>Podfile.lock</code> 以及沙盒中的 <code>manifest</code> 生成 <em>Analyzer</em> 对象。<em>Analyzer</em> 内部会使用 <em>Molinillo</em> （具体的是 <code>Molinillo::DependencyGraph</code> 图算法）解析得到一张依赖关系表。</p>
+<blockquote>
+<p>PS：通过 <em>Analyzer</em> 能获取到很多依赖信息，例如 <em>Podfile</em> 文件的依赖分析结果，也可以从 specs_by_target 来查看各个 <em>target</em> 相关的 specs。</p>
+</blockquote>
+<p>另外，需要注意的是 analyze 的过程中有一个 <em>pre_download</em> 的阶段，即在 <em>&ndash;verbose</em> 下看到的 <strong>Fetching external sources</strong> 过程。这个 <em>pre_download</em> 阶段<strong>不属于依赖下载</strong>过程，而是在当前的<strong>依赖分析</strong>阶段。</p>
+<blockquote>
+<p>PS：该过程主要是解决当我们在通过 Git 地址引入的 Pod 仓库的情况下，系统无法从默认的 Source 拿到对应的 Spec，需要直接访问我们的 Git 地址下载仓库的 zip 包，并取出对应的 <code>podspec</code> 文件，从而进行对比分析。</p>
+</blockquote>
+<h3 id="0x3-下载依赖文件download_dependencies">0x3 下载依赖文件（download_dependencies）</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">download_dependencies</span>
+  <span class="no">UI</span><span class="o">.</span><span class="n">section</span> <span class="s1">&#39;Downloading dependencies&#39;</span> <span class="k">do</span>
+    <span class="c1"># 初始化 sandbox 文件访问器</span>
+    <span class="n">create_file_accessors</span>
+    <span class="c1"># 构造 Pod Source Installer</span>
+    <span class="n">install_pod_sources</span>
+    <span class="c1"># 执行 podfile 定义的 pre install 的 hooks</span>
+    <span class="n">run_podfile_pre_install_hooks</span>
+    <span class="c1"># 根据配置清理 pod sources 信息，主要是清理无用 platform 相关内容</span>
+    <span class="n">clean_pod_sources</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>在 <code>create_file_accessors</code> 中会创建沙盒目录的文件访问器，通过构造 <code>FileAccessor</code> 实例来解析沙盒中的各种文件。接着是最重要的 <code>install_pod_sources</code> 过程，它会调用对应 Pod 的 <code>install!</code> 方法进行资源下载。</p>
+<p>先来看看 <code>install_pod_sources</code> 方法的实现：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">install_pod_sources</span>
+ <span class="vi">@installed_specs</span> <span class="o">=</span> <span class="o">[]</span>
+ <span class="c1"># install 的 Pod 只需要这两种状态，added 和 changed 状态的并集</span>
+ <span class="n">pods_to_install</span> <span class="o">=</span> <span class="n">sandbox_state</span><span class="o">.</span><span class="n">added</span> <span class="o">|</span> <span class="n">sandbox_state</span><span class="o">.</span><span class="n">changed</span>
+ <span class="n">title_options</span> <span class="o">=</span> <span class="p">{</span> <span class="ss">:verbose_prefix</span> <span class="o">=&gt;</span> <span class="s1">&#39;-&gt; &#39;</span><span class="o">.</span><span class="n">green</span> <span class="p">}</span>
+ <span class="nb">puts</span> <span class="s2">&#34;root_specs&#34;</span>
+ <span class="n">root_specs</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">item</span><span class="o">|</span>
+   <span class="nb">puts</span> <span class="n">item</span>
+ <span class="k">end</span>
+ <span class="c1"># 将 Podfile 解析后排序处理</span>
+ <span class="n">root_specs</span><span class="o">.</span><span class="n">sort_by</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:name</span><span class="p">)</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">spec</span><span class="o">|</span>
+   <span class="c1"># 如果是 added 或 changed 状态的 Pod</span>
+   <span class="k">if</span> <span class="n">pods_to_install</span><span class="o">.</span><span class="n">include?</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+     <span class="c1"># 如果是 changed 状态并且 manifest 已经有记录</span>
+     <span class="k">if</span> <span class="n">sandbox_state</span><span class="o">.</span><span class="n">changed</span><span class="o">.</span><span class="n">include?</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">sandbox</span><span class="o">.</span><span class="n">manifest</span>
+       <span class="c1"># 版本更新</span>
+       <span class="n">current_version</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">version</span>
+       <span class="c1"># 被更新版本记录</span>
+       <span class="n">previous_version</span> <span class="o">=</span> <span class="n">sandbox</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+       <span class="c1"># 变动记录</span>
+       <span class="n">has_changed_version</span> <span class="o">=</span> <span class="n">current_version</span> <span class="o">!=</span> <span class="n">previous_version</span>
+       <span class="c1"># 找到第一个包含 spec.name 的 Pod，获取对应的 Repo，其实就是 find 方法</span>
+       <span class="n">current_repo</span> <span class="o">=</span> <span class="n">analysis_result</span><span class="o">.</span><span class="n">specs_by_source</span><span class="o">.</span><span class="n">detect</span> <span class="p">{</span> <span class="o">|</span><span class="n">key</span><span class="p">,</span> <span class="n">values</span><span class="o">|</span> <span class="k">break</span> <span class="n">key</span> <span class="k">if</span> <span class="n">values</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:name</span><span class="p">)</span><span class="o">.</span><span class="n">include?</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="p">}</span>
+       <span class="c1"># 获取当前仓库</span>
+       <span class="n">current_repo</span> <span class="o">&amp;&amp;=</span> <span class="n">current_repo</span><span class="o">.</span><span class="n">url</span> <span class="o">||</span> <span class="n">current_repo</span><span class="o">.</span><span class="n">name</span>
+       <span class="c1"># 获取之前该仓库的信息</span>
+       <span class="n">previous_spec_repo</span> <span class="o">=</span> <span class="n">sandbox</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">spec_repo</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+       <span class="c1"># 是否仓库有变动</span>
+       <span class="n">has_changed_repo</span> <span class="o">=</span> <span class="o">!</span><span class="n">previous_spec_repo</span><span class="o">.</span><span class="n">nil?</span> <span class="o">&amp;&amp;</span> <span class="n">current_repo</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">current_repo</span> <span class="o">!=</span> <span class="n">previous_spec_repo</span><span class="p">)</span>
+
+       <span class="c1"># 通过 title 输出上面的详细变更信息</span>
+       <span class="n">title</span> <span class="o">=</span> <span class="o">...</span>
+     <span class="k">else</span>
+       <span class="c1"># 非 changed 状态，展示 Installing 这个是经常见的 log</span>
+       <span class="n">title</span> <span class="o">=</span> <span class="s2">&#34;Installing </span><span class="si">#{</span><span class="n">spec</span><span class="si">}</span><span class="s2">&#34;</span>
+     <span class="k">end</span>
+     <span class="no">UI</span><span class="o">.</span><span class="n">titled_section</span><span class="p">(</span><span class="n">title</span><span class="o">.</span><span class="n">green</span><span class="p">,</span> <span class="n">title_options</span><span class="p">)</span> <span class="k">do</span>
+       <span class="c1"># 通过 name 拿到对应的 installer，记录到 @pod_installers 中</span>
+       <span class="n">install_source_of_pod</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+     <span class="k">end</span>
+   <span class="k">else</span>
+     <span class="c1"># 如果没有 changed 情况，直接展示 Using，也是经常见到的 log</span>
+     <span class="no">UI</span><span class="o">.</span><span class="n">titled_section</span><span class="p">(</span><span class="s2">&#34;Using </span><span class="si">#{</span><span class="n">spec</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">,</span> <span class="n">title_options</span><span class="p">)</span> <span class="k">do</span>
+       <span class="c1"># # 通过 sandbox, specs 的 platform 信息生成 Installer 实例，记录到 @pod_installers 中</span>
+       <span class="n">create_pod_installer</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+     <span class="k">end</span>
+   <span class="k">end</span>
+ <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="c1"># 通过缓存返回 PodSourceInstaller 实例</span>
+<span class="k">def</span> <span class="nf">create_pod_installer</span><span class="p">(</span><span class="n">pod_name</span><span class="p">)</span>
+    <span class="n">specs_by_platform</span> <span class="o">=</span> <span class="n">specs_for_pod</span><span class="p">(</span><span class="n">pod_name</span><span class="p">)</span>
+ 
+    <span class="c1"># 当通过 pod_name 无法找到对应的 pod_target 或 platform 配置，主动抛出错误信息</span>
+    <span class="k">if</span> <span class="n">specs_by_platform</span><span class="o">.</span><span class="n">empty?</span>
+        <span class="n">requiring_targets</span> <span class="o">=</span> <span class="n">pod_targets</span><span class="o">.</span><span class="n">select</span> <span class="p">{</span> <span class="o">|</span><span class="n">pt</span><span class="o">|</span> <span class="n">pt</span><span class="o">.</span><span class="n">recursive_dependent_targets</span><span class="o">.</span><span class="n">any?</span> <span class="p">{</span> <span class="o">|</span><span class="n">dt</span><span class="o">|</span> <span class="n">dt</span><span class="o">.</span><span class="n">pod_name</span> <span class="o">==</span> <span class="n">pod_name</span> <span class="p">}</span> <span class="p">}</span>
+        <span class="c1"># message = &#34;...&#34;</span>
+        <span class="k">raise</span> <span class="no">StandardError</span><span class="p">,</span> <span class="n">message</span>
+    <span class="k">end</span>
+    <span class="c1"># 通过 sandbox, specs 的 platform 信息生成 Installer 实例</span>
+    <span class="n">pod_installer</span> <span class="o">=</span> <span class="no">PodSourceInstaller</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">sandbox</span><span class="p">,</span> <span class="n">podfile</span><span class="p">,</span> <span class="n">specs_by_platform</span><span class="p">,</span> <span class="ss">:can_cache</span> <span class="o">=&gt;</span> <span class="n">installation_options</span><span class="o">.</span><span class="n">clean?</span><span class="p">)</span>
+    <span class="n">pod_installers</span> <span class="o">&lt;&lt;</span> <span class="n">pod_installer</span>
+    <span class="n">pod_installer</span>
+<span class="k">end</span>
+
+<span class="c1"># 如果 resolver 声明一个 Pod 已经安装或者已经存在，将会将其删除并重新安装。如果不存在则直接安装。</span>
+<span class="k">def</span> <span class="nf">install_source_of_pod</span><span class="p">(</span><span class="n">pod_name</span><span class="p">)</span>
+  <span class="n">pod_installer</span> <span class="o">=</span> <span class="n">create_pod_installer</span><span class="p">(</span><span class="n">pod_name</span><span class="p">)</span>
+  <span class="n">pod_installer</span><span class="o">.</span><span class="n">install!</span>
+  <span class="vi">@installed_specs</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">pod_installer</span><span class="o">.</span><span class="n">specs_by_platform</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">flatten</span><span class="o">.</span><span class="n">uniq</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>在方法的开始，<code>root_specs</code> 方法是通过 <code>analysis_result</code> 拿出所有根 spec</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">root_specs</span>
+  <span class="n">analysis_result</span><span class="o">.</span><span class="n">specifications</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:root</span><span class="p">)</span><span class="o">.</span><span class="n">uniq</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>下面再来看看 <code>pod_installer</code> 中的 <code>install!</code> 方法，主要是通过调用 <code>cocoapods-downloader</code> 组件，将 Pod 对应的 Source 下载到本地。实现如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">install!</span>
+    <span class="n">download_source</span> <span class="k">unless</span> <span class="n">predownloaded?</span> <span class="o">||</span> <span class="n">local?</span>
+    <span class="no">PodSourcePreparer</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">root_spec</span><span class="p">,</span> <span class="n">root</span><span class="p">)</span><span class="o">.</span><span class="n">prepare!</span> <span class="k">if</span> <span class="n">local?</span>
+    <span class="n">sandbox</span><span class="o">.</span><span class="n">remove_local_podspec</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span> <span class="k">unless</span> <span class="n">predownloaded?</span> <span class="o">||</span> <span class="n">local?</span> <span class="o">||</span> <span class="n">external?</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="0x4-验证-targets-validate_targets">0x4 验证 targets (validate_targets)</h3>
+<p>用来验证之前流程中的产物 (pod 所生成的 Targets) 的合法性。主要作用就是构造 <code>TargetValidator</code>，并执行 <code>validate!</code> 方法：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">validate_targets</span>
+    <span class="n">validator</span> <span class="o">=</span> <span class="no">Xcode</span><span class="o">::</span><span class="no">TargetValidator</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">aggregate_targets</span><span class="p">,</span> <span class="n">pod_targets</span><span class="p">,</span> <span class="n">installation_options</span><span class="p">)</span>
+    <span class="n">validator</span><span class="o">.</span><span class="n">validate!</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">validate!</span>
+    <span class="n">verify_no_duplicate_framework_and_library_names</span>
+    <span class="n">verify_no_static_framework_transitive_dependencies</span>
+    <span class="n">verify_swift_pods_swift_version</span>
+    <span class="n">verify_swift_pods_have_module_dependencies</span>
+    <span class="n">verify_no_multiple_project_names</span> <span class="k">if</span> <span class="n">installation_options</span><span class="o">.</span><span class="n">generate_multiple_pod_projects?</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>验证环节在整个 Install 过程中仅占很小的一部分。因为只是验证部分，是完全解耦的。</p>
+<ol>
+<li><strong>verify_no_duplicate_framework_and_library_names</strong>
+验证是否有重名的 <code>framework</code>，如果有冲突会直接抛出 <code>frameworks with conflicting names</code> 异常。</li>
+<li><strong>verify_no_static_framework_transitive_dependencies</strong>
+验证动态库中是否有静态链接库 (<code>.a</code> 或者 <code>.framework</code>) 依赖，如果存在则会触发 <code>transitive dependencies that include static binaries...</code> 错误。假设存在以下场景：
+<ol>
+<li>组件 A 和组件 B 同时依赖了组件 C，C 为静态库，如 <code>Weibo_SDK</code></li>
+<li>组件 A 依赖组件 B，而组件 B 的 <code>.podspec</code> 文件中存在以下设置时，组件 B 将被判定为存在静态库依赖：
+<ol>
+<li>podspec 设置了 <code>s.static_framework = true</code></li>
+<li>podspec 以 <code>s.dependency 'xxx_SDK</code> 依赖了静态库 <code>xxx_SDK</code></li>
+<li>podspec 以 <code>s.vendored_libraries = 'libxxx.a'</code> 方式内嵌了静态库 <code>libxxx</code></li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<blockquote>
+<p>此时如果项目的 <code>Podfile</code> 设置了 <code>use_framework!</code> 以动态链接方式打包的时，则会触发该错误。
+<strong>问题原因</strong>
+Podfile 中不使用 <code>use_frameworks!</code> 时，每个 pod 是会生成相应的 .a（静态链接库）文件，然后通过 static libraries 来管理 pod 代码，在 Linked 时会包含该 pod 引用的其他的 pod 的 .a 文件。
+Podfile 中使用 <code>use_frameworks!</code> 时是会生成相应的 .framework 文件，然后通过 dynamic frameworks 的方式来管理 pod 代码，在 Linked 时会包含该 pod 引用的其他的 pod 的 .framework 文件。
+上述场景中虽然以 framework 的方式引用了 B 组件，然而 B 组件实际上是一个静态库，需要拷贝并链接到该 pod 中，然而 dynamic frameworks 方式并不会这么做，所以就报错了。
+<strong>解决方案</strong></p>
+<ol>
+<li>修改 pod 库中 <code>podspec</code>，增加 <code>pod_target_xcconfig</code>，定义好 <code>FRAMEWORK_SEARCH_PATHS</code> 和 <code>OTHER_LDFLAGS</code> 两个环境变量；</li>
+<li>hook <code>verify_no_static_framework_transitive_dependencies</code> 的方法，将其干掉！<a href="https://github.com/CocoaPods/CocoaPods/issues/3289">对应 issue</a></li>
+<li>修改 pod 库中 <code>podspec</code>，开启 static_framework 配置 <code>s.static_framework = true</code></li>
+</ol>
+</blockquote>
+<ol start="3">
+<li><strong>verify_swift_pods_swift_version</strong>
+确保 Swift Pod 的 Swift 版本正确配置且互相兼容的。</li>
+<li><strong>verify_swift_pods_have_module_dependencies</strong>
+检测 Swift 库的依赖库是否支持了 module，这里的 module 主要是针对 Objective-C 库而言。
+首先，Swift 是天然支持 module 系统来管理代码的，Swift Module 是构建在 <a href="http://clang.llvm.org/docs/Modules.html">LLVM Module</a> 之上的模块系统。Swift 库在解析后会生成对应的 <code>modulemap</code> 和 <code>umbrella.h</code> 文件，这是 LLVM Module 的标配，同样 Objective-C 也是支持 LLVM Module。<strong>当我们以 Dynamic Framework 的方式引入 Objective-C 库时，Xcode 支持配置并生成 header，而静态库 .a 需要自己编写对应的 <code>umbrella.h</code> 和 <code>modulemap</code></strong>。
+其次，如果你的 Swift Pod 依赖了 Objective-C 库，又希望以静态链接的方式来打包 Swift Pod 时，就需要保证 Objective-C 库启用了 <code>modular_headers</code>，这样 CocoaPods 会为我们生成对应 <code>modulemap</code> 和 <code>umbrella.h</code> 来支持 LLVM Module。你可以从这个地址 - <a href="http://blog.cocoapods.org/CocoaPods-1.5.0/">http://blog.cocoapods.org/CocoaPods-1.5.0/</a> 查看到更多细节。</li>
+<li><strong>verify_no_pods_used_with_multiple_swift_versions</strong>
+检测是否所有的 <em>Pod Target</em> 中版本一致性问题。</li>
+</ol>
+<p>用一个流程图来概括这一验证环节：
+<img src="http://ww1.sinaimg.cn/large/8157560cly1ghtpxodnpuj21j91ez0vg.jpg" alt="validate targets"></p>
+<h3 id="0x5-生成工程-integrate">0x5 生成工程 (Integrate)</h3>
+<p>工程文件的生成是 <code>pod install</code> 的最后一步，他会将之前版本仲裁后的所有组件通过 Project 文件的形式组织起来，并且会对 Project 中做一些用户指定的配置。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">integrate</span>
+    <span class="n">generate_pods_project</span>
+    <span class="k">if</span> <span class="n">installation_options</span><span class="o">.</span><span class="n">integrate_targets?</span>
+        <span class="c1"># 集成用户配置，读取依赖项，使用 xcconfig 来配置</span>
+        <span class="n">integrate_user_project</span>
+    <span class="k">else</span>
+        <span class="no">UI</span><span class="o">.</span><span class="n">section</span> <span class="s1">&#39;Skipping User Project Integration&#39;</span>
+    <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">generate_pods_project</span>
+    <span class="c1"># 创建 stage sanbox 用于保存安装前的沙盒状态，以支持增量编译的对比</span>
+    <span class="n">stage_sandbox</span><span class="p">(</span><span class="n">sandbox</span><span class="p">,</span> <span class="n">pod_targets</span><span class="p">)</span>
+    <span class="c1"># 检查是否支持增量编译，如果支持将返回 cache result</span>
+    <span class="n">cache_analysis_result</span> <span class="o">=</span> <span class="n">analyze_project_cache</span>
+    <span class="c1"># 需要重新生成的 target</span>
+    <span class="n">pod_targets_to_generate</span> <span class="o">=</span> <span class="n">cache_analysis_result</span><span class="o">.</span><span class="n">pod_targets_to_generate</span>
+    <span class="c1"># 需要重新生成的 aggregate target</span>
+    <span class="n">aggregate_targets_to_generate</span> <span class="o">=</span> <span class="n">cache_analysis_result</span><span class="o">.</span><span class="n">aggregate_targets_to_generate</span>
+
+    <span class="c1"># 清理需要重新生成 target 的 header 和 pod folders</span>
+    <span class="n">clean_sandbox</span><span class="p">(</span><span class="n">pod_targets_to_generate</span><span class="p">)</span>
+    <span class="c1"># 生成 Pod Project，组装 sandbox 中所有 Pod 的 path、build setting、源文件引用、静态库文件、资源文件等</span>
+    <span class="n">create_and_save_projects</span><span class="p">(</span><span class="n">pod_targets_to_generate</span><span class="p">,</span> <span class="n">aggregate_targets_to_generate</span><span class="p">,</span>
+                                <span class="n">cache_analysis_result</span><span class="o">.</span><span class="n">build_configurations</span><span class="p">,</span> <span class="n">cache_analysis_result</span><span class="o">.</span><span class="n">project_object_version</span><span class="p">)</span>
+
+    <span class="c1"># SandboxDirCleaner 用于清理增量 pod 安装中的无用 headers、target support files 目录</span>
+    <span class="no">SandboxDirCleaner</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">sandbox</span><span class="p">,</span> <span class="n">pod_targets</span><span class="p">,</span> <span class="n">aggregate_targets</span><span class="p">)</span><span class="o">.</span><span class="n">clean!</span>
+    <span class="c1"># 更新安装后的 cache 结果到目录 `Pods/.project_cache` 下</span>
+    <span class="n">update_project_cache</span><span class="p">(</span><span class="n">cache_analysis_result</span><span class="p">,</span> <span class="n">target_installation_results</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>在 <code>install</code> 过程中，除去依赖仲裁部分和下载部分的时间消耗，在工程文件生成也会有相对较大的时间开销。这里往往也是速度优化核心位置。</p>
+<h3 id="0x6-写入依赖-write_lockfiles">0x6 写入依赖 (write_lockfiles)</h3>
+<p>将依赖更新写入 <code>Podfile.lock</code> 和 <code>Manifest.lock</code></p>
+<h3 id="0x7-结束回调perform_post_install_action">0x7 结束回调（perform_post_install_action）</h3>
+<p>最后一步收尾工作，为所有插件提供 post-installation 操作以及 hook。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">perform_post_install_actions</span>
+    <span class="c1"># 调用 HooksManager 执行每个插件的 post_install 方法 </span>
+    <span class="n">run_plugins_post_install_hooks</span>
+    <span class="c1"># 打印过期 pod target 警告</span>
+    <span class="n">warn_for_deprecations</span>
+    <span class="c1"># 如果 pod 配置了 script phases 脚本，会主动输出一条提示消息</span>
+    <span class="n">warn_for_installed_script_phases</span>
+    <span class="c1"># 输出结束信息 `Pod installation complete!`</span>
+    <span class="n">print_post_install_message</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>核心组件在 <code>pod install</code> 各阶段的作用如下：</p>
+<p><img src="http://ww1.sinaimg.cn/large/8157560cly1ghshm3qinpj20h80ir40e.jpg" alt="02-pod install integrate"></p>
+<h1 id="总结">总结</h1>
+<p>当我们知道 CocoaPods 在 install 的大致过程后，我们可以对其做一些修改和控制。例如知道了插件的 <code>pre_install</code> 和 <code>post_install</code> 的具体时机，我们就可以在 <code>Podfile</code> 中执行对应的 Ruby 脚本，达到我们的预期。同时了解 install 过程也有助于我们进行每个阶段的性能分析，以优化和提高 Install 效率。</p>
+<p>后续，将学习 CocoaPods 中每一个组件的实现，将所有的问题在代码中找到答案。</p>
+<h1 id="知识点问题梳理">知识点问题梳理</h1>
+<p>这里罗列了四个问题用来考察你是否已经掌握了这篇文章，如果没有建议你加入<strong>收藏</strong>再次阅读：</p>
+<ol>
+<li>简单概述 CocoaPods 的核心模块？</li>
+<li><code>pod</code> 命令是如何找到并启动 CocoaPods 程序的？</li>
+<li>简述 pod install 流程？</li>
+<li><code>resolve_dependencies</code> 阶段中的 <code>pre_download</code> 是为了解决什么问题？</li>
+<li><code>validate_targets</code> 都做了哪些校验工作？</li>
+</ol>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">土土Edmond木</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2020-08-17
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/cocoapods/">CocoaPods</a>
+          <a href="/tags/ios/">iOS</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/sourcecode-cocoapods/03-cocoapods-claide/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">3. CocoaPods 命令解析 - CLAide</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/swiftui/wwdc20-session-10033/">
+            <span class="next-text nav-default">WWDC20 - Build SwiftUI views for widgets</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+    <script src="https://utteranc.es/client.js"
+            repo="looseyi/looseyi.github.io"
+            issue-term="pathname"
+            theme="github-light"
+            crossorigin="anonymous"
+            async>
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/utterance">comments powered by utterances.</a></noscript>
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:chun574271939@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://twitter.com/looseyi" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="https://github.com/looseyi" class="iconfont icon-github" title="github"></a>
+      <a href="https://www.weibo.com/foreverclp" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="https://www.zhihu.com/people/tu-tu-edmondmu" class="iconfont icon-zhihu" title="zhihu"></a>
+  <a href="http://looseyi.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2019-12-11 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">土土Edmond木</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-62789092-1', 'auto');
+	ga('set', 'anonymizeIp', true);
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>

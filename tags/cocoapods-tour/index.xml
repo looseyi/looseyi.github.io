@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>CocoaPods Tour on </title>
+    <link>http://looseyi.github.io/tags/cocoapods-tour/</link>
+    <description>Recent content in CocoaPods Tour on </description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Wed, 10 Jun 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://looseyi.github.io/tags/cocoapods-tour/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>1. 版本管理工具及 Ruby 工具链环境</title>
+      <link>http://looseyi.github.io/post/sourcecode-cocoapods/01-cocoapods-toolchains/</link>
+      <pubDate>Wed, 10 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/post/sourcecode-cocoapods/01-cocoapods-toolchains/</guid>
+      <description>1. 版本管理工具及 Ruby 工具链环境 CocoaPods 历险记这个专题是 Edmond 和冬瓜 是对于 iOS / macOS 工程中版本管理工具 CocoaPods 的实现细节、原理、源码、实践与经验的分享记录，旨在帮助</description>
+    </item>
+    
+  </channel>
+</rss>

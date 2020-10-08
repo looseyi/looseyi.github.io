@@ -3,55 +3,230 @@
   
   <url>
     <loc>http://looseyi.github.io/</loc>
-    <lastmod>2020-05-16T00:00:00+08:00</lastmod>
+    <lastmod>2020-09-17T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/post/sourcecode-cocoapods/04-cocoapods-podfile/</loc>
+    <lastmod>2020-09-17T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>http://looseyi.github.io/categories/</loc>
-    <lastmod>2020-05-16T00:00:00+08:00</lastmod>
+    <lastmod>2020-09-17T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>http://looseyi.github.io/tags/ios/</loc>
-    <lastmod>2020-05-16T00:00:00+08:00</lastmod>
+    <loc>http://looseyi.github.io/tags/cocoapods/</loc>
+    <lastmod>2020-09-17T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/categories/cocoapods/</loc>
+    <lastmod>2020-09-17T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>http://looseyi.github.io/categories/ios/</loc>
-    <lastmod>2020-05-16T00:00:00+08:00</lastmod>
+    <lastmod>2020-09-17T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>http://looseyi.github.io/tags/logger/</loc>
-    <lastmod>2020-05-16T00:00:00+08:00</lastmod>
+    <loc>http://looseyi.github.io/tags/ios/</loc>
+    <lastmod>2020-09-17T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>http://looseyi.github.io/post/</loc>
-    <lastmod>2020-05-16T00:00:00+08:00</lastmod>
+    <lastmod>2020-09-17T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>http://looseyi.github.io/tags/source-code/</loc>
-    <lastmod>2020-05-16T00:00:00+08:00</lastmod>
+    <loc>http://looseyi.github.io/tags/ruby/</loc>
+    <lastmod>2020-09-17T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>http://looseyi.github.io/tags/</loc>
+    <lastmod>2020-09-17T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/post/sourcecode-cocoapods/03-cocoapods-claide/</loc>
+    <lastmod>2020-09-02T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/post/sourcecode-cocoapods/02-cocoapods-corecomponents/</loc>
+    <lastmod>2020-08-17T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/tags/swiftui/</loc>
+    <lastmod>2020-06-27T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/categories/swiftui/</loc>
+    <lastmod>2020-06-27T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/categories/wwdc/</loc>
+    <lastmod>2020-06-27T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/post/swiftui/wwdc20-session-10033/</loc>
+    <lastmod>2020-06-27T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/tags/wwdc20/</loc>
+    <lastmod>2020-06-27T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/post/swiftui/wwdc20-session-10041/</loc>
+    <lastmod>2020-06-26T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/post/tool/cocoa-documentation-2/</loc>
+    <lastmod>2020-06-18T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/tags/document/</loc>
+    <lastmod>2020-06-18T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/tags/gitpage/</loc>
+    <lastmod>2020-06-18T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/tags/jazzy/</loc>
+    <lastmod>2020-06-18T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/tags/sourcekit/</loc>
+    <lastmod>2020-06-18T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/categories/tool/</loc>
+    <lastmod>2020-06-18T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/tags/gcd/</loc>
+    <lastmod>2020-06-16T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/post/notes/01-gcd/</loc>
+    <lastmod>2020-06-16T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/post/tool/cocoa-documentation-1/</loc>
+    <lastmod>2020-06-14T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/post/sourcecode-cocoapods/01-cocoapods-toolchains/</loc>
+    <lastmod>2020-06-10T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/tags/cocoapods-tour/</loc>
+    <lastmod>2020-06-10T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/tags/cache/</loc>
+    <lastmod>2020-05-21T00:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/tags/source-code/</loc>
+    <lastmod>2020-05-21T00:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/post/sourcecode-ios/source-code-mmkv/</loc>
+    <lastmod>2020-05-21T00:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/tags/logger/</loc>
     <lastmod>2020-05-16T00:00:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -67,20 +242,6 @@
   <url>
     <loc>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-2/</loc>
     <lastmod>2020-05-08T23:20:00+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>http://looseyi.github.io/tags/cache/</loc>
-    <lastmod>2020-05-05T23:23:47+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>http://looseyi.github.io/post/sourcecode-ios/source-code-mmkv/</loc>
-    <lastmod>2020-05-05T23:23:47+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -109,20 +270,6 @@
   <url>
     <loc>http://looseyi.github.io/post/sourcecode-ios/source-code-sdweb-en1/</loc>
     <lastmod>2020-04-12T23:08:12+17:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>http://looseyi.github.io/categories/cocoapods/</loc>
-    <lastmod>2020-03-29T15:10:58+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>http://looseyi.github.io/tags/cocoapods/</loc>
-    <lastmod>2020-03-29T15:10:58+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>

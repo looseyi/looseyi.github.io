@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>3. CocoaPods 命令解析 - CLAide - </title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="土土Edmond木" /><meta name="description" content="本文知识目录 引子 在上文 整体把握 CocoaPods 核心组件 中，我们通过对 pod install 的流程的介绍，引出 CocoaPods 的各个核心组件的角色分工和其主要作用，希望通过对这些组件的使用" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.71.1 with theme even" />
+
+
+<link rel="canonical" href="http://looseyi.github.io/post/sourcecode-cocoapods/03-cocoapods-claide/" />
+  <link href="http://looseyi.github.io/post/sourcecode-cocoapods/03-cocoapods-claide/index.xml" rel="alternate" type="application/rss+xml" title="" />
+  <link href="http://looseyi.github.io/post/sourcecode-cocoapods/03-cocoapods-claide/index.xml" rel="feed" type="application/rss+xml" title="" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="3. CocoaPods 命令解析 - CLAide" />
+<meta property="og:description" content="本文知识目录 引子 在上文 整体把握 CocoaPods 核心组件 中，我们通过对 pod install 的流程的介绍，引出 CocoaPods 的各个核心组件的角色分工和其主要作用，希望通过对这些组件的使用" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://looseyi.github.io/post/sourcecode-cocoapods/03-cocoapods-claide/" />
+<meta property="article:published_time" content="2020-09-02T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-09-02T00:00:00+00:00" />
+<meta itemprop="name" content="3. CocoaPods 命令解析 - CLAide">
+<meta itemprop="description" content="本文知识目录 引子 在上文 整体把握 CocoaPods 核心组件 中，我们通过对 pod install 的流程的介绍，引出 CocoaPods 的各个核心组件的角色分工和其主要作用，希望通过对这些组件的使用">
+<meta itemprop="datePublished" content="2020-09-02T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2020-09-02T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="6150">
+
+
+
+<meta itemprop="keywords" content="CocoaPods,iOS,Ruby," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="3. CocoaPods 命令解析 - CLAide"/>
+<meta name="twitter:description" content="本文知识目录 引子 在上文 整体把握 CocoaPods 核心组件 中，我们通过对 pod install 的流程的介绍，引出 CocoaPods 的各个核心组件的角色分工和其主要作用，希望通过对这些组件的使用"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Aha Moment</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Aha Moment</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">3. CocoaPods 命令解析 - CLAide</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-09-02 </span>
+        <div class="post-category">
+            <a href="/categories/ios/"> iOS </a>
+            <a href="/categories/cocoapods/"> CocoaPods </a>
+            </div>
+          <span class="more-meta"> 约 6150 字 </span>
+          <span class="more-meta"> 预计阅读 13 分钟 </span>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#claide-功能概览">CLAide 功能概览</a></li>
+    <li><a href="#calide-的目录结构">CALide 的目录结构</a></li>
+    <li><a href="#command-抽象类">Command 抽象类</a>
+      <ul>
+        <li><a href="#abstract-command">Abstract Command</a></li>
+        <li><a href="#normal-command">Normal Command</a></li>
+        <li><a href="#run-方法">Run 方法</a></li>
+        <li><a href="#argv-传入参数">ARGV 传入参数</a></li>
+      </ul>
+    </li>
+    <li><a href="#banner-与输出格式化">Banner 与输出格式化</a></li>
+    <li><a href="#pluginmanager-载入插件">PluginManager 载入插件</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#配置模版项目">配置模版项目</a>
+      <ul>
+        <li><a href="#0x1-生成模版项目">0x1 生成模版项目</a></li>
+        <li><a href="#0x2-修改-gemspec-配置">0x2 修改 gemspec 配置</a></li>
+        <li><a href="#0x3-添加命令行入口">0x3 添加命令行入口</a></li>
+      </ul>
+    </li>
+    <li><a href="#添加命令实现">添加命令实现</a>
+      <ul>
+        <li><a href="#beveragemaker">BeverageMaker</a></li>
+        <li><a href="#coffee">Coffee</a></li>
+        <li><a href="#tea">Tea</a></li>
+      </ul>
+    </li>
+    <li><a href="#安装--贩卖机">安装 🥤 贩卖机</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p><img src="http://ww1.sinaimg.cn/large/8157560cly1gich80dfnaj22300vx7wh.jpg" alt="Artboard.png"></p>
+<h1 id="本文知识目录">本文知识目录</h1>
+<p><img src="http://cdn.nlark.com/yuque/0/2020/jpeg/98641/1598855030358-748b6d6f-cd7a-4f44-9d59-959030b4b74d.jpeg?x-oss-process=image%2Fresize%2Cw_746" alt=""></p>
+<h1 id="引子">引子</h1>
+<p>在上文 <a href="https://juejin.im/post/6861792671489327111">整体把握 CocoaPods 核心组件</a> 中，我们通过对 <code>pod install</code> 的流程的介绍，引出 CocoaPods 的各个核心组件的角色分工和其主要作用，希望通过对这些组件的使用和介绍来帮助大家更好的了解 CocoaPods 的完整工作流以及背后的原理。
+今天我们主要聊一聊为 CocoaPods 提供的命令行解析的工具 <code>CLAide</code>，它是如何来解析 pod 命令以及 CocoaPods 的插件机制。</p>
+<h1 id="open-class">Open Class</h1>
+<p>开始之前，我们需要了解一个 Ruby 的语言特性：<a href="http://rubylearning.com/satishtalim/ruby_open_classes.html">Open Classes</a>
+在 Ruby 中，类永远是开放的，你总是可以将新的方法加入到已有的类中，除了在你自己的代码中，还可以用在标准库和内置类中，这个特性被称为 <code>Open Classes</code>。说到这里作为 iOS 工程师，脑中基本能闪现出 Objective-C 的 <a href="https://developer.apple.com/library/archive/documentation/General/Conceptual/DevPedia-CocoaCore/Category.html"><strong>Category</strong></a> 或者 Swift 的 <a href="https://docs.swift.org/swift-book/LanguageGuide/Extensions.html"><strong>Extensions</strong></a> 特性。不过，这种动态替换方法的功能也称作 Monkeypatch。(🐒  到底招谁惹谁了）
+下面，我们通过在 <code>Monkey.rb</code> 文件中添加一个自定义类 <code>Monkey</code> 来简单看一下该特性，</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">Monkey</span>
+    <span class="k">def</span> <span class="nf">eat</span>
+        <span class="nb">puts</span> <span class="s2">&#34;i have banana&#34;</span>
+    <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="n">monkey</span> <span class="o">=</span> <span class="no">Monkey</span><span class="o">.</span><span class="n">new</span>
+
+<span class="k">class</span> <span class="nc">Monkey</span>
+    <span class="k">def</span> <span class="nf">eat</span>
+        <span class="nb">puts</span> <span class="s2">&#34;I have apple&#34;</span>
+    <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="n">monkey</span><span class="o">.</span><span class="n">eat</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>直接在 VSCode 中运行，效果如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="o">[</span>Running<span class="o">]</span> ruby <span class="s2">&#34;/Users/edmond/Desktop/Monkey.rb&#34;</span>
+I have apple
+</code></pre></td></tr></table>
+</div>
+</div><p>可以看到，<code>Monkey</code> 类的实例输出已经改为 <code>I have apple</code>。</p>
+<blockquote>
+<p>需要注意，即使是已经创建好的实例，方法替换同样是生效的。
+另外 ⚠️ <code>Open Class</code> 可以跨文件、跨模块进行访问的，甚至对 Ruby 内置方法的也同样适用 (谨慎)。</p>
+</blockquote>
+<p>这强大的功能让我们可以很容易的对三方模块进行扩展，这也是 CocoaPods 的插件体系所依赖的基础。
+举个例子，在 <em>CocoaPods</em> 主仓库 <code>cocoapods/downloader.rb</code> 中定义了一些 download 方法：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">module</span> <span class="nn">Pod</span>
+  <span class="k">module</span> <span class="nn">Downloader</span>
+    <span class="c1"># ...</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>但是在 <em><a href="https://github.com/CocoaPods/cocoapods-downloader">cocoapods-downloader</a></em> 模块中，module <code>Downloader</code> 的方法并不能满足全部需求，于是在 <code>cocoapods-downloader/api.rbapi.rb</code> 中就对其进行了扩展：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">module</span> <span class="nn">Pod</span>
+  <span class="k">module</span> <span class="nn">Downloader</span>
+    <span class="k">module</span> <span class="nn">API</span>
+      <span class="k">def</span> <span class="nf">execute_command</span><span class="p">(</span><span class="n">executable</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">raise_on_failure</span> <span class="o">=</span> <span class="kp">false</span><span class="p">)</span>
+        <span class="c1"># ...</span>
+      <span class="k">end</span>
+      <span class="c1"># ...</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><h1 id="claide">CLAide</h1>
+<p><a href="https://github.com/CocoaPods/CLAide">CLAide</a> 虽然是一个简单的命令行解释器，但它提供了功能齐全的命令行界面和 API。它不仅负责解析我们使用到的 <code>Pods</code> 命令，例如：<code>pod install</code>, <code>pod update</code> 等，还可用于封装常用的一些脚本，将其打包成简单的命令行小工具。</p>
+<blockquote>
+<p>备注：所谓命令行解释器就是从标准输入或者文件中读取命令并执行的程序。详见 <a href="https://www.wikiwand.com/en/Command-line_argument_parsing">Wiki</a>。</p>
+</blockquote>
+<h2 id="claide-功能概览">CLAide 功能概览</h2>
+<p>我们先通过 <code>pod --help</code> 来查看 <code>CLAide</code> 的真实输出效果：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="err">$</span> <span class="n">pod</span>
+<span class="ss">Usage</span><span class="p">:</span>
+    <span class="err">$</span> <span class="n">pod</span> <span class="no">COMMAND</span>
+      <span class="no">CocoaPods</span><span class="p">,</span> <span class="n">the</span> <span class="no">Cocoa</span> <span class="n">library</span> <span class="n">package</span> <span class="n">manager</span><span class="o">.</span>
+
+<span class="ss">Commands</span><span class="p">:</span>
+    <span class="o">+</span> <span class="n">cache</span>               <span class="no">Manipulate</span> <span class="n">the</span> <span class="no">CocoaPods</span> <span class="n">cache</span>
+    <span class="o">+</span> <span class="n">deintegrate</span>         <span class="no">Deintegrate</span> <span class="no">CocoaPods</span> <span class="n">from</span> <span class="n">your</span> <span class="n">project</span>
+    <span class="o">+</span> <span class="n">env</span>                 <span class="no">Display</span> <span class="n">pod</span> <span class="n">environment</span>
+    <span class="o">+</span> <span class="n">init</span>                <span class="no">Generate</span> <span class="n">a</span> <span class="no">Podfile</span> <span class="k">for</span> <span class="n">the</span> <span class="n">current</span> <span class="n">directory</span>
+  	<span class="o">...</span>
+
+<span class="ss">Options</span><span class="p">:</span>
+    <span class="o">--</span><span class="n">allow</span><span class="o">-</span><span class="n">root</span>          <span class="no">Allows</span> <span class="no">CocoaPods</span> <span class="n">to</span> <span class="n">run</span> <span class="n">as</span> <span class="n">root</span>
+    <span class="o">--</span><span class="n">silent</span>              <span class="no">Show</span> <span class="n">nothing</span>
+    <span class="o">--</span><span class="n">version</span>             <span class="no">Show</span> <span class="n">the</span> <span class="n">version</span> <span class="n">of</span> <span class="n">the</span> <span class="n">tool</span>
+    <span class="o">...</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>👆所展示的 <code>Usage</code>、<code>Commands</code>、<code>Options</code> section 及其内容均是由 <code>CALide</code> 的输出模版 <strong>Banner</strong> 来完成的。<code>CALide</code> 提供了 Command 基类帮助我们快速定义出标准且美观的命令。除了 <code>pod</code> 命令之外，例如：<a href="https://github.com/CocoaPods/Xcodeproj">Xcodeproj</a> 所提供的命令也是由 <code>CALide</code> 来实现的。
+<code>CALide</code> 还提供了一套插件加载机制在命令执行前获取所有插件中的命令，例如：<code>cocoapods-packeger</code> 提供的 <code>pod package NAME [SOURCE]</code> 就是从其 source code 中的 <code>lib/pod/commnad/package.rb</code> 读取出来的，它令我们仅需一份 <code>podspec</code> 信息，即可完成 Cocoa 依赖库的 📦。</p>
+<h2 id="calide-的目录结构">CALide 的目录结构</h2>
+<blockquote>
+<p>对于 Ruby 的项目结构，在 Rubygems.org 中有 <a href="https://guides.rubygems.org/make-your-own-gem/">文件结构手册</a> 这个标准供大家参考学习。</p>
+</blockquote>
+<p>首先来看 CALide 项目的文件入口 lib/calide.rb ：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">module</span> <span class="nn">CLAide</span>
+  <span class="no">VERSION</span> <span class="o">=</span> <span class="s1">&#39;1.0.3&#39;</span><span class="o">.</span><span class="n">freeze</span>
+  <span class="nb">require</span> <span class="s1">&#39;claide/ansi&#39;</span>
+  <span class="nb">require</span> <span class="s1">&#39;claide/argument&#39;</span>
+  <span class="nb">require</span> <span class="s1">&#39;claide/argv&#39;</span>
+  <span class="nb">require</span> <span class="s1">&#39;claide/command&#39;</span>
+  <span class="nb">require</span> <span class="s1">&#39;claide/help&#39;</span>
+  <span class="nb">require</span> <span class="s1">&#39;claide/informative_error&#39;</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>我们接下来分析一下 <code>lib/cladie/</code> 目录下的相关代码。</p>
+<h2 id="command-抽象类">Command 抽象类</h2>
+<p><code>Command</code> 是用于构建命令行界面的基础抽象类。所有我们添加的命令都需要继承自 <code>Command</code>，这些子类可以嵌套组合成更加精细的命令。
+<code>pod</code> 命令正是由多个 <code>Pod::Command &lt; CLAide::Command</code> 的子类组合而成的 <code>abstract command</code>。当然 <code>pod</code> 的 subcommand 同样也能声明为 <code>abstact command</code>，通过这样的方式我们就能达到多级嵌套命令的效果。有抽象命令当然也需要有具体执行任务的 <code>normal command</code>。
+举个例子：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-basic" data-lang="basic"><span class="err">$</span><span class="w"> </span><span class="vg">pod</span><span class="w"> </span><span class="vg">update</span><span class="w"> </span><span class="o">--</span><span class="vg">help</span>
+<span class="nl">Usage:</span>
+<span class="w">    </span><span class="err">$</span><span class="w"> </span><span class="vg">pod</span><span class="w"> </span><span class="vg">update</span><span class="w"> </span><span class="p">[</span><span class="vg">POD_NAMES</span><span class="w"> </span><span class="o">...</span><span class="p">]</span>
+<span class="w">      </span><span class="vg">Updates</span><span class="w"> </span><span class="vg">the</span><span class="w"> </span><span class="vg">Pods</span><span class="w"> </span><span class="vg">identified</span><span class="w"> </span><span class="vg">by</span><span class="w"> </span><span class="vg">the</span><span class="w"> </span><span class="vg">specified</span><span class="w"> </span><span class="err">`</span><span class="vg">POD_NAMES</span><span class="err">`</span>
+
+<span class="nl">Options:</span>
+<span class="w">    </span><span class="o">--</span><span class="vg">verbose</span><span class="w">                              </span><span class="vg">Show</span><span class="w"> </span><span class="vg">more</span><span class="w"> </span><span class="vg">debugging</span><span class="w"> </span><span class="vg">information</span>
+<span class="w">    </span><span class="o">--</span><span class="vg">no</span><span class="o">-</span><span class="vg">ansi</span><span class="w">                              </span><span class="vg">Show</span><span class="w"> </span><span class="vg">output</span><span class="w"> </span><span class="vg">without</span><span class="w"> </span><span class="vg">ANSI</span><span class="w"> </span><span class="vg">codes</span>
+<span class="w">    </span><span class="o">--</span><span class="vg">help</span><span class="w">                                 </span><span class="vg">Show</span><span class="w"> </span><span class="vg">help</span><span class="w"> </span><span class="vg">banner</span><span class="w"> </span><span class="vg">of</span><span class="w"> </span><span class="vg">specified</span><span class="w"> </span><span class="vg">command</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>对应的， <code>pod update</code> 这个命令的逻辑在 <code>CLAide</code> 中就是如下描述：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">module</span> <span class="nn">Pod</span>
+  <span class="k">class</span> <span class="nc">Command</span>
+    <span class="k">class</span> <span class="nc">Update</span> <span class="o">&lt;</span> <span class="no">Command</span>
+      <span class="nb">self</span><span class="o">.</span><span class="n">arguments</span> <span class="o">=</span> <span class="o">[</span>
+        <span class="no">CLAide</span><span class="o">::</span><span class="no">Argument</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;POD_NAMES&#39;</span><span class="p">,</span> <span class="kp">false</span><span class="p">,</span> <span class="kp">true</span><span class="p">),</span>
+      <span class="o">]</span>
+      
+      <span class="nb">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="s">&lt;&lt;-DESC
+</span><span class="s"></span>        <span class="no">Updates</span> <span class="n">the</span> <span class="no">Pods</span> <span class="n">identified</span> <span class="n">by</span> <span class="n">the</span> <span class="n">specified</span> <span class="sb">`POD_NAMES`</span><span class="o">.</span>
+      <span class="no">DESC</span>
+      
+      <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">options</span>
+        <span class="o">[</span>
+          <span class="o">[</span><span class="s2">&#34;--sources&#34;</span><span class="p">,</span> <span class="s1">&#39;The sources from which to update dependent pods&#39;</span><span class="o">]</span><span class="p">,</span>
+          <span class="o">[</span><span class="s1">&#39;--exclude-pods&#39;</span><span class="p">,</span> <span class="s1">&#39;Pods to exclude during update&#39;</span><span class="o">]</span><span class="p">,</span>
+          <span class="o">[</span><span class="s1">&#39;--clean-install&#39;</span><span class="p">,</span> <span class="s1">&#39;Ignore the contents of the project cache and force a full pod installation&#39;</span><span class="o">]</span>
+        <span class="o">].</span><span class="n">concat</span><span class="p">(</span><span class="k">super</span><span class="p">)</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>当我们如此描述后，CLAide 会对这个类进行以下方式的解析：</p>
+<p><img src="http://cdn.nlark.com/yuque/0/2020/png/227152/1599005020049-ddaee5cf-5280-4586-b5ab-0a3587f0d245.png?x-oss-process=image%2Fresize%2Cw_746" alt="pod update"></p>
+<p>此外，<code>Command</code> class 提供了大量基础功能，其中最核心的方法为 <code>run</code>，会在 <code>normal command</code> 小节会介绍。对于任何命令类型都可以设置以下几个属性和方法：</p>
+<ul>
+<li><strong>summary</strong>: 用于简单描述该命令的作用</li>
+<li><strong>options</strong>: 用于返回该命令的可选项及对应的描述，返回的 options 需要通过调用 <code>super</code> 插入到父类的可选项前</li>
+<li><strong>initialize</strong>: 如果需要获取命令行传递的实参，需要通过重载 <code>initialize</code> 方法来获取</li>
+<li><strong>validate!</strong>: 用于检查输入实参的有效性，如果校验失败，会通过调用 <code>help!</code> 方法来输出帮助信息</li>
+<li><strong>help!</strong>：用于错误信息的处理和展示</li>
+</ul>
+<p>注意 ⚠️：这里我们说的 <strong><code>abstract command</code> 和 <code>normal command</code> 均是通过 <code>Command</code> 来实现的</strong>，只是它们的配置不同。</p>
+<h3 id="abstract-command">Abstract Command</h3>
+<p><code>abstract command</code> 为不提供具体命令实现的抽象容器命令类，不过它可以包含一个或多个的 subcommands。我们可以指定 subcommands 中的 <code>normal command</code> 为默认命令，就能将 <code>abstract command</code> 作为作为普通命令直接执行了。
+抽象命令的现实比较简单：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="nb">self</span><span class="o">.</span><span class="n">abstract_command</span> <span class="o">=</span> <span class="kp">true</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>仅需设置 <code>abstract_command</code>，然后就可以继承它来实现普通命令或者多级嵌套的抽象命令。
+以 <code>pod</code> 命令的实现为例：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">module</span> <span class="nn">Pod</span>
+  <span class="k">class</span> <span class="nc">Command</span> <span class="o">&lt;</span> <span class="no">CLAide</span><span class="o">::</span><span class="no">Command</span>
+    <span class="nb">require</span> <span class="s1">&#39;cocoapods/command/install&#39;</span> <span class="c1"># 1</span>
+    <span class="nb">require</span> <span class="s1">&#39;cocoapods/command/update&#39;</span>
+    <span class="c1"># ...</span>
+    <span class="nb">self</span><span class="o">.</span><span class="n">abstract_command</span> <span class="o">=</span> <span class="kp">true</span>
+    <span class="nb">self</span><span class="o">.</span><span class="n">command</span> <span class="o">=</span> <span class="s1">&#39;pod&#39;</span>
+    <span class="c1"># ...</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>上述通过 <strong>require</strong> 引入的 <code>update</code>、<code>install</code> 等子命令都是继承自 <code>Pod::Command</code> 的 <code>normal command</code>。
+<img src="http://cdn.nlark.com/yuque/0/2020/jpeg/98641/1598855030376-84980ad9-7ff0-4c97-bee8-266bc77772e9.jpeg?x-oss-process=image%2Fresize%2Cw_746" alt=""></p>
+<h3 id="normal-command">Normal Command</h3>
+<p>相对于抽象命令，普通命令就需要设置传递实参的名称和描述，以及重载 <code>run</code> 方法。
+<strong>Arguments</strong>
+<code>arguments</code> 用于配置该命令支持的参数列表的 banner 输出，类型为 <code>Array&lt;Argument&gt;]</code>，它最终会格式化成对应的信息展示在 <code>Usage</code> banner 中。
+我们来看 <code>pod update</code> 的 <code>arguments</code> 是如何配置的：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="nb">self</span><span class="o">.</span><span class="n">arguments</span> <span class="o">=</span> <span class="o">[</span>
+    <span class="no">CLAide</span><span class="o">::</span><span class="no">Argument</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;POD_NAMES&#39;</span><span class="p">,</span> <span class="kp">false</span><span class="p">,</span> <span class="kp">true</span><span class="p">),</span>
+<span class="o">]</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>其中 <code>Argument</code> 的构造方法如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">module</span> <span class="nn">CLAide</span>
+  <span class="k">class</span> <span class="nc">Argument</span>
+   
+    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">required</span><span class="p">,</span> <span class="n">repeatable</span> <span class="o">=</span> <span class="kp">false</span><span class="p">)</span>
+      <span class="vi">@names</span> <span class="o">=</span> <span class="nb">Array</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
+      <span class="vi">@required</span> <span class="o">=</span> <span class="n">required</span>
+      <span class="vi">@repeatable</span> <span class="o">=</span> <span class="n">repeatable</span>
+    <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这里传入的 names 就是在 <code>Usage</code> banner 中输出的 <code>[POD_NAMES ...]</code> 。
+<strong>require</strong> 表示该 Argument 是否为必传参数，可选参数会用 <code>[ ]</code> 将其包裹起来。也就是说 <code>pod update</code> 命令默认是不需要传 <code>POD_NAMES</code>
+<strong>repeatable</strong> 表示该 Argument 是否可以重复多次出现。如果设置为可重复，那么会在 names 的输出信息后面会添加 <code>...</code> 表示该参数为复数参数。
+举个例子：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">$ pod update Alamofire, SwiftyJSON
+</code></pre></td></tr></table>
+</div>
+</div><p>我们可以指定 <code>pod update</code> 仅更新特定的依赖库，如果不传 <code>POD_NAMES</code> 将进行全量更新。</p>
+<h3 id="run-方法">Run 方法</h3>
+<p>在 <code>Command</code> 类中定义了两个 <code>run</code> 方法：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">run</span><span class="p">(</span><span class="n">argv</span> <span class="o">=</span> <span class="o">[]</span><span class="p">)</span>
+    <span class="c1"># 根据文件前缀来匹配对应的插件</span>
+    <span class="n">plugin_prefixes</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">plugin_prefix</span><span class="o">|</span>
+       <span class="no">PluginManager</span><span class="o">.</span><span class="n">load_plugins</span><span class="p">(</span><span class="n">plugin_prefix</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="n">argv</span> <span class="o">=</span> <span class="no">ARGV</span><span class="o">.</span><span class="n">coerce</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+    <span class="c1"># 解析 argument 生成对应的 command instance</span>
+    <span class="n">command</span> <span class="o">=</span> <span class="n">parse</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span> 
+    <span class="no">ANSI</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="o">!</span><span class="n">command</span><span class="o">.</span><span class="n">ansi_output?</span>
+    <span class="k">unless</span> <span class="n">command</span><span class="o">.</span><span class="n">handle_root_options</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+       <span class="n">command</span><span class="o">.</span><span class="n">validate!</span>
+       <span class="n">command</span><span class="o">.</span><span class="n">run</span>
+    <span class="k">end</span>
+<span class="k">rescue</span> <span class="no">Object</span> <span class="o">=&gt;</span> <span class="n">exception</span>
+    <span class="n">handle_exception</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">exception</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">run</span>
+    <span class="k">raise</span> <span class="s1">&#39;A subclass should override the `CLAide::Command#run` method to &#39;</span> <span class="p">\</span>
+    <span class="s1">&#39;actually perform some work.&#39;</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这里的 <code>self.run</code> 方法是 class method，而 <code>run</code> 是 instanced method。对于 <code>Ruby</code> 不太熟悉的同学可以看看这个：<a href="https://stackoverflow.com/questions/13706373/what-does-def-self-function-name-mean">What does def <code>self.function</code> name mean?</a>
+作为 <code>Command</code> 类的核心方法，类方法 <code>self.run</code> 将终端传入的参数解析成对应的 <strong>command</strong> 和 <strong>argv</strong>，并最终调用 command 的实例方法 <code>run</code> 来触发真正的命令逻辑。因此，子类需要通过重载 <code>run</code> 方法来完成对应命令的实现。
+那么问题来了，方法 <code>Command::parse</code> 是如何将 <code>run</code> 的类方法转换为实例方法的呢？</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">parse</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+	 <span class="c1"># 通过解析 argv 获取到与 cmd 名称</span>
+    <span class="n">argv</span> <span class="o">=</span> <span class="no">ARGV</span><span class="o">.</span><span class="n">coerce</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="n">argv</span><span class="o">.</span><span class="n">arguments</span><span class="o">.</span><span class="n">first</span>
+    <span class="c1"># 如果 cmd 对应的 Command 类，则更新 argv，继续解析命令</span>
+    <span class="k">if</span> <span class="n">cmd</span> <span class="o">&amp;&amp;</span> <span class="n">subcommand</span> <span class="o">=</span> <span class="n">find_subcommand</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+        <span class="n">argv</span><span class="o">.</span><span class="n">shift_argument</span>
+        <span class="n">subcommand</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+    <span class="c1"># 如果 cmd 为抽象命令且指定了默认命令，则返回默认命令继续解析参数</span>
+    <span class="k">elsif</span> <span class="n">abstract_command?</span> <span class="o">&amp;&amp;</span> <span class="n">default_subcommand</span>
+        <span class="n">load_default_subcommand</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+    <span class="k">else</span>
+        <span class="c1"># 初始化真正的 cmd 实例</span>
+        <span class="kp">new</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+    <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>可以说，<code>CLAide</code> 的命令解析就是一个<strong>多叉树遍历</strong>，通过分割参数及遍历 <code>CLAide::Command</code> 的子类，最终找到用户输入的 <code>normal command</code> 并初始化返回。<img src="http://cdn.nlark.com/yuque/0/2020/png/227152/1599006816575-464e442d-5b43-475f-bc5f-4b086c59190c.png?x-oss-process=image%2Fresize%2Cw_746" alt=""></p>
+<p>这里还有一个知识点就是，<code>CLAide::Command</code> 是如何知道有哪些子类集成它的呢？</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">inherited</span><span class="p">(</span><span class="n">subcommand</span><span class="p">)</span>
+    <span class="n">subcommands</span> <span class="o">&lt;&lt;</span> <span class="n">subcommand</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>这里利用了 <code>Ruby</code> 提供的 <em>Hook Method</em> <code>self.inherited</code> 来获取它所继承的子类，并将其保存在 <code>subcommands</code>。</strong>
+另外，这里在真正执行 <code>self.run</code> 方法之前会遍历当前项目所引入的 Gems 包中的指定目录下的命令插件文件，并进行插件加载，具体内容将在 <code>PluginManager</code> 中展开。</p>
+<h3 id="argv-传入参数">ARGV 传入参数</h3>
+<p><code>CLAide</code> 提供了专门的类 <code>ARGV</code> 用于解析命令行传入的参数。主要功能是对 <code>Parse</code> 解析后的 tuple 列表进行各种过滤、CURD 等操作。
+按照 <code>CALide</code> 的定义参数分三种类型：</p>
+<ul>
+<li><code>arg</code>: 普通的实参，所谓的实参就是直接跟在命令后面的，且不带任何 <code>--</code> 修饰的字符</li>
+<li><code>flag</code>: 简单理解 <code>flag</code> 就是限定为 bool 变量的 <code>option</code> 类型参数，如果 <code>flag</code> 前面添加带 <code>--no-</code> 则值为 false，否则为 true</li>
+<li><code>option</code>: 可选项参数，以 <code>--</code> 为前缀且以 <code>=</code> 作为分割符来区分 key 和 value</li>
+</ul>
+<p>而在 <code>ARGV</code> 内部又提供了私有工具类 <code>Parser</code> 来解析终端的输入，其核心方法为 <code>parse</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">module</span> <span class="nn">Parser</span>
+    <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">parse</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+        <span class="n">entries</span> <span class="o">=</span> <span class="o">[]</span>
+        <span class="n">copy</span> <span class="o">=</span> <span class="n">argv</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:to_s</span><span class="p">)</span>
+        <span class="n">double_dash</span> <span class="o">=</span> <span class="kp">false</span>
+        <span class="k">while</span> <span class="n">argument</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">shift</span>
+          <span class="k">next</span> <span class="k">if</span> <span class="o">!</span><span class="n">double_dash</span> <span class="o">&amp;&amp;</span> <span class="n">double_dash</span> <span class="o">=</span> <span class="p">(</span><span class="n">argument</span> <span class="o">==</span> <span class="s1">&#39;--&#39;</span><span class="p">)</span>
+          <span class="n">type</span> <span class="o">=</span> <span class="n">double_dash</span> <span class="p">?</span> <span class="ss">:arg</span> <span class="p">:</span> <span class="n">argument_type</span><span class="p">(</span><span class="n">argument</span><span class="p">)</span>
+          <span class="n">parsed_argument</span> <span class="o">=</span> <span class="n">parse_argument</span><span class="p">(</span><span class="n">type</span><span class="p">,</span> <span class="n">argument</span><span class="p">)</span>
+          <span class="n">entries</span> <span class="o">&lt;&lt;</span> <span class="o">[</span><span class="n">type</span><span class="p">,</span> <span class="n">parsed_argument</span><span class="o">]</span>
+        <span class="k">end</span>
+        <span class="n">entries</span>
+    <span class="k">end</span>
+    <span class="c1"># ,,,</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>parse 的返回值为 <code>[Array&lt;Array&lt;Symbol, String, Array&gt;&gt;]</code> 类型的 tuple，其中 tuple 的第一个变量为实参的类型，第二个才是对应的实参。
+依旧以 <code>pod update</code> 为例：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">pod update Alamofire --no-repo-update --exclude-pods<span class="o">=</span>SwiftyJSON
+</code></pre></td></tr></table>
+</div>
+</div><p><img src="http://cdn.nlark.com/yuque/0/2020/jpeg/98641/1598855030381-29d93c99-1c6c-4a40-8bf7-a40eee4140a7.jpeg?x-oss-process=image%2Fresize%2Cw_746" alt="">
+解析后，输出的 tuple 列表如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="o">[</span>
+    <span class="o">[</span><span class="ss">:arg</span><span class="p">,</span> <span class="s2">&#34;Alamofire&#34;</span><span class="o">]</span><span class="p">,</span>
+    <span class="o">[</span><span class="ss">:flag</span><span class="p">,</span> <span class="o">[</span><span class="s2">&#34;repo-update&#34;</span><span class="p">,</span> <span class="kp">false</span><span class="o">]]</span><span class="p">,</span>
+    <span class="o">[</span><span class="ss">:option</span><span class="p">,</span> <span class="o">[</span><span class="s2">&#34;exclude-pods&#34;</span><span class="p">,</span> <span class="s2">&#34;SwiftyJSON&#34;</span><span class="o">]]</span>
+<span class="o">]</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="banner-与输出格式化">Banner 与输出格式化</h2>
+<p>接下来，我们再来聊聊 <code>CLAide</code> 提供的格式化效果的 banner。
+那什么是 banner 呢？回看第一个例子 <code>pod --help</code> 所输出的帮助信息，它分为三个 Section：</p>
+<ul>
+<li><code>Usage</code>：用于描该述命令的用法</li>
+<li><code>Commands</code>：用于描述该命令所包含的子命令，没有则不显示。在子命令前面存在两种类型的标识
+<ul>
+<li><code>+</code> ：用于强调该 command 是单独添加的子命令</li>
+<li><code>&gt;</code> ：用于表示指引的意思，表示该 command 是当前命令的默认实现</li>
+</ul>
+</li>
+<li><code>Options</code>：用于描述该命令的可选项</li>
+</ul>
+<p><strong>这三段帮助信息就是对应的不同的 banner。</strong>
+<code>CLAide</code> 对于输出的 banner 信息提供了 <a href="https://www.wikiwand.com/en/ANSI_escape_code">ANSI 转义</a>，用于在不同的终端里显示富文本的效果。banner 的主要格式化效果如下：</p>
+<ol>
+<li>对于 setcion 标题： <code>Usage</code>、<code>Commands</code>、<code>Options</code> 添加了下划线且加粗处理</li>
+<li>Command 配置为绿色</li>
+<li>Options 配置为蓝色</li>
+<li>提示警告信息配置为黄色</li>
+<li>错误信息则是红色</li>
+</ol>
+<p>对于这些配色方案，<code>CLAide</code> 提供了 String 的 convince method 来完成 ANSI 转义：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">String</span>
+  <span class="k">def</span> <span class="nf">ansi</span>
+    <span class="no">CLAide</span><span class="o">::</span><span class="no">ANSI</span><span class="o">::</span><span class="no">StringEscaper</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>例如：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="s2">&#34;example&#34;</span><span class="o">.</span><span class="n">ansi</span><span class="o">.</span><span class="n">yellow</span> <span class="c1">#=&gt; &#34;\e[33mexample\e[39m&#34;</span>
+<span class="s2">&#34;example&#34;</span><span class="o">.</span><span class="n">ansi</span><span class="o">.</span><span class="n">on_red</span> <span class="c1">#=&gt; &#34;\e[41mexample\e[49m&#34;</span>
+<span class="s2">&#34;example&#34;</span><span class="o">.</span><span class="n">ansi</span><span class="o">.</span><span class="n">bold</span>   <span class="c1">#=&gt; &#34;\e[1mexample\e[21m&#34;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>对于 Banner 的一些高亮效果也提供了 convince method：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">prettify_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+  <span class="n">title</span><span class="o">.</span><span class="n">ansi</span><span class="o">.</span><span class="n">underline</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">prettify_subcommand</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
+  <span class="nb">name</span><span class="o">.</span><span class="n">chomp</span><span class="o">.</span><span class="n">ansi</span><span class="o">.</span><span class="n">green</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">prettify_option_name</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
+  <span class="nb">name</span><span class="o">.</span><span class="n">chomp</span><span class="o">.</span><span class="n">ansi</span><span class="o">.</span><span class="n">blue</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="pluginmanager-载入插件">PluginManager 载入插件</h2>
+<p><code>PluginManager</code> 是 Command 的管理类，会在第一次运行命令 <code>self.run</code> 时进行加载，且仅加载命令类中指定前缀标识的文件下的命令。让我们先看 <code>PluginManager.rb</code> 的核心实现：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">load_plugins</span><span class="p">(</span><span class="n">plugin_prefix</span><span class="p">)</span>
+    <span class="n">loaded_plugins</span><span class="o">[</span><span class="n">plugin_prefix</span><span class="o">]</span> <span class="o">||=</span>
+    <span class="n">plugin_gems_for_prefix</span><span class="p">(</span><span class="n">plugin_prefix</span><span class="p">)</span><span class="o">.</span><span class="n">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">spec</span><span class="p">,</span> <span class="n">paths</span><span class="o">|</span>
+        <span class="n">spec</span> <span class="k">if</span> <span class="n">safe_activate_and_require</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">paths</span><span class="p">)</span>
+    <span class="k">end</span><span class="o">.</span><span class="n">compact</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">plugin_gems_for_prefix</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+    <span class="n">glob</span> <span class="o">=</span> <span class="s2">&#34;</span><span class="si">#{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">_plugin</span><span class="si">#{</span><span class="no">Gem</span><span class="o">.</span><span class="n">suffix_pattern</span><span class="si">}</span><span class="s2">&#34;</span>
+    <span class="no">Gem</span><span class="o">::</span><span class="no">Specification</span><span class="o">.</span><span class="n">latest_specs</span><span class="p">(</span><span class="kp">true</span><span class="p">)</span><span class="o">.</span><span class="n">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">spec</span><span class="o">|</span>
+        <span class="n">matches</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">matches_for_glob</span><span class="p">(</span><span class="n">glob</span><span class="p">)</span>
+        <span class="o">[</span><span class="n">spec</span><span class="p">,</span> <span class="n">matches</span><span class="o">]</span> <span class="k">unless</span> <span class="n">matches</span><span class="o">.</span><span class="n">empty?</span>
+    <span class="k">end</span><span class="o">.</span><span class="n">compact</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">safe_activate_and_require</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">paths</span><span class="p">)</span>
+    <span class="n">spec</span><span class="o">.</span><span class="n">activate</span>
+    <span class="n">paths</span><span class="o">.</span><span class="n">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">path</span><span class="o">|</span> <span class="nb">require</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="p">}</span>
+    <span class="kp">true</span>
+<span class="k">rescue</span> <span class="no">Exception</span> <span class="o">=&gt;</span> <span class="n">exception</span>
+    <span class="c1"># ...</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>整体的流程大致是：</p>
+<ol>
+<li>调用 <code>load_plugins</code> 并传入 <code>plugin_prefix</code></li>
+<li><code>plugin_gems_for_prefix</code> 对插件名进行处理，取出我们需要加载的文件</li>
+<li>调用 <code>safe_activate_and_require</code> 进行对应的 gem spec 检验并对每个文件进行加载</li>
+</ol>
+<p>CocoaPods 的插件加载正是依托于 CLAide 的 <code>load_plugins</code>，它会遍历所有的 RubyGem，并搜索这些 Gem 中是否包含名为 <code>#{plugin_prefix}_plugin.rb</code> 的文件。例如，在 Pod 命令的实现中有如下配置：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="nb">self</span><span class="o">.</span><span class="n">plugin_prefixes</span> <span class="o">=</span> <span class="sx">%w(claide cocoapods)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>也就是说在 Pod 命令执行前，<strong>它会加载所有包含 <code>claide_plugin.rb</code> 或 <code>cocoapods_plugin.rb</code> 文件的 Gem</strong>。通过在运行时的文件检查来加载符合要求的相关命令。</p>
+<p><img src="http://cdn.nlark.com/yuque/0/2020/png/227152/1599006816575-464e442d-5b43-475f-bc5f-4b086c59190c.png?x-oss-process=image%2Fresize%2Cw_746" alt="image.png"></p>
+<h1 id="用-claide-实现一款--贩卖机">用 CLAide 实现一款 🥤 贩卖机</h1>
+<p>最后一节让我们一起来创建一个 CLAide 命令。需求是希望实现一个自动 🥤 贩卖机，它有如下功能：主要售卖 ☕️ 和 🍵，这两种 🥤 都可以按需选择是否添加 🥛 和 🍬，对于 🍬 还可以选择不同的甜度。</p>
+<ul>
+<li>☕️：对于咖啡，我们提供了：BlackEye、Affogato、CaPheSuaDa、RedTux 的口味</li>
+<li>🍵：对于茶，你可以选择不同的品种，有黑茶、绿茶、乌龙茶和白茶，同时茶还提供了加 🧊 的选项</li>
+</ul>
+<h2 id="配置模版项目">配置模版项目</h2>
+<p>基于上述构想，我们最终的 <code>BeverageMaker</code> 目录将由以下文件组成：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">.
+├── BeverageMaker.gemspec
+│   <span class="c1"># ...</span>
+├── exe
+│   └── beverage-maker
+├── lib
+│   ├── beveragemaker
+│   │   ├── <span class="nb">command</span>
+│   │   │   ├── coffee.rb <span class="c1"># 包含 abstract command 以及用于制作不同咖啡的 normal command</span>
+│   │   │   ├── maker.rb  <span class="c1"># Command 抽象类</span>
+│   │   │   └── tea.rb    <span class="c1"># normal command, 不同种类的 🍵 通过参数配置来完成</span>
+│   │   ├── command.rb
+│   │   └── version.rb
+│   └── beveragemaker.rb
+└── spec
+    ├── BeverageMaker_spec.rb
+    └── spec_helper.rb
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="0x1-生成模版项目">0x1 生成模版项目</h3>
+<p>首先，我们使用 <code>bundler gem GEM_NAME</code> 命令生成一个模版项目，项目取名为 <strong>BeverageMaker</strong>。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="err">$</span> <span class="n">bundle</span> <span class="n">gem</span> <span class="no">BeverageMaker</span>
+<span class="no">Creating</span> <span class="n">gem</span> <span class="s1">&#39;BeverageMaker&#39;</span><span class="o">...</span>
+<span class="no">MIT</span> <span class="no">License</span> <span class="n">enabled</span> <span class="k">in</span> <span class="n">config</span>
+<span class="no">Code</span> <span class="n">of</span> <span class="n">conduct</span> <span class="n">enabled</span> <span class="k">in</span> <span class="n">config</span>
+      <span class="n">create</span>  <span class="no">BeverageMaker</span><span class="o">/</span><span class="no">Gemfile</span>
+      <span class="n">create</span>  <span class="no">BeverageMaker</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="no">BeverageMaker</span><span class="o">.</span><span class="n">rb</span>
+      <span class="n">create</span>  <span class="no">BeverageMaker</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="no">BeverageMaker</span><span class="o">/</span><span class="n">version</span><span class="o">.</span><span class="n">rb</span>
+      <span class="n">create</span>  <span class="no">BeverageMaker</span><span class="o">/</span><span class="no">BeverageMaker</span><span class="o">.</span><span class="n">gemspec</span>
+      <span class="n">create</span>  <span class="no">BeverageMaker</span><span class="o">/</span><span class="no">Rakefile</span>
+      <span class="c1"># ...</span>
+<span class="no">Initializing</span> <span class="n">git</span> <span class="n">repo</span> <span class="k">in</span> <span class="o">~</span><span class="sr">/$HOME/</span><span class="no">Desktop</span><span class="o">/</span><span class="no">BeverageMaker</span>
+<span class="no">Gem</span> <span class="s1">&#39;BeverageMaker&#39;</span> <span class="n">was</span> <span class="n">successfully</span> <span class="n">created</span><span class="o">.</span> <span class="no">For</span> <span class="n">more</span> <span class="n">information</span> <span class="n">on</span> <span class="n">making</span> <span class="n">a</span> <span class="no">RubyGem</span> <span class="n">visit</span> <span class="ss">https</span><span class="p">:</span><span class="sr">//</span><span class="n">bundler</span><span class="o">.</span><span class="n">io</span><span class="o">/</span><span class="n">guides</span><span class="o">/</span><span class="n">creating_gem</span><span class="o">.</span><span class="n">html</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="0x2-修改-gemspec-配置">0x2 修改 gemspec 配置</h3>
+<p>生成的项目中需要将 <code>BeverageMaker.gemspec</code> 文件所包含 <strong>TODO</strong> 的字段进行替换，作为示例项目相关链接都替换为个人主页了 😂。
+另外，需要添加我们的依赖 <code>'claide', '&gt;= 1.0.2', '&lt; 2.0'</code> 和 <code>'colored2', '~&gt; 3.1'</code>。</p>
+<blockquote>
+<p><strong>colored2</strong> 用于 banner 信息的 ANSI 转义并使其能在终端以富文本格式输出。</p>
+</blockquote>
+<p>最终 <code>.gempsc</code> 配置如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">require_relative</span> <span class="s1">&#39;lib/BeverageMaker/version&#39;</span>
+
+<span class="no">Gem</span><span class="o">::</span><span class="no">Specification</span><span class="o">.</span><span class="n">new</span> <span class="k">do</span> <span class="o">|</span><span class="n">spec</span><span class="o">|</span>
+  <span class="n">spec</span><span class="o">.</span><span class="n">name</span>          <span class="o">=</span> <span class="s2">&#34;BeverageMaker&#34;</span>
+  <span class="n">spec</span><span class="o">.</span><span class="n">version</span>       <span class="o">=</span> <span class="no">BeverageMaker</span><span class="o">::</span><span class="no">VERSION</span>
+  <span class="n">spec</span><span class="o">.</span><span class="n">authors</span>       <span class="o">=</span> <span class="o">[</span><span class="s2">&#34;Edmond&#34;</span><span class="o">]</span>
+  <span class="n">spec</span><span class="o">.</span><span class="n">email</span>         <span class="o">=</span> <span class="o">[</span><span class="s2">&#34;chun574271939@gmail.com&#34;</span><span class="o">]</span>
+
+  <span class="n">spec</span><span class="o">.</span><span class="n">summary</span>       <span class="o">=</span> <span class="s2">&#34;BeverageMaker&#34;</span>
+  <span class="n">spec</span><span class="o">.</span><span class="n">description</span>   <span class="o">=</span> <span class="s2">&#34;BeverageMaker&#34;</span>
+  <span class="n">spec</span><span class="o">.</span><span class="n">homepage</span>      <span class="o">=</span> <span class="s2">&#34;https://looseyi.github.io&#34;</span>
+  <span class="n">spec</span><span class="o">.</span><span class="n">license</span>       <span class="o">=</span> <span class="s2">&#34;MIT&#34;</span>
+  <span class="n">spec</span><span class="o">.</span><span class="n">required_ruby_version</span> <span class="o">=</span> <span class="no">Gem</span><span class="o">::</span><span class="no">Requirement</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&#34;&gt;= 2.3.0&#34;</span><span class="p">)</span>
+
+  <span class="n">spec</span><span class="o">.</span><span class="n">metadata</span><span class="o">[</span><span class="s2">&#34;allowed_push_host&#34;</span><span class="o">]</span> <span class="o">=</span> <span class="s2">&#34;https://looseyi.github.io&#34;</span>
+
+  <span class="n">spec</span><span class="o">.</span><span class="n">metadata</span><span class="o">[</span><span class="s2">&#34;homepage_uri&#34;</span><span class="o">]</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">homepage</span>
+  <span class="n">spec</span><span class="o">.</span><span class="n">metadata</span><span class="o">[</span><span class="s2">&#34;source_code_uri&#34;</span><span class="o">]</span> <span class="o">=</span> <span class="s2">&#34;https://looseyi.github.io&#34;</span>
+  <span class="n">spec</span><span class="o">.</span><span class="n">metadata</span><span class="o">[</span><span class="s2">&#34;changelog_uri&#34;</span><span class="o">]</span> <span class="o">=</span> <span class="s2">&#34;https://looseyi.github.io&#34;</span>
+
+  <span class="n">spec</span><span class="o">.</span><span class="n">files</span>         <span class="o">=</span> <span class="no">Dir</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="no">File</span><span class="o">.</span><span class="n">expand_path</span><span class="p">(</span><span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="bp">__FILE__</span><span class="p">))</span> <span class="k">do</span>
+    <span class="sb">`git ls-files -z`</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&#34;</span><span class="se">\x0</span><span class="s2">&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">reject</span> <span class="p">{</span> <span class="o">|</span><span class="n">f</span><span class="o">|</span> <span class="n">f</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sr">%r{^(test|spec|features)/}</span><span class="p">)</span> <span class="p">}</span>
+  <span class="k">end</span>
+  <span class="c1"># 1</span>
+  <span class="n">spec</span><span class="o">.</span><span class="n">bindir</span>        <span class="o">=</span> <span class="s2">&#34;exe&#34;</span>
+  <span class="n">spec</span><span class="o">.</span><span class="n">executables</span>   <span class="o">=</span> <span class="s2">&#34;beverage-maker&#34;</span>
+  <span class="n">spec</span><span class="o">.</span><span class="n">require_paths</span> <span class="o">=</span> <span class="o">[</span><span class="s2">&#34;lib&#34;</span><span class="o">]</span>
+   
+  <span class="n">spec</span><span class="o">.</span><span class="n">add_runtime_dependency</span> <span class="s1">&#39;claide&#39;</span><span class="p">,</span>         <span class="s1">&#39;&gt;= 1.0.2&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt; 2.0&#39;</span>
+  <span class="n">spec</span><span class="o">.</span><span class="n">add_runtime_dependency</span> <span class="s1">&#39;colored2&#39;</span><span class="p">,</span>       <span class="s1">&#39;~&gt; 3.1&#39;</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="0x3-添加命令行入口">0x3 添加命令行入口</h3>
+<p>通过修改 <code>.gemspec</code> 的 <code>bindir</code> 和 <code>executables</code> 字段，把最终的 binary 执行文件暴露给用户，使其成为一个真正的 CLI：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">spec</span><span class="o">.</span><span class="n">bindir</span>        <span class="o">=</span> <span class="s2">&#34;exe&#34;</span>
+<span class="n">spec</span><span class="o">.</span><span class="n">executables</span>   <span class="o">=</span> <span class="s2">&#34;beverage-maker&#34;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>在默认生成的模版中指定的 <code>bindir</code> 为 <code>/bin</code> 目录，这里我们替换为新建的 <code>exe</code> 目录，并在 <code>exe</code> 目录下创建一个名为 <code>beverage-maker</code> 的文件，它将作为 CLI 的入口，其内容如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="ch">#!/usr/bin/env ruby</span>
+
+<span class="nb">require</span> <span class="s1">&#39;beveragemaker&#39;</span>
+
+<span class="no">BeverageMaker</span><span class="o">::</span><span class="no">Command</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="no">ARGV</span><span class="p">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="添加命令实现">添加命令实现</h2>
+<p>为了让 Demo 结构清晰，我们将不能类型的饮料制作分到了不同的文件和命令类中。
+<img src="http://cdn.nlark.com/yuque/0/2020/jpeg/98641/1598855030357-6c577c34-8687-4aa3-b495-876a2a6e4ecb.jpeg?x-oss-process=image%2Fresize%2Cw_746" alt=""></p>
+<h3 id="beveragemaker">BeverageMaker</h3>
+<p>先来实现 <code>beverage-maker</code> 命令，它是一个 <code>abstract command</code>，其内容如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="nb">require</span> <span class="s1">&#39;claide&#39;</span>
+<span class="nb">require</span> <span class="s1">&#39;colored2&#39;</span>
+
+<span class="k">module</span> <span class="nn">BeverageMaker</span>
+  <span class="c1"># 引入具体的 coffee &amp; tea maker</span>
+  <span class="nb">require</span> <span class="s1">&#39;beveragemaker/command/coffee&#39;</span>
+  <span class="nb">require</span> <span class="s1">&#39;beveragemaker/command/tea&#39;</span>
+  
+  <span class="k">class</span> <span class="nc">Command</span> <span class="o">&lt;</span> <span class="no">CLAide</span><span class="o">::</span><span class="no">Command</span>
+
+    <span class="nb">self</span><span class="o">.</span><span class="n">command</span> <span class="o">=</span> <span class="s1">&#39;beverage-maker&#39;</span>  
+    <span class="nb">self</span><span class="o">.</span><span class="n">abstract_command</span> <span class="o">=</span> <span class="kp">true</span>   
+    <span class="nb">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;Make delicious beverages from the comfort of your terminal.&#39;</span>
+
+    <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">options</span>
+      <span class="o">[</span>
+        <span class="o">[</span><span class="s1">&#39;--no-milk&#39;</span><span class="p">,</span> <span class="s1">&#39;Don’t add milk to the beverage&#39;</span><span class="o">]</span><span class="p">,</span>
+        <span class="o">[</span><span class="s1">&#39;--sweetener=[sugar|honey]&#39;</span><span class="p">,</span> <span class="s1">&#39;Use one of the available sweeteners&#39;</span><span class="o">]</span><span class="p">,</span>
+      <span class="o">].</span><span class="n">concat</span><span class="p">(</span><span class="k">super</span><span class="p">)</span>
+    <span class="k">end</span>
+  
+    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+      <span class="vi">@add_milk</span> <span class="o">=</span> <span class="n">argv</span><span class="o">.</span><span class="n">flag?</span><span class="p">(</span><span class="s1">&#39;milk&#39;</span><span class="p">,</span> <span class="kp">true</span><span class="p">)</span>
+      <span class="vi">@sweetener</span> <span class="o">=</span> <span class="n">argv</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;sweetener&#39;</span><span class="p">)</span>
+      <span class="k">super</span>
+    <span class="k">end</span>
+  
+    <span class="k">def</span> <span class="nf">validate!</span>
+      <span class="k">super</span>
+      <span class="k">if</span> <span class="vi">@sweetener</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="sx">%w(sugar honey)</span><span class="o">.</span><span class="n">include?</span><span class="p">(</span><span class="vi">@sweetener</span><span class="p">)</span>
+        <span class="n">help!</span> <span class="s2">&#34;`</span><span class="si">#{</span><span class="vi">@sweetener</span><span class="si">}</span><span class="s2">&#39; is not a valid sweetener.&#34;</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  
+    <span class="k">def</span> <span class="nf">run</span>
+      <span class="nb">puts</span> <span class="s1">&#39;* Boiling water…&#39;</span>
+      <span class="nb">sleep</span> <span class="mi">1</span>
+      <span class="k">if</span> <span class="vi">@add_milk</span>
+        <span class="nb">puts</span> <span class="s1">&#39;* Adding milk…&#39;</span>
+        <span class="nb">sleep</span> <span class="mi">1</span>
+      <span class="k">end</span>
+      <span class="k">if</span> <span class="vi">@sweetener</span>
+        <span class="nb">puts</span> <span class="s2">&#34;* Adding </span><span class="si">#{</span><span class="vi">@sweetener</span><span class="si">}</span><span class="s2">…&#34;</span>
+        <span class="nb">sleep</span> <span class="mi">1</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>正常来说，对于不同口味的咖啡和茶是可以用相同的命令模式来实现的，不过为了更好的展示 <code>CLAide</code> 的效果，我们将咖啡的生产配置为 <code>abstact command</code>，对于不同口味的咖啡，需要实现不同的 <code>normal command</code>。而茶的生产直接通过 <code>normal command</code> 实现，不同品种的茶叶会以参数的形式来配置。</p>
+<h3 id="coffee">Coffee</h3>
+<p>接着添加 ☕️ 的代码</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">Coffee</span> <span class="o">&lt;</span> <span class="no">Command</span>
+    <span class="c1"># ...</span>
+    <span class="nb">self</span><span class="o">.</span><span class="n">abstract_command</span> <span class="o">=</span> <span class="kp">true</span>
+
+    <span class="k">def</span> <span class="nf">run</span>
+        <span class="k">super</span>
+        <span class="nb">puts</span> <span class="s2">&#34;* Grinding </span><span class="si">#{</span><span class="nb">self</span><span class="o">.</span><span class="n">class</span><span class="o">.</span><span class="n">command</span><span class="si">}</span><span class="s2"> beans…&#34;</span>
+        <span class="nb">sleep</span> <span class="mi">1</span>
+        <span class="nb">puts</span> <span class="s1">&#39;* Brewing coffee…&#39;</span>
+        <span class="nb">sleep</span> <span class="mi">1</span>
+        <span class="nb">puts</span> <span class="s1">&#39;* Enjoy!&#39;</span>
+    <span class="k">end</span>
+
+    <span class="k">class</span> <span class="nc">BlackEye</span> <span class="o">&lt;</span> <span class="no">Coffee</span>
+        <span class="nb">self</span><span class="o">.</span><span class="n">summary</span> <span class="o">=</span> <span class="s1">&#39;A Black Eye is dripped coffee with a double shot of &#39;</span> <span class="p">\</span>
+        <span class="s1">&#39;espresso&#39;</span>
+    <span class="k">end</span>
+    <span class="c1"># ...</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="tea">Tea</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">Tea</span> <span class="o">&lt;</span> <span class="no">Command</span>
+    <span class="c1"># ...</span>
+    <span class="nb">self</span><span class="o">.</span><span class="n">arguments</span> <span class="o">=</span> <span class="o">[</span>
+      <span class="no">CLAide</span><span class="o">::</span><span class="no">Argument</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;FLAVOR&#39;</span><span class="p">,</span> <span class="kp">true</span><span class="p">),</span>
+    <span class="o">]</span>
+
+    <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">options</span>
+      <span class="o">[[</span><span class="s1">&#39;--iced&#39;</span><span class="p">,</span> <span class="s1">&#39;the ice-tea version&#39;</span><span class="o">]].</span><span class="n">concat</span><span class="p">(</span><span class="k">super</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+      <span class="vi">@flavor</span> <span class="o">=</span> <span class="n">argv</span><span class="o">.</span><span class="n">shift_argument</span>
+      <span class="vi">@iced</span> <span class="o">=</span> <span class="n">argv</span><span class="o">.</span><span class="n">flag?</span><span class="p">(</span><span class="s1">&#39;iced&#39;</span><span class="p">)</span>
+      <span class="k">super</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">validate!</span>
+      <span class="k">super</span>
+      <span class="k">if</span> <span class="vi">@flavor</span><span class="o">.</span><span class="n">nil?</span>
+        <span class="n">help!</span> <span class="s1">&#39;A flavor argument is required.&#39;</span>
+      <span class="k">end</span>
+      <span class="k">unless</span> <span class="sx">%w(black green oolong white)</span><span class="o">.</span><span class="n">include?</span><span class="p">(</span><span class="vi">@flavor</span><span class="p">)</span>
+        <span class="n">help!</span> <span class="s2">&#34;`</span><span class="si">#{</span><span class="vi">@flavor</span><span class="si">}</span><span class="s2">&#39; is not a valid flavor.&#34;</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+	 <span class="c1"># ...</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="安装--贩卖机">安装 🥤 贩卖机</h2>
+<p>我们知道，对于正常发布的 gem 包，可以直接通过 <code>gem install GEM_NAME</code> 安装。
+而我们的 Demo 程序并未发布，那要如何安装使用呢？幸好 Gem 提供了源码安装的方式：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">gem build *.gemspec
+gem install *.gem
+</code></pre></td></tr></table>
+</div>
+</div><p><code>gem build</code> 可以根据一个 <code>.gemspec</code> 生成一个 <code>.gem</code> 文件供 gem 安装，所以在拥有源码的情况下，执行上面命令就可以安装了。
+执行结果如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">$ gem build *.gemspec
+WARNING:  description and summary are identical
+WARNING:  See http://guides.rubygems.org/specification-reference/ <span class="k">for</span> <span class="nb">help</span>
+  Successfully built RubyGem
+  Name: BeverageMaker
+  Version: 0.1.0
+  File: BeverageMaker-0.1.0.gem
+  
+$ gem install *.gem
+
+Successfully installed BeverageMaker-0.1.0
+Parsing documentation <span class="k">for</span> BeverageMaker-0.1.0
+Done installing documentation <span class="k">for</span> BeverageMaker after <span class="m">0</span> seconds
+<span class="m">1</span> gem installed
+</code></pre></td></tr></table>
+</div>
+</div><p>编译通过！
+现在可以开始我们的 🥤 制作啦！</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="err">$</span> <span class="n">beverage</span><span class="o">-</span><span class="n">maker</span>
+<span class="ss">Usage</span><span class="p">:</span>
+
+    <span class="err">$</span> <span class="n">beverage</span><span class="o">-</span><span class="n">maker</span> <span class="no">COMMAND</span>
+
+      <span class="no">Make</span> <span class="n">delicious</span> <span class="n">beverages</span> <span class="n">from</span> <span class="n">the</span> <span class="n">comfort</span> <span class="n">of</span> <span class="n">yourterminal</span><span class="o">.</span>
+
+<span class="ss">Commands</span><span class="p">:</span>
+
+    <span class="o">+</span> <span class="n">coffee</span>                    <span class="no">Drink</span> <span class="n">brewed</span> <span class="n">from</span> <span class="n">roasted</span> <span class="n">coffee</span> <span class="n">beans</span>
+
+<span class="ss">Options</span><span class="p">:</span>
+
+    <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">milk</span>                   <span class="no">Don</span><span class="err">’</span><span class="n">t</span> <span class="n">add</span> <span class="n">milk</span> <span class="n">to</span> <span class="n">the</span> <span class="n">beverage</span>
+    <span class="o">--</span><span class="n">sweetener</span><span class="o">=[</span><span class="n">sugar</span><span class="o">|</span><span class="n">honey</span><span class="o">]</span>   <span class="no">Use</span> <span class="n">one</span> <span class="n">of</span> <span class="n">the</span> <span class="n">available</span> <span class="n">sweeteners</span>
+    <span class="o">--</span><span class="n">version</span>                   <span class="no">Show</span> <span class="n">the</span> <span class="n">version</span> <span class="n">of</span> <span class="n">the</span> <span class="n">tool</span>
+    <span class="o">--</span><span class="n">verbose</span>                   <span class="no">Show</span> <span class="n">more</span> <span class="n">debugging</span> <span class="n">information</span>
+    <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">ansi</span>                   <span class="no">Show</span> <span class="n">output</span> <span class="n">without</span> <span class="no">ANSI</span> <span class="n">codes</span>
+    <span class="o">--</span><span class="n">help</span>                      <span class="no">Show</span> <span class="n">help</span> <span class="n">banner</span> <span class="n">of</span> <span class="n">specified</span> <span class="n">command</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>来一杯 black-eye ☕️，休息一下吧!</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="err">$</span> <span class="n">beverage</span><span class="o">-</span><span class="n">maker</span> <span class="n">coffee</span> <span class="n">black</span><span class="o">-</span><span class="n">eye</span>
+<span class="o">*</span> <span class="no">Boiling</span> <span class="n">water</span><span class="err">…</span>
+<span class="o">*</span> <span class="no">Adding</span> <span class="n">milk</span><span class="err">…</span>
+<span class="o">*</span> <span class="no">Grinding</span> <span class="n">black</span><span class="o">-</span><span class="n">eye</span> <span class="n">beans</span><span class="err">…</span>
+<span class="o">*</span> <span class="no">Brewing</span> <span class="n">coffee</span><span class="err">…</span>
+<span class="o">*</span> <span class="no">Enjoy</span><span class="o">!</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>如需本文的 Demo 代码，请访问：<a href="https://github.com/looseyi/BeverageMaker">https://github.com/looseyi/BeverageMaker</a></p>
+<h1 id="总结">总结</h1>
+<p>本文简单聊了 <code>CLAide</code> 的实现，并手动制作了一款 🥤 贩卖机来展示 CALide 的命令配置。主要感受如下：</p>
+<ol>
+<li>通过对源码对阅读，终于了解了对  <code>pod</code> 命令的的正确使用姿势</li>
+<li>仅需简单配置 <code>Command</code> banner，就能有比较精美的终端输出效果和帮助提示等</li>
+<li>提供的抽象命令功能，方便的将相关逻辑收口到统一到命令中，方便查阅</li>
+<li>从侧面简单了解了，如何在终端输出带富文本效果的提示信息</li>
+</ol>
+<h1 id="知识点问题梳理">知识点问题梳理</h1>
+<p>这里罗列了四个问题用来考察你是否已经掌握了这篇文章，如果没有建议你加入<strong>收藏</strong>再次阅读：</p>
+<ol>
+<li><code>CLAide</code> 预设的 banner 有哪些，其作用分别是什么 ？</li>
+<li><code>CALide</code> 中设定的 Argument 有几种类型，区别是什么 ？</li>
+<li><code>CALide</code> 中抽象命令的和普通命令的区别 ？</li>
+<li>要实现 CLI 需要修改 <code>.gemspec</code> 中的哪些配置 ？</li>
+</ol>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">土土Edmond木</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2020-09-02
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/cocoapods/">CocoaPods</a>
+          <a href="/tags/ios/">iOS</a>
+          <a href="/tags/ruby/">Ruby</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/sourcecode-cocoapods/04-cocoapods-podfile/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">4. Podfile 的解析逻辑</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/sourcecode-cocoapods/02-cocoapods-corecomponents/">
+            <span class="next-text nav-default">2. 整体把握 CocoaPods 核心组件</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+    <script src="https://utteranc.es/client.js"
+            repo="looseyi/looseyi.github.io"
+            issue-term="pathname"
+            theme="github-light"
+            crossorigin="anonymous"
+            async>
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/utterance">comments powered by utterances.</a></noscript>
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:chun574271939@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://twitter.com/looseyi" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="https://github.com/looseyi" class="iconfont icon-github" title="github"></a>
+      <a href="https://www.weibo.com/foreverclp" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="https://www.zhihu.com/people/tu-tu-edmondmu" class="iconfont icon-zhihu" title="zhihu"></a>
+  <a href="http://looseyi.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2019-12-11 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">土土Edmond木</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-62789092-1', 'auto');
+	ga('set', 'anonymizeIp', true);
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>

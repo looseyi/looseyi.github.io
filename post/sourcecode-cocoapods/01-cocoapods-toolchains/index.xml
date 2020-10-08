@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>1. 版本管理工具及 Ruby 工具链环境 on </title>
+    <link>http://looseyi.github.io/post/sourcecode-cocoapods/01-cocoapods-toolchains/</link>
+    <description>Recent content in 1. 版本管理工具及 Ruby 工具链环境 on </description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Wed, 10 Jun 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://looseyi.github.io/post/sourcecode-cocoapods/01-cocoapods-toolchains/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+  </channel>
+</rss>

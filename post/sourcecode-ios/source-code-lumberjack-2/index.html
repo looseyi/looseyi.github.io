@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.62.0 with theme even" />
+<meta name="generator" content="Hugo 0.71.1 with theme even" />
 
 
 <link rel="canonical" href="http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-2/" />
@@ -50,7 +50,7 @@
 <meta itemprop="description" content="DDFileLogger 继续上一篇：CocoaLumberjack 之 DDLog，重点介绍了 lumberjack 的核心管理类 DDLog 以及两个核心协议 DDLogger 和 DDLogFormatter。还涉及">
 <meta itemprop="datePublished" content="2020-05-08T23:20:00&#43;08:00" />
 <meta itemprop="dateModified" content="2020-05-08T23:20:00&#43;08:00" />
-<meta itemprop="wordCount" content="6088">
+<meta itemprop="wordCount" content="6089">
 
 
 
@@ -126,7 +126,7 @@
         <div class="post-category">
             <a href="/categories/ios/"> iOS </a>
             </div>
-          <span class="more-meta"> 约 6088 字 </span>
+          <span class="more-meta"> 约 6089 字 </span>
           <span class="more-meta"> 预计阅读 13 分钟 </span>
         
       </div>
@@ -139,12 +139,12 @@
   <ul>
     <li><a href="#log-file">Log File</a></li>
     <li><a href="#init">Init</a></li>
-    <li><a href="#file-rollinghttpswwwwikiwandcomenlog-rotation">File Rolling</a>
+    <li><a href="#file-rollinghttpswwwwikiwandcomenlog_rotation"><a href="https://www.wikiwand.com/en/Log_rotation">File Rolling</a></a>
       <ul>
-        <li><a href="#lt-mayberolllogfileduetosize">lt_maybeRollLogFileDueToSize</a></li>
-        <li><a href="#lt-mayberolllogfileduetoage">lt_maybeRollLogFileDueToAge</a></li>
-        <li><a href="#lt-scheduletimertorolllogfileduetoage">lt_scheduleTimerToRollLogFileDueToAge</a></li>
-        <li><a href="#lt-rolllogfilenow">lt_rollLogFileNow</a></li>
+        <li><a href="#lt_mayberolllogfileduetosize">lt_maybeRollLogFileDueToSize</a></li>
+        <li><a href="#lt_mayberolllogfileduetoage">lt_maybeRollLogFileDueToAge</a></li>
+        <li><a href="#lt_scheduletimertorolllogfileduetoage">lt_scheduleTimerToRollLogFileDueToAge</a></li>
+        <li><a href="#lt_rolllogfilenow">lt_rollLogFileNow</a></li>
       </ul>
     </li>
     <li><a href="#ddlogfileinfo">DDLogFileInfo</a></li>
@@ -152,16 +152,16 @@
       <ul>
         <li><a href="#logmessage">logMessage:</a></li>
         <li><a href="#flush">flush</a></li>
-        <li><a href="#lt-logdata">lt_logData</a></li>
+        <li><a href="#lt_logdata">lt_logData</a></li>
       </ul>
     </li>
     <li><a href="#file-logging">File Logging</a>
       <ul>
-        <li><a href="#lt-currentlogfilehandle">lt_currentLogFileHandle</a></li>
-        <li><a href="#lt-monitorcurrentlogfileforexternalchanges">lt_monitorCurrentLogFileForExternalChanges</a></li>
-        <li><a href="#lt-currentlogfileinfo">lt_currentLogFileInfo</a></li>
-        <li><a href="#lt-shoulduselogfile-isresuming">lt_shouldUseLogFile: isResuming</a></li>
-        <li><a href="#lt-shouldlogfilebearchived">lt_shouldLogFileBeArchived</a></li>
+        <li><a href="#lt_currentlogfilehandle">lt_currentLogFileHandle</a></li>
+        <li><a href="#lt_monitorcurrentlogfileforexternalchanges">lt_monitorCurrentLogFileForExternalChanges</a></li>
+        <li><a href="#lt_currentlogfileinfo">lt_currentLogFileInfo</a></li>
+        <li><a href="#lt_shoulduselogfile-isresuming">lt_shouldUseLogFile: isResuming</a></li>
+        <li><a href="#lt_shouldlogfilebearchived">lt_shouldLogFileBeArchived</a></li>
       </ul>
     </li>
   </ul>
@@ -178,10 +178,10 @@
   <ul>
     <li><a href="#life-cycle">Life Cycle</a>
       <ul>
-        <li><a href="#heading">初始化</a></li>
+        <li><a href="#初始化">初始化</a></li>
         <li><a href="#flushbuffer">flushBuffer</a></li>
         <li><a href="#dealloc">dealloc</a></li>
-        <li><a href="#lt-sendbuffereddatatofilelogger">lt_sendBufferedDataToFileLogger</a></li>
+        <li><a href="#lt_sendbuffereddatatofilelogger">lt_sendBufferedDataToFileLogger</a></li>
       </ul>
     </li>
     <li><a href="#logging">Logging</a>
@@ -195,7 +195,7 @@
   <ul>
     <li>
       <ul>
-        <li><a href="#heading-2">未完待续</a></li>
+        <li><a href="#未完待续">未完待续</a></li>
       </ul>
     </li>
   </ul>
@@ -243,17 +243,17 @@
 </span><span class="lnt">8
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="n">_completionQueue</span> <span class="o">=</span> <span class="n">dispatchQueue</span> <span class="o">?</span><span class="o">:</span> <span class="n">dispatch_get_global_queue</span><span class="p">(</span><span class="n">DISPATCH_QUEUE_PRIORITY_DEFAULT</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="p">;</span>
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="n">_completionQueue</span> <span class="o">=</span> <span class="n">dispatchQueue</span> <span class="o">?:</span> <span class="n">dispatch_get_global_queue</span><span class="p">(</span><span class="n">DISPATCH_QUEUE_PRIORITY_DEFAULT</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
 
 <span class="n">_maximumFileSize</span> <span class="o">=</span> <span class="n">kDDDefaultLogMaxFileSize</span><span class="p">;</span>
 <span class="n">_rollingFrequency</span> <span class="o">=</span> <span class="n">kDDDefaultLogRollingFrequency</span><span class="p">;</span>
 <span class="n">_automaticallyAppendNewlineForCustomFormatters</span> <span class="o">=</span> <span class="nb">YES</span><span class="p">;</span>
 
 <span class="n">_logFileManager</span> <span class="o">=</span> <span class="n">aLogFileManager</span><span class="p">;</span>
-<span class="n">_logFormatter</span> <span class="o">=</span> <span class="p">[</span><span class="n">DDLogFileFormatterDefault</span> <span class="n">new</span><span class="p">]</span><span class="p">;</span>
+<span class="n">_logFormatter</span> <span class="o">=</span> <span class="p">[</span><span class="n">DDLogFileFormatterDefault</span> <span class="n">new</span><span class="p">];</span>
 </code></pre></td></tr></table>
 </div>
-</div><h2 id="file-rollinghttpswwwwikiwandcomenlog-rotation"><a href="https://www.wikiwand.com/en/Log_rotation">File Rolling</a></h2>
+</div><h2 id="file-rollinghttpswwwwikiwandcomenlog_rotation"><a href="https://www.wikiwand.com/en/Log_rotation">File Rolling</a></h2>
 <p>也称为 log rotation，wiki 解释：</p>
 <blockquote>
 <p>In <a href="https://www.wikiwand.com/en/Information_technology">information technology</a>, <strong>log rotation</strong> is an automated process used in <a href="https://www.wikiwand.com/en/System_administration">system administration</a> in which <a href="https://www.wikiwand.com/en/Computer_data_logging">log files</a> are compressed, moved (<a href="https://www.wikiwand.com/en/Archive">archived</a>), renamed or deleted once they are too old or too big (there can be other metrics that can apply here). New incoming log data is directed into a new fresh file (at the same location)[<a href="https://www.wikiwand.com/en/Log_rotation#citenote1">1]</a>.</p>
@@ -294,13 +294,13 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-objc" data-lang="objc"><span class="c1">/// 默认日志文件 size 上限
 </span><span class="c1"></span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="k">const</span> <span class="n">kDDDefaultLogMaxFileSize</span>      <span class="o">=</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">;</span> <span class="c1">// 1 MB
-</span><span class="c1"></span><span class="c1">/// 默认日志文件分割间隔（执行轮替的间隔）
+</span><span class="c1">/// 默认日志文件分割间隔（执行轮替的间隔）
 </span><span class="c1"></span><span class="n">NSTimeInterval</span>     <span class="k">const</span> <span class="n">kDDDefaultLogRollingFrequency</span> <span class="o">=</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">24</span><span class="p">;</span> <span class="c1">// 24 Hours
-</span><span class="c1"></span><span class="c1">/// 默认最大日志文件分割数量
+</span><span class="c1">/// 默认最大日志文件分割数量
 </span><span class="c1"></span><span class="n">NSUInteger</span>         <span class="k">const</span> <span class="n">kDDDefaultLogMaxNumLogFiles</span>   <span class="o">=</span> <span class="mi">5</span><span class="p">;</span> <span class="c1">// 5 Files
-</span><span class="c1"></span><span class="c1">/// 默认日志文件整体磁盘配额
+</span><span class="c1">/// 默认日志文件整体磁盘配额
 </span><span class="c1"></span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="k">const</span> <span class="n">kDDDefaultLogFilesDiskQuota</span>   <span class="o">=</span> <span class="mi">20</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">;</span> <span class="c1">// 20 MB
-</span><span class="c1"></span><span class="c1">/// 日志文件滚动计时器更新频率
+</span><span class="c1">/// 日志文件滚动计时器更新频率
 </span><span class="c1"></span><span class="n">NSTimeInterval</span>     <span class="k">const</span> <span class="n">kDDRollingLeeway</span>              <span class="o">=</span> <span class="mf">1.0</span><span class="p">;</span> <span class="c1">// 1s
 </span></code></pre></td></tr></table>
 </div>
@@ -308,7 +308,7 @@
 <p>如果希望仅按照 <code>rollingFrequency</code> 作为控制条件，可以设置 <code>maximumFileSize</code> 为 zero。同理，可以设置  <code>rollingFrequency</code> 为 zero 来达到 disable 的作用。</p>
 <p>另外，rolling 中还提供了 <code>doNotReuseLogFiles</code> 来控制，是否允许复用上一次运行时写入的 log file。默认为</p>
 <p>NO，如果设置为 YES，则每启动都会新生成一次 log file。</p>
-<h3 id="lt-mayberolllogfileduetosize">lt_maybeRollLogFileDueToSize</h3>
+<h3 id="lt_mayberolllogfileduetosize">lt_maybeRollLogFileDueToSize</h3>
 <p>先来看看 <code>rollLogFile by size </code> 的情况。当修改 <code>maximumFileSize</code> 时会触发 <code>lt_maybeRollLogFileDueToSize</code>，<code>setMaximumFileSize:</code> 实现如下：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -330,18 +330,18 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">dispatch_block_t</span> <span class="n">block</span> <span class="o">=</span> <span class="o">^</span><span class="p">{</span>
     <span class="k">@autoreleasepool</span> <span class="p">{</span>
-        <span class="nb">self</span><span class="o">-</span><span class="o">&gt;</span><span class="n">_maximumFileSize</span> <span class="o">=</span> <span class="n">newMaximumFileSize</span><span class="p">;</span>
-        <span class="p">[</span><span class="nb">self</span> <span class="n">lt_maybeRollLogFileDueToSize</span><span class="p">]</span><span class="p">;</span>
+        <span class="nb">self</span><span class="o">-&gt;</span><span class="n">_maximumFileSize</span> <span class="o">=</span> <span class="n">newMaximumFileSize</span><span class="p">;</span>
+        <span class="p">[</span><span class="nb">self</span> <span class="n">lt_maybeRollLogFileDueToSize</span><span class="p">];</span>
     <span class="p">}</span>
-<span class="p">}</span><span class="p">;</span>
-<span class="n">NSAssert</span><span class="p">(</span><span class="o">!</span><span class="p">[</span><span class="nb">self</span> <span class="n">isOnGlobalLoggingQueue</span><span class="p">]</span><span class="p">,</span> <span class="s">@&#34;</span><span class="s">Core architecture requirement failure</span><span class="s">&#34;</span><span class="p">)</span><span class="p">;</span>
-<span class="n">NSAssert</span><span class="p">(</span><span class="o">!</span><span class="p">[</span><span class="nb">self</span> <span class="n">isOnInternalLoggerQueue</span><span class="p">]</span><span class="p">,</span> <span class="s">@&#34;</span><span class="s">MUST access ivar directly, NOT via self.* syntax.</span><span class="s">&#34;</span><span class="p">)</span><span class="p">;</span>
+<span class="p">};</span>
+<span class="n">NSAssert</span><span class="p">(</span><span class="o">!</span><span class="p">[</span><span class="nb">self</span> <span class="n">isOnGlobalLoggingQueue</span><span class="p">],</span> <span class="s">@&#34;Core architecture requirement failure&#34;</span><span class="p">);</span>
+<span class="n">NSAssert</span><span class="p">(</span><span class="o">!</span><span class="p">[</span><span class="nb">self</span> <span class="n">isOnInternalLoggerQueue</span><span class="p">],</span> <span class="s">@&#34;MUST access ivar directly, NOT via self.* syntax.&#34;</span><span class="p">);</span>
 
-<span class="n">dispatch_queue_t</span> <span class="n">globalLoggingQueue</span> <span class="o">=</span> <span class="p">[</span><span class="n">DDLog</span> <span class="n">loggingQueue</span><span class="p">]</span><span class="p">;</span>
+<span class="n">dispatch_queue_t</span> <span class="n">globalLoggingQueue</span> <span class="o">=</span> <span class="p">[</span><span class="n">DDLog</span> <span class="n">loggingQueue</span><span class="p">];</span>
 
 <span class="n">dispatch_async</span><span class="p">(</span><span class="n">globalLoggingQueue</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span>
-    <span class="n">dispatch_async</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">loggerQueue</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span><span class="p">;</span>
-<span class="p">}</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">dispatch_async</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">loggerQueue</span><span class="p">,</span> <span class="n">block</span><span class="p">);</span>
+<span class="p">});</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>最终会在 loggerQueue 中调用 block 以触发 <code>lt_maybeRollLogFileDueToSize</code>。上述代码为何要通过两层的 queue 的嵌套以及 loggingQueue 和 loggerQueue 的说明都在上一篇又详细的解释。来看 <code>lt_maybeRollLogFileDueToSize</code> 实现：</p>
@@ -359,14 +359,14 @@
 </span><span class="lnt">10
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="n">NSAssert</span><span class="p">(</span><span class="p">[</span><span class="nb">self</span> <span class="n">isOnInternalLoggerQueue</span><span class="p">]</span><span class="p">,</span> <span class="s">@&#34;</span><span class="s">lt_ methods should be on logger queue.</span><span class="s">&#34;</span><span class="p">)</span><span class="p">;</span>
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="n">NSAssert</span><span class="p">([</span><span class="nb">self</span> <span class="n">isOnInternalLoggerQueue</span><span class="p">],</span> <span class="s">@&#34;lt_ methods should be on logger queue.&#34;</span><span class="p">);</span>
 <span class="k">if</span> <span class="p">(</span><span class="n">_maximumFileSize</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">fileSize</span> <span class="o">=</span> <span class="p">[</span><span class="n">_currentLogFileHandle</span> <span class="n">offsetInFile</span><span class="p">]</span><span class="p">;</span>
+    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">fileSize</span> <span class="o">=</span> <span class="p">[</span><span class="n">_currentLogFileHandle</span> <span class="n">offsetInFile</span><span class="p">];</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="n">fileSize</span> <span class="o">&gt;</span><span class="o">=</span> <span class="n">_maximumFileSize</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">NSLogVerbose</span><span class="p">(</span><span class="s">@&#34;</span><span class="s">DDFileLogger: Rolling log file due to size (%qu)...</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">fileSize</span><span class="p">)</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">fileSize</span> <span class="o">&gt;=</span> <span class="n">_maximumFileSize</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">NSLogVerbose</span><span class="p">(</span><span class="s">@&#34;DDFileLogger: Rolling log file due to size (%qu)...&#34;</span><span class="p">,</span> <span class="n">fileSize</span><span class="p">);</span>
 
-        <span class="p">[</span><span class="nb">self</span> <span class="n">lt_rollLogFileNow</span><span class="p">]</span><span class="p">;</span>
+        <span class="p">[</span><span class="nb">self</span> <span class="n">lt_rollLogFileNow</span><span class="p">];</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
@@ -376,7 +376,7 @@
 <li>作者通过对 <code>_maximumFileSize &gt; 0</code> 来控制是否开启 log 大小检查。_currentLogFileHandle 是当前所写入 log file 的文件操作符（之后简称为 <strong>fd</strong> ：file descriptor）为 <code>NSFileHandle</code> 类；</li>
 <li>当文件超限时，执行 <code>lt_rollLogFileNow</code> ；</li>
 </ol>
-<h3 id="lt-mayberolllogfileduetoage">lt_maybeRollLogFileDueToAge</h3>
+<h3 id="lt_mayberolllogfileduetoage">lt_maybeRollLogFileDueToAge</h3>
 <p>同 <code>setMaximumFileSize:</code> 类似，修改 <code>rollingFrequency</code> 会在 block 中触发 <code>lt_maybeRollLogFileDueToAge</code>：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -390,18 +390,18 @@
 </span><span class="lnt">8
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="n">NSAssert</span><span class="p">(</span><span class="p">[</span><span class="nb">self</span> <span class="n">isOnInternalLoggerQueue</span><span class="p">]</span><span class="p">,</span> <span class="s">@&#34;</span><span class="s">lt_ methods should be on logger queue.</span><span class="s">&#34;</span><span class="p">)</span><span class="p">;</span>
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="n">NSAssert</span><span class="p">([</span><span class="nb">self</span> <span class="n">isOnInternalLoggerQueue</span><span class="p">],</span> <span class="s">@&#34;lt_ methods should be on logger queue.&#34;</span><span class="p">);</span>
 
-<span class="k">if</span> <span class="p">(</span><span class="n">_rollingFrequency</span> <span class="o">&gt;</span> <span class="mf">0.0</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="p">(</span><span class="n">_currentLogFileInfo</span><span class="p">.</span><span class="n">age</span> <span class="o">+</span> <span class="n">kDDRollingLeeway</span><span class="p">)</span> <span class="o">&gt;</span><span class="o">=</span> <span class="n">_rollingFrequency</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">NSLogVerbose</span><span class="p">(</span><span class="s">@&#34;</span><span class="s">DDFileLogger: Rolling log file due to age...</span><span class="s">&#34;</span><span class="p">)</span><span class="p">;</span>
-    <span class="p">[</span><span class="nb">self</span> <span class="n">lt_rollLogFileNow</span><span class="p">]</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">_rollingFrequency</span> <span class="o">&gt;</span> <span class="mf">0.0</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">_currentLogFileInfo</span><span class="p">.</span><span class="n">age</span> <span class="o">+</span> <span class="n">kDDRollingLeeway</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">_rollingFrequency</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">NSLogVerbose</span><span class="p">(</span><span class="s">@&#34;DDFileLogger: Rolling log file due to age...&#34;</span><span class="p">);</span>
+    <span class="p">[</span><span class="nb">self</span> <span class="n">lt_rollLogFileNow</span><span class="p">];</span>
 <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-    <span class="p">[</span><span class="nb">self</span> <span class="n">lt_scheduleTimerToRollLogFileDueToAge</span><span class="p">]</span><span class="p">;</span>
+    <span class="p">[</span><span class="nb">self</span> <span class="n">lt_scheduleTimerToRollLogFileDueToAge</span><span class="p">];</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>同样是检查环境，检查 <code>_rollingFrequency &gt; 0.0</code> 以及 log file 的创建时间是否超限。如果轮替时间超限则开始轮替。否则会重置 rollingTimer 下一次轮替的 delay 时间。</p>
-<h3 id="lt-scheduletimertorolllogfileduetoage">lt_scheduleTimerToRollLogFileDueToAge</h3>
+<h3 id="lt_scheduletimertorolllogfileduetoage">lt_scheduleTimerToRollLogFileDueToAge</h3>
 <p>这里的定时器使用的是 <code>  dispatch_source_t</code> 。首先将当前 timer invalid 然后检查 _currentLogFileInfo 和 _rollingFrequency：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -415,10 +415,10 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(</span><span class="n">_rollingTimer</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">dispatch_source_cancel</span><span class="p">(</span><span class="n">_rollingTimer</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">dispatch_source_cancel</span><span class="p">(</span><span class="n">_rollingTimer</span><span class="p">);</span>
     <span class="n">_rollingTimer</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
 <span class="p">}</span>
-<span class="k">if</span> <span class="p">(</span><span class="n">_currentLogFileInfo</span> <span class="o">=</span><span class="o">=</span> <span class="nb">nil</span> <span class="o">|</span><span class="o">|</span> <span class="n">_rollingFrequency</span> <span class="o">&lt;</span><span class="o">=</span> <span class="mf">0.0</span><span class="p">)</span> <span class="p">{</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">_currentLogFileInfo</span> <span class="o">==</span> <span class="nb">nil</span> <span class="o">||</span> <span class="n">_rollingFrequency</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
@@ -434,9 +434,9 @@
 </span><span class="lnt">3
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">NSDate</span> <span class="o">*</span><span class="n">logFileCreationDate</span> <span class="o">=</span> <span class="p">[</span><span class="n">_currentLogFileInfo</span> <span class="n">creationDate</span><span class="p">]</span><span class="p">;</span>
-<span class="n">NSTimeInterval</span> <span class="n">frequency</span> <span class="o">=</span> <span class="n">MIN</span><span class="p">(</span><span class="n">_rollingFrequency</span><span class="p">,</span> <span class="n">DBL_MAX</span> <span class="o">-</span> <span class="p">[</span><span class="n">logFileCreationDate</span> <span class="n">timeIntervalSinceReferenceDate</span><span class="p">]</span><span class="p">)</span><span class="p">;</span>
-<span class="n">NSDate</span> <span class="o">*</span><span class="n">logFileRollingDate</span> <span class="o">=</span> <span class="p">[</span><span class="n">logFileCreationDate</span> <span class="nl">dateByAddingTimeInterval</span><span class="p">:</span><span class="n">frequency</span><span class="p">]</span><span class="p">;</span>
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">NSDate</span> <span class="o">*</span><span class="n">logFileCreationDate</span> <span class="o">=</span> <span class="p">[</span><span class="n">_currentLogFileInfo</span> <span class="n">creationDate</span><span class="p">];</span>
+<span class="n">NSTimeInterval</span> <span class="n">frequency</span> <span class="o">=</span> <span class="n">MIN</span><span class="p">(</span><span class="n">_rollingFrequency</span><span class="p">,</span> <span class="n">DBL_MAX</span> <span class="o">-</span> <span class="p">[</span><span class="n">logFileCreationDate</span> <span class="n">timeIntervalSinceReferenceDate</span><span class="p">]);</span>
+<span class="n">NSDate</span> <span class="o">*</span><span class="n">logFileRollingDate</span> <span class="o">=</span> <span class="p">[</span><span class="n">logFileCreationDate</span> <span class="nl">dateByAddingTimeInterval</span><span class="p">:</span><span class="n">frequency</span><span class="p">];</span>
 </code></pre></td></tr></table>
 </div>
 </div></li>
@@ -452,11 +452,11 @@
 </span><span class="lnt">6
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">_rollingTimer</span> <span class="o">=</span> <span class="n">dispatch_source_create</span><span class="p">(</span><span class="n">DISPATCH_SOURCE_TYPE_TIMER</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">_loggerQueue</span><span class="p">)</span><span class="p">;</span>
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">_rollingTimer</span> <span class="o">=</span> <span class="n">dispatch_source_create</span><span class="p">(</span><span class="n">DISPATCH_SOURCE_TYPE_TIMER</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">_loggerQueue</span><span class="p">);</span>
 <span class="k">__weak</span> <span class="n">__auto_type</span> <span class="n">weakSelf</span> <span class="o">=</span> <span class="nb">self</span><span class="p">;</span>
 <span class="n">dispatch_source_set_event_handler</span><span class="p">(</span><span class="n">_rollingTimer</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span> <span class="k">@autoreleasepool</span> <span class="p">{</span>
-    <span class="p">[</span><span class="n">weakSelf</span> <span class="n">lt_maybeRollLogFileDueToAge</span><span class="p">]</span><span class="p">;</span>
-<span class="p">}</span> <span class="p">}</span><span class="p">)</span><span class="p">;</span>
+    <span class="p">[</span><span class="n">weakSelf</span> <span class="n">lt_maybeRollLogFileDueToAge</span><span class="p">];</span>
+<span class="p">}</span> <span class="p">});</span>
 <span class="c1">//... 兼容 MRC，设置 dispatch_source_t release 回调
 </span></code></pre></td></tr></table>
 </div>
@@ -478,20 +478,20 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">static</span> <span class="n">NSTimeInterval</span> <span class="k">const</span> <span class="n">kDDMaxTimerDelay</span> <span class="o">=</span> <span class="n">LLONG_MAX</span> <span class="o">/</span> <span class="n">NSEC_PER_SEC</span><span class="p">;</span>
-<span class="n">int64_t</span> <span class="n">delay</span> <span class="o">=</span> <span class="p">(</span><span class="n">int64_t</span><span class="p">)</span><span class="p">(</span><span class="n">MIN</span><span class="p">(</span><span class="p">[</span><span class="n">logFileRollingDate</span> <span class="n">timeIntervalSinceNow</span><span class="p">]</span><span class="p">,</span> <span class="n">kDDMaxTimerDelay</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">NSTimeInterval</span><span class="p">)</span> <span class="n">NSEC_PER_SEC</span><span class="p">)</span><span class="p">;</span>
-<span class="n">dispatch_time_t</span> <span class="n">fireTime</span> <span class="o">=</span> <span class="n">dispatch_time</span><span class="p">(</span><span class="n">DISPATCH_TIME_NOW</span><span class="p">,</span> <span class="n">delay</span><span class="p">)</span><span class="p">;</span>
+<span class="n">int64_t</span> <span class="n">delay</span> <span class="o">=</span> <span class="p">(</span><span class="n">int64_t</span><span class="p">)(</span><span class="n">MIN</span><span class="p">([</span><span class="n">logFileRollingDate</span> <span class="n">timeIntervalSinceNow</span><span class="p">],</span> <span class="n">kDDMaxTimerDelay</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">NSTimeInterval</span><span class="p">)</span> <span class="n">NSEC_PER_SEC</span><span class="p">);</span>
+<span class="n">dispatch_time_t</span> <span class="n">fireTime</span> <span class="o">=</span> <span class="n">dispatch_time</span><span class="p">(</span><span class="n">DISPATCH_TIME_NOW</span><span class="p">,</span> <span class="n">delay</span><span class="p">);</span>
    
-<span class="n">dispatch_source_set_timer</span><span class="p">(</span><span class="n">_rollingTimer</span><span class="p">,</span> <span class="n">fireTime</span><span class="p">,</span> <span class="n">DISPATCH_TIME_FOREVER</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64_t</span><span class="p">)</span><span class="n">kDDRollingLeeway</span> <span class="o">*</span> <span class="n">NSEC_PER_SEC</span><span class="p">)</span><span class="p">;</span>
+<span class="n">dispatch_source_set_timer</span><span class="p">(</span><span class="n">_rollingTimer</span><span class="p">,</span> <span class="n">fireTime</span><span class="p">,</span> <span class="n">DISPATCH_TIME_FOREVER</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64_t</span><span class="p">)</span><span class="n">kDDRollingLeeway</span> <span class="o">*</span> <span class="n">NSEC_PER_SEC</span><span class="p">);</span>
    
-<span class="k">if</span> <span class="p">(</span><span class="p">@</span><span class="n">available</span><span class="p">(</span><span class="n">macOS</span> <span class="mf">10.12</span><span class="p">,</span> <span class="n">iOS</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">tvOS</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">watchOS</span> <span class="mf">3.0</span><span class="p">,</span> <span class="o">*</span><span class="p">)</span><span class="p">)</span>
-    <span class="n">dispatch_activate</span><span class="p">(</span><span class="n">_rollingTimer</span><span class="p">)</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(@</span><span class="n">available</span><span class="p">(</span><span class="n">macOS</span> <span class="mf">10.12</span><span class="p">,</span> <span class="n">iOS</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">tvOS</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">watchOS</span> <span class="mf">3.0</span><span class="p">,</span> <span class="o">*</span><span class="p">))</span>
+    <span class="n">dispatch_activate</span><span class="p">(</span><span class="n">_rollingTimer</span><span class="p">);</span>
 <span class="k">else</span>
-    <span class="nf">dispatch_resume</span><span class="p">(</span><span class="n">_rollingTimer</span><span class="p">)</span><span class="p">;</span>
+    <span class="nf">dispatch_resume</span><span class="p">(</span><span class="n">_rollingTimer</span><span class="p">);</span>
 </code></pre></td></tr></table>
 </div>
 </div></li>
 </ol>
-<h3 id="lt-rolllogfilenow">lt_rollLogFileNow</h3>
+<h3 id="lt_rolllogfilenow">lt_rollLogFileNow</h3>
 <p>整个 fileLogger 的文件写入操作均基于 fd，而 fd 的获取是通过 lazy 的方式。如果 fd 为空， rollLogFile will do nothing。而日志轮替做的事情也比较清晰：</p>
 <ol>
 <li>同步并关闭 fd，同时将文件标记为 <strong>Archived</strong>;</li>
@@ -528,30 +528,30 @@
 </span><span class="lnt">26
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(</span><span class="n">_currentLogFileHandle</span> <span class="o">=</span><span class="o">=</span> <span class="nb">nil</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span><span class="p">;</span> <span class="p">}</span>
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(</span><span class="n">_currentLogFileHandle</span> <span class="o">==</span> <span class="nb">nil</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span><span class="p">;</span> <span class="p">}</span>
 
-<span class="p">[</span><span class="n">_currentLogFileHandle</span> <span class="n">synchronizeFile</span><span class="p">]</span><span class="p">;</span>
-<span class="p">[</span><span class="n">_currentLogFileHandle</span> <span class="n">closeFile</span><span class="p">]</span><span class="p">;</span>
+<span class="p">[</span><span class="n">_currentLogFileHandle</span> <span class="n">synchronizeFile</span><span class="p">];</span>
+<span class="p">[</span><span class="n">_currentLogFileHandle</span> <span class="n">closeFile</span><span class="p">];</span>
 <span class="n">_currentLogFileHandle</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
 
 <span class="n">_currentLogFileInfo</span><span class="p">.</span><span class="n">isArchived</span> <span class="o">=</span> <span class="nb">YES</span><span class="p">;</span>
-<span class="kt">BOOL</span> <span class="n">logFileManagerRespondsToSelector</span> <span class="o">=</span> <span class="p">[</span><span class="n">_logFileManager</span> <span class="nl">respondsToSelector</span><span class="p">:</span><span class="k">@selector</span><span class="p">(</span><span class="nl">didRollAndArchiveLogFile</span><span class="p">:</span><span class="p">)</span><span class="p">]</span><span class="p">;</span>
+<span class="kt">BOOL</span> <span class="n">logFileManagerRespondsToSelector</span> <span class="o">=</span> <span class="p">[</span><span class="n">_logFileManager</span> <span class="nl">respondsToSelector</span><span class="p">:</span><span class="k">@selector</span><span class="p">(</span><span class="nl">didRollAndArchiveLogFile</span><span class="p">:)];</span>
 <span class="n">NSString</span> <span class="o">*</span><span class="n">archivedFilePath</span> <span class="o">=</span> <span class="p">(</span><span class="n">logFileManagerRespondsToSelector</span><span class="p">)</span> <span class="o">?</span> <span class="p">[</span><span class="n">_currentLogFileInfo</span><span class="p">.</span><span class="n">filePath</span> <span class="k">copy</span><span class="p">]</span> <span class="o">:</span> <span class="nb">nil</span><span class="p">;</span>
 <span class="n">_currentLogFileInfo</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
 
 <span class="k">if</span> <span class="p">(</span><span class="n">logFileManagerRespondsToSelector</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">dispatch_async</span><span class="p">(</span><span class="n">_completionQueue</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span>
-        <span class="p">[</span><span class="nb">self</span><span class="o">-</span><span class="o">&gt;</span><span class="n">_logFileManager</span> <span class="nl">didRollAndArchiveLogFile</span><span class="p">:</span><span class="n">archivedFilePath</span><span class="p">]</span><span class="p">;</span>
-    <span class="p">}</span><span class="p">)</span><span class="p">;</span>
+        <span class="p">[</span><span class="nb">self</span><span class="o">-&gt;</span><span class="n">_logFileManager</span> <span class="nl">didRollAndArchiveLogFile</span><span class="p">:</span><span class="n">archivedFilePath</span><span class="p">];</span>
+    <span class="p">});</span>
 <span class="p">}</span>
 
 <span class="k">if</span> <span class="p">(</span><span class="n">_currentLogFileVnode</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">dispatch_source_cancel</span><span class="p">(</span><span class="n">_currentLogFileVnode</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">dispatch_source_cancel</span><span class="p">(</span><span class="n">_currentLogFileVnode</span><span class="p">);</span>
     <span class="n">_currentLogFileVnode</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
 <span class="p">}</span>
 
 <span class="k">if</span> <span class="p">(</span><span class="n">_rollingTimer</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">dispatch_source_cancel</span><span class="p">(</span><span class="n">_rollingTimer</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">dispatch_source_cancel</span><span class="p">(</span><span class="n">_rollingTimer</span><span class="p">);</span>
     <span class="n">_rollingTimer</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
@@ -623,10 +623,10 @@
 <pre class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="p">[</span><span class="n">_currentLogFileHandle</span> <span class="n">synchronizeFile</span><span class="p">]</span><span class="p">;</span>
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="p">[</span><span class="n">_currentLogFileHandle</span> <span class="n">synchronizeFile</span><span class="p">];</span>
 </code></pre></td></tr></table>
 </div>
-</div><h3 id="lt-logdata">lt_logData</h3>
+</div><h3 id="lt_logdata">lt_logData</h3>
 <p>将 log message 转化过的 NSData 写入 file，代码如下：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -646,15 +646,15 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">@try</span> <span class="p">{</span>
-    <span class="n">NSFileHandle</span> <span class="o">*</span><span class="n">handle</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="n">lt_currentLogFileHandle</span><span class="p">]</span><span class="p">;</span>
-    <span class="p">[</span><span class="n">handle</span> <span class="n">seekToEndOfFile</span><span class="p">]</span><span class="p">;</span>
-    <span class="p">[</span><span class="n">handle</span> <span class="nl">writeData</span><span class="p">:</span><span class="n">data</span><span class="p">]</span><span class="p">;</span>
+    <span class="n">NSFileHandle</span> <span class="o">*</span><span class="n">handle</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="n">lt_currentLogFileHandle</span><span class="p">];</span>
+    <span class="p">[</span><span class="n">handle</span> <span class="n">seekToEndOfFile</span><span class="p">];</span>
+    <span class="p">[</span><span class="n">handle</span> <span class="nl">writeData</span><span class="p">:</span><span class="n">data</span><span class="p">];</span>
 <span class="p">}</span> <span class="k">@catch</span> <span class="p">(</span><span class="n">NSException</span> <span class="o">*</span><span class="n">exception</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">exception_count</span><span class="o">+</span><span class="o">+</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">exception_count</span> <span class="o">&lt;</span><span class="o">=</span> <span class="mi">10</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">NSLogError</span><span class="p">(</span><span class="s">@&#34;</span><span class="s">DDFileLogger.logMessage: %@</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">exception</span><span class="p">)</span><span class="p">;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">exception_count</span> <span class="o">=</span><span class="o">=</span> <span class="mi">10</span><span class="p">)</span> <span class="p">{</span>
-            <span class="n">NSLogError</span><span class="p">(</span><span class="s">@&#34;</span><span class="s">DDFileLogger.logMessage: Too many exceptions -- will not log any more of them.</span><span class="s">&#34;</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">exception_count</span><span class="o">++</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">exception_count</span> <span class="o">&lt;=</span> <span class="mi">10</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">NSLogError</span><span class="p">(</span><span class="s">@&#34;DDFileLogger.logMessage: %@&#34;</span><span class="p">,</span> <span class="n">exception</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">exception_count</span> <span class="o">==</span> <span class="mi">10</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">NSLogError</span><span class="p">(</span><span class="s">@&#34;DDFileLogger.logMessage: Too many exceptions -- will not log any more of them.&#34;</span><span class="p">);</span>
         <span class="p">}</span>
     <span class="p">}</span>
 <span class="p">}</span>
@@ -683,13 +683,13 @@
 
 <span class="k">static</span> <span class="n">dispatch_once_t</span> <span class="n">onceToken</span><span class="p">;</span>
 <span class="n">dispatch_once</span><span class="p">(</span><span class="o">&amp;</span><span class="n">onceToken</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span>
-<span class="n">implementsDeprecatedWillLog</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="nl">respondsToSelector</span><span class="p">:</span><span class="k">@selector</span><span class="p">(</span><span class="n">willLogMessage</span><span class="p">)</span><span class="p">]</span><span class="p">;</span>
-<span class="p">}</span><span class="p">)</span><span class="p">;</span>
+<span class="n">implementsDeprecatedWillLog</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="nl">respondsToSelector</span><span class="p">:</span><span class="k">@selector</span><span class="p">(</span><span class="n">willLogMessage</span><span class="p">)];</span>
+<span class="p">});</span>
 
 <span class="k">if</span> <span class="p">(</span><span class="n">implementsDeprecatedWillLog</span><span class="p">)</span> <span class="p">{</span>
-    <span class="p">[</span><span class="nb">self</span> <span class="n">willLogMessage</span><span class="p">]</span><span class="p">;</span>
+    <span class="p">[</span><span class="nb">self</span> <span class="n">willLogMessage</span><span class="p">];</span>
 <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-    <span class="p">[</span><span class="nb">self</span> <span class="nl">willLogMessage</span><span class="p">:</span><span class="n">_currentLogFileInfo</span><span class="p">]</span><span class="p">;</span>
+    <span class="p">[</span><span class="nb">self</span> <span class="nl">willLogMessage</span><span class="p">:</span><span class="n">_currentLogFileInfo</span><span class="p">];</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -713,26 +713,26 @@
 </span><span class="lnt">15
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">dummyMethod</span> <span class="p">{</span><span class="p">}</span>
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">dummyMethod</span> <span class="p">{}</span>
 
 <span class="p">-</span> <span class="p">(</span><span class="n">NSMethodSignature</span> <span class="o">*</span><span class="p">)</span><span class="nf">methodSignatureForSelector:</span><span class="p">(</span><span class="kt">SEL</span><span class="p">)</span><span class="nv">aSelector</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">aSelector</span> <span class="o">=</span><span class="o">=</span> <span class="k">@selector</span><span class="p">(</span><span class="n">willLogMessage</span><span class="p">)</span> <span class="o">|</span><span class="o">|</span> <span class="n">aSelector</span> <span class="o">=</span><span class="o">=</span> <span class="k">@selector</span><span class="p">(</span><span class="n">didLogMessage</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">aSelector</span> <span class="o">==</span> <span class="k">@selector</span><span class="p">(</span><span class="n">willLogMessage</span><span class="p">)</span> <span class="o">||</span> <span class="n">aSelector</span> <span class="o">==</span> <span class="k">@selector</span><span class="p">(</span><span class="n">didLogMessage</span><span class="p">))</span> <span class="p">{</span>
         <span class="c1">// Ignore calls to deprecated methods.
-</span><span class="c1"></span>        <span class="k">return</span> <span class="p">[</span><span class="nb">self</span> <span class="nl">methodSignatureForSelector</span><span class="p">:</span><span class="k">@selector</span><span class="p">(</span><span class="n">dummyMethod</span><span class="p">)</span><span class="p">]</span><span class="p">;</span>
+</span><span class="c1"></span>        <span class="k">return</span> <span class="p">[</span><span class="nb">self</span> <span class="nl">methodSignatureForSelector</span><span class="p">:</span><span class="k">@selector</span><span class="p">(</span><span class="n">dummyMethod</span><span class="p">)];</span>
     <span class="p">}</span>
-    <span class="k">return</span> <span class="p">[</span><span class="nb">super</span> <span class="nl">methodSignatureForSelector</span><span class="p">:</span><span class="n">aSelector</span><span class="p">]</span><span class="p">;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="nb">super</span> <span class="nl">methodSignatureForSelector</span><span class="p">:</span><span class="n">aSelector</span><span class="p">];</span>
 <span class="p">}</span>
 
 <span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">forwardInvocation:</span><span class="p">(</span><span class="n">NSInvocation</span> <span class="o">*</span><span class="p">)</span><span class="nv">anInvocation</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">anInvocation</span><span class="p">.</span><span class="n">selector</span> <span class="o">!</span><span class="o">=</span> <span class="k">@selector</span><span class="p">(</span><span class="n">dummyMethod</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
-        <span class="p">[</span><span class="nb">super</span> <span class="nl">forwardInvocation</span><span class="p">:</span><span class="n">anInvocation</span><span class="p">]</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">anInvocation</span><span class="p">.</span><span class="n">selector</span> <span class="o">!=</span> <span class="k">@selector</span><span class="p">(</span><span class="n">dummyMethod</span><span class="p">))</span> <span class="p">{</span>
+        <span class="p">[</span><span class="nb">super</span> <span class="nl">forwardInvocation</span><span class="p">:</span><span class="n">anInvocation</span><span class="p">];</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
 </div><h2 id="file-logging">File Logging</h2>
 <p>整个 file logging 相关方法是对 fileHandle 和 fileInfo 的各种状态判断以及更新。</p>
-<h3 id="lt-currentlogfilehandle">lt_currentLogFileHandle</h3>
+<h3 id="lt_currentlogfilehandle">lt_currentLogFileHandle</h3>
 <p>_currentLogFileHandle 通过 layze 方式获取。当 <code>lt_rollLogFileNow</code> 成功后会将 _currentLogFileHandle 置 nil。创建逻辑如下：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -746,13 +746,13 @@
 </span><span class="lnt">8
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">NSString</span> <span class="o">*</span><span class="n">logFilePath</span> <span class="o">=</span> <span class="p">[</span><span class="p">[</span><span class="nb">self</span> <span class="n">lt_currentLogFileInfo</span><span class="p">]</span> <span class="n">filePath</span><span class="p">]</span><span class="p">;</span>
-<span class="n">_currentLogFileHandle</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSFileHandle</span> <span class="nl">fileHandleForWritingAtPath</span><span class="p">:</span><span class="n">logFilePath</span><span class="p">]</span><span class="p">;</span>
-<span class="p">[</span><span class="n">_currentLogFileHandle</span> <span class="n">seekToEndOfFile</span><span class="p">]</span><span class="p">;</span>
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">NSString</span> <span class="o">*</span><span class="n">logFilePath</span> <span class="o">=</span> <span class="p">[[</span><span class="nb">self</span> <span class="n">lt_currentLogFileInfo</span><span class="p">]</span> <span class="n">filePath</span><span class="p">];</span>
+<span class="n">_currentLogFileHandle</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSFileHandle</span> <span class="nl">fileHandleForWritingAtPath</span><span class="p">:</span><span class="n">logFilePath</span><span class="p">];</span>
+<span class="p">[</span><span class="n">_currentLogFileHandle</span> <span class="n">seekToEndOfFile</span><span class="p">];</span>
 
 <span class="k">if</span> <span class="p">(</span><span class="n">_currentLogFileHandle</span><span class="p">)</span> <span class="p">{</span>
-    <span class="p">[</span><span class="nb">self</span> <span class="n">lt_scheduleTimerToRollLogFileDueToAge</span><span class="p">]</span><span class="p">;</span>
-    <span class="p">[</span><span class="nb">self</span> <span class="n">lt_monitorCurrentLogFileForExternalChanges</span><span class="p">]</span><span class="p">;</span>
+    <span class="p">[</span><span class="nb">self</span> <span class="n">lt_scheduleTimerToRollLogFileDueToAge</span><span class="p">];</span>
+    <span class="p">[</span><span class="nb">self</span> <span class="n">lt_monitorCurrentLogFileForExternalChanges</span><span class="p">];</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -760,7 +760,7 @@
 <li>通过 <code>lt_currentLogFileInfo</code> 获取 filePath 生成 _currentLogFileHandle 并将文件指针置文章末尾；</li>
 <li>创建成功后重置 rolling 定时器，并开启 GCD 监听 _currentLogFileHandle；</li>
 </ol>
-<h3 id="lt-monitorcurrentlogfileforexternalchanges">lt_monitorCurrentLogFileForExternalChanges</h3>
+<h3 id="lt_monitorcurrentlogfileforexternalchanges">lt_monitorCurrentLogFileForExternalChanges</h3>
 <p>先是 _currentLogFileHandle 是否为空的断言，接着是设置 <code>dispatch_source_vnode_flags_t</code> 添加 event handler 回调：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -781,22 +781,22 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-objc" data-lang="objc"><span class="n">dispatch_source_vnode_flags_t</span> <span class="n">flags</span> <span class="o">=</span> <span class="n">DISPATCH_VNODE_DELETE</span> <span class="o">|</span> <span class="n">DISPATCH_VNODE_RENAME</span> <span class="o">|</span> <span class="n">DISPATCH_VNODE_REVOKE</span><span class="p">;</span>
-<span class="n">_currentLogFileVnode</span> <span class="o">=</span> <span class="n">dispatch_source_create</span><span class="p">(</span><span class="n">DISPATCH_SOURCE_TYPE_VNODE</span><span class="p">,</span> <span class="p">(</span><span class="n">uintptr_t</span><span class="p">)</span><span class="p">[</span><span class="n">_currentLogFileHandle</span> <span class="n">fileDescriptor</span><span class="p">]</span><span class="p">,</span> <span class="n">flags</span><span class="p">,</span> <span class="n">_loggerQueue</span><span class="p">)</span><span class="p">;</span>
+<span class="n">_currentLogFileVnode</span> <span class="o">=</span> <span class="n">dispatch_source_create</span><span class="p">(</span><span class="n">DISPATCH_SOURCE_TYPE_VNODE</span><span class="p">,</span> <span class="p">(</span><span class="n">uintptr_t</span><span class="p">)[</span><span class="n">_currentLogFileHandle</span> <span class="n">fileDescriptor</span><span class="p">],</span> <span class="n">flags</span><span class="p">,</span> <span class="n">_loggerQueue</span><span class="p">);</span>
 
 <span class="k">__weak</span> <span class="n">__auto_type</span> <span class="n">weakSelf</span> <span class="o">=</span> <span class="nb">self</span><span class="p">;</span>
 <span class="n">dispatch_source_set_event_handler</span><span class="p">(</span><span class="n">_currentLogFileVnode</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span> <span class="k">@autoreleasepool</span> <span class="p">{</span>
-    <span class="n">NSLogInfo</span><span class="p">(</span><span class="s">@&#34;</span><span class="s">DDFileLogger: Current logfile was moved. Rolling it and creating a new one</span><span class="s">&#34;</span><span class="p">)</span><span class="p">;</span>
-    <span class="p">[</span><span class="n">weakSelf</span> <span class="n">lt_rollLogFileNow</span><span class="p">]</span><span class="p">;</span>
-<span class="p">}</span> <span class="p">}</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">NSLogInfo</span><span class="p">(</span><span class="s">@&#34;DDFileLogger: Current logfile was moved. Rolling it and creating a new one&#34;</span><span class="p">);</span>
+    <span class="p">[</span><span class="n">weakSelf</span> <span class="n">lt_rollLogFileNow</span><span class="p">];</span>
+<span class="p">}</span> <span class="p">});</span>
 <span class="c1">//... 兼容 MRC，设置 dispatch_source_t release 回调
 </span><span class="c1"></span>
-<span class="k">if</span> <span class="p">(</span><span class="p">@</span><span class="n">available</span><span class="p">(</span><span class="n">macOS</span> <span class="mf">10.12</span><span class="p">,</span> <span class="n">iOS</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">tvOS</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">watchOS</span> <span class="mf">3.0</span><span class="p">,</span> <span class="o">*</span><span class="p">)</span><span class="p">)</span>
-    <span class="n">dispatch_activate</span><span class="p">(</span><span class="n">_currentLogFileVnode</span><span class="p">)</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(@</span><span class="n">available</span><span class="p">(</span><span class="n">macOS</span> <span class="mf">10.12</span><span class="p">,</span> <span class="n">iOS</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">tvOS</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">watchOS</span> <span class="mf">3.0</span><span class="p">,</span> <span class="o">*</span><span class="p">))</span>
+    <span class="n">dispatch_activate</span><span class="p">(</span><span class="n">_currentLogFileVnode</span><span class="p">);</span>
 <span class="k">else</span>
-    <span class="nf">dispatch_resume</span><span class="p">(</span><span class="n">_currentLogFileVnode</span><span class="p">)</span><span class="p">;</span>
+    <span class="nf">dispatch_resume</span><span class="p">(</span><span class="n">_currentLogFileVnode</span><span class="p">);</span>
 </code></pre></td></tr></table>
 </div>
-</div><h3 id="lt-currentlogfileinfo">lt_currentLogFileInfo</h3>
+</div><h3 id="lt_currentlogfileinfo">lt_currentLogFileInfo</h3>
 <p>获取当前是否存在可用的 fileInfo。检查条件如下：</p>
 <ol>
 <li>取出 <code>logsDirectory</code> 中的 log 文件列表，并转化为 DDLogFileInfo。文件需要满足以 <code>.log</code> 结尾；</li>
@@ -804,7 +804,7 @@
 <li>如果 <code>newCurrentLogFile</code> 存在，检查其可用性。如不可用则会通过 fileManger 创建新的 fileInfo；</li>
 </ol>
 <p>实现这里就不贴出了，接着来看检查条件。</p>
-<h3 id="lt-shoulduselogfile-isresuming">lt_shouldUseLogFile: isResuming</h3>
+<h3 id="lt_shoulduselogfile-isresuming">lt_shouldUseLogFile: isResuming</h3>
 <p>isResuming 是从对上一步 <code>newCurrentLogFile</code> 可用性的判断中传入的参数：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -813,7 +813,7 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-objc" data-lang="objc"><span class="c1">// Check if we&#39;re resuming and if so, get the first of the sorted log file infos.
-</span><span class="c1"></span><span class="kt">BOOL</span> <span class="n">isResuming</span> <span class="o">=</span> <span class="n">newCurrentLogFile</span> <span class="o">=</span><span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
+</span><span class="c1"></span><span class="kt">BOOL</span> <span class="n">isResuming</span> <span class="o">=</span> <span class="n">newCurrentLogFile</span> <span class="o">==</span> <span class="nb">nil</span><span class="p">;</span>
 </code></pre></td></tr></table>
 </div>
 </div><ol>
@@ -832,7 +832,7 @@
 <p>满足条件返回 YES；</p>
 </li>
 </ol>
-<h3 id="lt-shouldlogfilebearchived">lt_shouldLogFileBeArchived</h3>
+<h3 id="lt_shouldlogfilebearchived">lt_shouldLogFileBeArchived</h3>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -860,24 +860,24 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">if</span> <span class="p">(</span><span class="n">mostRecentLogFileInfo</span><span class="p">.</span><span class="n">isArchived</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nb">NO</span><span class="p">;</span>
-<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="p">[</span><span class="nb">self</span> <span class="nl">shouldArchiveRecentLogFileInfo</span><span class="p">:</span><span class="n">mostRecentLogFileInfo</span><span class="p">]</span><span class="p">)</span> <span class="p">{</span>
+<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">([</span><span class="nb">self</span> <span class="nl">shouldArchiveRecentLogFileInfo</span><span class="p">:</span><span class="n">mostRecentLogFileInfo</span><span class="p">])</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nb">YES</span><span class="p">;</span>
-<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">_maximumFileSize</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">mostRecentLogFileInfo</span><span class="p">.</span><span class="n">fileSize</span> <span class="o">&gt;</span><span class="o">=</span> <span class="n">_maximumFileSize</span><span class="p">)</span> <span class="p">{</span>
+<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">_maximumFileSize</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">mostRecentLogFileInfo</span><span class="p">.</span><span class="n">fileSize</span> <span class="o">&gt;=</span> <span class="n">_maximumFileSize</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nb">YES</span><span class="p">;</span>
-<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">_rollingFrequency</span> <span class="o">&gt;</span> <span class="mf">0.0</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">mostRecentLogFileInfo</span><span class="p">.</span><span class="n">age</span> <span class="o">&gt;</span><span class="o">=</span> <span class="n">_rollingFrequency</span><span class="p">)</span> <span class="p">{</span>
+<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">_rollingFrequency</span> <span class="o">&gt;</span> <span class="mf">0.0</span> <span class="o">&amp;&amp;</span> <span class="n">mostRecentLogFileInfo</span><span class="p">.</span><span class="n">age</span> <span class="o">&gt;=</span> <span class="n">_rollingFrequency</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nb">YES</span><span class="p">;</span>
 <span class="p">}</span>
-<span class="cp">#</span><span class="cp">if TARGET_OS_IPHONE</span><span class="cp">
-</span><span class="cp"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">doesAppRunInBackground</span><span class="p">(</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">NSFileProtectionType</span> <span class="n">key</span> <span class="o">=</span> <span class="n">mostRecentLogFileInfo</span><span class="p">.</span><span class="n">fileAttributes</span><span class="p">[</span><span class="n">NSFileProtectionKey</span><span class="p">]</span><span class="p">;</span>
-        <span class="kt">BOOL</span> <span class="n">isUntilFirstAuth</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span> <span class="nl">isEqualToString</span><span class="p">:</span><span class="n">NSFileProtectionCompleteUntilFirstUserAuthentication</span><span class="p">]</span><span class="p">;</span>
-        <span class="kt">BOOL</span> <span class="n">isNone</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span> <span class="nl">isEqualToString</span><span class="p">:</span><span class="n">NSFileProtectionNone</span><span class="p">]</span><span class="p">;</span>
+<span class="cp">#if TARGET_OS_IPHONE
+</span><span class="cp"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">doesAppRunInBackground</span><span class="p">())</span> <span class="p">{</span>
+        <span class="n">NSFileProtectionType</span> <span class="n">key</span> <span class="o">=</span> <span class="n">mostRecentLogFileInfo</span><span class="p">.</span><span class="n">fileAttributes</span><span class="p">[</span><span class="n">NSFileProtectionKey</span><span class="p">];</span>
+        <span class="kt">BOOL</span> <span class="n">isUntilFirstAuth</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span> <span class="nl">isEqualToString</span><span class="p">:</span><span class="n">NSFileProtectionCompleteUntilFirstUserAuthentication</span><span class="p">];</span>
+        <span class="kt">BOOL</span> <span class="n">isNone</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span> <span class="nl">isEqualToString</span><span class="p">:</span><span class="n">NSFileProtectionNone</span><span class="p">];</span>
 
-        <span class="k">if</span> <span class="p">(</span><span class="n">key</span> <span class="o">!</span><span class="o">=</span> <span class="nb">nil</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="o">!</span><span class="n">isUntilFirstAuth</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="o">!</span><span class="n">isNone</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">key</span> <span class="o">!=</span> <span class="nb">nil</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">isUntilFirstAuth</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">isNone</span><span class="p">)</span> <span class="p">{</span>
             <span class="k">return</span> <span class="nb">YES</span><span class="p">;</span>
         <span class="p">}</span>
     <span class="p">}</span>
-<span class="cp">#</span><span class="cp">endif</span><span class="cp">
+<span class="cp">#endif
 </span><span class="cp"></span><span class="k">return</span> <span class="nb">NO</span><span class="p">;</span>
 </code></pre></td></tr></table>
 </div>
@@ -899,7 +899,7 @@
 <pre class="chroma"><code class="language-objc" data-lang="objc"><span class="p">-</span> <span class="p">(</span><span class="n">NSFileProtectionType</span><span class="p">)</span><span class="nf">logFileProtection</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">_defaultFileProtectionLevel</span><span class="p">.</span><span class="n">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">return</span> <span class="n">_defaultFileProtectionLevel</span><span class="p">;</span>
-    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">doesAppRunInBackground</span><span class="p">(</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">doesAppRunInBackground</span><span class="p">())</span> <span class="p">{</span>
         <span class="k">return</span> <span class="n">NSFileProtectionCompleteUntilFirstUserAuthentication</span><span class="p">;</span>
     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
         <span class="k">return</span> <span class="n">NSFileProtectionCompleteUnlessOpen</span><span class="p">;</span>
@@ -944,18 +944,18 @@
 <span class="k">@property</span> <span class="p">(</span><span class="k">readwrite</span><span class="p">,</span> <span class="k">assign</span><span class="p">,</span> <span class="k">atomic</span><span class="p">)</span> <span class="n">NSUInteger</span> <span class="n">maximumNumberOfLogFiles</span><span class="p">;</span>
 <span class="k">@property</span> <span class="p">(</span><span class="k">readwrite</span><span class="p">,</span> <span class="k">assign</span><span class="p">,</span> <span class="k">atomic</span><span class="p">)</span> <span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">logFilesDiskQuota</span><span class="p">;</span>
 <span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">readonly</span><span class="p">,</span> <span class="k">copy</span><span class="p">)</span> <span class="n">NSString</span> <span class="o">*</span><span class="n">logsDirectory</span><span class="p">;</span>
-<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">readonly</span><span class="p">,</span> <span class="k">strong</span><span class="p">)</span> <span class="n">NSArray</span><span class="o">&lt;</span><span class="n">NSString</span> <span class="o">*</span><span class="o">&gt;</span> <span class="o">*</span><span class="n">unsortedLogFilePaths</span><span class="p">;</span>
-<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">readonly</span><span class="p">,</span> <span class="k">strong</span><span class="p">)</span> <span class="n">NSArray</span><span class="o">&lt;</span><span class="n">NSString</span> <span class="o">*</span><span class="o">&gt;</span> <span class="o">*</span><span class="n">unsortedLogFileNames</span><span class="p">;</span>
-<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">readonly</span><span class="p">,</span> <span class="k">strong</span><span class="p">)</span> <span class="n">NSArray</span><span class="o">&lt;</span><span class="n">DDLogFileInfo</span> <span class="o">*</span><span class="o">&gt;</span> <span class="o">*</span><span class="n">unsortedLogFileInfos</span><span class="p">;</span>
-<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">readonly</span><span class="p">,</span> <span class="k">strong</span><span class="p">)</span> <span class="n">NSArray</span><span class="o">&lt;</span><span class="n">NSString</span> <span class="o">*</span><span class="o">&gt;</span> <span class="o">*</span><span class="n">sortedLogFilePaths</span><span class="p">;</span>
-<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">readonly</span><span class="p">,</span> <span class="k">strong</span><span class="p">)</span> <span class="n">NSArray</span><span class="o">&lt;</span><span class="n">NSString</span> <span class="o">*</span><span class="o">&gt;</span> <span class="o">*</span><span class="n">sortedLogFileNames</span><span class="p">;</span>
-<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">readonly</span><span class="p">,</span> <span class="k">strong</span><span class="p">)</span> <span class="n">NSArray</span><span class="o">&lt;</span><span class="n">DDLogFileInfo</span> <span class="o">*</span><span class="o">&gt;</span> <span class="o">*</span><span class="n">sortedLogFileInfos</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">readonly</span><span class="p">,</span> <span class="k">strong</span><span class="p">)</span> <span class="n">NSArray</span><span class="o">&lt;</span><span class="n">NSString</span> <span class="o">*&gt;</span> <span class="o">*</span><span class="n">unsortedLogFilePaths</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">readonly</span><span class="p">,</span> <span class="k">strong</span><span class="p">)</span> <span class="n">NSArray</span><span class="o">&lt;</span><span class="n">NSString</span> <span class="o">*&gt;</span> <span class="o">*</span><span class="n">unsortedLogFileNames</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">readonly</span><span class="p">,</span> <span class="k">strong</span><span class="p">)</span> <span class="n">NSArray</span><span class="o">&lt;</span><span class="n">DDLogFileInfo</span> <span class="o">*&gt;</span> <span class="o">*</span><span class="n">unsortedLogFileInfos</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">readonly</span><span class="p">,</span> <span class="k">strong</span><span class="p">)</span> <span class="n">NSArray</span><span class="o">&lt;</span><span class="n">NSString</span> <span class="o">*&gt;</span> <span class="o">*</span><span class="n">sortedLogFilePaths</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">readonly</span><span class="p">,</span> <span class="k">strong</span><span class="p">)</span> <span class="n">NSArray</span><span class="o">&lt;</span><span class="n">NSString</span> <span class="o">*&gt;</span> <span class="o">*</span><span class="n">sortedLogFileNames</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">readonly</span><span class="p">,</span> <span class="k">strong</span><span class="p">)</span> <span class="n">NSArray</span><span class="o">&lt;</span><span class="n">DDLogFileInfo</span> <span class="o">*&gt;</span> <span class="o">*</span><span class="n">sortedLogFileInfos</span><span class="p">;</span>
 
-<span class="p">-</span> <span class="p">(</span><span class="n">nullable</span> <span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nf">createNewLogFileWithError:</span><span class="p">(</span><span class="n">NSError</span> <span class="o">*</span><span class="o">*</span><span class="p">)</span><span class="nv">error</span><span class="p">;</span>
+<span class="p">-</span> <span class="p">(</span><span class="n">nullable</span> <span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nf">createNewLogFileWithError:</span><span class="p">(</span><span class="n">NSError</span> <span class="o">**</span><span class="p">)</span><span class="nv">error</span><span class="p">;</span>
 
 <span class="k">@optional</span>
-<span class="o">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nl">didArchiveLogFile</span><span class="p">:</span><span class="p">(</span><span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="n">logFilePath</span> <span class="n">NS_SWIFT_NAME</span><span class="p">(</span><span class="n">didArchiveLogFile</span><span class="p">(</span><span class="nl">atPath</span><span class="p">:</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
-<span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">didRollAndArchiveLogFile:</span><span class="p">(</span><span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">logFilePath</span> <span class="n">NS_SWIFT_NAME</span><span class="p">(</span><span class="n">didRollAndArchiveLogFile</span><span class="p">(</span><span class="nl">atPath</span><span class="p">:</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
+<span class="o">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nl">didArchiveLogFile</span><span class="p">:(</span><span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="n">logFilePath</span> <span class="n">NS_SWIFT_NAME</span><span class="p">(</span><span class="n">didArchiveLogFile</span><span class="p">(</span><span class="nl">atPath</span><span class="p">:));</span>
+<span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">didRollAndArchiveLogFile:</span><span class="p">(</span><span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">logFilePath</span> <span class="n">NS_SWIFT_NAME</span><span class="p">(</span><span class="n">didRollAndArchiveLogFile</span><span class="p">(</span><span class="nl">atPath</span><span class="p">:));</span>
 
 <span class="k">@end</span>
 </code></pre></td></tr></table>
@@ -987,9 +987,9 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-objc" data-lang="objc"><span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">used</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-<span class="k">for</span> <span class="p">(</span><span class="n">NSUInteger</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">sortedLogFileInfos</span><span class="p">.</span><span class="n">count</span><span class="p">;</span> <span class="n">i</span><span class="o">+</span><span class="o">+</span><span class="p">)</span> <span class="p">{</span>
-   <span class="n">DDLogFileInfo</span> <span class="o">*</span><span class="n">info</span> <span class="o">=</span> <span class="n">sortedLogFileInfos</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="p">;</span>
-   <span class="n">used</span> <span class="o">+</span><span class="o">=</span> <span class="n">info</span><span class="p">.</span><span class="n">fileSize</span><span class="p">;</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">NSUInteger</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">sortedLogFileInfos</span><span class="p">.</span><span class="n">count</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+   <span class="n">DDLogFileInfo</span> <span class="o">*</span><span class="n">info</span> <span class="o">=</span> <span class="n">sortedLogFileInfos</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+   <span class="n">used</span> <span class="o">+=</span> <span class="n">info</span><span class="p">.</span><span class="n">fileSize</span><span class="p">;</span>
    
    <span class="k">if</span> <span class="p">(</span><span class="n">used</span> <span class="o">&gt;</span> <span class="n">diskQuota</span><span class="p">)</span> <span class="p">{</span>
        <span class="n">firstIndexToDelete</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
@@ -1013,10 +1013,10 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">if</span> <span class="p">(</span><span class="n">maxNumLogFiles</span><span class="p">)</span> <span class="p">{</span>
-     <span class="k">if</span> <span class="p">(</span><span class="n">firstIndexToDelete</span> <span class="o">=</span><span class="o">=</span> <span class="n">NSNotFound</span><span class="p">)</span> <span class="p">{</span>
+     <span class="k">if</span> <span class="p">(</span><span class="n">firstIndexToDelete</span> <span class="o">==</span> <span class="n">NSNotFound</span><span class="p">)</span> <span class="p">{</span>
          <span class="n">firstIndexToDelete</span> <span class="o">=</span> <span class="n">maxNumLogFiles</span><span class="p">;</span>
      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-         <span class="n">firstIndexToDelete</span> <span class="o">=</span> <span class="n">MIN</span><span class="p">(</span><span class="n">firstIndexToDelete</span><span class="p">,</span> <span class="n">maxNumLogFiles</span><span class="p">)</span><span class="p">;</span>
+         <span class="n">firstIndexToDelete</span> <span class="o">=</span> <span class="n">MIN</span><span class="p">(</span><span class="n">firstIndexToDelete</span><span class="p">,</span> <span class="n">maxNumLogFiles</span><span class="p">);</span>
      <span class="p">}</span>
  <span class="p">}</span>
 </code></pre></td></tr></table>
@@ -1038,7 +1038,7 @@
 <pre class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="p">[</span><span class="n">DDLog</span> <span class="nl">addLogger</span><span class="p">:</span><span class="p">[</span><span class="n">_logger</span> <span class="n">wrapWithBuffer</span><span class="p">]</span><span class="p">]</span><span class="p">;</span>
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="p">[</span><span class="n">DDLog</span> <span class="nl">addLogger</span><span class="p">:[</span><span class="n">_logger</span> <span class="n">wrapWithBuffer</span><span class="p">]];</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>通过 <code>wrapWithBuffer</code> 返回的是 <code>DDBufferedProxy</code> 类：</p>
@@ -1047,7 +1047,7 @@
 <pre class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="p">(</span><span class="n">DDFileLogger</span> <span class="o">*</span><span class="p">)</span><span class="p">[</span><span class="p">[</span><span class="n">DDBufferedProxy</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithFileLogger</span><span class="p">:</span><span class="nb">self</span><span class="p">]</span><span class="p">;</span>
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="p">(</span><span class="n">DDFileLogger</span> <span class="o">*</span><span class="p">)[[</span><span class="n">DDBufferedProxy</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithFileLogger</span><span class="p">:</span><span class="nb">self</span><span class="p">];</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>接着利用 <strong>Message Forwarding</strong> 将 DDBufferedProxy 未代理的方法通通转发回 fileLogger 处理：</p>
@@ -1067,15 +1067,15 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="p">-</span> <span class="p">(</span><span class="n">NSMethodSignature</span> <span class="o">*</span><span class="p">)</span><span class="nf">methodSignatureForSelector:</span><span class="p">(</span><span class="kt">SEL</span><span class="p">)</span><span class="nv">sel</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">fileLogger</span> <span class="nl">methodSignatureForSelector</span><span class="p">:</span><span class="n">sel</span><span class="p">]</span><span class="p">;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">fileLogger</span> <span class="nl">methodSignatureForSelector</span><span class="p">:</span><span class="n">sel</span><span class="p">];</span>
 <span class="p">}</span>
 
 <span class="p">-</span> <span class="p">(</span><span class="kt">BOOL</span><span class="p">)</span><span class="nf">respondsToSelector:</span><span class="p">(</span><span class="kt">SEL</span><span class="p">)</span><span class="nv">aSelector</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">fileLogger</span> <span class="nl">respondsToSelector</span><span class="p">:</span><span class="n">aSelector</span><span class="p">]</span><span class="p">;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">fileLogger</span> <span class="nl">respondsToSelector</span><span class="p">:</span><span class="n">aSelector</span><span class="p">];</span>
 <span class="p">}</span>
 
 <span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">forwardInvocation:</span><span class="p">(</span><span class="n">NSInvocation</span> <span class="o">*</span><span class="p">)</span><span class="nv">invocation</span> <span class="p">{</span>
-    <span class="p">[</span><span class="n">invocation</span> <span class="nl">invokeWithTarget</span><span class="p">:</span><span class="nb">self</span><span class="p">.</span><span class="n">fileLogger</span><span class="p">]</span><span class="p">;</span>
+    <span class="p">[</span><span class="n">invocation</span> <span class="nl">invokeWithTarget</span><span class="p">:</span><span class="nb">self</span><span class="p">.</span><span class="n">fileLogger</span><span class="p">];</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -1136,14 +1136,14 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">static</span> <span class="kr">inline</span> <span class="n">NSUInteger</span> <span class="nf">p_DDGetDefaultBufferSizeBytesMax</span><span class="p">(</span><span class="k">const</span> <span class="kt">BOOL</span> <span class="n">max</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">struct</span> <span class="n">statfs</span> <span class="o">*</span><span class="n">mountedFileSystems</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-    <span class="kt">int</span> <span class="n">count</span> <span class="o">=</span> <span class="n">getmntinfo</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mountedFileSystems</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">count</span> <span class="o">=</span> <span class="n">getmntinfo</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mountedFileSystems</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
 
-    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">count</span><span class="p">;</span> <span class="n">i</span><span class="o">+</span><span class="o">+</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">struct</span> <span class="n">statfs</span> <span class="n">mounted</span> <span class="o">=</span> <span class="n">mountedFileSystems</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">count</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">struct</span> <span class="n">statfs</span> <span class="n">mounted</span> <span class="o">=</span> <span class="n">mountedFileSystems</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
         <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">name</span> <span class="o">=</span> <span class="n">mounted</span><span class="p">.</span><span class="n">f_mntonname</span><span class="p">;</span>
 
         <span class="c1">// We can use 2 as max here, since any length &gt; 1 will fail the if-statement.
-</span><span class="c1"></span>        <span class="k">if</span> <span class="p">(</span><span class="n">strnlen</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">=</span><span class="o">=</span> <span class="mi">1</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="o">*</span><span class="n">name</span> <span class="o">=</span><span class="o">=</span> <span class="sa"></span><span class="sc">&#39;</span><span class="sc">/</span><span class="sc">&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="c1"></span>        <span class="k">if</span> <span class="p">(</span><span class="n">strnlen</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="o">&amp;&amp;</span> <span class="o">*</span><span class="n">name</span> <span class="o">==</span> <span class="sc">&#39;/&#39;</span><span class="p">)</span> <span class="p">{</span>
             <span class="k">return</span> <span class="n">max</span> <span class="o">?</span> <span class="p">(</span><span class="n">NSUInteger</span><span class="p">)</span><span class="n">mounted</span><span class="p">.</span><span class="nl">f_iosize</span> <span class="p">:</span> <span class="p">(</span><span class="n">NSUInteger</span><span class="p">)</span><span class="n">mounted</span><span class="p">.</span><span class="n">f_bsize</span><span class="p">;</span>
         <span class="p">}</span>
     <span class="p">}</span>
@@ -1179,27 +1179,27 @@
 </span><span class="lnt">17
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">static</span> <span class="n">NSUInteger</span> <span class="nf">DDGetMaxBufferSizeBytes</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">static</span> <span class="n">NSUInteger</span> <span class="nf">DDGetMaxBufferSizeBytes</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">static</span> <span class="n">NSUInteger</span> <span class="n">maxBufferSize</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
     <span class="k">static</span> <span class="n">dispatch_once_t</span> <span class="n">onceToken</span><span class="p">;</span>
     <span class="n">dispatch_once</span><span class="p">(</span><span class="o">&amp;</span><span class="n">onceToken</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span>
-        <span class="n">maxBufferSize</span> <span class="o">=</span> <span class="n">p_DDGetDefaultBufferSizeBytesMax</span><span class="p">(</span><span class="nb">YES</span><span class="p">)</span><span class="p">;</span>
-    <span class="p">}</span><span class="p">)</span><span class="p">;</span>
+        <span class="n">maxBufferSize</span> <span class="o">=</span> <span class="n">p_DDGetDefaultBufferSizeBytesMax</span><span class="p">(</span><span class="nb">YES</span><span class="p">);</span>
+    <span class="p">});</span>
     <span class="k">return</span> <span class="n">maxBufferSize</span><span class="p">;</span>
 <span class="p">}</span>
 
-<span class="k">static</span> <span class="n">NSUInteger</span> <span class="nf">DDGetDefaultBufferSizeBytes</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
+<span class="k">static</span> <span class="n">NSUInteger</span> <span class="nf">DDGetDefaultBufferSizeBytes</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">static</span> <span class="n">NSUInteger</span> <span class="n">defaultBufferSize</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
     <span class="k">static</span> <span class="n">dispatch_once_t</span> <span class="n">onceToken</span><span class="p">;</span>
     <span class="n">dispatch_once</span><span class="p">(</span><span class="o">&amp;</span><span class="n">onceToken</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span>
-        <span class="n">defaultBufferSize</span> <span class="o">=</span> <span class="n">p_DDGetDefaultBufferSizeBytesMax</span><span class="p">(</span><span class="nb">NO</span><span class="p">)</span><span class="p">;</span>
-    <span class="p">}</span><span class="p">)</span><span class="p">;</span>
+        <span class="n">defaultBufferSize</span> <span class="o">=</span> <span class="n">p_DDGetDefaultBufferSizeBytesMax</span><span class="p">(</span><span class="nb">NO</span><span class="p">);</span>
+    <span class="p">});</span>
     <span class="k">return</span> <span class="n">defaultBufferSize</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
 </div><h2 id="life-cycle">Life Cycle</h2>
-<h3 id="heading">初始化</h3>
+<h3 id="初始化">初始化</h3>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt">1
@@ -1208,8 +1208,8 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-objc" data-lang="objc"><span class="n">_fileLogger</span> <span class="o">=</span> <span class="n">fileLogger</span><span class="p">;</span>
-<span class="n">_maxBufferSizeBytes</span> <span class="o">=</span> <span class="n">DDGetDefaultBufferSizeBytes</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
-<span class="p">[</span><span class="nb">self</span> <span class="n">flushBuffer</span><span class="p">]</span><span class="p">;</span>
+<span class="n">_maxBufferSizeBytes</span> <span class="o">=</span> <span class="n">DDGetDefaultBufferSizeBytes</span><span class="p">();</span>
+<span class="p">[</span><span class="nb">self</span> <span class="n">flushBuffer</span><span class="p">];</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>初始化时，保存 fileLogger 引用，获取默认 bufferSize 以及刷新 outputStream。</p>
@@ -1222,9 +1222,9 @@
 </span><span class="lnt">4
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="p">[</span><span class="n">_buffer</span> <span class="n">close</span><span class="p">]</span><span class="p">;</span>
-<span class="n">_buffer</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSOutputStream</span> <span class="n">outputStreamToMemory</span><span class="p">]</span><span class="p">;</span>
-<span class="p">[</span><span class="n">_buffer</span> <span class="n">open</span><span class="p">]</span><span class="p">;</span>
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="p">[</span><span class="n">_buffer</span> <span class="n">close</span><span class="p">];</span>
+<span class="n">_buffer</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSOutputStream</span> <span class="n">outputStreamToMemory</span><span class="p">];</span>
+<span class="p">[</span><span class="n">_buffer</span> <span class="n">open</span><span class="p">];</span>
 <span class="n">_currentBufferSizeBytes</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 </code></pre></td></tr></table>
 </div>
@@ -1246,18 +1246,18 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-objc" data-lang="objc"><span class="n">dispatch_block_t</span> <span class="n">block</span> <span class="o">=</span> <span class="o">^</span><span class="p">{</span>
-     <span class="p">[</span><span class="nb">self</span> <span class="n">lt_sendBufferedDataToFileLogger</span><span class="p">]</span><span class="p">;</span>
+     <span class="p">[</span><span class="nb">self</span> <span class="n">lt_sendBufferedDataToFileLogger</span><span class="p">];</span>
      <span class="nb">self</span><span class="p">.</span><span class="n">fileLogger</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
- <span class="p">}</span><span class="p">;</span>
+ <span class="p">};</span>
 
- <span class="k">if</span> <span class="p">(</span><span class="p">[</span><span class="nb">self</span><span class="o">-</span><span class="o">&gt;</span><span class="n">_fileLogger</span> <span class="n">isOnInternalLoggerQueue</span><span class="p">]</span><span class="p">)</span> <span class="p">{</span>
-     <span class="n">block</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+ <span class="k">if</span> <span class="p">([</span><span class="nb">self</span><span class="o">-&gt;</span><span class="n">_fileLogger</span> <span class="n">isOnInternalLoggerQueue</span><span class="p">])</span> <span class="p">{</span>
+     <span class="n">block</span><span class="p">();</span>
  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-     <span class="n">dispatch_sync</span><span class="p">(</span><span class="nb">self</span><span class="o">-</span><span class="o">&gt;</span><span class="n">_fileLogger</span><span class="p">.</span><span class="n">loggerQueue</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span><span class="p">;</span>
+     <span class="n">dispatch_sync</span><span class="p">(</span><span class="nb">self</span><span class="o">-&gt;</span><span class="n">_fileLogger</span><span class="p">.</span><span class="n">loggerQueue</span><span class="p">,</span> <span class="n">block</span><span class="p">);</span>
  <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
-</div><h3 id="lt-sendbuffereddatatofilelogger">lt_sendBufferedDataToFileLogger</h3>
+</div><h3 id="lt_sendbuffereddatatofilelogger">lt_sendBufferedDataToFileLogger</h3>
 <p>写回 fileLogger 则是将 buffer 中的 data 取出，然后调用 <code>lt_logData</code> 写入 fileLogger，最后 flushBuffer。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -1266,9 +1266,9 @@
 </span><span class="lnt">3
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="n">NSData</span> <span class="o">*</span><span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">_buffer</span> <span class="nl">propertyForKey</span><span class="p">:</span><span class="n">NSStreamDataWrittenToMemoryStreamKey</span><span class="p">]</span><span class="p">;</span>
-<span class="p">[</span><span class="n">_fileLogger</span> <span class="nl">lt_logData</span><span class="p">:</span><span class="n">data</span><span class="p">]</span><span class="p">;</span>
-<span class="p">[</span><span class="nb">self</span> <span class="n">flushBuffer</span><span class="p">]</span><span class="p">;</span>
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="n">NSData</span> <span class="o">*</span><span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">_buffer</span> <span class="nl">propertyForKey</span><span class="p">:</span><span class="n">NSStreamDataWrittenToMemoryStreamKey</span><span class="p">];</span>
+<span class="p">[</span><span class="n">_fileLogger</span> <span class="nl">lt_logData</span><span class="p">:</span><span class="n">data</span><span class="p">];</span>
+<span class="p">[</span><span class="nb">self</span> <span class="n">flushBuffer</span><span class="p">];</span>
 </code></pre></td></tr></table>
 </div>
 </div><h2 id="logging">Logging</h2>
@@ -1295,18 +1295,18 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-objc" data-lang="objc"><span class="p">[</span><span class="n">data</span> <span class="nl">enumerateByteRangesUsingBlock</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="k">const</span> <span class="kt">void</span> <span class="o">*</span> <span class="n">__nonnull</span> <span class="n">bytes</span><span class="p">,</span> <span class="n">NSRange</span> <span class="n">byteRange</span><span class="p">,</span> <span class="kt">BOOL</span> <span class="o">*</span> <span class="n">__nonnull</span> <span class="n">__unused</span> <span class="n">stop</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">NSUInteger</span> <span class="n">bytesLength</span> <span class="o">=</span> <span class="n">byteRange</span><span class="p">.</span><span class="n">length</span><span class="p">;</span>
-<span class="cp">#</span><span class="cp">ifdef NS_BLOCK_ASSERTIONS</span><span class="cp">
+<span class="cp">#ifdef NS_BLOCK_ASSERTIONS
 </span><span class="cp"></span>    <span class="n">__unused</span>
-<span class="cp">#</span><span class="cp">endif</span><span class="cp">
-</span><span class="cp"></span>    <span class="n">NSInteger</span> <span class="n">written</span> <span class="o">=</span> <span class="p">[</span><span class="n">_buffer</span> <span class="nl">write</span><span class="p">:</span><span class="n">bytes</span> <span class="nl">maxLength</span><span class="p">:</span><span class="n">bytesLength</span><span class="p">]</span><span class="p">;</span>
-    <span class="n">NSAssert</span><span class="p">(</span><span class="n">written</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="p">(</span><span class="n">NSUInteger</span><span class="p">)</span><span class="n">written</span> <span class="o">=</span><span class="o">=</span> <span class="n">bytesLength</span><span class="p">,</span> <span class="s">@&#34;</span><span class="s">Failed to write to memory buffer.</span><span class="s">&#34;</span><span class="p">)</span><span class="p">;</span>
+<span class="cp">#endif
+</span><span class="cp"></span>    <span class="n">NSInteger</span> <span class="n">written</span> <span class="o">=</span> <span class="p">[</span><span class="n">_buffer</span> <span class="nl">write</span><span class="p">:</span><span class="n">bytes</span> <span class="nl">maxLength</span><span class="p">:</span><span class="n">bytesLength</span><span class="p">];</span>
+    <span class="n">NSAssert</span><span class="p">(</span><span class="n">written</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">NSUInteger</span><span class="p">)</span><span class="n">written</span> <span class="o">==</span> <span class="n">bytesLength</span><span class="p">,</span> <span class="s">@&#34;Failed to write to memory buffer.&#34;</span><span class="p">);</span>
 
-    <span class="n">_currentBufferSizeBytes</span> <span class="o">+</span><span class="o">=</span> <span class="n">bytesLength</span><span class="p">;</span>
+    <span class="n">_currentBufferSizeBytes</span> <span class="o">+=</span> <span class="n">bytesLength</span><span class="p">;</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="n">_currentBufferSizeBytes</span> <span class="o">&gt;</span><span class="o">=</span> <span class="n">_maxBufferSizeBytes</span><span class="p">)</span> <span class="p">{</span>
-        <span class="p">[</span><span class="nb">self</span> <span class="n">lt_sendBufferedDataToFileLogger</span><span class="p">]</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">_currentBufferSizeBytes</span> <span class="o">&gt;=</span> <span class="n">_maxBufferSizeBytes</span><span class="p">)</span> <span class="p">{</span>
+        <span class="p">[</span><span class="nb">self</span> <span class="n">lt_sendBufferedDataToFileLogger</span><span class="p">];</span>
     <span class="p">}</span>
-<span class="p">}</span><span class="p">]</span><span class="p">;</span>
+<span class="p">}];</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>会不断地将 data 写入 buffer，如果满了就写入 log file 并 flushBuffer。通过这种方式，有效的减小了文件写入的 I/O 操作。</p>
@@ -1326,16 +1326,16 @@
 <pre class="chroma"><code class="language-objc" data-lang="objc"><span class="n">dispatch_block_t</span> <span class="n">block</span> <span class="o">=</span> <span class="o">^</span><span class="p">{</span>
 <span class="n">adispatch_block_t</span> <span class="n">block</span> <span class="o">=</span> <span class="o">^</span><span class="p">{</span>
     <span class="k">@autoreleasepool</span> <span class="p">{</span>
-        <span class="p">[</span><span class="nb">self</span> <span class="n">lt_sendBufferedDataToFileLogger</span><span class="p">]</span><span class="p">;</span>
-        <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">fileLogger</span> <span class="n">flush</span><span class="p">]</span><span class="p">;</span>
+        <span class="p">[</span><span class="nb">self</span> <span class="n">lt_sendBufferedDataToFileLogger</span><span class="p">];</span>
+        <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">fileLogger</span> <span class="n">flush</span><span class="p">];</span>
     <span class="p">}</span>
-<span class="p">}</span><span class="p">;</span>
+<span class="p">};</span>
 </code></pre></td></tr></table>
 </div>
-</div><h1 id="heading-1">总结</h1>
+</div><h1 id="总结">总结</h1>
 <p>通过对 DDFileLogger 源码的浅尝，能够强烈感受到作者扎实的基础能力。例如使用 NSFileHandle 来操作 file 的增量写入，使用 dispatch_source_t 来实现 timer 的 delay 功能，以及利用 dispatch_source_t 来监听 NSFileHandle 的 change 等都体现了作者对 GCD 的熟悉和掌控能力，包括上一篇中的 queue 的使用。除了这些实现细节之外，作者对 file rolling 等日志监控的相关概念的实现都有不错的理解。最后整个框架则对 deprecated API 有着较好的兼容，确实是名副其实的高性能。</p>
 <p>总之，收获颇多。</p>
-<h3 id="heading-2">未完待续</h3>
+<h3 id="未完待续">未完待续</h3>
 <p>DDLogger 中至少还会有一篇的 blog 是关于 <code>DDAbstractDatabaseLogger</code> 分析。之后可能会有相关日志组件的横向对比，但是 lumberjack 是真的超乎我想象的优先开源实现。</p>
 
     </div>
@@ -1367,8 +1367,8 @@
             <span class="prev-text nav-default">浅析 - CocoaLumberjack 3.6 之 DatabaseLogger</span>
             <span class="prev-text nav-mobile">上一篇</span>
           </a>
-        <a class="next" href="/post/sourcecode-ios/source-code-mmkv/">
-            <span class="next-text nav-default">浅析 - MMKV 1.1 / iOS</span>
+        <a class="next" href="/post/sourcecode-ios/source-code-lumberjack-1/">
+            <span class="next-text nav-default">浅析 - CocoaLumberjack 3.6 之 DDLog</span>
             <span class="next-text nav-mobile">下一篇</span>
             <i class="iconfont icon-right"></i>
           </a>

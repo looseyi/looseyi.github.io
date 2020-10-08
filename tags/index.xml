@@ -6,17 +6,125 @@
     <description>Recent content in Tags on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 16 May 2020 00:00:00 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 17 Sep 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="http://looseyi.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>iOS</title>
+      <title>CocoaPods</title>
+      <link>http://looseyi.github.io/tags/cocoapods/</link>
+      <pubDate>Thu, 17 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/tags/cocoapods/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>iOS&#39;</title>
       <link>http://looseyi.github.io/tags/ios/</link>
-      <pubDate>Sat, 16 May 2020 00:00:00 +0800</pubDate>
+      <pubDate>Thu, 17 Sep 2020 00:00:00 +0000</pubDate>
       
       <guid>http://looseyi.github.io/tags/ios/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Ruby</title>
+      <link>http://looseyi.github.io/tags/ruby/</link>
+      <pubDate>Thu, 17 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/tags/ruby/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>SwiftUI</title>
+      <link>http://looseyi.github.io/tags/swiftui/</link>
+      <pubDate>Sat, 27 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/tags/swiftui/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>WWDC20&#39;</title>
+      <link>http://looseyi.github.io/tags/wwdc20/</link>
+      <pubDate>Sat, 27 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/tags/wwdc20/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Document</title>
+      <link>http://looseyi.github.io/tags/document/</link>
+      <pubDate>Thu, 18 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/tags/document/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>gitpage</title>
+      <link>http://looseyi.github.io/tags/gitpage/</link>
+      <pubDate>Thu, 18 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/tags/gitpage/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Jazzy</title>
+      <link>http://looseyi.github.io/tags/jazzy/</link>
+      <pubDate>Thu, 18 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/tags/jazzy/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>SourceKit</title>
+      <link>http://looseyi.github.io/tags/sourcekit/</link>
+      <pubDate>Thu, 18 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/tags/sourcekit/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>GCD</title>
+      <link>http://looseyi.github.io/tags/gcd/</link>
+      <pubDate>Tue, 16 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/tags/gcd/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>CocoaPods Tour</title>
+      <link>http://looseyi.github.io/tags/cocoapods-tour/</link>
+      <pubDate>Wed, 10 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/tags/cocoapods-tour/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Cache</title>
+      <link>http://looseyi.github.io/tags/cache/</link>
+      <pubDate>Thu, 21 May 2020 00:00:00 +0800</pubDate>
+      
+      <guid>http://looseyi.github.io/tags/cache/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Source Code</title>
+      <link>http://looseyi.github.io/tags/source-code/</link>
+      <pubDate>Thu, 21 May 2020 00:00:00 +0800</pubDate>
+      
+      <guid>http://looseyi.github.io/tags/source-code/</guid>
       <description></description>
     </item>
     
@@ -26,33 +134,6 @@
       <pubDate>Sat, 16 May 2020 00:00:00 +0800</pubDate>
       
       <guid>http://looseyi.github.io/tags/logger/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Source Code</title>
-      <link>http://looseyi.github.io/tags/source-code/</link>
-      <pubDate>Sat, 16 May 2020 00:00:00 +0800</pubDate>
-      
-      <guid>http://looseyi.github.io/tags/source-code/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Cache</title>
-      <link>http://looseyi.github.io/tags/cache/</link>
-      <pubDate>Tue, 05 May 2020 23:23:47 +0800</pubDate>
-      
-      <guid>http://looseyi.github.io/tags/cache/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>CocoaPods</title>
-      <link>http://looseyi.github.io/tags/cocoapods/</link>
-      <pubDate>Sun, 29 Mar 2020 15:10:58 +0800</pubDate>
-      
-      <guid>http://looseyi.github.io/tags/cocoapods/</guid>
       <description></description>
     </item>
     

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Ruby on </title>
+    <link>http://looseyi.github.io/tags/ruby/</link>
+    <description>Recent content in Ruby on </description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Thu, 17 Sep 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://looseyi.github.io/tags/ruby/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>4. Podfile 的解析逻辑</title>
+      <link>http://looseyi.github.io/post/sourcecode-cocoapods/04-cocoapods-podfile/</link>
+      <pubDate>Thu, 17 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/post/sourcecode-cocoapods/04-cocoapods-podfile/</guid>
+      <description>本文知识目录 引子 在上文 CocoaPods 命令解析 中，我们通过对 CLAide 的源码分析，了解了 CocoaPods 是如何处理 pod 命令，多级命令又是如何组织和嵌套的，并解释了命令行输出所代表</description>
+    </item>
+    
+    <item>
+      <title>3. CocoaPods 命令解析 - CLAide</title>
+      <link>http://looseyi.github.io/post/sourcecode-cocoapods/03-cocoapods-claide/</link>
+      <pubDate>Wed, 02 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/post/sourcecode-cocoapods/03-cocoapods-claide/</guid>
+      <description>本文知识目录 引子 在上文 整体把握 CocoaPods 核心组件 中，我们通过对 pod install 的流程的介绍，引出 CocoaPods 的各个核心组件的角色分工和其主要作用，希望通过对这些组件的使用</description>
+    </item>
+    
+  </channel>
+</rss>

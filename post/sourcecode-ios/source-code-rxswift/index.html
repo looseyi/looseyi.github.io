@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.62.0 with theme even" />
+<meta name="generator" content="Hugo 0.71.1 with theme even" />
 
 
 <link rel="canonical" href="http://looseyi.github.io/post/sourcecode-ios/source-code-rxswift/" />
@@ -50,7 +50,7 @@
 <meta itemprop="description" content="前言 ReactiveX 它是一个与语言无关的编程思想。作为成员框架之一 RxSwift 落地了大部分 ReactiveX 中关于流的操作。官方描述： An API for asynchronous programming with observable streams ReactiveX is a combination of the best ideas from the Observer pattern, the Iterator pattern,">
 <meta itemprop="datePublished" content="2020-03-16T23:10:58&#43;08:00" />
 <meta itemprop="dateModified" content="2020-03-16T23:10:58&#43;08:00" />
-<meta itemprop="wordCount" content="4363">
+<meta itemprop="wordCount" content="4392">
 
 
 
@@ -127,7 +127,7 @@
             <a href="/categories/ios/"> iOS </a>
             <a href="/categories/swift/"> Swift </a>
             </div>
-          <span class="more-meta"> 约 4363 字 </span>
+          <span class="more-meta"> 约 4392 字 </span>
           <span class="more-meta"> 预计阅读 9 分钟 </span>
         
       </div>
@@ -140,7 +140,7 @@
   <ul>
     <li>
       <ul>
-        <li><a href="#heading">前言</a></li>
+        <li><a href="#前言">前言</a></li>
       </ul>
     </li>
     <li><a href="#observable">Observable</a></li>
@@ -158,13 +158,13 @@
         <li></li>
       </ul>
     </li>
-    <li><a href="#heading-1">总结</a></li>
+    <li><a href="#总结">总结</a></li>
   </ul>
 </nav>
   </div>
 </div>
     <div class="post-content">
-      <h3 id="heading">前言</h3>
+      <h3 id="前言">前言</h3>
 <p>ReactiveX 它是一个与语言无关的编程思想。作为成员框架之一 RxSwift 落地了大部分 ReactiveX 中关于流的操作。官方描述：</p>
 <blockquote>
 <p>An API for asynchronous programming with observable streams</p>
@@ -184,7 +184,7 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-swift" data-lang="swift"><span class="n">Observable</span><span class="p">.</span><span class="n">of</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-    <span class="p">.</span><span class="n">subscribe</span><span class="p">(</span> <span class="p">{</span> <span class="bp">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span><span class="p">)</span>
+    <span class="p">.</span><span class="n">subscribe</span><span class="p">(</span> <span class="p">{</span> <span class="bp">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">})</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>我们看第一行，它把 <strong>Swift.Sequence&lt;Int&gt;</strong> 序列 <em>[1, 2, 3]</em> 转换为流，<a href="https://github.com/ReactiveX/RxSwift/blob/c6c0c540109678b96639c25e9c0ebe4a6d7a69a9/RxSwift/Observables/Sequence.swift">of(_:)</a> 方法的声明如下：</p>
@@ -200,7 +200,7 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">extension</span> <span class="nc">ObservableType</span> <span class="p">{</span>
    
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">of</span><span class="p">(</span><span class="kc">_</span> <span class="n">elements</span><span class="p">:</span> <span class="n">Element</span> <span class="p">.</span><span class="p">.</span><span class="p">.</span><span class="p">,</span> <span class="n">scheduler</span><span class="p">:</span> <span class="n">ImmediateSchedulerType</span> <span class="p">=</span> <span class="n">CurrentThreadScheduler</span><span class="p">.</span><span class="n">instance</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">Observable</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span> <span class="p">{</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">of</span><span class="p">(</span><span class="kc">_</span> <span class="n">elements</span><span class="p">:</span> <span class="n">Element</span> <span class="p">...,</span> <span class="n">scheduler</span><span class="p">:</span> <span class="n">ImmediateSchedulerType</span> <span class="p">=</span> <span class="n">CurrentThreadScheduler</span><span class="p">.</span><span class="n">instance</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">Observable</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span> <span class="p">{</span>
         <span class="k">return</span> <span class="n">ObservableSequence</span><span class="p">(</span><span class="n">elements</span><span class="p">:</span> <span class="n">elements</span><span class="p">,</span> <span class="n">scheduler</span><span class="p">:</span> <span class="n">scheduler</span><span class="p">)</span>
     <span class="p">}</span>
 <span class="p">}</span>
@@ -235,9 +235,9 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">public</span> <span class="kd">protocol</span> <span class="nc">ObservableConvertibleType</span> <span class="p">{</span>
-    <span class="c1">//</span><span class="c1">/</span><span class="c1"> </span><span class="c1">T</span><span class="c1">y</span><span class="c1">p</span><span class="c1">e</span><span class="c1"> </span><span class="c1">o</span><span class="c1">f</span><span class="c1"> </span><span class="c1">e</span><span class="c1">l</span><span class="c1">e</span><span class="c1">m</span><span class="c1">e</span><span class="c1">n</span><span class="c1">t</span><span class="c1">s</span><span class="c1"> </span><span class="c1">i</span><span class="c1">n</span><span class="c1"> </span><span class="c1">s</span><span class="c1">e</span><span class="c1">q</span><span class="c1">u</span><span class="c1">e</span><span class="c1">n</span><span class="c1">c</span><span class="c1">e</span><span class="c1">.</span>
+    <span class="c1">/// Type of elements in sequence.</span>
     <span class="n">associatedtype</span> <span class="n">Element</span>
-    <span class="kd">func</span> <span class="nf">asObservable</span><span class="p">(</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">Observable</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span>
+    <span class="kd">func</span> <span class="nf">asObservable</span><span class="p">()</span> <span class="p">-&gt;</span> <span class="n">Observable</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -263,14 +263,14 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">public</span> <span class="kd">protocol</span> <span class="nc">ObservableType</span><span class="p">:</span> <span class="n">ObservableConvertibleType</span> <span class="p">{</span>
    
-    <span class="kd">func</span> <span class="nf">subscribe</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">:</span> <span class="n">ObserverType</span><span class="p">&gt;</span><span class="p">(</span><span class="kc">_</span> <span class="n">observer</span><span class="p">:</span> <span class="n">Observer</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">Disposable</span> <span class="k">where</span> <span class="n">Observer</span><span class="p">.</span><span class="n">Element</span> <span class="p">=</span><span class="p">=</span> <span class="n">Element</span>
+    <span class="kd">func</span> <span class="nf">subscribe</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">:</span> <span class="n">ObserverType</span><span class="p">&gt;(</span><span class="kc">_</span> <span class="n">observer</span><span class="p">:</span> <span class="n">Observer</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">Disposable</span> <span class="k">where</span> <span class="n">Observer</span><span class="p">.</span><span class="n">Element</span> <span class="p">==</span> <span class="n">Element</span>
 <span class="p">}</span>
 
 <span class="kd">extension</span> <span class="nc">ObservableType</span> <span class="p">{</span>
-    <span class="c1">//</span><span class="c1">/</span><span class="c1"> </span><span class="c1">D</span><span class="c1">e</span><span class="c1">f</span><span class="c1">a</span><span class="c1">u</span><span class="c1">l</span><span class="c1">t</span><span class="c1"> </span><span class="c1">i</span><span class="c1">m</span><span class="c1">p</span><span class="c1">l</span><span class="c1">e</span><span class="c1">m</span><span class="c1">e</span><span class="c1">n</span><span class="c1">t</span><span class="c1">a</span><span class="c1">t</span><span class="c1">i</span><span class="c1">o</span><span class="c1">n</span><span class="c1"> </span><span class="c1">o</span><span class="c1">f</span><span class="c1"> </span><span class="c1">c</span><span class="c1">o</span><span class="c1">n</span><span class="c1">v</span><span class="c1">e</span><span class="c1">r</span><span class="c1">t</span><span class="c1">i</span><span class="c1">n</span><span class="c1">g</span><span class="c1"> </span><span class="c1">`</span><span class="c1">O</span><span class="c1">b</span><span class="c1">s</span><span class="c1">e</span><span class="c1">r</span><span class="c1">v</span><span class="c1">a</span><span class="c1">b</span><span class="c1">l</span><span class="c1">e</span><span class="c1">T</span><span class="c1">y</span><span class="c1">p</span><span class="c1">e</span><span class="c1">`</span><span class="c1"> </span><span class="c1">t</span><span class="c1">o</span><span class="c1"> </span><span class="c1">`</span><span class="c1">O</span><span class="c1">b</span><span class="c1">s</span><span class="c1">e</span><span class="c1">r</span><span class="c1">v</span><span class="c1">a</span><span class="c1">b</span><span class="c1">l</span><span class="c1">e</span><span class="c1">`</span><span class="c1">.</span>
-    <span class="kd">public</span> <span class="kd">func</span> <span class="nf">asObservable</span><span class="p">(</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">Observable</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span> <span class="p">{</span>
-        <span class="c1">//</span><span class="c1"> </span><span class="c1">t</span><span class="c1">e</span><span class="c1">m</span><span class="c1">p</span><span class="c1">o</span><span class="c1">r</span><span class="c1">a</span><span class="c1">r</span><span class="c1">y</span><span class="c1"> </span><span class="c1">w</span><span class="c1">o</span><span class="c1">r</span><span class="c1">k</span><span class="c1">a</span><span class="c1">r</span><span class="c1">o</span><span class="c1">u</span><span class="c1">n</span><span class="c1">d</span>
-        <span class="c1">//</span><span class="c1">r</span><span class="c1">e</span><span class="c1">t</span><span class="c1">u</span><span class="c1">r</span><span class="c1">n</span><span class="c1"> </span><span class="c1">O</span><span class="c1">b</span><span class="c1">s</span><span class="c1">e</span><span class="c1">r</span><span class="c1">v</span><span class="c1">a</span><span class="c1">b</span><span class="c1">l</span><span class="c1">e</span><span class="c1">.</span><span class="c1">c</span><span class="c1">r</span><span class="c1">e</span><span class="c1">a</span><span class="c1">t</span><span class="c1">e</span><span class="c1">(</span><span class="c1">s</span><span class="c1">u</span><span class="c1">b</span><span class="c1">s</span><span class="c1">c</span><span class="c1">r</span><span class="c1">i</span><span class="c1">b</span><span class="c1">e</span><span class="c1">:</span><span class="c1"> </span><span class="c1">s</span><span class="c1">e</span><span class="c1">l</span><span class="c1">f</span><span class="c1">.</span><span class="c1">s</span><span class="c1">u</span><span class="c1">b</span><span class="c1">s</span><span class="c1">c</span><span class="c1">r</span><span class="c1">i</span><span class="c1">b</span><span class="c1">e</span><span class="c1">)</span>
+    <span class="c1">/// Default implementation of converting `ObservableType` to `Observable`.</span>
+    <span class="kd">public</span> <span class="kd">func</span> <span class="nf">asObservable</span><span class="p">()</span> <span class="p">-&gt;</span> <span class="n">Observable</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span> <span class="p">{</span>
+        <span class="c1">// temporary workaround</span>
+        <span class="c1">//return Observable.create(subscribe: self.subscribe)</span>
         <span class="k">return</span> <span class="n">Observable</span><span class="p">.</span><span class="n">create</span> <span class="p">{</span> <span class="n">o</span> <span class="k">in</span>
             <span class="k">return</span> <span class="kc">self</span><span class="p">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
         <span class="p">}</span>
@@ -292,7 +292,7 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">extension</span> <span class="nc">ObservableType</span> <span class="p">{</span>
    
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">create</span><span class="p">(</span><span class="kc">_</span> <span class="n">subscribe</span><span class="p">:</span> <span class="p">@</span><span class="n">escaping</span> <span class="p">(</span><span class="n">AnyObserver</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">Disposable</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">Observable</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span> <span class="p">{</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">create</span><span class="p">(</span><span class="kc">_</span> <span class="n">subscribe</span><span class="p">:</span> <span class="p">@</span><span class="n">escaping</span> <span class="p">(</span><span class="n">AnyObserver</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;)</span> <span class="p">-&gt;</span> <span class="n">Disposable</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">Observable</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span> <span class="p">{</span>
         <span class="k">return</span> <span class="n">AnonymousObservable</span><span class="p">(</span><span class="n">subscribe</span><span class="p">)</span>
     <span class="p">}</span>
 <span class="p">}</span>
@@ -324,11 +324,11 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Observable</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span> <span class="p">:</span> <span class="n">ObservableType</span> <span class="p">{</span>
     
-    <span class="kd">public</span> <span class="kd">func</span> <span class="nf">subscribe</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">:</span> <span class="n">ObserverType</span><span class="p">&gt;</span><span class="p">(</span><span class="kc">_</span> <span class="n">observer</span><span class="p">:</span> <span class="n">Observer</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">Disposable</span> <span class="k">where</span> <span class="n">Observer</span><span class="p">.</span><span class="n">Element</span> <span class="p">=</span><span class="p">=</span> <span class="n">Element</span> <span class="p">{</span>
-        <span class="n">rxAbstractMethod</span><span class="p">(</span><span class="p">)</span>
+    <span class="kd">public</span> <span class="kd">func</span> <span class="nf">subscribe</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">:</span> <span class="n">ObserverType</span><span class="p">&gt;(</span><span class="kc">_</span> <span class="n">observer</span><span class="p">:</span> <span class="n">Observer</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">Disposable</span> <span class="k">where</span> <span class="n">Observer</span><span class="p">.</span><span class="n">Element</span> <span class="p">==</span> <span class="n">Element</span> <span class="p">{</span>
+        <span class="n">rxAbstractMethod</span><span class="p">()</span>
     <span class="p">}</span>
     
-    <span class="kd">public</span> <span class="kd">func</span> <span class="nf">asObservable</span><span class="p">(</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">Observable</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span> <span class="p">{</span>
+    <span class="kd">public</span> <span class="kd">func</span> <span class="nf">asObservable</span><span class="p">()</span> <span class="p">-&gt;</span> <span class="n">Observable</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span> <span class="p">{</span>
         <span class="k">return</span> <span class="kc">self</span>
     <span class="p">}</span>
 <span class="p">}</span>
@@ -354,14 +354,14 @@
 </span><span class="lnt">10
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">init</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">init</span><span class="p">()</span> <span class="p">{</span>
     <span class="cp">#if</span> <span class="cp">TRACE_RESOURCES</span>
-        <span class="kc">_</span> <span class="p">=</span> <span class="n">Resources</span><span class="p">.</span><span class="n">incrementTotal</span><span class="p">(</span><span class="p">)</span>
+        <span class="kc">_</span> <span class="p">=</span> <span class="n">Resources</span><span class="p">.</span><span class="n">incrementTotal</span><span class="p">()</span>
     <span class="cp">#endif</span>
 <span class="p">}</span>
 <span class="kd">deinit</span> <span class="p">{</span>
     <span class="cp">#if</span> <span class="cp">TRACE_RESOURCES</span>
-        <span class="kc">_</span> <span class="p">=</span> <span class="n">Resources</span><span class="p">.</span><span class="n">decrementTotal</span><span class="p">(</span><span class="p">)</span>
+        <span class="kc">_</span> <span class="p">=</span> <span class="n">Resources</span><span class="p">.</span><span class="n">decrementTotal</span><span class="p">()</span>
     <span class="cp">#endif</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
@@ -388,16 +388,16 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">class</span> <span class="nc">Producer</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span> <span class="p">:</span> <span class="n">Observable</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span> <span class="p">{</span>
-    <span class="kr">override</span> <span class="kd">func</span> <span class="nf">subscribe</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">:</span> <span class="n">ObserverType</span><span class="p">&gt;</span><span class="p">(</span><span class="kc">_</span> <span class="n">observer</span><span class="p">:</span> <span class="n">Observer</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">Disposable</span> <span class="k">where</span> <span class="n">Observer</span><span class="p">.</span><span class="n">Element</span> <span class="p">=</span><span class="p">=</span> <span class="n">Element</span> <span class="p">{</span>
-        <span class="c1">//</span><span class="c1">/</span><span class="c1"> </span><span class="c1">S</span><span class="c1">c</span><span class="c1">h</span><span class="c1">e</span><span class="c1">d</span><span class="c1">u</span><span class="c1">l</span><span class="c1">e</span><span class="c1">r</span><span class="c1"> </span><span class="c1">{</span>
-        <span class="kd">let</span> <span class="nv">disposer</span> <span class="p">=</span> <span class="n">SinkDisposer</span><span class="p">(</span><span class="p">)</span>
+    <span class="kr">override</span> <span class="kd">func</span> <span class="nf">subscribe</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">:</span> <span class="n">ObserverType</span><span class="p">&gt;(</span><span class="kc">_</span> <span class="n">observer</span><span class="p">:</span> <span class="n">Observer</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">Disposable</span> <span class="k">where</span> <span class="n">Observer</span><span class="p">.</span><span class="n">Element</span> <span class="p">==</span> <span class="n">Element</span> <span class="p">{</span>
+        <span class="c1">/// Scheduler {</span>
+        <span class="kd">let</span> <span class="nv">disposer</span> <span class="p">=</span> <span class="n">SinkDisposer</span><span class="p">()</span>
         <span class="kd">let</span> <span class="nv">sinkAndSubscription</span> <span class="p">=</span> <span class="kc">self</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">observer</span><span class="p">,</span> <span class="n">cancel</span><span class="p">:</span> <span class="n">disposer</span><span class="p">)</span>
         <span class="n">disposer</span><span class="p">.</span><span class="n">setSinkAndSubscription</span><span class="p">(</span><span class="n">sink</span><span class="p">:</span> <span class="n">sinkAndSubscription</span><span class="p">.</span><span class="n">sink</span><span class="p">,</span> <span class="n">subscription</span><span class="p">:</span> <span class="n">sinkAndSubscription</span><span class="p">.</span><span class="n">subscription</span><span class="p">)</span>
-        <span class="c1">//</span><span class="c1">/</span><span class="c1"> </span><span class="c1">}</span>
+        <span class="c1">/// }</span>
     <span class="p">}</span>
 
-    <span class="kd">func</span> <span class="nf">run</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">:</span> <span class="n">ObserverType</span><span class="p">&gt;</span><span class="p">(</span><span class="kc">_</span> <span class="n">observer</span><span class="p">:</span> <span class="n">Observer</span><span class="p">,</span> <span class="n">cancel</span><span class="p">:</span> <span class="n">Cancelable</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="p">(</span><span class="n">sink</span><span class="p">:</span> <span class="n">Disposable</span><span class="p">,</span> <span class="n">subscription</span><span class="p">:</span> <span class="n">Disposable</span><span class="p">)</span> <span class="k">where</span> <span class="n">Observer</span><span class="p">.</span><span class="n">Element</span> <span class="p">=</span><span class="p">=</span> <span class="n">Element</span> <span class="p">{</span>
-        <span class="n">rxAbstractMethod</span><span class="p">(</span><span class="p">)</span>
+    <span class="kd">func</span> <span class="nf">run</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">:</span> <span class="n">ObserverType</span><span class="p">&gt;(</span><span class="kc">_</span> <span class="n">observer</span><span class="p">:</span> <span class="n">Observer</span><span class="p">,</span> <span class="n">cancel</span><span class="p">:</span> <span class="n">Cancelable</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="p">(</span><span class="n">sink</span><span class="p">:</span> <span class="n">Disposable</span><span class="p">,</span> <span class="n">subscription</span><span class="p">:</span> <span class="n">Disposable</span><span class="p">)</span> <span class="k">where</span> <span class="n">Observer</span><span class="p">.</span><span class="n">Element</span> <span class="p">==</span> <span class="n">Element</span> <span class="p">{</span>
+        <span class="n">rxAbstractMethod</span><span class="p">()</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
@@ -458,9 +458,9 @@
         <span class="k">return</span> <span class="n">isFlagSet</span><span class="p">(</span><span class="kc">self</span><span class="p">.</span><span class="n">_state</span><span class="p">,</span> <span class="n">DisposeState</span><span class="p">.</span><span class="n">disposed</span><span class="p">.</span><span class="n">rawValue</span><span class="p">)</span>
     <span class="p">}</span>
 
-    <span class="kd">func</span> <span class="nf">setSinkAndSubscription</span><span class="p">(</span><span class="n">sink</span><span class="p">:</span> <span class="n">Disposable</span><span class="p">,</span> <span class="n">subscription</span><span class="p">:</span> <span class="n">Disposable</span><span class="p">)</span> <span class="p">{</span> <span class="p">.</span><span class="p">.</span><span class="p">.</span> <span class="p">}</span>
+    <span class="kd">func</span> <span class="nf">setSinkAndSubscription</span><span class="p">(</span><span class="n">sink</span><span class="p">:</span> <span class="n">Disposable</span><span class="p">,</span> <span class="n">subscription</span><span class="p">:</span> <span class="n">Disposable</span><span class="p">)</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
 
-    <span class="kd">func</span> <span class="nf">dispose</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span> <span class="p">.</span><span class="p">.</span><span class="p">.</span> <span class="p">}</span>
+    <span class="kd">func</span> <span class="nf">dispose</span><span class="p">()</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -487,8 +487,8 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">public</span> <span class="kd">protocol</span> <span class="nc">Disposable</span> <span class="p">{</span>
-    <span class="c1">//</span><span class="c1">/</span><span class="c1"> </span><span class="c1">D</span><span class="c1">i</span><span class="c1">s</span><span class="c1">p</span><span class="c1">o</span><span class="c1">s</span><span class="c1">e</span><span class="c1"> </span><span class="c1">r</span><span class="c1">e</span><span class="c1">s</span><span class="c1">o</span><span class="c1">u</span><span class="c1">r</span><span class="c1">c</span><span class="c1">e</span><span class="c1">.</span>
-    <span class="kd">func</span> <span class="nf">dispose</span><span class="p">(</span><span class="p">)</span>
+    <span class="c1">/// Dispose resource.</span>
+    <span class="kd">func</span> <span class="nf">dispose</span><span class="p">()</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -502,7 +502,7 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">public</span> <span class="kd">protocol</span> <span class="nc">Cancelable</span> <span class="p">:</span> <span class="n">Disposable</span> <span class="p">{</span>
-    <span class="c1">//</span><span class="c1">/</span><span class="c1"> </span><span class="c1">W</span><span class="c1">a</span><span class="c1">s</span><span class="c1"> </span><span class="c1">r</span><span class="c1">e</span><span class="c1">s</span><span class="c1">o</span><span class="c1">u</span><span class="c1">r</span><span class="c1">c</span><span class="c1">e</span><span class="c1"> </span><span class="c1">d</span><span class="c1">i</span><span class="c1">s</span><span class="c1">p</span><span class="c1">o</span><span class="c1">s</span><span class="c1">e</span><span class="c1">d</span><span class="c1">.</span>
+    <span class="c1">/// Was resource disposed.</span>
     <span class="kd">var</span> <span class="nv">isDisposed</span><span class="p">:</span> <span class="nb">Bool</span> <span class="p">{</span> <span class="kr">get</span> <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
@@ -533,12 +533,12 @@
 
 <span class="kd">let</span> <span class="nv">previousState</span> <span class="p">=</span> <span class="n">fetchOr</span><span class="p">(</span><span class="kc">self</span><span class="p">.</span><span class="n">_state</span><span class="p">,</span> <span class="n">DisposeState</span><span class="p">.</span><span class="n">sinkAndSubscriptionSet</span><span class="p">.</span><span class="n">rawValue</span><span class="p">)</span>
 <span class="k">if</span> <span class="p">(</span><span class="n">previousState</span> <span class="o">&amp;</span> <span class="n">DisposeState</span><span class="p">.</span><span class="n">sinkAndSubscriptionSet</span><span class="p">.</span><span class="n">rawValue</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
-    <span class="n">rxFatalError</span><span class="p">(</span><span class="s">&#34;</span><span class="s">Sink and subscription were already set</span><span class="s">&#34;</span><span class="p">)</span>
+    <span class="n">rxFatalError</span><span class="p">(</span><span class="s">&#34;Sink and subscription were already set&#34;</span><span class="p">)</span>
 <span class="p">}</span>
 
 <span class="k">if</span> <span class="p">(</span><span class="n">previousState</span> <span class="o">&amp;</span> <span class="n">DisposeState</span><span class="p">.</span><span class="n">disposed</span><span class="p">.</span><span class="n">rawValue</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
-    <span class="n">sink</span><span class="p">.</span><span class="n">dispose</span><span class="p">(</span><span class="p">)</span>
-    <span class="n">subscription</span><span class="p">.</span><span class="n">dispose</span><span class="p">(</span><span class="p">)</span>
+    <span class="n">sink</span><span class="p">.</span><span class="n">dispose</span><span class="p">()</span>
+    <span class="n">subscription</span><span class="p">.</span><span class="n">dispose</span><span class="p">()</span>
     <span class="kc">self</span><span class="p">.</span><span class="n">_sink</span> <span class="p">=</span> <span class="kc">nil</span>
     <span class="kc">self</span><span class="p">.</span><span class="n">_subscription</span> <span class="p">=</span> <span class="kc">nil</span>
 <span class="p">}</span>
@@ -587,10 +587,10 @@
 <span class="p">}</span>
 
 <span class="kd">func</span> <span class="nf">fetchOr</span><span class="p">(</span><span class="kc">_</span> <span class="n">this</span><span class="p">:</span> <span class="n">AtomicInt</span><span class="p">,</span> <span class="kc">_</span> <span class="n">mask</span><span class="p">:</span> <span class="nb">Int32</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">Int32</span> <span class="p">{</span>
-    <span class="n">this</span><span class="p">.</span><span class="n">lock</span><span class="p">(</span><span class="p">)</span>
+    <span class="n">this</span><span class="p">.</span><span class="n">lock</span><span class="p">()</span>
     <span class="kd">let</span> <span class="nv">oldValue</span> <span class="p">=</span> <span class="n">this</span><span class="p">.</span><span class="n">value</span>
     <span class="n">this</span><span class="p">.</span><span class="n">value</span> <span class="o">|=</span> <span class="n">mask</span>
-    <span class="n">this</span><span class="p">.</span><span class="n">unlock</span><span class="p">(</span><span class="p">)</span>
+    <span class="n">this</span><span class="p">.</span><span class="n">unlock</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">oldValue</span>
 <span class="p">}</span>
 
@@ -602,7 +602,7 @@
     <span class="k">return</span> <span class="n">sub</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 <span class="p">}</span>
 
-<span class="p">.</span><span class="p">.</span><span class="p">.</span>
+<span class="p">...</span>
 </code></pre></td></tr></table>
 </div>
 </div><blockquote>
@@ -651,14 +651,14 @@
 
 <span class="k">if</span> <span class="p">(</span><span class="n">previousState</span> <span class="o">&amp;</span> <span class="n">DisposeState</span><span class="p">.</span><span class="n">sinkAndSubscriptionSet</span><span class="p">.</span><span class="n">rawValue</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
     <span class="k">guard</span> <span class="kd">let</span> <span class="nv">sink</span> <span class="p">=</span> <span class="kc">self</span><span class="p">.</span><span class="n">_sink</span> <span class="k">else</span> <span class="p">{</span>
-        <span class="n">rxFatalError</span><span class="p">(</span><span class="s">&#34;</span><span class="s">Sink not set</span><span class="s">&#34;</span><span class="p">)</span>
+        <span class="n">rxFatalError</span><span class="p">(</span><span class="s">&#34;Sink not set&#34;</span><span class="p">)</span>
     <span class="p">}</span>
     <span class="k">guard</span> <span class="kd">let</span> <span class="nv">subscription</span> <span class="p">=</span> <span class="kc">self</span><span class="p">.</span><span class="n">_subscription</span> <span class="k">else</span> <span class="p">{</span>
-        <span class="n">rxFatalError</span><span class="p">(</span><span class="s">&#34;</span><span class="s">Subscription not set</span><span class="s">&#34;</span><span class="p">)</span>
+        <span class="n">rxFatalError</span><span class="p">(</span><span class="s">&#34;Subscription not set&#34;</span><span class="p">)</span>
     <span class="p">}</span>
 
-    <span class="n">sink</span><span class="p">.</span><span class="n">dispose</span><span class="p">(</span><span class="p">)</span>
-    <span class="n">subscription</span><span class="p">.</span><span class="n">dispose</span><span class="p">(</span><span class="p">)</span>
+    <span class="n">sink</span><span class="p">.</span><span class="n">dispose</span><span class="p">()</span>
+    <span class="n">subscription</span><span class="p">.</span><span class="n">dispose</span><span class="p">()</span>
 
     <span class="kc">self</span><span class="p">.</span><span class="n">_sink</span> <span class="p">=</span> <span class="kc">nil</span>
     <span class="kc">self</span><span class="p">.</span><span class="n">_subscription</span> <span class="p">=</span> <span class="kc">nil</span>
@@ -678,7 +678,7 @@
 <h2 id="sink">Sink</h2>
 <p>项目中的 issue 有一个简单描述 <a href="https://github.com/ReactiveX/RxSwift/issues/817">What is a Sink ?</a></p>
 <blockquote>
-<p>It's an internal class used to implement the operators, that receives events and processes them.</p>
+<p>It&rsquo;s an internal class used to implement the operators, that receives events and processes them.</p>
 </blockquote>
 <p>Sink，接受 Event 事件并进行相应处理或者将其转发，是实现各种运算符的内部类，比如 Map、Reduce、Filter 运算符等。作为 Producer 背后的苦力一直默默付出。</p>
 <p>Sink 从哪里来的呢？继续以开头的 <code>Observable.of(1, 2, 3)</code> 为例，看 ObservableSequence 的 run 方法实现：</p>
@@ -695,12 +695,12 @@
 </span><span class="lnt">9
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kr">final</span> <span class="kd">private</span> <span class="kd">class</span> <span class="nc">ObservableSequence</span><span class="p">&lt;</span><span class="n">Sequence</span><span class="p">:</span> <span class="n">Swift</span><span class="p">.</span><span class="n">Sequence</span><span class="p">&gt;</span><span class="p">:</span> <span class="n">Producer</span><span class="p">&lt;</span><span class="n">Sequence</span><span class="p">.</span><span class="n">Element</span><span class="p">&gt;</span> <span class="p">{</span>
-    <span class="c1">//</span><span class="c1">/</span><span class="c1"> </span><span class="c1">i</span><span class="c1">n</span><span class="c1">i</span><span class="c1">t</span><span class="c1"> </span><span class="c1">.</span><span class="c1">.</span><span class="c1">.</span>
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kr">final</span> <span class="kd">private</span> <span class="kd">class</span> <span class="nc">ObservableSequence</span><span class="p">&lt;</span><span class="n">Sequence</span><span class="p">:</span> <span class="n">Swift</span><span class="p">.</span><span class="n">Sequence</span><span class="p">&gt;:</span> <span class="n">Producer</span><span class="p">&lt;</span><span class="n">Sequence</span><span class="p">.</span><span class="n">Element</span><span class="p">&gt;</span> <span class="p">{</span>
+    <span class="c1">/// init ...</span>
    
-    <span class="kr">override</span> <span class="kd">func</span> <span class="nf">run</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">:</span> <span class="n">ObserverType</span><span class="p">&gt;</span><span class="p">(</span><span class="kc">_</span> <span class="n">observer</span><span class="p">:</span> <span class="n">Observer</span><span class="p">,</span> <span class="n">cancel</span><span class="p">:</span> <span class="n">Cancelable</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="p">(</span><span class="n">sink</span><span class="p">:</span> <span class="n">Disposable</span><span class="p">,</span> <span class="n">subscription</span><span class="p">:</span> <span class="n">Disposable</span><span class="p">)</span> <span class="k">where</span> <span class="n">Observer</span><span class="p">.</span><span class="n">Element</span> <span class="p">=</span><span class="p">=</span> <span class="n">Element</span> <span class="p">{</span>
+    <span class="kr">override</span> <span class="kd">func</span> <span class="nf">run</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">:</span> <span class="n">ObserverType</span><span class="p">&gt;(</span><span class="kc">_</span> <span class="n">observer</span><span class="p">:</span> <span class="n">Observer</span><span class="p">,</span> <span class="n">cancel</span><span class="p">:</span> <span class="n">Cancelable</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="p">(</span><span class="n">sink</span><span class="p">:</span> <span class="n">Disposable</span><span class="p">,</span> <span class="n">subscription</span><span class="p">:</span> <span class="n">Disposable</span><span class="p">)</span> <span class="k">where</span> <span class="n">Observer</span><span class="p">.</span><span class="n">Element</span> <span class="p">==</span> <span class="n">Element</span> <span class="p">{</span>
         <span class="kd">let</span> <span class="nv">sink</span> <span class="p">=</span> <span class="n">ObservableSequenceSink</span><span class="p">(</span><span class="n">parent</span><span class="p">:</span> <span class="kc">self</span><span class="p">,</span> <span class="n">observer</span><span class="p">:</span> <span class="n">observer</span><span class="p">,</span> <span class="n">cancel</span><span class="p">:</span> <span class="n">cancel</span><span class="p">)</span>
-        <span class="kd">let</span> <span class="nv">subscription</span> <span class="p">=</span> <span class="n">sink</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="p">)</span>
+        <span class="kd">let</span> <span class="nv">subscription</span> <span class="p">=</span> <span class="n">sink</span><span class="p">.</span><span class="n">run</span><span class="p">()</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">sink</span><span class="p">:</span> <span class="n">sink</span><span class="p">,</span> <span class="n">subscription</span><span class="p">:</span> <span class="n">subscription</span><span class="p">)</span>
     <span class="p">}</span>
 <span class="p">}</span>
@@ -745,17 +745,17 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">class</span> <span class="nc">Sink</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">:</span> <span class="n">ObserverType</span><span class="p">&gt;</span> <span class="p">:</span> <span class="n">Disposable</span> <span class="p">{</span>
     <span class="n">fileprivate</span> <span class="kd">let</span> <span class="nv">_observer</span><span class="p">:</span> <span class="n">Observer</span>
-    <span class="n">fileprivate</span> <span class="kd">let</span> <span class="nv">_cancel</span><span class="p">:</span> <span class="n">Cancelable</span> <span class="c1">//</span><span class="c1"> </span><span class="c1">s</span><span class="c1">i</span><span class="c1">n</span><span class="c1">k</span><span class="c1">D</span><span class="c1">i</span><span class="c1">s</span><span class="c1">p</span><span class="c1">o</span><span class="c1">s</span><span class="c1">e</span><span class="c1">r</span>
+    <span class="n">fileprivate</span> <span class="kd">let</span> <span class="nv">_cancel</span><span class="p">:</span> <span class="n">Cancelable</span> <span class="c1">// sinkDisposer</span>
     <span class="kd">private</span> <span class="kd">let</span> <span class="nv">_disposed</span> <span class="p">=</span> <span class="n">AtomicInt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-    <span class="kr">final</span> <span class="kd">func</span> <span class="nf">forwardOn</span><span class="p">(</span><span class="kc">_</span> <span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">.</span><span class="n">Element</span><span class="p">&gt;</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kr">final</span> <span class="kd">func</span> <span class="nf">forwardOn</span><span class="p">(</span><span class="kc">_</span> <span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">.</span><span class="n">Element</span><span class="p">&gt;)</span> <span class="p">{</span>
         <span class="k">if</span> <span class="n">isFlagSet</span><span class="p">(</span><span class="kc">self</span><span class="p">.</span><span class="n">_disposed</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
             <span class="k">return</span>
         <span class="p">}</span>
         <span class="kc">self</span><span class="p">.</span><span class="n">_observer</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
     <span class="p">}</span>
 
-    <span class="kr">final</span> <span class="kd">func</span> <span class="nf">forwarder</span><span class="p">(</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">SinkForward</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">&gt;</span> <span class="p">{</span>
+    <span class="kr">final</span> <span class="kd">func</span> <span class="nf">forwarder</span><span class="p">()</span> <span class="p">-&gt;</span> <span class="n">SinkForward</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">&gt;</span> <span class="p">{</span>
         <span class="k">return</span> <span class="n">SinkForward</span><span class="p">(</span><span class="n">forward</span><span class="p">:</span> <span class="kc">self</span><span class="p">)</span>
     <span class="p">}</span>
 
@@ -763,9 +763,9 @@
         <span class="k">return</span> <span class="n">isFlagSet</span><span class="p">(</span><span class="kc">self</span><span class="p">.</span><span class="n">_disposed</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="p">}</span>
 
-    <span class="kd">func</span> <span class="nf">dispose</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">func</span> <span class="nf">dispose</span><span class="p">()</span> <span class="p">{</span>
         <span class="n">fetchOr</span><span class="p">(</span><span class="kc">self</span><span class="p">.</span><span class="n">_disposed</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="kc">self</span><span class="p">.</span><span class="n">_cancel</span><span class="p">.</span><span class="n">dispose</span><span class="p">(</span><span class="p">)</span>
+        <span class="kc">self</span><span class="p">.</span><span class="n">_cancel</span><span class="p">.</span><span class="n">dispose</span><span class="p">()</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
@@ -792,15 +792,15 @@
 </span><span class="lnt">12
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kr">final</span> <span class="kd">class</span> <span class="nc">SinkForward</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">:</span> <span class="n">ObserverType</span><span class="p">&gt;</span><span class="p">:</span> <span class="n">ObserverType</span> <span class="p">{</span>
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kr">final</span> <span class="kd">class</span> <span class="nc">SinkForward</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">:</span> <span class="n">ObserverType</span><span class="p">&gt;:</span> <span class="n">ObserverType</span> <span class="p">{</span>
 
-    <span class="kr">final</span> <span class="kd">func</span> <span class="nf">on</span><span class="p">(</span><span class="kc">_</span> <span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kr">final</span> <span class="kd">func</span> <span class="nf">on</span><span class="p">(</span><span class="kc">_</span> <span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;)</span> <span class="p">{</span>
         <span class="k">switch</span> <span class="n">event</span> <span class="p">{</span>
         <span class="k">case</span> <span class="p">.</span><span class="n">next</span><span class="p">:</span>
             <span class="kc">self</span><span class="p">.</span><span class="n">_forward</span><span class="p">.</span><span class="n">_observer</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
         <span class="k">case</span> <span class="p">.</span><span class="n">error</span><span class="p">,</span> <span class="p">.</span><span class="n">completed</span><span class="p">:</span>
             <span class="kc">self</span><span class="p">.</span><span class="n">_forward</span><span class="p">.</span><span class="n">_observer</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
-            <span class="kc">self</span><span class="p">.</span><span class="n">_forward</span><span class="p">.</span><span class="n">_cancel</span><span class="p">.</span><span class="n">dispose</span><span class="p">(</span><span class="p">)</span>
+            <span class="kc">self</span><span class="p">.</span><span class="n">_forward</span><span class="p">.</span><span class="n">_cancel</span><span class="p">.</span><span class="n">dispose</span><span class="p">()</span>
         <span class="p">}</span>
     <span class="p">}</span>
 <span class="p">}</span>
@@ -830,21 +830,21 @@
 </span><span class="lnt">19
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kr">final</span> <span class="kd">private</span> <span class="kd">class</span> <span class="nc">ObservableSequenceSink</span><span class="p">&lt;</span><span class="n">Sequence</span><span class="p">:</span> <span class="n">Swift</span><span class="p">.</span><span class="n">Sequence</span><span class="p">,</span> <span class="n">Observer</span><span class="p">:</span> <span class="n">ObserverType</span><span class="p">&gt;</span><span class="p">:</span> <span class="n">Sink</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">&gt;</span> <span class="k">where</span> <span class="n">Sequence</span><span class="p">.</span><span class="n">Element</span> <span class="p">=</span><span class="p">=</span> <span class="n">Observer</span><span class="p">.</span><span class="n">Element</span> <span class="p">{</span>
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kr">final</span> <span class="kd">private</span> <span class="kd">class</span> <span class="nc">ObservableSequenceSink</span><span class="p">&lt;</span><span class="n">Sequence</span><span class="p">:</span> <span class="n">Swift</span><span class="p">.</span><span class="n">Sequence</span><span class="p">,</span> <span class="n">Observer</span><span class="p">:</span> <span class="n">ObserverType</span><span class="p">&gt;:</span> <span class="n">Sink</span><span class="p">&lt;</span><span class="n">Observer</span><span class="p">&gt;</span> <span class="k">where</span> <span class="n">Sequence</span><span class="p">.</span><span class="n">Element</span> <span class="p">==</span> <span class="n">Observer</span><span class="p">.</span><span class="n">Element</span> <span class="p">{</span>
     <span class="kd">typealias</span> <span class="n">Parent</span> <span class="p">=</span> <span class="n">ObservableSequence</span><span class="p">&lt;</span><span class="n">Sequence</span><span class="p">&gt;</span>
 
     <span class="kd">private</span> <span class="kd">let</span> <span class="nv">_parent</span><span class="p">:</span> <span class="n">Parent</span>
 
-    <span class="kd">func</span> <span class="nf">run</span><span class="p">(</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">Disposable</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="kc">self</span><span class="p">.</span><span class="n">_parent</span><span class="p">.</span><span class="n">_scheduler</span><span class="p">.</span><span class="n">scheduleRecursive</span><span class="p">(</span><span class="kc">self</span><span class="p">.</span><span class="n">_parent</span><span class="p">.</span><span class="n">_elements</span><span class="p">.</span><span class="n">makeIterator</span><span class="p">(</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span> <span class="n">iterator</span><span class="p">,</span> <span class="n">recurse</span> <span class="k">in</span>
+    <span class="kd">func</span> <span class="nf">run</span><span class="p">()</span> <span class="p">-&gt;</span> <span class="n">Disposable</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="kc">self</span><span class="p">.</span><span class="n">_parent</span><span class="p">.</span><span class="n">_scheduler</span><span class="p">.</span><span class="n">scheduleRecursive</span><span class="p">(</span><span class="kc">self</span><span class="p">.</span><span class="n">_parent</span><span class="p">.</span><span class="n">_elements</span><span class="p">.</span><span class="n">makeIterator</span><span class="p">())</span> <span class="p">{</span> <span class="n">iterator</span><span class="p">,</span> <span class="n">recurse</span> <span class="k">in</span>
             <span class="kd">var</span> <span class="nv">mutableIterator</span> <span class="p">=</span> <span class="n">iterator</span>
-            <span class="k">if</span> <span class="kd">let</span> <span class="nv">next</span> <span class="p">=</span> <span class="n">mutableIterator</span><span class="p">.</span><span class="n">next</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
-                <span class="kc">self</span><span class="p">.</span><span class="n">forwardOn</span><span class="p">(</span><span class="p">.</span><span class="n">next</span><span class="p">(</span><span class="n">next</span><span class="p">)</span><span class="p">)</span>
+            <span class="k">if</span> <span class="kd">let</span> <span class="nv">next</span> <span class="p">=</span> <span class="n">mutableIterator</span><span class="p">.</span><span class="n">next</span><span class="p">()</span> <span class="p">{</span>
+                <span class="kc">self</span><span class="p">.</span><span class="n">forwardOn</span><span class="p">(.</span><span class="n">next</span><span class="p">(</span><span class="n">next</span><span class="p">))</span>
                 <span class="n">recurse</span><span class="p">(</span><span class="n">mutableIterator</span><span class="p">)</span>
             <span class="p">}</span>
             <span class="k">else</span> <span class="p">{</span>
-                <span class="kc">self</span><span class="p">.</span><span class="n">forwardOn</span><span class="p">(</span><span class="p">.</span><span class="n">completed</span><span class="p">)</span>
-                <span class="kc">self</span><span class="p">.</span><span class="n">dispose</span><span class="p">(</span><span class="p">)</span>
+                <span class="kc">self</span><span class="p">.</span><span class="n">forwardOn</span><span class="p">(.</span><span class="n">completed</span><span class="p">)</span>
+                <span class="kc">self</span><span class="p">.</span><span class="n">dispose</span><span class="p">()</span>
             <span class="p">}</span>
         <span class="p">}</span>
     <span class="p">}</span>
@@ -865,7 +865,7 @@
 <pre class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="p">.</span><span class="n">subscribe</span><span class="p">(</span> <span class="p">{</span> <span class="bp">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span><span class="p">)</span>
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="p">.</span><span class="n">subscribe</span><span class="p">(</span> <span class="p">{</span> <span class="bp">print</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">})</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>同 <code>of(_:)</code> 一样，订阅也是对 <a href="https://github.com/ReactiveX/RxSwift/blob/master/RxSwift/ObservableType%2BExtensions.swift">ObservableType 扩展</a>来实现的。简化后如下：</p>
@@ -890,17 +890,17 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">extension</span> <span class="nc">ObservableType</span> <span class="p">{</span>
 
-    <span class="kd">public</span> <span class="kd">func</span> <span class="nf">subscribe</span><span class="p">(</span><span class="kc">_</span> <span class="n">on</span><span class="p">:</span> <span class="p">@</span><span class="n">escaping</span> <span class="p">(</span><span class="n">Event</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">Void</span><span class="p">)</span>
+    <span class="kd">public</span> <span class="kd">func</span> <span class="nf">subscribe</span><span class="p">(</span><span class="kc">_</span> <span class="n">on</span><span class="p">:</span> <span class="p">@</span><span class="n">escaping</span> <span class="p">(</span><span class="n">Event</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;)</span> <span class="p">-&gt;</span> <span class="nb">Void</span><span class="p">)</span>
         <span class="p">-&gt;</span> <span class="n">Disposable</span> <span class="p">{</span>
             <span class="kd">let</span> <span class="nv">observer</span> <span class="p">=</span> <span class="n">AnonymousObserver</span> <span class="p">{</span> <span class="n">e</span> <span class="k">in</span>
                 <span class="n">on</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
             <span class="p">}</span>
-            <span class="k">return</span> <span class="kc">self</span><span class="p">.</span><span class="n">asObservable</span><span class="p">(</span><span class="p">)</span><span class="p">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">observer</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">self</span><span class="p">.</span><span class="n">asObservable</span><span class="p">().</span><span class="n">subscribe</span><span class="p">(</span><span class="n">observer</span><span class="p">)</span>
     <span class="p">}</span>
 
-    <span class="kd">public</span> <span class="kd">func</span> <span class="nf">subscribe</span><span class="p">(</span><span class="n">onNext</span><span class="p">:</span> <span class="p">(</span><span class="p">(</span><span class="n">Element</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">Void</span><span class="p">)</span><span class="p">?</span> <span class="p">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">onError</span><span class="p">:</span> <span class="p">(</span><span class="p">(</span><span class="n">Swift</span><span class="p">.</span><span class="n">Error</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">Void</span><span class="p">)</span><span class="p">?</span> <span class="p">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">onCompleted</span><span class="p">:</span> <span class="p">(</span><span class="p">(</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">Void</span><span class="p">)</span><span class="p">?</span> <span class="p">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">onDisposed</span><span class="p">:</span> <span class="p">(</span><span class="p">(</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">Void</span><span class="p">)</span><span class="p">?</span> <span class="p">=</span> <span class="kc">nil</span><span class="p">)</span>
+    <span class="kd">public</span> <span class="kd">func</span> <span class="nf">subscribe</span><span class="p">(</span><span class="n">onNext</span><span class="p">:</span> <span class="p">((</span><span class="n">Element</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">Void</span><span class="p">)?</span> <span class="p">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">onError</span><span class="p">:</span> <span class="p">((</span><span class="n">Swift</span><span class="p">.</span><span class="n">Error</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">Void</span><span class="p">)?</span> <span class="p">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">onCompleted</span><span class="p">:</span> <span class="p">(()</span> <span class="p">-&gt;</span> <span class="nb">Void</span><span class="p">)?</span> <span class="p">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">onDisposed</span><span class="p">:</span> <span class="p">(()</span> <span class="p">-&gt;</span> <span class="nb">Void</span><span class="p">)?</span> <span class="p">=</span> <span class="kc">nil</span><span class="p">)</span>
         <span class="p">-&gt;</span> <span class="n">Disposable</span> <span class="p">{</span>
-        <span class="p">.</span><span class="p">.</span><span class="p">.</span>
+        <span class="p">...</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
@@ -925,17 +925,17 @@
 </span><span class="lnt">14
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kr">final</span> <span class="kd">class</span> <span class="nc">AnonymousObserver</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span><span class="p">:</span> <span class="n">ObserverBase</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span> <span class="p">{</span>
-    <span class="kd">typealias</span> <span class="n">EventHandler</span> <span class="p">=</span> <span class="p">(</span><span class="n">Event</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">Void</span>
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kr">final</span> <span class="kd">class</span> <span class="nc">AnonymousObserver</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;:</span> <span class="n">ObserverBase</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span> <span class="p">{</span>
+    <span class="kd">typealias</span> <span class="n">EventHandler</span> <span class="p">=</span> <span class="p">(</span><span class="n">Event</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;)</span> <span class="p">-&gt;</span> <span class="nb">Void</span>
     
     <span class="kd">private</span> <span class="kd">let</span> <span class="nv">_eventHandler</span> <span class="p">:</span> <span class="n">EventHandler</span>
-    <span class="c1">//</span><span class="c1">/</span><span class="c1"> </span><span class="c1">这</span><span class="c1">里</span><span class="c1">同</span><span class="c1">样</span><span class="c1">忽</span><span class="c1">略</span><span class="c1">了</span><span class="c1"> </span><span class="c1">`</span><span class="c1">i</span><span class="c1">n</span><span class="c1">i</span><span class="c1">t</span><span class="c1">(</span><span class="c1">)</span><span class="c1">`</span><span class="c1"> </span><span class="c1">与</span><span class="c1"> </span><span class="c1">`</span><span class="c1">d</span><span class="c1">e</span><span class="c1">i</span><span class="c1">n</span><span class="c1">i</span><span class="c1">t</span><span class="c1">(</span><span class="c1">)</span><span class="c1">`</span><span class="c1"> </span><span class="c1">的</span><span class="c1">资</span><span class="c1">源</span><span class="c1">统</span><span class="c1">计</span><span class="c1">逻</span><span class="c1">辑</span>
+    <span class="c1">/// 这里同样忽略了 `init()` 与 `deinit()` 的资源统计逻辑</span>
     <span class="kd">init</span><span class="p">(</span><span class="kc">_</span> <span class="n">eventHandler</span><span class="p">:</span> <span class="p">@</span><span class="n">escaping</span> <span class="n">EventHandler</span><span class="p">)</span> <span class="p">{</span>
-        <span class="c1">//</span><span class="c1">/</span><span class="c1"> </span><span class="c1">资</span><span class="c1">源</span><span class="c1">统</span><span class="c1">计</span>
+        <span class="c1">/// 资源统计</span>
         <span class="kc">self</span><span class="p">.</span><span class="n">_eventHandler</span> <span class="p">=</span> <span class="n">eventHandler</span>
     <span class="p">}</span>
 
-    <span class="kr">override</span> <span class="kd">func</span> <span class="nf">onCore</span><span class="p">(</span><span class="kc">_</span> <span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kr">override</span> <span class="kd">func</span> <span class="nf">onCore</span><span class="p">(</span><span class="kc">_</span> <span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;)</span> <span class="p">{</span>
         <span class="k">return</span> <span class="kc">self</span><span class="p">.</span><span class="n">_eventHandler</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
     <span class="p">}</span>
 <span class="p">}</span>
@@ -983,22 +983,22 @@
 <pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">public</span> <span class="kd">protocol</span> <span class="nc">ObserverType</span> <span class="p">{</span>
     <span class="n">associatedtype</span> <span class="n">Element</span>
 
-    <span class="kd">func</span> <span class="nf">on</span><span class="p">(</span><span class="kc">_</span> <span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span><span class="p">)</span>
+    <span class="kd">func</span> <span class="nf">on</span><span class="p">(</span><span class="kc">_</span> <span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;)</span>
 <span class="p">}</span>
 
-<span class="c1">//</span><span class="c1">/</span><span class="c1"> </span><span class="c1">C</span><span class="c1">o</span><span class="c1">n</span><span class="c1">v</span><span class="c1">e</span><span class="c1">n</span><span class="c1">i</span><span class="c1">e</span><span class="c1">n</span><span class="c1">c</span><span class="c1">e</span><span class="c1"> </span><span class="c1">A</span><span class="c1">P</span><span class="c1">I</span><span class="c1"> </span><span class="c1">e</span><span class="c1">x</span><span class="c1">t</span><span class="c1">e</span><span class="c1">n</span><span class="c1">s</span><span class="c1">i</span><span class="c1">o</span><span class="c1">n</span><span class="c1">s</span><span class="c1"> </span><span class="c1">t</span><span class="c1">o</span><span class="c1"> </span><span class="c1">p</span><span class="c1">r</span><span class="c1">o</span><span class="c1">v</span><span class="c1">i</span><span class="c1">d</span><span class="c1">e</span><span class="c1"> </span><span class="c1">a</span><span class="c1">l</span><span class="c1">t</span><span class="c1">e</span><span class="c1">r</span><span class="c1">n</span><span class="c1">a</span><span class="c1">t</span><span class="c1">e</span><span class="c1"> </span><span class="c1">n</span><span class="c1">e</span><span class="c1">x</span><span class="c1">t</span><span class="c1">,</span><span class="c1"> </span><span class="c1">e</span><span class="c1">r</span><span class="c1">r</span><span class="c1">o</span><span class="c1">r</span><span class="c1">,</span><span class="c1"> </span><span class="c1">c</span><span class="c1">o</span><span class="c1">m</span><span class="c1">p</span><span class="c1">l</span><span class="c1">e</span><span class="c1">t</span><span class="c1">e</span><span class="c1">d</span><span class="c1"> </span><span class="c1">e</span><span class="c1">v</span><span class="c1">e</span><span class="c1">n</span><span class="c1">t</span><span class="c1">s</span>
+<span class="c1">/// Convenience API extensions to provide alternate next, error, completed events</span>
 <span class="kd">extension</span> <span class="nc">ObserverType</span> <span class="p">{</span>
 
     <span class="kd">public</span> <span class="kd">func</span> <span class="nf">onNext</span><span class="p">(</span><span class="kc">_</span> <span class="n">element</span><span class="p">:</span> <span class="n">Element</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kc">self</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="p">.</span><span class="n">next</span><span class="p">(</span><span class="n">element</span><span class="p">)</span><span class="p">)</span>
+        <span class="kc">self</span><span class="p">.</span><span class="n">on</span><span class="p">(.</span><span class="n">next</span><span class="p">(</span><span class="n">element</span><span class="p">))</span>
     <span class="p">}</span>
 
-    <span class="kd">public</span> <span class="kd">func</span> <span class="nf">onCompleted</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kc">self</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="p">.</span><span class="n">completed</span><span class="p">)</span>
+    <span class="kd">public</span> <span class="kd">func</span> <span class="nf">onCompleted</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kc">self</span><span class="p">.</span><span class="n">on</span><span class="p">(.</span><span class="n">completed</span><span class="p">)</span>
     <span class="p">}</span>
     
     <span class="kd">public</span> <span class="kd">func</span> <span class="nf">onError</span><span class="p">(</span><span class="kc">_</span> <span class="n">error</span><span class="p">:</span> <span class="n">Swift</span><span class="p">.</span><span class="n">Error</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kc">self</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="p">.</span><span class="n">error</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="p">)</span>
+        <span class="kc">self</span><span class="p">.</span><span class="n">on</span><span class="p">(.</span><span class="n">error</span><span class="p">(</span><span class="n">error</span><span class="p">))</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
@@ -1019,13 +1019,13 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">public</span> <span class="kd">enum</span> <span class="nc">Event</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span> <span class="p">{</span>
-    <span class="c1">//</span><span class="c1">/</span><span class="c1"> </span><span class="c1">N</span><span class="c1">e</span><span class="c1">x</span><span class="c1">t</span><span class="c1"> </span><span class="c1">e</span><span class="c1">l</span><span class="c1">e</span><span class="c1">m</span><span class="c1">e</span><span class="c1">n</span><span class="c1">t</span><span class="c1"> </span><span class="c1">i</span><span class="c1">s</span><span class="c1"> </span><span class="c1">p</span><span class="c1">r</span><span class="c1">o</span><span class="c1">d</span><span class="c1">u</span><span class="c1">c</span><span class="c1">e</span><span class="c1">d</span><span class="c1">.</span>
+    <span class="c1">/// Next element is produced.</span>
     <span class="k">case</span> <span class="n">next</span><span class="p">(</span><span class="n">Element</span><span class="p">)</span>
 
-    <span class="c1">//</span><span class="c1">/</span><span class="c1"> </span><span class="c1">S</span><span class="c1">e</span><span class="c1">q</span><span class="c1">u</span><span class="c1">e</span><span class="c1">n</span><span class="c1">c</span><span class="c1">e</span><span class="c1"> </span><span class="c1">t</span><span class="c1">e</span><span class="c1">r</span><span class="c1">m</span><span class="c1">i</span><span class="c1">n</span><span class="c1">a</span><span class="c1">t</span><span class="c1">e</span><span class="c1">d</span><span class="c1"> </span><span class="c1">w</span><span class="c1">i</span><span class="c1">t</span><span class="c1">h</span><span class="c1"> </span><span class="c1">a</span><span class="c1">n</span><span class="c1"> </span><span class="c1">e</span><span class="c1">r</span><span class="c1">r</span><span class="c1">o</span><span class="c1">r</span><span class="c1">.</span>
+    <span class="c1">/// Sequence terminated with an error.</span>
     <span class="k">case</span> <span class="n">error</span><span class="p">(</span><span class="n">Swift</span><span class="p">.</span><span class="n">Error</span><span class="p">)</span>
 
-    <span class="c1">//</span><span class="c1">/</span><span class="c1"> </span><span class="c1">S</span><span class="c1">e</span><span class="c1">q</span><span class="c1">u</span><span class="c1">e</span><span class="c1">n</span><span class="c1">c</span><span class="c1">e</span><span class="c1"> </span><span class="c1">c</span><span class="c1">o</span><span class="c1">m</span><span class="c1">p</span><span class="c1">l</span><span class="c1">e</span><span class="c1">t</span><span class="c1">e</span><span class="c1">d</span><span class="c1"> </span><span class="c1">s</span><span class="c1">u</span><span class="c1">c</span><span class="c1">c</span><span class="c1">e</span><span class="c1">s</span><span class="c1">s</span><span class="c1">f</span><span class="c1">u</span><span class="c1">l</span><span class="c1">l</span><span class="c1">y</span><span class="c1">.</span>
+    <span class="c1">/// Sequence completed successfully.</span>
     <span class="k">case</span> <span class="n">completed</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
@@ -1063,24 +1063,24 @@
 <pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">class</span> <span class="nc">ObserverBase</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span> <span class="p">:</span> <span class="n">Disposable</span><span class="p">,</span> <span class="n">ObserverType</span> <span class="p">{</span>
     <span class="kd">private</span> <span class="kd">let</span> <span class="nv">_isStopped</span> <span class="p">=</span> <span class="n">AtomicInt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-    <span class="kd">func</span> <span class="nf">on</span><span class="p">(</span><span class="kc">_</span> <span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">func</span> <span class="nf">on</span><span class="p">(</span><span class="kc">_</span> <span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;)</span> <span class="p">{</span>
         <span class="k">switch</span> <span class="n">event</span> <span class="p">{</span>
         <span class="k">case</span> <span class="p">.</span><span class="n">next</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">load</span><span class="p">(</span><span class="kc">self</span><span class="p">.</span><span class="n">_isStopped</span><span class="p">)</span> <span class="p">=</span><span class="p">=</span> <span class="mi">0</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="n">load</span><span class="p">(</span><span class="kc">self</span><span class="p">.</span><span class="n">_isStopped</span><span class="p">)</span> <span class="p">==</span> <span class="mi">0</span> <span class="p">{</span>
                 <span class="kc">self</span><span class="p">.</span><span class="n">onCore</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
             <span class="p">}</span>
         <span class="k">case</span> <span class="p">.</span><span class="n">error</span><span class="p">,</span> <span class="p">.</span><span class="n">completed</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">fetchOr</span><span class="p">(</span><span class="kc">self</span><span class="p">.</span><span class="n">_isStopped</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="p">=</span><span class="p">=</span> <span class="mi">0</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="n">fetchOr</span><span class="p">(</span><span class="kc">self</span><span class="p">.</span><span class="n">_isStopped</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="p">==</span> <span class="mi">0</span> <span class="p">{</span>
                 <span class="kc">self</span><span class="p">.</span><span class="n">onCore</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
             <span class="p">}</span>
         <span class="p">}</span>
     <span class="p">}</span>
 
-    <span class="kd">func</span> <span class="nf">onCore</span><span class="p">(</span><span class="kc">_</span> <span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">rxAbstractMethod</span><span class="p">(</span><span class="p">)</span>
+    <span class="kd">func</span> <span class="nf">onCore</span><span class="p">(</span><span class="kc">_</span> <span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">&lt;</span><span class="n">Element</span><span class="p">&gt;)</span> <span class="p">{</span>
+        <span class="n">rxAbstractMethod</span><span class="p">()</span>
     <span class="p">}</span>
 
-    <span class="kd">func</span> <span class="nf">dispose</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">func</span> <span class="nf">dispose</span><span class="p">()</span> <span class="p">{</span>
         <span class="n">fetchOr</span><span class="p">(</span><span class="kc">self</span><span class="p">.</span><span class="n">_isStopped</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="p">}</span>
 <span class="p">}</span>
@@ -1101,7 +1101,7 @@
 <p>因此 ObserverBase 核心功作用是保证暴露给子类的  <code>onCore(_:)</code>  在观察结束后不会被重复执行。也就是保证 AnonymousObserver 的 eventHandler 被正确执行。</p>
 <p>最后，回顾一下订阅相关流程：</p>
 <p><img src="http://ww1.sinaimg.cn/large/8157560cly1gd35tywfx7j223n0wogtr.jpg" alt="rxswift-subscription"></p>
-<h2 id="heading-1">总结</h2>
+<h2 id="总结">总结</h2>
 <p>RxSwift 所展示的订阅流的处理，不仅充分利用了 Swift 语言本身的特性，如为协议添加默认实现、采用泛型来约束类的行为、天然支持链式调用等。通过经典的设计模式 <a href="https://www.wikiwand.com/en/Producer%E2%80%93consumer_problem">Producer–consumer</a>，以多元化的 Producer 来轻松支持各种 operator 的实现。还有就是巧妙的运用了位运算来简化逻辑。</p>
 <p>由于篇幅有限，Schedule 的调度逻辑并未展开，还有就是 DisposeBag 通篇未提及，就当是思考作业啦。</p>
 

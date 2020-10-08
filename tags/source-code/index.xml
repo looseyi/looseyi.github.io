@@ -6,10 +6,19 @@
     <description>Recent content in Source Code on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 16 May 2020 00:00:00 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 21 May 2020 00:00:00 +0800</lastBuildDate>
     
 	<atom:link href="http://looseyi.github.io/tags/source-code/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>浅析 - 微信 MMKV 1.1.1</title>
+      <link>http://looseyi.github.io/post/sourcecode-ios/source-code-mmkv/</link>
+      <pubDate>Thu, 21 May 2020 00:00:00 +0800</pubDate>
+      
+      <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-mmkv/</guid>
+      <description>介绍 MMKV is an efficient, small, easy-to-use mobile key-value storage framework used in the WeChat application. It&amp;rsquo;s currently available on Android, iOS/macOS, Win32 and POSIX. 作为一个精简易用且性能强悍的全平台 K-V 存储框架，MMKV 有如下特点： 高效： 利用 mmap 直接将文件</description>
+    </item>
     
     <item>
       <title>浅析 - CocoaLumberjack 3.6 之 DatabaseLogger</title>
@@ -30,21 +39,12 @@
     </item>
     
     <item>
-      <title>浅析 - MMKV 1.1 / iOS</title>
-      <link>http://looseyi.github.io/post/sourcecode-ios/source-code-mmkv/</link>
-      <pubDate>Tue, 05 May 2020 23:23:47 +0800</pubDate>
-      
-      <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-mmkv/</guid>
-      <description>#介绍 MMKV is an efficient, small, easy-to-use mobile key-value storage framework used in the WeChat application. It&#39;s currently available on Android, iOS/macOS, Win32 and POSIX. MMKV 作为一个精简易用且性能强悍的全平台 K-V 存储框架，有如下特点： 高效： 利用 mmap 直接将文件映射</description>
-    </item>
-    
-    <item>
       <title>浅析 - CocoaLumberjack 3.6 之 DDLog</title>
       <link>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-1/</link>
       <pubDate>Mon, 04 May 2020 18:20:00 +0800</pubDate>
       
       <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-1/</guid>
-      <description>介绍 CocoaLumberjack is a fast &amp;amp; simple, yet powerful &amp;amp; flexible logging framework for Mac and iOS. 先扯一下 lumberjack 这个单词，对应的就是它的 logo，一位伐木工，好想知道作者对用意啊，是基础建设的意思吗？ 写这篇</description>
+      <description>介绍 CocoaLumberjack is a fast &amp;amp; simple, yet powerful &amp;amp; flexible logging framework for Mac and iOS. 先扯一下 lumberjack 这个单词，对应的就是它的 logo，一位伐木工。 一直不太理解为什么是用这个单词，其他语音中也有日</description>
     </item>
     
     <item>
@@ -53,7 +53,7 @@
       <pubDate>Sun, 12 Apr 2020 23:08:12 +1700</pubDate>
       
       <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-sdweb-en1/</guid>
-      <description>This article is based on SDWebImage 5.6. Why i write this article, cause i found that SD&#39;s API is constantly iterating, and many of the structures are different from earlier versions. Here is to make a record. We will start from the top of the API&#39;s level list below, force on the entire framework&#39;s data flow. 5.0 Migration Guid It is highly recommended to watch the official migration document, which</description>
+      <description>This article is based on SDWebImage 5.6. Why i write this article, cause i found that SD&amp;rsquo;s API is constantly iterating, and many of the structures are different from earlier versions. Here is to make a record. We will start from the top of the API&amp;rsquo;s level list below, force on the entire framework&amp;rsquo;s data flow. 5.0 Migration Guid It is highly recommended to watch the official migration document, which</description>
     </item>
     
     <item>

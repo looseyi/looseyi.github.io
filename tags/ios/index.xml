@@ -1,15 +1,105 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>iOS on </title>
+    <title>iOS&#39; on </title>
     <link>http://looseyi.github.io/tags/ios/</link>
-    <description>Recent content in iOS on </description>
+    <description>Recent content in iOS&#39; on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 16 May 2020 00:00:00 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 17 Sep 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="http://looseyi.github.io/tags/ios/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>4. Podfile 的解析逻辑</title>
+      <link>http://looseyi.github.io/post/sourcecode-cocoapods/04-cocoapods-podfile/</link>
+      <pubDate>Thu, 17 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/post/sourcecode-cocoapods/04-cocoapods-podfile/</guid>
+      <description>本文知识目录 引子 在上文 CocoaPods 命令解析 中，我们通过对 CLAide 的源码分析，了解了 CocoaPods 是如何处理 pod 命令，多级命令又是如何组织和嵌套的，并解释了命令行输出所代表</description>
+    </item>
+    
+    <item>
+      <title>3. CocoaPods 命令解析 - CLAide</title>
+      <link>http://looseyi.github.io/post/sourcecode-cocoapods/03-cocoapods-claide/</link>
+      <pubDate>Wed, 02 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/post/sourcecode-cocoapods/03-cocoapods-claide/</guid>
+      <description>本文知识目录 引子 在上文 整体把握 CocoaPods 核心组件 中，我们通过对 pod install 的流程的介绍，引出 CocoaPods 的各个核心组件的角色分工和其主要作用，希望通过对这些组件的使用</description>
+    </item>
+    
+    <item>
+      <title>2. 整体把握 CocoaPods 核心组件</title>
+      <link>http://looseyi.github.io/post/sourcecode-cocoapods/02-cocoapods-corecomponents/</link>
+      <pubDate>Mon, 17 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/post/sourcecode-cocoapods/02-cocoapods-corecomponents/</guid>
+      <description>本文知识目录 引子 在上文 版本管理工具及 Ruby 工具链环境 中，我们聊到如何统一管理团队小伙伴的 CocoaPods 生产环境及使用到的 Ruby 工具链。今天让我们将目光转到 CocoaPods 身上</description>
+    </item>
+    
+    <item>
+      <title>WWDC20 - Build SwiftUI views for widgets</title>
+      <link>http://looseyi.github.io/post/swiftui/wwdc20-session-10033/</link>
+      <pubDate>Sat, 27 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/post/swiftui/wwdc20-session-10033/</guid>
+      <description>WWDC20 Session 10033 - Build SwiftUI views for widgets 本文知识目录 本文属于 WWDC20 中 Widgets 系列的文章。Widgets 是使用 SwiftUI 进行开发的，如果您对 SwiftUI 还不是很了解请翻看 Introduction to SwiftUI。如</description>
+    </item>
+    
+    <item>
+      <title>WWDC20 - What&#39;s new in SwiftUI</title>
+      <link>http://looseyi.github.io/post/swiftui/wwdc20-session-10041/</link>
+      <pubDate>Fri, 26 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/post/swiftui/wwdc20-session-10041/</guid>
+      <description>WWDC 2020 Session 10041 - What&amp;rsquo;s new in SwiftUI 本文知识目录 对于 iOS 开发而言， WWDC 2019 中推出的 SwiftUI 无疑是最受关注的一项技术，它可以在所有 Apple 平台上构建出色的用户界面。而今年我们迎来</description>
+    </item>
+    
+    <item>
+      <title>Cocoa 文档注释与生成工具使用 - Jazzy &#43; SourceKitten</title>
+      <link>http://looseyi.github.io/post/tool/cocoa-documentation-2/</link>
+      <pubDate>Thu, 18 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/post/tool/cocoa-documentation-2/</guid>
+      <description>我们在前文 《Cocoa 代码注释与文档生成》 中详细介绍了如何为 Swift &amp;amp; ObjC 的代码编写符合规范的注释，以及使用 Jazzy 来生成项目文档。 今天我们来尝试一下，如</description>
+    </item>
+    
+    <item>
+      <title>📒个人备忘 - 队列、GCD、线程基础</title>
+      <link>http://looseyi.github.io/post/notes/01-gcd/</link>
+      <pubDate>Tue, 16 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/post/notes/01-gcd/</guid>
+      <description>[toc] 引子 本篇内容大多来自网络上的一些文章，希望做一个 📝 和参考，如有出错的地方希望指正。 起因是公司内部的同学在开发中遇到了 FMDB 的一个 Crash，查</description>
+    </item>
+    
+    <item>
+      <title>Cocoa 文档注释与生成</title>
+      <link>http://looseyi.github.io/post/tool/cocoa-documentation-1/</link>
+      <pubDate>Sun, 14 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/post/tool/cocoa-documentation-1/</guid>
+      <description>Cocoa 代码注释与文档生成 本文的文档规范部分的内容参考自：NSHipster 的 Swift Documentation 作者 &amp;amp; Nate Cook 本文知识目录 背景 曾经以为好的代码是可以自我解释不需要注</description>
+    </item>
+    
+    <item>
+      <title>1. 版本管理工具及 Ruby 工具链环境</title>
+      <link>http://looseyi.github.io/post/sourcecode-cocoapods/01-cocoapods-toolchains/</link>
+      <pubDate>Wed, 10 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/post/sourcecode-cocoapods/01-cocoapods-toolchains/</guid>
+      <description>1. 版本管理工具及 Ruby 工具链环境 CocoaPods 历险记这个专题是 Edmond 和冬瓜 是对于 iOS / macOS 工程中版本管理工具 CocoaPods 的实现细节、原理、源码、实践与经验的分享记录，旨在帮助</description>
+    </item>
+    
+    <item>
+      <title>浅析 - 微信 MMKV 1.1.1</title>
+      <link>http://looseyi.github.io/post/sourcecode-ios/source-code-mmkv/</link>
+      <pubDate>Thu, 21 May 2020 00:00:00 +0800</pubDate>
+      
+      <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-mmkv/</guid>
+      <description>介绍 MMKV is an efficient, small, easy-to-use mobile key-value storage framework used in the WeChat application. It&amp;rsquo;s currently available on Android, iOS/macOS, Win32 and POSIX. 作为一个精简易用且性能强悍的全平台 K-V 存储框架，MMKV 有如下特点： 高效： 利用 mmap 直接将文件</description>
+    </item>
     
     <item>
       <title>浅析 - CocoaLumberjack 3.6 之 DatabaseLogger</title>
@@ -30,21 +120,12 @@
     </item>
     
     <item>
-      <title>浅析 - MMKV 1.1 / iOS</title>
-      <link>http://looseyi.github.io/post/sourcecode-ios/source-code-mmkv/</link>
-      <pubDate>Tue, 05 May 2020 23:23:47 +0800</pubDate>
-      
-      <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-mmkv/</guid>
-      <description>#介绍 MMKV is an efficient, small, easy-to-use mobile key-value storage framework used in the WeChat application. It&#39;s currently available on Android, iOS/macOS, Win32 and POSIX. MMKV 作为一个精简易用且性能强悍的全平台 K-V 存储框架，有如下特点： 高效： 利用 mmap 直接将文件映射</description>
-    </item>
-    
-    <item>
       <title>浅析 - CocoaLumberjack 3.6 之 DDLog</title>
       <link>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-1/</link>
       <pubDate>Mon, 04 May 2020 18:20:00 +0800</pubDate>
       
       <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-1/</guid>
-      <description>介绍 CocoaLumberjack is a fast &amp;amp; simple, yet powerful &amp;amp; flexible logging framework for Mac and iOS. 先扯一下 lumberjack 这个单词，对应的就是它的 logo，一位伐木工，好想知道作者对用意啊，是基础建设的意思吗？ 写这篇</description>
+      <description>介绍 CocoaLumberjack is a fast &amp;amp; simple, yet powerful &amp;amp; flexible logging framework for Mac and iOS. 先扯一下 lumberjack 这个单词，对应的就是它的 logo，一位伐木工。 一直不太理解为什么是用这个单词，其他语音中也有日</description>
     </item>
     
     <item>
@@ -53,7 +134,7 @@
       <pubDate>Sun, 12 Apr 2020 23:08:12 +1700</pubDate>
       
       <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-sdweb-en1/</guid>
-      <description>This article is based on SDWebImage 5.6. Why i write this article, cause i found that SD&#39;s API is constantly iterating, and many of the structures are different from earlier versions. Here is to make a record. We will start from the top of the API&#39;s level list below, force on the entire framework&#39;s data flow. 5.0 Migration Guid It is highly recommended to watch the official migration document, which</description>
+      <description>This article is based on SDWebImage 5.6. Why i write this article, cause i found that SD&amp;rsquo;s API is constantly iterating, and many of the structures are different from earlier versions. Here is to make a record. We will start from the top of the API&amp;rsquo;s level list below, force on the entire framework&amp;rsquo;s data flow. 5.0 Migration Guid It is highly recommended to watch the official migration document, which</description>
     </item>
     
     <item>
@@ -102,12 +183,12 @@
     </item>
     
     <item>
-      <title>浅析 Cocoapods-Binary 实现</title>
+      <title>浅析 cocoapods-binary</title>
       <link>http://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-1/</link>
       <pubDate>Sat, 21 Dec 2019 11:37:41 +2100</pubDate>
       
       <guid>http://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-1/</guid>
-      <description>背景 公司级别的项目在发展过程，不可避免会遇到项目过大，导致的编译和开发效率的降低。在如何提高编译速度，加快生产效率，各大厂都有各种尝试，可惜</description>
+      <description>#介绍 cocoapods-binary 最早是在 CocoaPods 的 Blog 中发现的：pre-compiling dependencies。虽非官方出品，但却是国内程序员的力作，medium 原版介</description>
     </item>
     
   </channel>

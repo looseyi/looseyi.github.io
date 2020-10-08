@@ -6,17 +6,53 @@
     <description>Recent content in Categories on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 16 May 2020 00:00:00 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 17 Sep 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="http://looseyi.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
+      <title>CocoaPods</title>
+      <link>http://looseyi.github.io/categories/cocoapods/</link>
+      <pubDate>Thu, 17 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/categories/cocoapods/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>iOS</title>
       <link>http://looseyi.github.io/categories/ios/</link>
-      <pubDate>Sat, 16 May 2020 00:00:00 +0800</pubDate>
+      <pubDate>Thu, 17 Sep 2020 00:00:00 +0000</pubDate>
       
       <guid>http://looseyi.github.io/categories/ios/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>SwiftUI</title>
+      <link>http://looseyi.github.io/categories/swiftui/</link>
+      <pubDate>Sat, 27 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/categories/swiftui/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>WWDC</title>
+      <link>http://looseyi.github.io/categories/wwdc/</link>
+      <pubDate>Sat, 27 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/categories/wwdc/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Tool</title>
+      <link>http://looseyi.github.io/categories/tool/</link>
+      <pubDate>Thu, 18 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/categories/tool/</guid>
       <description></description>
     </item>
     
@@ -35,15 +71,6 @@
       <pubDate>Sun, 12 Apr 2020 23:08:12 +1700</pubDate>
       
       <guid>http://looseyi.github.io/categories/objc/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>CocoaPods</title>
-      <link>http://looseyi.github.io/categories/cocoapods/</link>
-      <pubDate>Sun, 29 Mar 2020 15:10:58 +0800</pubDate>
-      
-      <guid>http://looseyi.github.io/categories/cocoapods/</guid>
       <description></description>
     </item>
     

@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Cocoa 文档注释与生成 - </title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="土土Edmond木" /><meta name="description" content="Cocoa 代码注释与文档生成 本文的文档规范部分的内容参考自：NSHipster 的 Swift Documentation 作者 &amp;amp; Nate Cook 本文知识目录 背景 曾经以为好的代码是可以自我解释不需要注" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.71.1 with theme even" />
+
+
+<link rel="canonical" href="http://looseyi.github.io/post/tool/cocoa-documentation-1/" />
+  <link href="http://looseyi.github.io/post/tool/cocoa-documentation-1/index.xml" rel="alternate" type="application/rss+xml" title="" />
+  <link href="http://looseyi.github.io/post/tool/cocoa-documentation-1/index.xml" rel="feed" type="application/rss+xml" title="" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="Cocoa 文档注释与生成" />
+<meta property="og:description" content="Cocoa 代码注释与文档生成 本文的文档规范部分的内容参考自：NSHipster 的 Swift Documentation 作者 &amp; Nate Cook 本文知识目录 背景 曾经以为好的代码是可以自我解释不需要注" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://looseyi.github.io/post/tool/cocoa-documentation-1/" />
+<meta property="article:published_time" content="2020-06-14T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-06-14T00:00:00+00:00" />
+<meta itemprop="name" content="Cocoa 文档注释与生成">
+<meta itemprop="description" content="Cocoa 代码注释与文档生成 本文的文档规范部分的内容参考自：NSHipster 的 Swift Documentation 作者 &amp; Nate Cook 本文知识目录 背景 曾经以为好的代码是可以自我解释不需要注">
+<meta itemprop="datePublished" content="2020-06-14T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2020-06-14T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="3524">
+
+
+
+<meta itemprop="keywords" content="iOS&#39;,Document,SourceKit,Jazzy," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Cocoa 文档注释与生成"/>
+<meta name="twitter:description" content="Cocoa 代码注释与文档生成 本文的文档规范部分的内容参考自：NSHipster 的 Swift Documentation 作者 &amp; Nate Cook 本文知识目录 背景 曾经以为好的代码是可以自我解释不需要注"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Aha Moment</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Aha Moment</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Cocoa 文档注释与生成</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-06-14 </span>
+        <div class="post-category">
+            <a href="/categories/ios/"> iOS </a>
+            <a href="/categories/tool/"> Tool </a>
+            </div>
+          <span class="more-meta"> 约 3524 字 </span>
+          <span class="more-meta"> 预计阅读 8 分钟 </span>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#appledochttpsgithubcomtomazappledoc"><a href="https://github.com/tomaz/appledoc">appledoc</a></a></li>
+        <li><a href="#doxygenhttpwwwstacknldimitridoxygen"><a href="http://www.stack.nl/~dimitri/doxygen/">Doxygen</a></a></li>
+        <li><a href="#jazzyhttpsgithubcomrealmjazzy"><a href="https://github.com/realm/jazzy">Jazzy</a></a></li>
+      </ul>
+    </li>
+  </ul>
+
+  <ul>
+    <li><a href="#基本标记规则">基本标记规则</a></li>
+    <li><a href="#摘要和说明">摘要和说明</a></li>
+    <li><a href="#参数和返回值">参数和返回值</a></li>
+    <li><a href="#其他字段">其他字段</a></li>
+    <li><a href="#代码块">代码块</a></li>
+    <li><a href="#mark--todo--fixme">MARK / TODO / FIXME</a></li>
+    <li><a href="#给一个类添加完整的注释">给一个类添加完整的注释</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#为-swift-项目生成文档">为 Swift 项目生成文档</a></li>
+    <li><a href="#为-objective-c-项目生成文档">为 Objective-C 项目生成文档</a></li>
+    <li><a href="#为-swift--objective-c-混编项目生成文档">为 Swift &amp; Objective-C 混编项目生成文档</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p><img src="http://ww1.sinaimg.cn/large/8157560cly1gfsyp7xbikj20ow0bi46r.jpg" alt="Cocoa Documentation.png"></p>
+<h1 id="cocoa-代码注释与文档生成">Cocoa 代码注释与文档生成</h1>
+<blockquote>
+<p>本文的文档规范部分的内容参考自：NSHipster 的 <a href="https://nshipster.cn/swift-documentation/">Swift Documentation</a> 作者 &amp; <a href="https://nshipster.cn/authors/nate-cook/">Nate Cook</a></p>
+</blockquote>
+<h1 id="本文知识目录">本文知识目录</h1>
+<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gfsxkabh1yj21i61bc7ag.jpg" alt="Cocoa 代码注释与文档生成目录.png"></p>
+<h1 id="背景">背景</h1>
+<p>曾经以为好的代码是可以自我解释不需要注释的，后来发现不是这样的。就算是个人项目，代码注释的重要性也是毋庸置疑。毕竟人的记忆只有七秒！</p>
+<p>一个开发者是从其他语言转到 Cocoa 开发，大都会被它冗长的代码所 😺 到，Objective-C 的冗长使得其代码就是有效的自我说明。有如 <code>stringByAppendingPathExtension:</code> 以及参数的显式类型，这样的方法一般不会给人留下太多的想象空间。不过 Swift 就有所不同了。</p>
+<p>但即使是自我说明的代码也可以通过说明文档加以改进，而且只需少量的努力就可以给别人产生显著的好处。</p>
+<h1 id="文档生成工具">文档生成工具</h1>
+<p>每一个现代编程语言都有注释：由一个特殊的字符序列标记的非可执行的自然语言，如 <code>//</code>，<code>/**/</code>，<code>＃</code> 和 <code>--</code>。使用特殊格式注释的文档，提供了代码的辅助解释和上下文，可以用编译工具提取和解析。</p>
+<p>从 00 年代早期，<a href="https://developer.apple.com/library/mac/documentation/DeveloperTools/Conceptual/HeaderDoc/intro/intro.html#//apple_ref/doc/uid/TP40001215-CH345-SW1">Headerdoc</a> 就一直作为苹果首选的文档标准。从 Perl 脚本解析勉强的 <a href="https://en.wikipedia.org/wiki/Javadoc">Javadoc</a> 注释作为出发点，Headerdoc 最终成为了苹果在线文档及 Xcode 中的开发者文档的后台引擎。</p>
+<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gfrubouxgmj21hs0me4jw.jpg" alt="HeadDoc风格的文档"></p>
+<p>随着 WWDC 2014 的发布，开发者文档被翻修并重新设计，包含了 Swift 和 Objective-C 的支持。</p>
+<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gfru9nqjdmj21j60pk7gx.jpg" alt="Apple 新风格的文档"></p>
+<h3 id="appledochttpsgithubcomtomazappledoc"><a href="https://github.com/tomaz/appledoc">appledoc</a></h3>
+<blockquote>
+<p>类似 Javadoc， appledoc 能够从 <code>.h</code> 文件生成 HTML 和 Xcode 兼容的 <code>.docset</code> 文档。</p>
+</blockquote>
+<h3 id="doxygenhttpwwwstacknldimitridoxygen"><a href="http://www.stack.nl/~dimitri/doxygen/">Doxygen</a></h3>
+<blockquote>
+<p>主要用于 C++，但一般在 iOS / OS X 的开发者社区不很受待见。</p>
+</blockquote>
+<h3 id="jazzyhttpsgithubcomrealmjazzy"><a href="https://github.com/realm/jazzy">Jazzy</a></h3>
+<blockquote>
+<p>支持 Objective-C 和 Swift，通过对 Clang 和 SourceKit 的 hook 方式获取代码 AST 树来精准获取注释。</p>
+</blockquote>
+<h1 id="cocoa-文档规范">Cocoa 文档规范</h1>
+<p>就像许多苹果开发者生态系统一样，Swift 改变了一切。 本着 “<strong>与时俱进，与新共存</strong>” 的精神，Xcode 7 将Headerdoc 换成了粉丝最喜欢的 Markdown，尤其是 Swift 风格的 Markdown。</p>
+<p>Xcode 中生成 document 模版的快捷键为 <strong>option(alt) + cmd + /</strong></p>
+<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gfrz872it4j20d00g77hi.jpg" alt="Xcode 添加注释的快捷方式"></p>
+<p>下面为最基本的 Cocoa 注释。</p>
+<p>Objective-C 风格的注释：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="c1">/// Let&#39;s say something
+</span><span class="c1">///
+</span><span class="c1">/// @param bar I&#39;m paramter
+</span><span class="c1">/// @return I&#39;m return value
+</span><span class="c1"></span><span class="p">-</span> <span class="p">(</span><span class="kt">id</span><span class="p">)</span><span class="nf">fooBar:</span><span class="p">(</span><span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">bar</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>Swift 风格的代码注释：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="c1">///</span>
+<span class="c1">/// Let&#39;s say something</span>
+<span class="c1">///</span>
+<span class="c1">/// - Parameter bar: I&#39;m paramter</span>
+<span class="c1">/// - Returns: I&#39;m return value</span>
+<span class="kd">func</span> <span class="nf">foo</span><span class="p">(</span><span class="n">bar</span><span class="p">:</span> <span class="nb">String</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">AnyObject</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><img src="http://ww1.sinaimg.cn/large/8157560cly1gfs1q96waej20em07w0vz.jpg" alt="Swift 注释的提示效果"></p>
+<h2 id="基本标记规则">基本标记规则</h2>
+<p>文档注释通过使用 <code>/** ... */</code> 的多行注释或 <code>///...</code> 的单行注释来进行区分。在注释块里面的内容支持标准的 Markdown 语法，规则如下：</p>
+<ul>
+<li>段落由空行分隔</li>
+<li>无序列表可由多个项目符号字符组成：<code>-</code>、<code>+</code>、 <code>*</code>、 <code>•</code></li>
+<li>有序列表使用阿拉伯数字 <code>1，2，3，…</code> 后跟一个点符  <code>1.</code>  或右括号 <code>1)</code> 或两侧括号括起来 <code>(1)</code></li>
+<li>标题使用 <code>#</code> 作为前缀，内容的分割线使用 <code>---</code></li>
+<li>支持 <a href="https://daringfireball.net/projects/markdown/syntax#link">链接</a> 和 <a href="https://daringfireball.net/projects/markdown/syntax#img">图片</a>，会将基于Web的图像下载并直接在 Xcode 中显示</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-markdown" data-lang="markdown">/**
+ Hello, documentation
+
+ [<span class="nt">土土Edmond木</span>](<span class="na">https://looseyi.github.io/</span>)
+
+ # Lists
+
+ You can apply <span class="ge">*italic*</span>, <span class="gs">**bold**</span>, or <span class="sb">`code`</span> inline styles.
+
+ ---
+
+ # Unordered Lists
+ <span class="k">-</span> Lists are great,
+ <span class="k">-</span> but perhaps don&#39;t nest;
+ <span class="k">-</span> Sub-list formatting...
+ <span class="k">-</span> ...isn&#39;t the best.
+ ---
+
+ ## Ordered Lists
+ <span class="k">1.</span> Ordered lists, too,
+ <span class="k">2.</span> for things that are sorted;
+ <span class="k">3.</span> Arabic numerals
+ <span class="k">4.</span> are the only kind supported.
+ */
+</code></pre></td></tr></table>
+</div>
+</div><p>预览效果</p>
+<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gfs7fph5hxj20em0dkgui.jpg" alt="Markdown 注释的样式效果.png"></p>
+<h2 id="摘要和说明">摘要和说明</h2>
+<p>文档注释的开头部分将成为 “摘要“ <code>Summary</code>，余下的其他内容将一起归入 “讨论” <code>Discussion</code>。</p>
+<blockquote>
+<p>如果文档注释以段落以外的任何内容开头，则其所有内容都将放入讨论中。</p>
+</blockquote>
+<h2 id="参数和返回值">参数和返回值</h2>
+<p>Xcode可以识别一些特殊字段，并使它们与符号描述分开。 当将 <strong>Parameter</strong>，<strong>Return</strong> 和 <strong>Throws</strong> 置为项目符号项后带上冒号 <code>:</code> 时，它们会在快捷提示和帮助文档中与 <code>讨论</code> 分段。</p>
+<ul>
+<li><strong>Parameters:</strong>  行首以 <code>- Parameter &lt;param name&gt;:</code> 开始并带上参数的描述</li>
+<li><strong>Return values:</strong> 行首以 <code>Returns:</code> 开始并带上返回值的描述</li>
+<li><strong>Thrown errors:</strong> 行首以 <code>Throws:</code> 并配上可能抛出的异常描述，由于 Swift 不会对超出错误一致性的抛出错误进行类型检查，因此正确记录错误尤为重要。</li>
+</ul>
+<p>本文我们基本以 Swift 代码作为示例。如果代码是 Objective-C，格式稍微有一些区别。</p>
+<p>以返回值的关键字为例。在 Swift 中，我们编写 <code>-return :</code>，但在 Objective-C 中，您将编写 <code>@return</code>。 有关更多详细信息，请参见 Apple 的 <a href="https://developer.apple.com/library/archive/documentation/DeveloperTools/Conceptual/HeaderDoc/tags/tags.html">HeaderDoc 用户指南</a>。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-markdown" data-lang="markdown">/**
+ Creates a personalized greeting for a recipient.
+
+ <span class="k">-</span> Parameter recipient: The person being greeted.
+
+ <span class="k">-</span> Throws: <span class="sb">`MyError.invalidRecipient`</span>
+           if <span class="sb">`recipient`</span> is &#34;Derek&#34;
+           (he knows what he did).
+
+ <span class="k">-</span> Returns: A new string saying hello to <span class="sb">`recipient`</span>.
+ */
+func greeting(to recipient: String) throws -&gt; String {
+    guard recipient != &#34;Derek&#34; else {
+        throw MyError.invalidRecipient
+    }
+
+    return &#34;Greetings, \(recipient)!&#34;
+}
+</code></pre></td></tr></table>
+</div>
+</div><p>如果你的方法有多个参数的话，可以通过 <code>Parameters:</code> 字段加上无序列表符来注释：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-markdown" data-lang="markdown">/// Returns the magnitude of a vector in three dimensions
+/// from the given components.
+///
+/// - Parameters:
+///     - x: The <span class="ge">*x*</span> component of the vector.
+///     - y: The <span class="ge">*y*</span> component of the vector.
+///     - z: The <span class="ge">*z*</span> component of the vector.
+func magnitude3D(x: Double, y: Double, z: Double) -&gt; Double {
+    return sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2))
+}
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="其他字段">其他字段</h2>
+<p>除了上面的常用字段，Swift 风格的 Markdown 还定义了其他几个字段：</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Algorithm/Safety Information</strong></td>
+<td>Precondition Postcondition Requires Invariant Complexity Important Warning</td>
+</tr>
+<tr>
+<td><strong>Metadata</strong></td>
+<td>Author Authors Copyright Date SeeAlso Since Version</td>
+</tr>
+<tr>
+<td><strong>General Notes &amp; Exhortations</strong></td>
+<td>Attention Bug Experiment Note Remark ToDo</td>
+</tr>
+</tbody>
+</table>
+<p>可以按以下方式松散地组织它们，每个字段在快速帮助中均显示为粗体标题，后跟一段文本：</p>
+<blockquote>
+<p><strong>- 字段名:</strong>
+字段描述的内容从下一行开始</p>
+</blockquote>
+<h2 id="代码块">代码块</h2>
+<p>文档注释也支持嵌入 Code 来演示功能的正确用法或实现细节。插入代码可以通过添加三个反引号 <code>(```)</code> :</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-markdown" data-lang="markdown">/**
+ The area of the <span class="sb">`Shape`</span> instance.
+
+ Computation depends on the shape of the instance.
+ For a triangle, <span class="sb">`area`</span> is equivalent to:
+</code></pre></td></tr></table>
+</div>
+</div><p>let height = triangle.calculateHeight()
+let area = triangle.base * height / 2</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">*/
+var area: CGFloat { get }
+</code></pre></td></tr></table>
+</div>
+</div><p>或者三个反波浪号 <code>(~~~)</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-markdown" data-lang="markdown">/**
+ The perimeter of the <span class="sb">`Shape`</span> instance.
+
+ Computation depends on the shape of the instance, and is
+ equivalent to:
+
+ ~~~
+ // Circles:
+ let perimeter = circle.radius <span class="ge">* 2 *</span> Float.pi
+ // Other shapes:
+ let perimeter = shape.sides.map { $0.length }
+ .reduce(0, +)
+ ~~~
+ */
+var perimeter: CGFloat { get }
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="mark--todo--fixme">MARK / TODO / FIXME</h2>
+<p>在 Objective-C 中，我们通过预处理器指令 <a href="https://nshipster.com/pragma/">#pragma mark</a> 将功能划分为有意义的，易于导航的部分。 在 Swift中，可以通过注释 <code>// MARK：</code> 实现相同的功能。以及我们常用的其他 tag：</p>
+<ul>
+<li><code>// MARK:</code></li>
+<li><code>// TODO:</code></li>
+<li><code>// FIXME:</code></li>
+<li><code>// NOTE:</code></li>
+</ul>
+<p>为了展示这些新标签的实际作用，下面介绍了如何扩展 Bicycle 类以采用 CustomStringConvertible 协议并实现 description属性。</p>
+<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gfs9j3pvf6j20cy0eggta.jpg" alt="Mark 分割效果"></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="c1">// </span><span class="cs">MARK:</span><span class="c1"> - CustomStringConvertible</span>
+
+<span class="kd">extension</span> <span class="nc">Bicycle</span><span class="p">:</span> <span class="n">CustomStringConvertible</span> <span class="p">{</span>
+    <span class="kd">public</span> <span class="kd">var</span> <span class="nv">description</span><span class="p">:</span> <span class="nb">String</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nv">descriptors</span><span class="p">:</span> <span class="p">[</span><span class="nb">String</span><span class="p">]</span> <span class="p">=</span> <span class="p">[]</span>
+        <span class="p">...</span>
+       
+        <span class="c1">// </span><span class="cs">FIXME:</span><span class="c1"> Use a distance formatter</span>
+        <span class="n">descriptors</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#34;...&#34;</span><span class="p">)</span>
+
+        <span class="c1">// </span><span class="cs">TODO:</span><span class="c1"> Allow bikes to be named?</span>
+        <span class="k">return</span> <span class="n">descriptors</span><span class="p">.</span><span class="n">joined</span><span class="p">(</span><span class="n">separator</span><span class="p">:</span> <span class="s">&#34;, &#34;</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="给一个类添加完整的注释">给一个类添加完整的注释</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="c1">/// 🚲 A two-wheeled, human-powered mode of transportation.</span>
+<span class="kd">class</span> <span class="nc">Bicycle</span> <span class="p">{</span>
+    <span class="c1">/// Frame and construction style.</span>
+    <span class="kd">enum</span> <span class="nc">Style</span> <span class="p">{</span>
+        <span class="c1">/// A style for streets or trails.</span>
+        <span class="k">case</span> <span class="n">road</span>
+
+        <span class="c1">/// A style for long journeys.</span>
+        <span class="k">case</span> <span class="n">touring</span>
+
+        <span class="c1">/// A style for casual trips around town.</span>
+        <span class="k">case</span> <span class="n">cruiser</span>
+
+        <span class="c1">/// A style for general-purpose transportation.</span>
+        <span class="k">case</span> <span class="n">hybrid</span>
+    <span class="p">}</span>
+
+    <span class="c1">/// The style of the bicycle.</span>
+    <span class="kd">let</span> <span class="nv">style</span><span class="p">:</span> <span class="n">Style</span>
+
+    <span class="c1">/// The size of the frame, in centimeters.</span>
+    <span class="kd">let</span> <span class="nv">frameSize</span><span class="p">:</span> <span class="nb">Int</span>
+
+    <span class="c1">/// The number of trips traveled by the bicycle.</span>
+    <span class="kd">private</span><span class="p">(</span><span class="kr">set</span><span class="p">)</span> <span class="kd">var</span> <span class="nv">numberOfTrips</span><span class="p">:</span> <span class="nb">Int</span>
+
+    <span class="c1">/// The total distance traveled by the bicycle, in meters.</span>
+    <span class="kd">private</span><span class="p">(</span><span class="kr">set</span><span class="p">)</span> <span class="kd">var</span> <span class="nv">distanceTraveled</span><span class="p">:</span> <span class="nb">Double</span>
+
+    <span class="cm">/**
+</span><span class="cm">     Take a bike out for a spin.
+</span><span class="cm">
+</span><span class="cm">     Calling this method increments the `numberOfTrips`
+</span><span class="cm">     and increases `distanceTraveled` by the value of `meters`.
+</span><span class="cm">
+</span><span class="cm">     - Parameter meters: The distance to travel in meters.
+</span><span class="cm">     - Precondition: `meters` must be greater than 0.
+</span><span class="cm">     */</span>
+    <span class="kd">func</span> <span class="nf">travel</span><span class="p">(</span><span class="bp">distance</span> <span class="n">meters</span><span class="p">:</span> <span class="nb">Double</span><span class="p">)</span> <span class="p">{</span>
+        <span class="bp">precondition</span><span class="p">(</span><span class="n">meters</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">distanceTraveled</span> <span class="o">+=</span> <span class="n">meters</span>
+        <span class="n">numberOfTrips</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>完整的 🚴‍♀️ 文档，<a href="https://swift-documentation-example.nshipster.com/classes/bicycle">戳这里</a>。</p>
+<h1 id="library-项目文档的生成">Library 项目文档的生成</h1>
+<p>接下来我们一起来实践一下，如何使用 Jazzy 来生成项目的 API 文档。</p>
+<p>首先，Jazzy 支持对 Swift 和 Objective-C 的 Xcode project 项目生成文档，对于 SwiftPM 也是近期刚支持的。我们会逐步进阶，从一个独立的 Swift 和 ObjC 项目，再到混编项目，最后是基于 CocoaPods 来生成私有库文档。</p>
+<h2 id="为-swift-项目生成文档">为 Swift 项目生成文档</h2>
+<p>Jazzy 默认是解析 Swift 代码注释来生成文档。我们先尝试为 <a href="https://github.com/Alamofire/Alamofire">Alamofire</a> 生成 HTML 文档。</p>
+<p>首先需要安装 Jazzy，Jazzy 是一个 Gem 依赖库，更多了解 Gem 请看 <a href="https://juejin.im/post/5ee1a589518825431e03f758#heading-18">《版本管理工具及 Ruby 工具链环境》</a>。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="o">[</span><span class="n">sudo</span><span class="o">]</span> <span class="n">gem</span> <span class="n">install</span> <span class="n">jazzy</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>不过由于 Alamofire 在项目的 Gemfile 中已经添加了 Jazzy 的依赖，所以我们这里使用 <code>bundle install</code> 来安装。最后通过 <code>-o Docs</code> 将文档输出到项目的根目录，完整命令如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">$ git clone https://github.com/Alamofire/Alamofire
+$ <span class="nb">cd</span> Alamofire
+$ bundle install
+$ bundle <span class="nb">exec</span> jazzy -o Docs
+</code></pre></td></tr></table>
+</div>
+</div><p>生成文档的效果：</p>
+<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gfssabvz0pj20zw0fiwi2.jpg" alt="Jazzy 生成文档效果.png"></p>
+<p>Jazzy 默认会读取项目中的 <code>README.md</code>、<code>README.markdown</code>  、<code>README.mdown</code>  、<code>README</code> 文档内容作为 index page 的内容。</p>
+<p>对于 Swift module 项目，Jazzy 在生成文档时会自动寻找项目根目录下的 project，然后执行 <code>xcodebuild</code>  或 <code>swift build</code> 来生成 <a href="https://clang.llvm.org/docs/IntroductionToTheClangAST.html">Clang AST</a>，再通过 <a href="https://www.jpsim.com/uncovering-sourcekit">SourceKit</a> 来生成注释文档。</p>
+<p>对于支持 SwiftPM 的项目，我们也可以通过指定 <code>--wift-build-tool</code> 来生成文档：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">$ bundle <span class="nb">exec</span> jazzy <span class="se">\
+</span><span class="se"></span>  -o Docs <span class="se">\
+</span><span class="se"></span>  --module Alamofire <span class="se">\
+</span><span class="se"></span>  --swift-build-tool spm <span class="se">\
+</span><span class="se"></span>  --build-tool-arguments -Xswiftc,-swift-version,-Xswiftc,5
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="为-objective-c-项目生成文档">为 Objective-C 项目生成文档</h2>
+<p>Objective-C 项目文档的生成需要多几个参数，这里我们以 AFNetworking 为例。</p>
+<p>clone 代码到本地后需要修改 AFNetworking 目录下的 Gemfile 添加 Jazzy 依赖：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">source</span> <span class="s2">&#34;https://rubygems.org&#34;</span>
+
+<span class="n">gem</span> <span class="s2">&#34;fastlane&#34;</span>
+<span class="n">gem</span> <span class="s2">&#34;cocoapods&#34;</span>
+<span class="n">gem</span> <span class="s2">&#34;jazzy&#34;</span>
+<span class="n">gem</span> <span class="s2">&#34;xcode-install&#34;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>接着安装 jazzy 生成 docs 文档：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">$ bundle install
+$ bundle <span class="nb">exec</span> jazzy <span class="se">\
+</span><span class="se"></span>  -o Docs <span class="se">\
+</span><span class="se"></span>  --objc <span class="se">\
+</span><span class="se"></span>  --umbrella-header AFNetworking/AFNetworking.h <span class="se">\
+</span><span class="se"></span>  --framework-root AFNetworking
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>&ndash;objc：指定为 Objective-C 生成文档</li>
+<li>&ndash;umbrella-header：指定 Objective-C framework 的 <code>Umbrella header</code> 路径</li>
+<li>&ndash;framework-root: 指定 Objective-C framework 路径</li>
+</ul>
+<h2 id="为-swift--objective-c-混编项目生成文档">为 Swift &amp; Objective-C 混编项目生成文档</h2>
+<p>Jazzy 对于混编项目的支持目前还不是很友好。想要生成混编代码注释的文档，我们需要事先生成 <code>json</code> 格式的中间产物，再传递给 Jazzy 来生成完整的文档。这里需要用到工具 <strong><a href="https://github.com/jpsim/SourceKitten">sourcekitten</a></strong>。</p>
+<p>先看基于混编项目生成文档的方式：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># 输出 SourceKitter 的 Swift 文档数据到 json</span>
+sourcekitten doc -- -workspace MyProject.xcworkspace -scheme MyScheme &gt; swiftDoc.json
+
+<span class="c1"># 输出 SourceKitter 的 Objective-C 文档数据到 json</span>
+sourcekitten doc --objc <span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/MyProject/MyProject.h <span class="se">\
+</span><span class="se"></span>      -- -x objective-c  -isysroot <span class="k">$(</span>xcrun --show-sdk-path --sdk iphonesimulator<span class="k">)</span> <span class="se">\
+</span><span class="se"></span>      -I <span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span> -fmodules &gt; objcDoc.json
+
+<span class="c1"># 合并 swift 和 Objective-C json 并输出文档</span>
+jazzy --sourcekitten-sourcefile swiftDoc.json,objcDoc.json
+</code></pre></td></tr></table>
+</div>
+</div><p>当然 Jazzy 还有其他很多使用参数这里就不一一介绍了，大家感兴趣的可以查看官方文档或者使用 <code>jazzy --help &lt;command&gt;</code> 。</p>
+<h1 id="总结">总结</h1>
+<ul>
+<li>本文介绍了如何按照 Apple 的标准写出 Swift 风格的代码注释，以及基于 Jazzy 来生成简单的 HTML 文档。</li>
+<li>也许大家平时不太注意文档的规范和书写，但是当我们需要查看系统 framework 或者是开源的 API 时总觉得注释里的说明不够详尽，所以从现在开始写好文档吧。</li>
+<li>好文档不仅可以可以记录代码的实现思路和原理，同时也能够更好的将核心思想传递给接手的人，更好的维护。</li>
+<li>基本上优秀的开源库都要非常详尽的说明文档，比例 Alamofire，<a href="https://github.com/Tencent/QMUI_iOS">QMUI</a> 都很值得学习。</li>
+</ul>
+<h1 id="知识点问题梳理">知识点问题梳理</h1>
+<p>这里罗列了四个问题用来考察你是否已经掌握了这篇文章，如果没有建议你加入**收藏 **再次阅读：</p>
+<ol>
+<li>
+<p><strong>Objective-C 和 Swift 代码注释的区别？</strong></p>
+</li>
+<li>
+<p><strong>对包含多个参数的方法注释与单个参数对方法有什么区别？</strong></p>
+</li>
+<li>
+<p><strong>代码注释都支持哪些 Markdown 格式？</strong></p>
+</li>
+<li>
+<p><strong>Jazzy 支持几种模式的文档生成？</strong></p>
+</li>
+</ol>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">土土Edmond木</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2020-06-14
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/ios/">iOS&#39;</a>
+          <a href="/tags/document/">Document</a>
+          <a href="/tags/sourcekit/">SourceKit</a>
+          <a href="/tags/jazzy/">Jazzy</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/notes/01-gcd/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">📒个人备忘 - 队列、GCD、线程基础</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/sourcecode-cocoapods/01-cocoapods-toolchains/">
+            <span class="next-text nav-default">1. 版本管理工具及 Ruby 工具链环境</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+    <script src="https://utteranc.es/client.js"
+            repo="looseyi/looseyi.github.io"
+            issue-term="pathname"
+            theme="github-light"
+            crossorigin="anonymous"
+            async>
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/utterance">comments powered by utterances.</a></noscript>
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:chun574271939@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://twitter.com/looseyi" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="https://github.com/looseyi" class="iconfont icon-github" title="github"></a>
+      <a href="https://www.weibo.com/foreverclp" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="https://www.zhihu.com/people/tu-tu-edmondmu" class="iconfont icon-zhihu" title="zhihu"></a>
+  <a href="http://looseyi.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2019-12-11 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">土土Edmond木</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-62789092-1', 'auto');
+	ga('set', 'anonymizeIp', true);
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>

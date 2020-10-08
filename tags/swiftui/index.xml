@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>SwiftUI on </title>
+    <link>http://looseyi.github.io/tags/swiftui/</link>
+    <description>Recent content in SwiftUI on </description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sat, 27 Jun 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://looseyi.github.io/tags/swiftui/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>WWDC20 - Build SwiftUI views for widgets</title>
+      <link>http://looseyi.github.io/post/swiftui/wwdc20-session-10033/</link>
+      <pubDate>Sat, 27 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/post/swiftui/wwdc20-session-10033/</guid>
+      <description>WWDC20 Session 10033 - Build SwiftUI views for widgets 本文知识目录 本文属于 WWDC20 中 Widgets 系列的文章。Widgets 是使用 SwiftUI 进行开发的，如果您对 SwiftUI 还不是很了解请翻看 Introduction to SwiftUI。如</description>
+    </item>
+    
+    <item>
+      <title>WWDC20 - What&#39;s new in SwiftUI</title>
+      <link>http://looseyi.github.io/post/swiftui/wwdc20-session-10041/</link>
+      <pubDate>Fri, 26 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/post/swiftui/wwdc20-session-10041/</guid>
+      <description>WWDC 2020 Session 10041 - What&amp;rsquo;s new in SwiftUI 本文知识目录 对于 iOS 开发而言， WWDC 2019 中推出的 SwiftUI 无疑是最受关注的一项技术，它可以在所有 Apple 平台上构建出色的用户界面。而今年我们迎来</description>
+    </item>
+    
+  </channel>
+</rss>

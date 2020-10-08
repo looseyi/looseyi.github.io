@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.62.0 with theme even" />
+<meta name="generator" content="Hugo 0.71.1 with theme even" />
 
 
 <link rel="canonical" href="http://looseyi.github.io/post/sourcecode-ios/source-code-sdweb-1/" />
@@ -50,7 +50,7 @@
 <meta itemprop="description" content="本文基于 SDWebImage 5.6。重读的原因也是由于发现它的 API 在不断迭代，许多结构已经不同与早期版本，同时也是为了做一个记录。阅读顺序也会依据 API 执行顺序进行">
 <meta itemprop="datePublished" content="2020-02-22T23:08:12&#43;08:00" />
 <meta itemprop="dateModified" content="2020-02-22T23:08:12&#43;08:00" />
-<meta itemprop="wordCount" content="8973">
+<meta itemprop="wordCount" content="8988">
 
 
 
@@ -126,7 +126,7 @@
         <div class="post-category">
             <a href="/categories/ios/"> iOS </a>
             </div>
-          <span class="more-meta"> 约 8973 字 </span>
+          <span class="more-meta"> 约 8988 字 </span>
           <span class="more-meta"> 预计阅读 18 分钟 </span>
         
       </div>
@@ -146,7 +146,7 @@
     <li><a href="#imageprefetcher">ImagePrefetcher</a></li>
     <li><a href="#imageloader">ImageLoader</a>
       <ul>
-        <li><a href="#heading">数据处理</a></li>
+        <li><a href="#数据处理">数据处理</a></li>
       </ul>
     </li>
     <li><a href="#imagecache">ImageCache</a>
@@ -161,7 +161,7 @@
         <li><a href="#loadimage">LoadImage</a></li>
       </ul>
     </li>
-    <li><a href="#heading-1">总结</a></li>
+    <li><a href="#总结">总结</a></li>
   </ul>
 </nav>
   </div>
@@ -235,14 +235,14 @@
 </span><span class="lnt">8
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="cp">#</span><span class="cp">ifndef dispatch_main_async_safe</span><span class="cp">
-</span><span class="cp"></span><span class="cp">#</span><span class="cp">define dispatch_main_async_safe(block)\</span><span class="cp">
-</span><span class="cp"></span><span class="cp">    if (dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL) == dispatch_queue_get_label(dispatch_get_main_queue())) {\</span><span class="cp">
-</span><span class="cp"></span><span class="cp">        block();\</span><span class="cp">
-</span><span class="cp"></span><span class="cp">    } else {\</span><span class="cp">
-</span><span class="cp"></span><span class="cp">        dispatch_async(dispatch_get_main_queue(), block);\</span><span class="cp">
-</span><span class="cp"></span><span class="cp">    }</span><span class="cp">
-</span><span class="cp"></span><span class="cp">#</span><span class="cp">endif</span><span class="cp">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="cp">#ifndef dispatch_main_async_safe
+</span><span class="cp">#define dispatch_main_async_safe(block)\
+</span><span class="cp">    if (dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL) == dispatch_queue_get_label(dispatch_get_main_queue())) {\
+</span><span class="cp">        block();\
+</span><span class="cp">    } else {\
+</span><span class="cp">        dispatch_async(dispatch_get_main_queue(), block);\
+</span><span class="cp">    }
+</span><span class="cp">#endif
 </span></code></pre></td></tr></table>
 </div>
 </div><p>区别于早起版本的实现：</p>
@@ -257,20 +257,20 @@
 </span><span class="lnt">7
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="cp">#</span><span class="cp">define dispatch_main_async_safe(block)\</span><span class="cp">
-</span><span class="cp"></span><span class="cp">    if ([NSThread isMainThread]) {\</span><span class="cp">
-</span><span class="cp"></span><span class="cp">        block();\</span><span class="cp">
-</span><span class="cp"></span><span class="cp">    } else {\</span><span class="cp">
-</span><span class="cp"></span><span class="cp">        dispatch_async(dispatch_get_main_queue(), block);\</span><span class="cp">
-</span><span class="cp"></span><span class="cp">    }</span><span class="cp">
-</span><span class="cp"></span><span class="cp">#</span><span class="cp">endif</span><span class="cp">
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="cp">#define dispatch_main_async_safe(block)\
+</span><span class="cp">    if ([NSThread isMainThread]) {\
+</span><span class="cp">        block();\
+</span><span class="cp">    } else {\
+</span><span class="cp">        dispatch_async(dispatch_get_main_queue(), block);\
+</span><span class="cp">    }
+</span><span class="cp">#endif
 </span></code></pre></td></tr></table>
 </div>
 </div><ul>
 <li><code>#ifndef</code> 提高了代码的严谨度，防止重复定义 <code>dispatch_main_async_safe</code></li>
 <li>判断条件由 isMainThread 改为了 dispatch_queue_t label 是否相等</li>
 </ul>
-<p>关于第二点，有一篇 <a href="https://github.com/SDWebImage/SDWebImage/pull/781">SD 的讨论</a>，以及另一篇说明 <a href="http://blog.benjamin-encz.de/post/main-queue-vs-main-thread/">GCD's Main Queue vs. Main Thread</a></p>
+<p>关于第二点，有一篇 <a href="https://github.com/SDWebImage/SDWebImage/pull/781">SD 的讨论</a>，以及另一篇说明 <a href="http://blog.benjamin-encz.de/post/main-queue-vs-main-thread/">GCD&rsquo;s Main Queue vs. Main Thread</a></p>
 <blockquote>
 <p>Calling an API from a non-main queue that is executing on the main thread will lead to issues if the library (like VektorKit) relies on checking for execution on the main queue.</p>
 </blockquote>
@@ -316,8 +316,8 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="c1">// key is strong, value is weak because operation instance is retained by SDWebImageManager&#39;s runningOperations property
-</span><span class="c1"></span><span class="c1">// we should use lock to keep thread-safe because these method may not be acessed from main queue
-</span><span class="c1"></span><span class="k">typedef</span> <span class="n">NSMapTable</span><span class="o">&lt;</span><span class="n">NSString</span> <span class="o">*</span><span class="p">,</span> <span class="kt">id</span><span class="o">&lt;</span><span class="n">SDWebImageOperation</span><span class="o">&gt;</span><span class="o">&gt;</span> <span class="n">SDOperationsDictionary</span><span class="p">;</span>
+</span><span class="c1">// we should use lock to keep thread-safe because these method may not be acessed from main queue
+</span><span class="c1"></span><span class="k">typedef</span> <span class="n">NSMapTable</span><span class="o">&lt;</span><span class="n">NSString</span> <span class="o">*</span><span class="p">,</span> <span class="kt">id</span><span class="o">&lt;</span><span class="n">SDWebImageOperation</span><span class="o">&gt;&gt;</span> <span class="n">SDOperationsDictionary</span><span class="p">;</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>用 weak 是因为 operation 实例是保存在 SDWebImageManager 的 runningOperations，这里只是保存了引用，以方便 cancel 。</p>
@@ -350,7 +350,7 @@
 </span><span class="lnt">3
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="p">-</span> <span class="p">(</span><span class="n">nullable</span> <span class="n">SDWebImagePrefetchToken</span> <span class="o">*</span><span class="p">)</span><span class="nf">prefetchURLs:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">NSArray</span><span class="o">&lt;</span><span class="n">NSURL</span> <span class="o">*</span><span class="o">&gt;</span> <span class="o">*</span><span class="p">)</span><span class="nv">urls</span>
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="p">-</span> <span class="p">(</span><span class="n">nullable</span> <span class="n">SDWebImagePrefetchToken</span> <span class="o">*</span><span class="p">)</span><span class="nf">prefetchURLs:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">NSArray</span><span class="o">&lt;</span><span class="n">NSURL</span> <span class="o">*&gt;</span> <span class="o">*</span><span class="p">)</span><span class="nv">urls</span>
                                           <span class="nf">progress:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">SDWebImagePrefetcherProgressBlock</span><span class="p">)</span><span class="nv">progressBlock</span>
                                          <span class="nf">completed:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">SDWebImagePrefetcherCompletionBlock</span><span class="p">)</span><span class="nv">completionBlock</span><span class="p">;</span>
 </code></pre></td></tr></table>
@@ -376,18 +376,18 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">@autoreleasepool</span> <span class="p">{</span>
-    <span class="p">@</span><span class="n">weakify</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span><span class="p">;</span>
+    <span class="p">@</span><span class="n">weakify</span><span class="p">(</span><span class="nb">self</span><span class="p">);</span>
     <span class="n">SDAsyncBlockOperation</span> <span class="o">*</span><span class="n">prefetchOperation</span> <span class="o">=</span> <span class="p">[</span><span class="n">SDAsyncBlockOperation</span> <span class="nl">blockOperationWithBlock</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="n">SDAsyncBlockOperation</span> <span class="o">*</span> <span class="n">_Nonnull</span> <span class="n">asyncOperation</span><span class="p">)</span> <span class="p">{</span>
-        <span class="p">@</span><span class="n">strongify</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span><span class="p">;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">self</span> <span class="o">|</span><span class="o">|</span> <span class="n">asyncOperation</span><span class="p">.</span><span class="n">isCancelled</span><span class="p">)</span> <span class="p">{</span>
+        <span class="p">@</span><span class="n">strongify</span><span class="p">(</span><span class="nb">self</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">self</span> <span class="o">||</span> <span class="n">asyncOperation</span><span class="p">.</span><span class="n">isCancelled</span><span class="p">)</span> <span class="p">{</span>
             <span class="k">return</span><span class="p">;</span>
         <span class="p">}</span>
         <span class="c1">/// load Image ...
-</span><span class="c1"></span>    <span class="p">}</span><span class="p">]</span><span class="p">;</span>
+</span><span class="c1"></span>    <span class="p">}];</span>
     <span class="k">@synchronized</span> <span class="p">(</span><span class="n">token</span><span class="p">)</span> <span class="p">{</span>
-        <span class="p">[</span><span class="n">token</span><span class="p">.</span><span class="n">prefetchOperations</span> <span class="nl">addPointer</span><span class="p">:</span><span class="p">(</span><span class="k">__bridge</span> <span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="n">prefetchOperation</span><span class="p">]</span><span class="p">;</span>
+        <span class="p">[</span><span class="n">token</span><span class="p">.</span><span class="n">prefetchOperations</span> <span class="nl">addPointer</span><span class="p">:(</span><span class="k">__bridge</span> <span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="n">prefetchOperation</span><span class="p">];</span>
     <span class="p">}</span>
-    <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">prefetchQueue</span> <span class="nl">addOperation</span><span class="p">:</span><span class="n">prefetchOperation</span><span class="p">]</span><span class="p">;</span>
+    <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">prefetchQueue</span> <span class="nl">addOperation</span><span class="p">:</span><span class="n">prefetchOperation</span><span class="p">];</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -407,10 +407,10 @@
 <pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">NSPointerArray</span> <span class="o">*</span><span class="n">operations</span> <span class="o">=</span> <span class="n">token</span><span class="p">.</span><span class="n">loadOperations</span><span class="p">;</span>
 <span class="kt">id</span><span class="o">&lt;</span><span class="n">SDWebImageOperation</span><span class="o">&gt;</span> <span class="n">operation</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">manager</span> <span class="nl">loadImageWithURL</span><span class="p">:</span><span class="n">url</span> <span class="nl">options</span><span class="p">:</span><span class="nb">self</span><span class="p">.</span><span class="n">options</span> <span class="nl">context</span><span class="p">:</span><span class="nb">self</span><span class="p">.</span><span class="n">context</span> <span class="nl">progress</span><span class="p">:</span><span class="nb">nil</span> <span class="nl">completed</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">image</span><span class="p">,</span> <span class="n">NSData</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">data</span><span class="p">,</span> <span class="n">NSError</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">error</span><span class="p">,</span> <span class="n">SDImageCacheType</span> <span class="n">cacheType</span><span class="p">,</span> <span class="kt">BOOL</span> <span class="n">finished</span><span class="p">,</span> <span class="n">NSURL</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">imageURL</span><span class="p">)</span> <span class="p">{</span>
     <span class="c1">/// progress handler    
-</span><span class="c1"></span><span class="p">}</span><span class="p">]</span><span class="p">;</span>
-<span class="n">NSAssert</span><span class="p">(</span><span class="n">operation</span> <span class="o">!</span><span class="o">=</span> <span class="nb">nil</span><span class="p">,</span> <span class="s">@&#34;</span><span class="s">Operation should not be nil, [SDWebImageManager loadImageWithURL:options:context:progress:completed:] break prefetch logic</span><span class="s">&#34;</span><span class="p">)</span><span class="p">;</span>
+</span><span class="c1"></span><span class="p">}];</span>
+<span class="n">NSAssert</span><span class="p">(</span><span class="n">operation</span> <span class="o">!=</span> <span class="nb">nil</span><span class="p">,</span> <span class="s">@&#34;Operation should not be nil, [SDWebImageManager loadImageWithURL:options:context:progress:completed:] break prefetch logic&#34;</span><span class="p">);</span>
 <span class="k">@synchronized</span> <span class="p">(</span><span class="n">token</span><span class="p">)</span> <span class="p">{</span>
-    <span class="p">[</span><span class="n">operations</span> <span class="nl">addPointer</span><span class="p">:</span><span class="p">(</span><span class="k">__bridge</span> <span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="n">operation</span><span class="p">]</span><span class="p">;</span>
+    <span class="p">[</span><span class="n">operations</span> <span class="nl">addPointer</span><span class="p">:(</span><span class="k">__bridge</span> <span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="n">operation</span><span class="p">];</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -462,7 +462,7 @@
 <span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">strong</span><span class="p">,</span> <span class="n">nullable</span><span class="p">)</span> <span class="kt">id</span><span class="o">&lt;</span><span class="n">SDWebImageDownloaderDecryptor</span><span class="o">&gt;</span> <span class="n">decryptor</span><span class="p">;</span>
 <span class="cm">/* ... */</span>
 
-<span class="p">-</span><span class="p">(</span><span class="n">nullable</span> <span class="n">SDWebImageDownloadToken</span> <span class="o">*</span><span class="p">)</span><span class="nf">downloadImageWithURL:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">NSURL</span> <span class="o">*</span><span class="p">)</span><span class="nv">url</span>
+<span class="p">-(</span><span class="n">nullable</span> <span class="n">SDWebImageDownloadToken</span> <span class="o">*</span><span class="p">)</span><span class="nf">downloadImageWithURL:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">NSURL</span> <span class="o">*</span><span class="p">)</span><span class="nv">url</span>
     <span class="nf">options:</span><span class="p">(</span><span class="n">SDWebImageDownloaderOptions</span><span class="p">)</span><span class="nv">options</span>
     <span class="nf">context:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">SDWebImageContext</span> <span class="o">*</span><span class="p">)</span><span class="nv">context</span>
    <span class="nf">progress:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">SDWebImageDownloaderProgressBlock</span><span class="p">)</span><span class="nv">progressBlock</span>
@@ -514,7 +514,7 @@
 </span><span class="c1"></span>
 <span class="k">@protocol</span> <span class="nc">SDWebImageDownloaderRequestModifier</span> <span class="o">&lt;</span><span class="n">NSObject</span><span class="o">&gt;</span>
    
-<span class="o">-</span> <span class="p">(</span><span class="n">nullable</span> <span class="n">NSURLRequest</span> <span class="o">*</span><span class="p">)</span><span class="nl">modifiedRequestWithRequest</span><span class="p">:</span><span class="p">(</span><span class="n">nonnull</span> <span class="n">NSURLRequest</span> <span class="o">*</span><span class="p">)</span><span class="n">request</span><span class="p">;</span>
+<span class="o">-</span> <span class="p">(</span><span class="n">nullable</span> <span class="n">NSURLRequest</span> <span class="o">*</span><span class="p">)</span><span class="nl">modifiedRequestWithRequest</span><span class="p">:(</span><span class="n">nonnull</span> <span class="n">NSURLRequest</span> <span class="o">*</span><span class="p">)</span><span class="n">request</span><span class="p">;</span>
 
 <span class="k">@end</span>
 </code></pre></td></tr></table>
@@ -535,7 +535,7 @@
 </span><span class="c1"></span>
 <span class="k">@protocol</span> <span class="nc">SDWebImageDownloaderResponseModifier</span> <span class="o">&lt;</span><span class="n">NSObject</span><span class="o">&gt;</span>
 
-<span class="o">-</span> <span class="p">(</span><span class="n">nullable</span> <span class="n">NSURLResponse</span> <span class="o">*</span><span class="p">)</span><span class="nl">modifiedResponseWithResponse</span><span class="p">:</span><span class="p">(</span><span class="n">nonnull</span> <span class="n">NSURLResponse</span> <span class="o">*</span><span class="p">)</span><span class="n">response</span><span class="p">;</span>
+<span class="o">-</span> <span class="p">(</span><span class="n">nullable</span> <span class="n">NSURLResponse</span> <span class="o">*</span><span class="p">)</span><span class="nl">modifiedResponseWithResponse</span><span class="p">:(</span><span class="n">nonnull</span> <span class="n">NSURLResponse</span> <span class="o">*</span><span class="p">)</span><span class="n">response</span><span class="p">;</span>
 
 <span class="k">@end</span>
 </code></pre></td></tr></table>
@@ -554,7 +554,7 @@
 <pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="c1">/// Decrypt the original download data and return a new data. You can use this to decrypt the data using your perfereed algorithm.
 </span><span class="c1"></span><span class="k">@protocol</span> <span class="nc">SDWebImageDownloaderDecryptor</span> <span class="o">&lt;</span><span class="n">NSObject</span><span class="o">&gt;</span>
 
-<span class="o">-</span> <span class="p">(</span><span class="n">nullable</span> <span class="n">NSData</span> <span class="o">*</span><span class="p">)</span><span class="nl">decryptedDataWithData</span><span class="p">:</span><span class="p">(</span><span class="n">nonnull</span> <span class="n">NSData</span> <span class="o">*</span><span class="p">)</span><span class="n">data</span> <span class="nl">response</span><span class="p">:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">NSURLResponse</span> <span class="o">*</span><span class="p">)</span><span class="n">response</span><span class="p">;</span>
+<span class="o">-</span> <span class="p">(</span><span class="n">nullable</span> <span class="n">NSData</span> <span class="o">*</span><span class="p">)</span><span class="nl">decryptedDataWithData</span><span class="p">:(</span><span class="n">nonnull</span> <span class="n">NSData</span> <span class="o">*</span><span class="p">)</span><span class="n">data</span> <span class="nl">response</span><span class="p">:(</span><span class="n">nullable</span> <span class="n">NSURLResponse</span> <span class="o">*</span><span class="p">)</span><span class="n">response</span><span class="p">;</span>
 
 <span class="k">@end</span>
 </code></pre></td></tr></table>
@@ -567,7 +567,7 @@
 <pre class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">NSOperation</span><span class="o">&lt;</span><span class="n">SDWebImageDownloaderOperation</span><span class="o">&gt;</span> <span class="o">*</span><span class="n">operation</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">URLOperations</span> <span class="nl">objectForKey</span><span class="p">:</span><span class="n">url</span><span class="p">]</span><span class="p">;</span>
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">NSOperation</span><span class="o">&lt;</span><span class="n">SDWebImageDownloaderOperation</span><span class="o">&gt;</span> <span class="o">*</span><span class="n">operation</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">URLOperations</span> <span class="nl">objectForKey</span><span class="p">:</span><span class="n">url</span><span class="p">];</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>如果 operation 存在，调用</p>
@@ -579,7 +579,7 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">@synchronized</span> <span class="p">(</span><span class="n">operation</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">downloadOperationCancelToken</span> <span class="o">=</span> <span class="p">[</span><span class="n">operation</span> <span class="nl">addHandlersForProgress</span><span class="p">:</span><span class="n">progressBlock</span> <span class="nl">completed</span><span class="p">:</span><span class="n">completedBlock</span><span class="p">]</span><span class="p">;</span>
+    <span class="n">downloadOperationCancelToken</span> <span class="o">=</span> <span class="p">[</span><span class="n">operation</span> <span class="nl">addHandlersForProgress</span><span class="p">:</span><span class="n">progressBlock</span> <span class="nl">completed</span><span class="p">:</span><span class="n">completedBlock</span><span class="p">];</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -603,12 +603,12 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="c1">// In order to prevent from potential duplicate caching (NSURLCache + SDImageCache) we disable the cache for image requests if told otherwise
 </span><span class="c1"></span><span class="n">NSURLRequestCachePolicy</span> <span class="n">cachePolicy</span> <span class="o">=</span> <span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageDownloaderUseNSURLCache</span> <span class="o">?</span> <span class="nl">NSURLRequestUseProtocolCachePolicy</span> <span class="p">:</span> <span class="n">NSURLRequestReloadIgnoringLocalCacheData</span><span class="p">;</span>
-<span class="n">NSMutableURLRequest</span> <span class="o">*</span><span class="n">mutableRequest</span> <span class="o">=</span> <span class="p">[</span><span class="p">[</span><span class="n">NSMutableURLRequest</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithURL</span><span class="p">:</span><span class="n">url</span> <span class="nl">cachePolicy</span><span class="p">:</span><span class="n">cachePolicy</span> <span class="nl">timeoutInterval</span><span class="p">:</span><span class="n">timeoutInterval</span><span class="p">]</span><span class="p">;</span>
-<span class="n">mutableRequest</span><span class="p">.</span><span class="n">HTTPShouldHandleCookies</span> <span class="o">=</span> <span class="n">SD_OPTIONS_CONTAINS</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">SDWebImageDownloaderHandleCookies</span><span class="p">)</span><span class="p">;</span>
+<span class="n">NSMutableURLRequest</span> <span class="o">*</span><span class="n">mutableRequest</span> <span class="o">=</span> <span class="p">[[</span><span class="n">NSMutableURLRequest</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithURL</span><span class="p">:</span><span class="n">url</span> <span class="nl">cachePolicy</span><span class="p">:</span><span class="n">cachePolicy</span> <span class="nl">timeoutInterval</span><span class="p">:</span><span class="n">timeoutInterval</span><span class="p">];</span>
+<span class="n">mutableRequest</span><span class="p">.</span><span class="n">HTTPShouldHandleCookies</span> <span class="o">=</span> <span class="n">SD_OPTIONS_CONTAINS</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">SDWebImageDownloaderHandleCookies</span><span class="p">);</span>
 <span class="n">mutableRequest</span><span class="p">.</span><span class="n">HTTPShouldUsePipelining</span> <span class="o">=</span> <span class="nb">YES</span><span class="p">;</span>
-<span class="n">SD_LOCK</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">HTTPHeadersLock</span><span class="p">)</span><span class="p">;</span>
+<span class="n">SD_LOCK</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">HTTPHeadersLock</span><span class="p">);</span>
 <span class="n">mutableRequest</span><span class="p">.</span><span class="n">allHTTPHeaderFields</span> <span class="o">=</span> <span class="nb">self</span><span class="p">.</span><span class="n">HTTPHeaders</span><span class="p">;</span>
-<span class="n">SD_UNLOCK</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">HTTPHeadersLock</span><span class="p">)</span><span class="p">;</span>
+<span class="n">SD_UNLOCK</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">HTTPHeadersLock</span><span class="p">);</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>主要通过 SDWebImageDownloaderOptions 获取参数来配置， timeout 是由 downloader 的 config.downloadTimeout 决定，默认为 15s。然后从 imageContext 中取出 <code>id&lt;SDWebImageDownloaderRequestModifier&gt; requestModifier</code> 对 request 进行改造。</p>
@@ -625,8 +625,8 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="c1">// Request Modifier
 </span><span class="c1"></span><span class="kt">id</span><span class="o">&lt;</span><span class="n">SDWebImageDownloaderRequestModifier</span><span class="o">&gt;</span> <span class="n">requestModifier</span><span class="p">;</span>
-<span class="k">if</span> <span class="p">(</span><span class="p">[</span><span class="n">context</span> <span class="nl">valueForKey</span><span class="p">:</span><span class="n">SDWebImageContextDownloadRequestModifier</span><span class="p">]</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">requestModifier</span> <span class="o">=</span> <span class="p">[</span><span class="n">context</span> <span class="nl">valueForKey</span><span class="p">:</span><span class="n">SDWebImageContextDownloadRequestModifier</span><span class="p">]</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">([</span><span class="n">context</span> <span class="nl">valueForKey</span><span class="p">:</span><span class="n">SDWebImageContextDownloadRequestModifier</span><span class="p">])</span> <span class="p">{</span>
+    <span class="n">requestModifier</span> <span class="o">=</span> <span class="p">[</span><span class="n">context</span> <span class="nl">valueForKey</span><span class="p">:</span><span class="n">SDWebImageContextDownloadRequestModifier</span><span class="p">];</span>
 <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
     <span class="n">requestModifier</span> <span class="o">=</span> <span class="nb">self</span><span class="p">.</span><span class="n">requestModifier</span><span class="p">;</span>
 <span class="p">}</span>
@@ -647,12 +647,12 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="kt">Class</span> <span class="n">operationClass</span> <span class="o">=</span> <span class="nb">self</span><span class="p">.</span><span class="n">config</span><span class="p">.</span><span class="n">operationClass</span><span class="p">;</span>
-<span class="k">if</span> <span class="p">(</span><span class="n">operationClass</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="p">[</span><span class="n">operationClass</span> <span class="nl">isSubclassOfClass</span><span class="p">:</span><span class="p">[</span><span class="n">NSOperation</span> <span class="k">class</span><span class="p">]</span><span class="p">]</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="p">[</span><span class="n">operationClass</span> <span class="nl">conformsToProtocol</span><span class="p">:</span><span class="p">@</span><span class="n">protocol</span><span class="p">(</span><span class="n">SDWebImageDownloaderOperation</span><span class="p">)</span><span class="p">]</span><span class="p">)</span> <span class="p">{</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">operationClass</span> <span class="o">&amp;&amp;</span> <span class="p">[</span><span class="n">operationClass</span> <span class="nl">isSubclassOfClass</span><span class="p">:[</span><span class="n">NSOperation</span> <span class="k">class</span><span class="p">]]</span> <span class="o">&amp;&amp;</span> <span class="p">[</span><span class="n">operationClass</span> <span class="nl">conformsToProtocol</span><span class="p">:@</span><span class="n">protocol</span><span class="p">(</span><span class="n">SDWebImageDownloaderOperation</span><span class="p">)])</span> <span class="p">{</span>
     <span class="c1">// Custom operation class
 </span><span class="c1"></span><span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-    <span class="n">operationClass</span> <span class="o">=</span> <span class="p">[</span><span class="n">SDWebImageDownloaderOperation</span> <span class="k">class</span><span class="p">]</span><span class="p">;</span>
+    <span class="n">operationClass</span> <span class="o">=</span> <span class="p">[</span><span class="n">SDWebImageDownloaderOperation</span> <span class="k">class</span><span class="p">];</span>
 <span class="p">}</span>
-<span class="n">NSOperation</span><span class="o">&lt;</span><span class="n">SDWebImageDownloaderOperation</span><span class="o">&gt;</span> <span class="o">*</span><span class="n">operation</span> <span class="o">=</span> <span class="p">[</span><span class="p">[</span><span class="n">operationClass</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithRequest</span><span class="p">:</span><span class="n">request</span> <span class="nl">inSession</span><span class="p">:</span><span class="nb">self</span><span class="p">.</span><span class="n">session</span> <span class="nl">options</span><span class="p">:</span><span class="n">options</span> <span class="nl">context</span><span class="p">:</span><span class="n">context</span><span class="p">]</span><span class="p">;</span>
+<span class="n">NSOperation</span><span class="o">&lt;</span><span class="n">SDWebImageDownloaderOperation</span><span class="o">&gt;</span> <span class="o">*</span><span class="n">operation</span> <span class="o">=</span> <span class="p">[[</span><span class="n">operationClass</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithRequest</span><span class="p">:</span><span class="n">request</span> <span class="nl">inSession</span><span class="p">:</span><span class="nb">self</span><span class="p">.</span><span class="n">session</span> <span class="nl">options</span><span class="p">:</span><span class="n">options</span> <span class="nl">context</span><span class="p">:</span><span class="n">context</span><span class="p">];</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>设置其 credential、minimumProgressInterval、queuePriority、pendingOperation。</p>
@@ -669,18 +669,18 @@
 </span><span class="lnt">8
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">if</span> <span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">config</span><span class="p">.</span><span class="n">executionOrder</span> <span class="o">=</span><span class="o">=</span> <span class="n">SDWebImageDownloaderLIFOExecutionOrder</span><span class="p">)</span> <span class="p">{</span>
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">if</span> <span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">config</span><span class="p">.</span><span class="n">executionOrder</span> <span class="o">==</span> <span class="n">SDWebImageDownloaderLIFOExecutionOrder</span><span class="p">)</span> <span class="p">{</span>
     <span class="c1">// Emulate LIFO execution order by systematically, each previous adding operation can dependency the new operation
 </span><span class="c1"></span>    <span class="c1">// This can gurantee the new operation to be execulated firstly, even if when some operations finished, meanwhile you appending new operations
 </span><span class="c1"></span>    <span class="c1">// Just make last added operation dependents new operation can not solve this problem. See test case #test15DownloaderLIFOExecutionOrder
 </span><span class="c1"></span>    <span class="k">for</span> <span class="p">(</span><span class="n">NSOperation</span> <span class="o">*</span><span class="n">pendingOperation</span> <span class="k">in</span> <span class="nb">self</span><span class="p">.</span><span class="n">downloadQueue</span><span class="p">.</span><span class="n">operations</span><span class="p">)</span> <span class="p">{</span>
-        <span class="p">[</span><span class="n">pendingOperation</span> <span class="nl">addDependency</span><span class="p">:</span><span class="n">operation</span><span class="p">]</span><span class="p">;</span>
+        <span class="p">[</span><span class="n">pendingOperation</span> <span class="nl">addDependency</span><span class="p">:</span><span class="n">operation</span><span class="p">];</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>通过遍历队列，将新任务修改为当前队列中所有任务的依赖以反转优先级。</p>
-<h3 id="heading">数据处理</h3>
+<h3 id="数据处理">数据处理</h3>
 <p>SDWebImageDownloaderOperation 也是协议化后的类型，协议本身遵循 NSURLSessionTaskDelegate, NSURLSessionDataDelegate，它是真正处理 URL 请求数据的类，支持后台下载，支持对 responseData 修改(by responseModifier)，支持对 download ImageData 进行解密 (by decryptor)。其主要内部 properties 如下：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -713,7 +713,7 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">@property</span> <span class="p">(</span><span class="k">assign</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">,</span> <span class="k">readwrite</span><span class="p">)</span> <span class="n">SDWebImageDownloaderOptions</span> <span class="n">options</span><span class="p">;</span>
 <span class="k">@property</span> <span class="p">(</span><span class="k">copy</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">,</span> <span class="k">readwrite</span><span class="p">,</span> <span class="n">nullable</span><span class="p">)</span> <span class="n">SDWebImageContext</span> <span class="o">*</span><span class="n">context</span><span class="p">;</span>
-<span class="k">@property</span> <span class="p">(</span><span class="k">strong</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">,</span> <span class="n">nonnull</span><span class="p">)</span> <span class="n">NSMutableArray</span><span class="o">&lt;</span><span class="n">SDCallbacksDictionary</span> <span class="o">*</span><span class="o">&gt;</span> <span class="o">*</span><span class="n">callbackBlocks</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="k">strong</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">,</span> <span class="n">nonnull</span><span class="p">)</span> <span class="n">NSMutableArray</span><span class="o">&lt;</span><span class="n">SDCallbacksDictionary</span> <span class="o">*&gt;</span> <span class="o">*</span><span class="n">callbackBlocks</span><span class="p">;</span>
 
 <span class="k">@property</span> <span class="p">(</span><span class="k">strong</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">,</span> <span class="n">nullable</span><span class="p">)</span> <span class="n">NSMutableData</span> <span class="o">*</span><span class="n">imageData</span><span class="p">;</span>
 <span class="k">@property</span> <span class="p">(</span><span class="k">copy</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">,</span> <span class="n">nullable</span><span class="p">)</span> <span class="n">NSData</span> <span class="o">*</span><span class="n">cachedData</span><span class="p">;</span> <span class="c1">// for `SDWebImageDownloaderIgnoreCachedResponse`
@@ -722,14 +722,14 @@
 
 <span class="k">@property</span> <span class="p">(</span><span class="k">strong</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">,</span> <span class="n">nullable</span><span class="p">)</span> <span class="kt">id</span><span class="o">&lt;</span><span class="n">SDWebImageDownloaderResponseModifier</span><span class="o">&gt;</span> <span class="n">responseModifier</span><span class="p">;</span> <span class="c1">// modifiy original URLResponse
 </span><span class="c1"></span><span class="k">@property</span> <span class="p">(</span><span class="k">strong</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">,</span> <span class="n">nullable</span><span class="p">)</span> <span class="kt">id</span><span class="o">&lt;</span><span class="n">SDWebImageDownloaderDecryptor</span><span class="o">&gt;</span> <span class="n">decryptor</span><span class="p">;</span> <span class="c1">// decrypt image data
-</span><span class="c1"></span><span class="c1">// This is weak because it is injected by whoever manages this session. If this gets nil-ed out, we won&#39;t be able to run
-</span><span class="c1"></span><span class="c1">// the task associated with this operation
+</span><span class="c1">// This is weak because it is injected by whoever manages this session. If this gets nil-ed out, we won&#39;t be able to run
+</span><span class="c1">// the task associated with this operation
 </span><span class="c1"></span><span class="k">@property</span> <span class="p">(</span><span class="k">weak</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">,</span> <span class="n">nullable</span><span class="p">)</span> <span class="n">NSURLSession</span> <span class="o">*</span><span class="n">unownedSession</span><span class="p">;</span>
 <span class="c1">// This is set if we&#39;re using not using an injected NSURLSession. We&#39;re responsible of invalidating this one
 </span><span class="c1"></span><span class="k">@property</span> <span class="p">(</span><span class="k">strong</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">,</span> <span class="n">nullable</span><span class="p">)</span> <span class="n">NSURLSession</span> <span class="o">*</span><span class="n">ownedSession</span><span class="p">;</span>
 
 <span class="k">@property</span> <span class="p">(</span><span class="k">strong</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">,</span> <span class="n">nonnull</span><span class="p">)</span> <span class="n">dispatch_queue_t</span> <span class="n">coderQueue</span><span class="p">;</span> <span class="c1">// the queue to do image decoding
-</span><span class="c1"></span><span class="cp">#</span><span class="cp">if SD_UIKIT</span><span class="cp">
+</span><span class="c1"></span><span class="cp">#if SD_UIKIT
 </span><span class="cp"></span><span class="k">@property</span> <span class="p">(</span><span class="k">assign</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">)</span> <span class="n">UIBackgroundTaskIdentifier</span> <span class="n">backgroundTaskId</span><span class="p">;</span>
 
 <span class="p">-</span> <span class="p">(</span><span class="n">nonnull</span> <span class="kt">instancetype</span><span class="p">)</span><span class="nf">initWithRequest:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">NSURLRequest</span> <span class="o">*</span><span class="p">)</span><span class="nv">request</span>
@@ -745,7 +745,7 @@
 <pre class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="p">[</span><span class="n">NSURLSession</span> <span class="nl">sessionWithConfiguration</span><span class="p">:</span><span class="nl">delegate</span><span class="p">:</span><span class="nl">delegateQueue</span><span class="p">:</span><span class="p">]</span><span class="p">;</span>
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="p">[</span><span class="n">NSURLSession</span> <span class="nl">sessionWithConfiguration</span><span class="p">:</span><span class="nl">delegate</span><span class="p">:</span><span class="nl">delegateQueue</span><span class="p">:];</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>ownedSession 的 delegate 毋庸置疑就在 operation 内部，而初始化传入 session 的 delegate 则是 downloader 。它会通过 taskID 取出 operation 调用对应实现来完成回调的统一处理和转发，例如：</p>
@@ -764,9 +764,9 @@
 <pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">URLSession:</span><span class="p">(</span><span class="n">NSURLSession</span> <span class="o">*</span><span class="p">)</span><span class="nv">session</span> <span class="nf">task:</span><span class="p">(</span><span class="n">NSURLSessionTask</span> <span class="o">*</span><span class="p">)</span><span class="nv">task</span> <span class="nf">didCompleteWithError:</span><span class="p">(</span><span class="n">NSError</span> <span class="o">*</span><span class="p">)</span><span class="nv">error</span> <span class="p">{</span>
     
     <span class="c1">// Identify the operation that runs this task and pass it the delegate method
-</span><span class="c1"></span>    <span class="n">NSOperation</span><span class="o">&lt;</span><span class="n">SDWebImageDownloaderOperation</span><span class="o">&gt;</span> <span class="o">*</span><span class="n">dataOperation</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="nl">operationWithTask</span><span class="p">:</span><span class="n">task</span><span class="p">]</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="p">[</span><span class="n">dataOperation</span> <span class="nl">respondsToSelector</span><span class="p">:</span><span class="k">@selector</span><span class="p">(</span><span class="nl">URLSession</span><span class="p">:</span><span class="nl">task</span><span class="p">:</span><span class="nl">didCompleteWithError</span><span class="p">:</span><span class="p">)</span><span class="p">]</span><span class="p">)</span> <span class="p">{</span>
-        <span class="p">[</span><span class="n">dataOperation</span> <span class="nl">URLSession</span><span class="p">:</span><span class="n">session</span> <span class="nl">task</span><span class="p">:</span><span class="n">task</span> <span class="nl">didCompleteWithError</span><span class="p">:</span><span class="n">error</span><span class="p">]</span><span class="p">;</span>
+</span><span class="c1"></span>    <span class="n">NSOperation</span><span class="o">&lt;</span><span class="n">SDWebImageDownloaderOperation</span><span class="o">&gt;</span> <span class="o">*</span><span class="n">dataOperation</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="nl">operationWithTask</span><span class="p">:</span><span class="n">task</span><span class="p">];</span>
+    <span class="k">if</span> <span class="p">([</span><span class="n">dataOperation</span> <span class="nl">respondsToSelector</span><span class="p">:</span><span class="k">@selector</span><span class="p">(</span><span class="nl">URLSession</span><span class="p">:</span><span class="nl">task</span><span class="p">:</span><span class="nl">didCompleteWithError</span><span class="p">:)])</span> <span class="p">{</span>
+        <span class="p">[</span><span class="n">dataOperation</span> <span class="nl">URLSession</span><span class="p">:</span><span class="n">session</span> <span class="nl">task</span><span class="p">:</span><span class="n">task</span> <span class="nl">didCompleteWithError</span><span class="p">:</span><span class="n">error</span><span class="p">];</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
@@ -798,14 +798,14 @@
 <pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="c1">// progressive decode the image in coder queue
 </span><span class="c1"></span><span class="n">dispatch_async</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">coderQueue</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span>
     <span class="k">@autoreleasepool</span> <span class="p">{</span>
-        <span class="n">UIImage</span> <span class="o">*</span><span class="n">image</span> <span class="o">=</span> <span class="n">SDImageLoaderDecodeProgressiveImageData</span><span class="p">(</span><span class="n">imageData</span><span class="p">,</span> <span class="nb">self</span><span class="p">.</span><span class="n">request</span><span class="p">.</span><span class="n">URL</span><span class="p">,</span> <span class="n">finished</span><span class="p">,</span> <span class="nb">self</span><span class="p">,</span> <span class="p">[</span><span class="p">[</span><span class="nb">self</span> <span class="k">class</span><span class="p">]</span> <span class="nl">imageOptionsFromDownloaderOptions</span><span class="p">:</span><span class="nb">self</span><span class="p">.</span><span class="n">options</span><span class="p">]</span><span class="p">,</span> <span class="nb">self</span><span class="p">.</span><span class="n">context</span><span class="p">)</span><span class="p">;</span>
+        <span class="n">UIImage</span> <span class="o">*</span><span class="n">image</span> <span class="o">=</span> <span class="n">SDImageLoaderDecodeProgressiveImageData</span><span class="p">(</span><span class="n">imageData</span><span class="p">,</span> <span class="nb">self</span><span class="p">.</span><span class="n">request</span><span class="p">.</span><span class="n">URL</span><span class="p">,</span> <span class="n">finished</span><span class="p">,</span> <span class="nb">self</span><span class="p">,</span> <span class="p">[[</span><span class="nb">self</span> <span class="k">class</span><span class="p">]</span> <span class="nl">imageOptionsFromDownloaderOptions</span><span class="p">:</span><span class="nb">self</span><span class="p">.</span><span class="n">options</span><span class="p">],</span> <span class="nb">self</span><span class="p">.</span><span class="n">context</span><span class="p">);</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">image</span><span class="p">)</span> <span class="p">{</span>
             <span class="c1">// We do not keep the progressive decoding image even when `finished`=YES. Because they are for view rendering but not take full function from downloader options. And some coders implementation may not keep consistent between progressive decoding and normal decoding.
 </span><span class="c1"></span>            
-            <span class="p">[</span><span class="nb">self</span> <span class="nl">callCompletionBlocksWithImage</span><span class="p">:</span><span class="n">image</span> <span class="nl">imageData</span><span class="p">:</span><span class="nb">nil</span> <span class="nl">error</span><span class="p">:</span><span class="nb">nil</span> <span class="nl">finished</span><span class="p">:</span><span class="nb">NO</span><span class="p">]</span><span class="p">;</span>
+            <span class="p">[</span><span class="nb">self</span> <span class="nl">callCompletionBlocksWithImage</span><span class="p">:</span><span class="n">image</span> <span class="nl">imageData</span><span class="p">:</span><span class="nb">nil</span> <span class="nl">error</span><span class="p">:</span><span class="nb">nil</span> <span class="nl">finished</span><span class="p">:</span><span class="nb">NO</span><span class="p">];</span>
         <span class="p">}</span>
     <span class="p">}</span>
-<span class="p">}</span><span class="p">)</span><span class="p">;</span>
+<span class="p">});</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>​		否则，会在 <strong>didCompleteWithError</strong> 时完成解码操作：<code>SDImageLoaderDecodeImageData</code> ，不过在解码前需要先解密:</p>
@@ -816,8 +816,8 @@
 </span><span class="lnt">3
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">if</span> <span class="p">(</span><span class="n">imageData</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="nb">self</span><span class="p">.</span><span class="n">decryptor</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">imageData</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">decryptor</span> <span class="nl">decryptedDataWithData</span><span class="p">:</span><span class="n">imageData</span> <span class="nl">response</span><span class="p">:</span><span class="nb">self</span><span class="p">.</span><span class="n">response</span><span class="p">]</span><span class="p">;</span>
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">if</span> <span class="p">(</span><span class="n">imageData</span> <span class="o">&amp;&amp;</span> <span class="nb">self</span><span class="p">.</span><span class="n">decryptor</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">imageData</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">decryptor</span> <span class="nl">decryptedDataWithData</span><span class="p">:</span><span class="n">imageData</span> <span class="nl">response</span><span class="p">:</span><span class="nb">self</span><span class="p">.</span><span class="n">response</span><span class="p">];</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -930,22 +930,22 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="p">-</span> <span class="p">(</span><span class="kt">id</span><span class="p">)</span><span class="nf">objectForKey:</span><span class="p">(</span><span class="kt">id</span><span class="p">)</span><span class="nv">key</span> <span class="p">{</span>
-    <span class="kt">id</span> <span class="n">obj</span> <span class="o">=</span> <span class="p">[</span><span class="nb">super</span> <span class="nl">objectForKey</span><span class="p">:</span><span class="n">key</span><span class="p">]</span><span class="p">;</span>
+    <span class="kt">id</span> <span class="n">obj</span> <span class="o">=</span> <span class="p">[</span><span class="nb">super</span> <span class="nl">objectForKey</span><span class="p">:</span><span class="n">key</span><span class="p">];</span>
     <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">self</span><span class="p">.</span><span class="n">config</span><span class="p">.</span><span class="n">shouldUseWeakMemoryCache</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">return</span> <span class="n">obj</span><span class="p">;</span>
     <span class="p">}</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">key</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="o">!</span><span class="n">obj</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">key</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">obj</span><span class="p">)</span> <span class="p">{</span>
         <span class="c1">// Check weak cache
-</span><span class="c1"></span>        <span class="n">SD_LOCK</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">weakCacheLock</span><span class="p">)</span><span class="p">;</span>
-        <span class="n">obj</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">weakCache</span> <span class="nl">objectForKey</span><span class="p">:</span><span class="n">key</span><span class="p">]</span><span class="p">;</span>
-        <span class="n">SD_UNLOCK</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">weakCacheLock</span><span class="p">)</span><span class="p">;</span>
+</span><span class="c1"></span>        <span class="n">SD_LOCK</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">weakCacheLock</span><span class="p">);</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">weakCache</span> <span class="nl">objectForKey</span><span class="p">:</span><span class="n">key</span><span class="p">];</span>
+        <span class="n">SD_UNLOCK</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">weakCacheLock</span><span class="p">);</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="p">{</span>
             <span class="c1">// Sync cache
 </span><span class="c1"></span>            <span class="n">NSUInteger</span> <span class="n">cost</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-            <span class="k">if</span> <span class="p">(</span><span class="p">[</span><span class="n">obj</span> <span class="nl">isKindOfClass</span><span class="p">:</span><span class="p">[</span><span class="n">UIImage</span> <span class="k">class</span><span class="p">]</span><span class="p">]</span><span class="p">)</span> <span class="p">{</span>
-                <span class="n">cost</span> <span class="o">=</span> <span class="p">[</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="p">)</span><span class="n">obj</span> <span class="n">sd_memoryCost</span><span class="p">]</span><span class="p">;</span>
+            <span class="k">if</span> <span class="p">([</span><span class="n">obj</span> <span class="nl">isKindOfClass</span><span class="p">:[</span><span class="n">UIImage</span> <span class="k">class</span><span class="p">]])</span> <span class="p">{</span>
+                <span class="n">cost</span> <span class="o">=</span> <span class="p">[(</span><span class="n">UIImage</span> <span class="o">*</span><span class="p">)</span><span class="n">obj</span> <span class="n">sd_memoryCost</span><span class="p">];</span>
             <span class="p">}</span>
-            <span class="p">[</span><span class="nb">super</span> <span class="nl">setObject</span><span class="p">:</span><span class="n">obj</span> <span class="nl">forKey</span><span class="p">:</span><span class="n">key</span> <span class="nl">cost</span><span class="p">:</span><span class="n">cost</span><span class="p">]</span><span class="p">;</span>
+            <span class="p">[</span><span class="nb">super</span> <span class="nl">setObject</span><span class="p">:</span><span class="n">obj</span> <span class="nl">forKey</span><span class="p">:</span><span class="n">key</span> <span class="nl">cost</span><span class="p">:</span><span class="n">cost</span><span class="p">];</span>
         <span class="p">}</span>
     <span class="p">}</span>
     <span class="k">return</span> <span class="n">obj</span><span class="p">;</span>
@@ -1032,18 +1032,18 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">dispatch_async</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">ioQueue</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span>
     <span class="k">@autoreleasepool</span> <span class="p">{</span>
-        <span class="n">NSData</span> <span class="o">*</span><span class="n">data</span> <span class="o">=</span> <span class="p">.</span><span class="p">.</span><span class="p">.</span> <span class="c1">// 根据 SDImageFormat 对 image 进行编码获取
+        <span class="n">NSData</span> <span class="o">*</span><span class="n">data</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// 根据 SDImageFormat 对 image 进行编码获取
 </span><span class="c1"></span>        <span class="c1">/// data = [[SDImageCodersManager sharedManager] encodedDataWithImage:image format:format options:nil];
-</span><span class="c1"></span>        <span class="p">[</span><span class="nb">self</span> <span class="nl">_storeImageDataToDisk</span><span class="p">:</span><span class="n">data</span> <span class="nl">forKey</span><span class="p">:</span><span class="n">key</span><span class="p">]</span><span class="p">;</span>
+</span><span class="c1"></span>        <span class="p">[</span><span class="nb">self</span> <span class="nl">_storeImageDataToDisk</span><span class="p">:</span><span class="n">data</span> <span class="nl">forKey</span><span class="p">:</span><span class="n">key</span><span class="p">];</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">image</span><span class="p">)</span> <span class="p">{</span>
             <span class="c1">// Check extended data
 </span><span class="c1"></span>            <span class="kt">id</span> <span class="n">extendedObject</span> <span class="o">=</span> <span class="n">image</span><span class="p">.</span><span class="n">sd_extendedObject</span><span class="p">;</span>
             <span class="c1">// ... get extended data
-</span><span class="c1"></span>            <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">diskCache</span> <span class="nl">setExtendedData</span><span class="p">:</span><span class="n">extendedData</span> <span class="nl">forKey</span><span class="p">:</span><span class="n">key</span><span class="p">]</span><span class="p">;</span>
+</span><span class="c1"></span>            <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">diskCache</span> <span class="nl">setExtendedData</span><span class="p">:</span><span class="n">extendedData</span> <span class="nl">forKey</span><span class="p">:</span><span class="n">key</span><span class="p">];</span>
         <span class="p">}</span>
     <span class="p">}</span>
     <span class="c1">// call completionBlock in main queue
-</span><span class="c1"></span><span class="p">}</span><span class="p">)</span><span class="p">;</span>
+</span><span class="c1"></span><span class="p">});</span>
 </code></pre></td></tr></table>
 </div>
 </div></li>
@@ -1068,16 +1068,16 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="p">-</span> <span class="p">(</span><span class="kt">id</span><span class="o">&lt;</span><span class="n">SDWebImageOperation</span><span class="o">&gt;</span><span class="p">)</span><span class="nf">queryImageForKey:</span><span class="p">(</span><span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">key</span> <span class="nf">options:</span><span class="p">(</span><span class="n">SDWebImageOptions</span><span class="p">)</span><span class="nv">options</span> <span class="nf">context:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">SDWebImageContext</span> <span class="o">*</span><span class="p">)</span><span class="nv">context</span> <span class="nf">completion:</span><span class="p">(</span><span class="n">nullable</span> <span class="n">SDImageCacheQueryCompletionBlock</span><span class="p">)</span><span class="nv">completionBlock</span> <span class="p">{</span>
     <span class="n">SDImageCacheOptions</span> <span class="n">cacheOptions</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageQueryMemoryData</span><span class="p">)</span> <span class="n">cacheOptions</span> <span class="o">|</span><span class="o">=</span> <span class="n">SDImageCacheQueryMemoryData</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageQueryMemoryDataSync</span><span class="p">)</span> <span class="n">cacheOptions</span> <span class="o">|</span><span class="o">=</span> <span class="n">SDImageCacheQueryMemoryDataSync</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageQueryDiskDataSync</span><span class="p">)</span> <span class="n">cacheOptions</span> <span class="o">|</span><span class="o">=</span> <span class="n">SDImageCacheQueryDiskDataSync</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageScaleDownLargeImages</span><span class="p">)</span> <span class="n">cacheOptions</span> <span class="o">|</span><span class="o">=</span> <span class="n">SDImageCacheScaleDownLargeImages</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageAvoidDecodeImage</span><span class="p">)</span> <span class="n">cacheOptions</span> <span class="o">|</span><span class="o">=</span> <span class="n">SDImageCacheAvoidDecodeImage</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageDecodeFirstFrameOnly</span><span class="p">)</span> <span class="n">cacheOptions</span> <span class="o">|</span><span class="o">=</span> <span class="n">SDImageCacheDecodeFirstFrameOnly</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImagePreloadAllFrames</span><span class="p">)</span> <span class="n">cacheOptions</span> <span class="o">|</span><span class="o">=</span> <span class="n">SDImageCachePreloadAllFrames</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageMatchAnimatedImageClass</span><span class="p">)</span> <span class="n">cacheOptions</span> <span class="o">|</span><span class="o">=</span> <span class="n">SDImageCacheMatchAnimatedImageClass</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageQueryMemoryData</span><span class="p">)</span> <span class="n">cacheOptions</span> <span class="o">|=</span> <span class="n">SDImageCacheQueryMemoryData</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageQueryMemoryDataSync</span><span class="p">)</span> <span class="n">cacheOptions</span> <span class="o">|=</span> <span class="n">SDImageCacheQueryMemoryDataSync</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageQueryDiskDataSync</span><span class="p">)</span> <span class="n">cacheOptions</span> <span class="o">|=</span> <span class="n">SDImageCacheQueryDiskDataSync</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageScaleDownLargeImages</span><span class="p">)</span> <span class="n">cacheOptions</span> <span class="o">|=</span> <span class="n">SDImageCacheScaleDownLargeImages</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageAvoidDecodeImage</span><span class="p">)</span> <span class="n">cacheOptions</span> <span class="o">|=</span> <span class="n">SDImageCacheAvoidDecodeImage</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageDecodeFirstFrameOnly</span><span class="p">)</span> <span class="n">cacheOptions</span> <span class="o">|=</span> <span class="n">SDImageCacheDecodeFirstFrameOnly</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImagePreloadAllFrames</span><span class="p">)</span> <span class="n">cacheOptions</span> <span class="o">|=</span> <span class="n">SDImageCachePreloadAllFrames</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageMatchAnimatedImageClass</span><span class="p">)</span> <span class="n">cacheOptions</span> <span class="o">|=</span> <span class="n">SDImageCacheMatchAnimatedImageClass</span><span class="p">;</span>
     
-    <span class="k">return</span> <span class="p">[</span><span class="nb">self</span> <span class="nl">queryCacheOperationForKey</span><span class="p">:</span><span class="n">key</span> <span class="nl">options</span><span class="p">:</span><span class="n">cacheOptions</span> <span class="nl">context</span><span class="p">:</span><span class="n">context</span> <span class="nl">done</span><span class="p">:</span><span class="n">completionBlock</span><span class="p">]</span><span class="p">;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="nb">self</span> <span class="nl">queryCacheOperationForKey</span><span class="p">:</span><span class="n">key</span> <span class="nl">options</span><span class="p">:</span><span class="n">cacheOptions</span> <span class="nl">context</span><span class="p">:</span><span class="n">context</span> <span class="nl">done</span><span class="p">:</span><span class="n">completionBlock</span><span class="p">];</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -1088,7 +1088,7 @@
 <pre class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">key</span> <span class="o">=</span> <span class="n">SDTransformedKeyForKey</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">transformerKey</span><span class="p">)</span><span class="p">;</span>
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">key</span> <span class="o">=</span> <span class="n">SDTransformedKeyForKey</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">transformerKey</span><span class="p">);</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>尝试从 memory cache 获取 image，如果存在：</p>
@@ -1110,12 +1110,12 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="c1">// Ensure static image
 </span><span class="c1"></span><span class="kt">Class</span> <span class="n">animatedImageClass</span> <span class="o">=</span> <span class="n">image</span><span class="p">.</span><span class="k">class</span><span class="p">;</span>
-<span class="k">if</span> <span class="p">(</span><span class="n">image</span><span class="p">.</span><span class="n">sd_isAnimated</span> <span class="o">|</span><span class="o">|</span> <span class="p">(</span><span class="p">[</span><span class="n">animatedImageClass</span> <span class="nl">isSubclassOfClass</span><span class="p">:</span><span class="p">[</span><span class="n">UIImage</span> <span class="k">class</span><span class="p">]</span><span class="p">]</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="p">[</span><span class="n">animatedImageClass</span> <span class="nl">conformsToProtocol</span><span class="p">:</span><span class="p">@</span><span class="n">protocol</span><span class="p">(</span><span class="n">SDAnimatedImage</span><span class="p">)</span><span class="p">]</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
-<span class="cp">#</span><span class="cp">if SD_MAC</span><span class="cp">
-</span><span class="cp"></span>    <span class="n">image</span> <span class="o">=</span> <span class="p">[</span><span class="p">[</span><span class="n">NSImage</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithCGImage</span><span class="p">:</span><span class="n">image</span><span class="p">.</span><span class="n">CGImage</span> <span class="nl">scale</span><span class="p">:</span><span class="n">image</span><span class="p">.</span><span class="n">scale</span> <span class="nl">orientation</span><span class="p">:</span><span class="n">kCGImagePropertyOrientationUp</span><span class="p">]</span><span class="p">;</span>
-<span class="cp">#</span><span class="cp">else</span><span class="cp">
-</span><span class="cp"></span>    <span class="n">image</span> <span class="o">=</span> <span class="p">[</span><span class="p">[</span><span class="n">UIImage</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithCGImage</span><span class="p">:</span><span class="n">image</span><span class="p">.</span><span class="n">CGImage</span> <span class="nl">scale</span><span class="p">:</span><span class="n">image</span><span class="p">.</span><span class="n">scale</span> <span class="nl">orientation</span><span class="p">:</span><span class="n">image</span><span class="p">.</span><span class="n">imageOrientation</span><span class="p">]</span><span class="p">;</span>
-<span class="cp">#</span><span class="cp">endif</span><span class="cp">
+<span class="k">if</span> <span class="p">(</span><span class="n">image</span><span class="p">.</span><span class="n">sd_isAnimated</span> <span class="o">||</span> <span class="p">([</span><span class="n">animatedImageClass</span> <span class="nl">isSubclassOfClass</span><span class="p">:[</span><span class="n">UIImage</span> <span class="k">class</span><span class="p">]]</span> <span class="o">&amp;&amp;</span> <span class="p">[</span><span class="n">animatedImageClass</span> <span class="nl">conformsToProtocol</span><span class="p">:@</span><span class="n">protocol</span><span class="p">(</span><span class="n">SDAnimatedImage</span><span class="p">)]))</span> <span class="p">{</span>
+<span class="cp">#if SD_MAC
+</span><span class="cp"></span>    <span class="n">image</span> <span class="o">=</span> <span class="p">[[</span><span class="n">NSImage</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithCGImage</span><span class="p">:</span><span class="n">image</span><span class="p">.</span><span class="n">CGImage</span> <span class="nl">scale</span><span class="p">:</span><span class="n">image</span><span class="p">.</span><span class="n">scale</span> <span class="nl">orientation</span><span class="p">:</span><span class="n">kCGImagePropertyOrientationUp</span><span class="p">];</span>
+<span class="cp">#else
+</span><span class="cp"></span>    <span class="n">image</span> <span class="o">=</span> <span class="p">[[</span><span class="n">UIImage</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithCGImage</span><span class="p">:</span><span class="n">image</span><span class="p">.</span><span class="n">CGImage</span> <span class="nl">scale</span><span class="p">:</span><span class="n">image</span><span class="p">.</span><span class="n">scale</span> <span class="nl">orientation</span><span class="p">:</span><span class="n">image</span><span class="p">.</span><span class="n">imageOrientation</span><span class="p">];</span>
+<span class="cp">#endif
 </span><span class="cp"></span><span class="p">}</span>
 </code></pre></td></tr></table>
 </div>
@@ -1134,8 +1134,8 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="c1">// Check image class matching
 </span><span class="c1"></span><span class="kt">Class</span> <span class="n">animatedImageClass</span> <span class="o">=</span> <span class="n">image</span><span class="p">.</span><span class="k">class</span><span class="p">;</span>
-<span class="kt">Class</span> <span class="n">desiredImageClass</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">SDWebImageContextAnimatedImageClass</span><span class="p">]</span><span class="p">;</span>
-<span class="k">if</span> <span class="p">(</span><span class="n">desiredImageClass</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="o">!</span><span class="p">[</span><span class="n">animatedImageClass</span> <span class="nl">isSubclassOfClass</span><span class="p">:</span><span class="n">desiredImageClass</span><span class="p">]</span><span class="p">)</span> <span class="p">{</span>
+<span class="kt">Class</span> <span class="n">desiredImageClass</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">SDWebImageContextAnimatedImageClass</span><span class="p">];</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">desiredImageClass</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="p">[</span><span class="n">animatedImageClass</span> <span class="nl">isSubclassOfClass</span><span class="p">:</span><span class="n">desiredImageClass</span><span class="p">])</span> <span class="p">{</span>
     <span class="n">image</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></td></tr></table>
@@ -1154,10 +1154,10 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="c1">// Check whether we need to synchronously query disk
-</span><span class="c1"></span><span class="c1">// 1. in-memory cache hit &amp; memoryDataSync
-</span><span class="c1"></span><span class="c1">// 2. in-memory cache miss &amp; diskDataSync
-</span><span class="c1"></span><span class="kt">BOOL</span> <span class="n">shouldQueryDiskSync</span> <span class="o">=</span> <span class="p">(</span><span class="p">(</span><span class="n">image</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDImageCacheQueryMemoryDataSync</span><span class="p">)</span> <span class="o">|</span><span class="o">|</span>
-                            <span class="p">(</span><span class="o">!</span><span class="n">image</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDImageCacheQueryDiskDataSync</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
+</span><span class="c1">// 1. in-memory cache hit &amp; memoryDataSync
+</span><span class="c1">// 2. in-memory cache miss &amp; diskDataSync
+</span><span class="c1"></span><span class="kt">BOOL</span> <span class="n">shouldQueryDiskSync</span> <span class="o">=</span> <span class="p">((</span><span class="n">image</span> <span class="o">&amp;&amp;</span> <span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDImageCacheQueryMemoryDataSync</span><span class="p">)</span> <span class="o">||</span>
+                            <span class="p">(</span><span class="o">!</span><span class="n">image</span> <span class="o">&amp;&amp;</span> <span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDImageCacheQueryDiskDataSync</span><span class="p">));</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>整个 diskQuery 存在 queryDiskBlock 中并用 autorelease 包裹：</p>
@@ -1198,12 +1198,12 @@
 </span><span class="lnt">33
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="kt">void</span><span class="p">(</span><span class="o">^</span><span class="n">queryDiskBlock</span><span class="p">)</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="o">=</span>  <span class="o">^</span><span class="p">{</span>
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="kt">void</span><span class="p">(</span><span class="o">^</span><span class="n">queryDiskBlock</span><span class="p">)(</span><span class="kt">void</span><span class="p">)</span> <span class="o">=</span>  <span class="o">^</span><span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">operation</span><span class="p">.</span><span class="n">isCancelled</span><span class="p">)</span> <span class="p">{</span>
         <span class="c1">// call doneBlock &amp; return
 </span><span class="c1"></span>    <span class="p">}</span>
     <span class="k">@autoreleasepool</span> <span class="p">{</span>
-        <span class="n">NSData</span> <span class="o">*</span><span class="n">diskData</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="nl">diskImageDataBySearchingAllPathsForKey</span><span class="p">:</span><span class="n">key</span><span class="p">]</span><span class="p">;</span>
+        <span class="n">NSData</span> <span class="o">*</span><span class="n">diskData</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="nl">diskImageDataBySearchingAllPathsForKey</span><span class="p">:</span><span class="n">key</span><span class="p">];</span>
         <span class="n">UIImage</span> <span class="o">*</span><span class="n">diskImage</span><span class="p">;</span>
         <span class="n">SDImageCacheType</span> <span class="n">cacheType</span> <span class="o">=</span> <span class="n">SDImageCacheTypeNone</span><span class="p">;</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">image</span><span class="p">)</span> <span class="p">{</span>
@@ -1213,20 +1213,20 @@
         <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">diskData</span><span class="p">)</span> <span class="p">{</span>
             <span class="n">cacheType</span> <span class="o">=</span> <span class="n">SDImageCacheTypeDisk</span><span class="p">;</span>
             <span class="c1">// decode image data only if in-memory cache missed
-</span><span class="c1"></span>            <span class="n">diskImage</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="nl">diskImageForKey</span><span class="p">:</span><span class="n">key</span> <span class="nl">data</span><span class="p">:</span><span class="n">diskData</span> <span class="nl">options</span><span class="p">:</span><span class="n">options</span> <span class="nl">context</span><span class="p">:</span><span class="n">context</span><span class="p">]</span><span class="p">;</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">diskImage</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="nb">self</span><span class="p">.</span><span class="n">config</span><span class="p">.</span><span class="n">shouldCacheImagesInMemory</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="c1"></span>            <span class="n">diskImage</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="nl">diskImageForKey</span><span class="p">:</span><span class="n">key</span> <span class="nl">data</span><span class="p">:</span><span class="n">diskData</span> <span class="nl">options</span><span class="p">:</span><span class="n">options</span> <span class="nl">context</span><span class="p">:</span><span class="n">context</span><span class="p">];</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">diskImage</span> <span class="o">&amp;&amp;</span> <span class="nb">self</span><span class="p">.</span><span class="n">config</span><span class="p">.</span><span class="n">shouldCacheImagesInMemory</span><span class="p">)</span> <span class="p">{</span>
                 <span class="n">NSUInteger</span> <span class="n">cost</span> <span class="o">=</span> <span class="n">diskImage</span><span class="p">.</span><span class="n">sd_memoryCost</span><span class="p">;</span>
-                <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">memoryCache</span> <span class="nl">setObject</span><span class="p">:</span><span class="n">diskImage</span> <span class="nl">forKey</span><span class="p">:</span><span class="n">key</span> <span class="nl">cost</span><span class="p">:</span><span class="n">cost</span><span class="p">]</span><span class="p">;</span>
+                <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">memoryCache</span> <span class="nl">setObject</span><span class="p">:</span><span class="n">diskImage</span> <span class="nl">forKey</span><span class="p">:</span><span class="n">key</span> <span class="nl">cost</span><span class="p">:</span><span class="n">cost</span><span class="p">];</span>
             <span class="p">}</span>
         <span class="p">}</span>
         <span class="c1">// call doneBlock
 </span><span class="c1"></span>        <span class="k">if</span> <span class="p">(</span><span class="n">doneBlock</span><span class="p">)</span> <span class="p">{</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">shouldQueryDiskSync</span><span class="p">)</span> <span class="p">{</span>
-                <span class="n">doneBlock</span><span class="p">(</span><span class="n">diskImage</span><span class="p">,</span> <span class="n">diskData</span><span class="p">,</span> <span class="n">cacheType</span><span class="p">)</span><span class="p">;</span>
+                <span class="n">doneBlock</span><span class="p">(</span><span class="n">diskImage</span><span class="p">,</span> <span class="n">diskData</span><span class="p">,</span> <span class="n">cacheType</span><span class="p">);</span>
             <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-                <span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_get_main_queue</span><span class="p">(</span><span class="p">)</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span>
-                    <span class="n">doneBlock</span><span class="p">(</span><span class="n">diskImage</span><span class="p">,</span> <span class="n">diskData</span><span class="p">,</span> <span class="n">cacheType</span><span class="p">)</span><span class="p">;</span>
-                <span class="p">}</span><span class="p">)</span><span class="p">;</span>
+                <span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_get_main_queue</span><span class="p">(),</span> <span class="o">^</span><span class="p">{</span>
+                    <span class="n">doneBlock</span><span class="p">(</span><span class="n">diskImage</span><span class="p">,</span> <span class="n">diskData</span><span class="p">,</span> <span class="n">cacheType</span><span class="p">);</span>
+                <span class="p">});</span>
             <span class="p">}</span>
         <span class="p">}</span>
     <span class="p">}</span>
@@ -1242,8 +1242,8 @@
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="err">&#39;</span><span class="n">image</span><span class="p">.</span><span class="n">png</span><span class="err">&#39;</span> <span class="o">|</span><span class="o">&gt;</span> <span class="n">flip</span><span class="p">(</span><span class="nb">YES</span><span class="p">,</span><span class="nb">NO</span><span class="p">)</span> <span class="o">|</span><span class="o">&gt;</span> <span class="n">rotate</span><span class="p">(</span><span class="n">pi</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span><span class="nb">YES</span><span class="p">)</span>  <span class="o">=</span><span class="o">&gt;</span> 
-<span class="err">&#39;</span><span class="n">image</span><span class="o">-</span><span class="n">SDImageFlippingTransformer</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="o">-</span><span class="n">SDImageRotationTransformer</span><span class="p">(</span><span class="mf">0.78539816339</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="p">.</span><span class="n">png</span><span class="err">&#39;</span>
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="err">&#39;</span><span class="n">image</span><span class="p">.</span><span class="n">png</span><span class="err">&#39;</span> <span class="o">|&gt;</span> <span class="n">flip</span><span class="p">(</span><span class="nb">YES</span><span class="p">,</span><span class="nb">NO</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="n">rotate</span><span class="p">(</span><span class="n">pi</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span><span class="nb">YES</span><span class="p">)</span>  <span class="o">=&gt;</span> 
+<span class="err">&#39;</span><span class="n">image</span><span class="o">-</span><span class="n">SDImageFlippingTransformer</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="o">-</span><span class="n">SDImageRotationTransformer</span><span class="p">(</span><span class="mf">0.78539816339</span><span class="p">,</span><span class="mi">1</span><span class="p">).</span><span class="n">png</span><span class="err">&#39;</span>
 </code></pre></td></tr></table>
 </div>
 </div><h2 id="sdimagemanaer">SDImageManaer</h2>
@@ -1313,20 +1313,20 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-objective-c" data-lang="objective-c"> <span class="n">SDWebImageManager</span><span class="p">.</span><span class="n">sharedManager</span><span class="p">.</span><span class="n">optionsProcessor</span> <span class="o">=</span> <span class="p">[</span><span class="n">SDWebImageOptionsProcessor</span> <span class="nl">optionsProcessorWithBlock</span><span class="p">:</span><span class="o">^</span><span class="n">SDWebImageOptionsResult</span> <span class="o">*</span> <span class="n">_Nullable</span><span class="p">(</span><span class="n">NSURL</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">url</span><span class="p">,</span> <span class="n">SDWebImageOptions</span> <span class="n">options</span><span class="p">,</span> <span class="n">SDWebImageContext</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">context</span><span class="p">)</span> <span class="p">{</span>
      <span class="c1">// Only do animation on `SDAnimatedImageView`
-</span><span class="c1"></span>     <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">context</span><span class="p">[</span><span class="n">SDWebImageContextAnimatedImageClass</span><span class="p">]</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">options</span> <span class="o">|</span><span class="o">=</span> <span class="n">SDWebImageDecodeFirstFrameOnly</span><span class="p">;</span>
+</span><span class="c1"></span>     <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">context</span><span class="p">[</span><span class="n">SDWebImageContextAnimatedImageClass</span><span class="p">])</span> <span class="p">{</span>
+        <span class="n">options</span> <span class="o">|=</span> <span class="n">SDWebImageDecodeFirstFrameOnly</span><span class="p">;</span>
      <span class="p">}</span>
      <span class="c1">// Do not force decode for png url
-</span><span class="c1"></span>     <span class="k">if</span> <span class="p">(</span><span class="p">[</span><span class="n">url</span><span class="p">.</span><span class="n">lastPathComponent</span> <span class="nl">isEqualToString</span><span class="p">:</span><span class="s">@&#34;</span><span class="s">png</span><span class="s">&#34;</span><span class="p">]</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">options</span> <span class="o">|</span><span class="o">=</span> <span class="n">SDWebImageAvoidDecodeImage</span><span class="p">;</span>
+</span><span class="c1"></span>     <span class="k">if</span> <span class="p">([</span><span class="n">url</span><span class="p">.</span><span class="n">lastPathComponent</span> <span class="nl">isEqualToString</span><span class="p">:</span><span class="s">@&#34;png&#34;</span><span class="p">])</span> <span class="p">{</span>
+        <span class="n">options</span> <span class="o">|=</span> <span class="n">SDWebImageAvoidDecodeImage</span><span class="p">;</span>
      <span class="p">}</span>
      <span class="c1">// Always use screen scale factor
-</span><span class="c1"></span>     <span class="n">SDWebImageMutableContext</span> <span class="o">*</span><span class="n">mutableContext</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSDictionary</span> <span class="nl">dictionaryWithDictionary</span><span class="p">:</span><span class="n">context</span><span class="p">]</span><span class="p">;</span>
+</span><span class="c1"></span>     <span class="n">SDWebImageMutableContext</span> <span class="o">*</span><span class="n">mutableContext</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSDictionary</span> <span class="nl">dictionaryWithDictionary</span><span class="p">:</span><span class="n">context</span><span class="p">];</span>
      <span class="n">mutableContext</span><span class="p">[</span><span class="n">SDWebImageContextImageScaleFactor</span><span class="p">]</span> <span class="o">=</span> <span class="l">@(</span><span class="n">UIScreen</span><span class="p">.</span><span class="n">mainScreen</span><span class="p">.</span><span class="n">scale</span><span class="l">)</span><span class="p">;</span>
-     <span class="n">context</span> <span class="o">=</span> <span class="p">[</span><span class="n">mutableContext</span> <span class="k">copy</span><span class="p">]</span><span class="p">;</span>
+     <span class="n">context</span> <span class="o">=</span> <span class="p">[</span><span class="n">mutableContext</span> <span class="k">copy</span><span class="p">];</span>
  
-     <span class="k">return</span> <span class="p">[</span><span class="p">[</span><span class="n">SDWebImageOptionsResult</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithOptions</span><span class="p">:</span><span class="n">options</span> <span class="nl">context</span><span class="p">:</span><span class="n">context</span><span class="p">]</span><span class="p">;</span>
- <span class="p">}</span><span class="p">]</span><span class="p">;</span>
+     <span class="k">return</span> <span class="p">[[</span><span class="n">SDWebImageOptionsResult</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithOptions</span><span class="p">:</span><span class="n">options</span> <span class="nl">context</span><span class="p">:</span><span class="n">context</span><span class="p">];</span>
+ <span class="p">}];</span>
 </code></pre></td></tr></table>
 </div>
 </div><h3 id="loadimage">LoadImage</h3>
@@ -1366,28 +1366,28 @@
 </span><span class="lnt">22
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">SDWebImageCombinedOperation</span> <span class="o">*</span><span class="n">operation</span> <span class="o">=</span> <span class="p">[</span><span class="n">SDWebImagCombinedOperation</span> <span class="n">new</span><span class="p">]</span><span class="p">;</span>
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">SDWebImageCombinedOperation</span> <span class="o">*</span><span class="n">operation</span> <span class="o">=</span> <span class="p">[</span><span class="n">SDWebImagCombinedOperation</span> <span class="n">new</span><span class="p">];</span>
 <span class="n">operation</span><span class="p">.</span><span class="n">manager</span> <span class="o">=</span> <span class="nb">self</span><span class="p">;</span>
 
 <span class="c1">///  1
 </span><span class="c1"></span><span class="kt">BOOL</span> <span class="n">isFailedUrl</span> <span class="o">=</span> <span class="nb">NO</span><span class="p">;</span>
 <span class="k">if</span> <span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">SD_LOCK</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">failedURLsLock</span><span class="p">)</span><span class="p">;</span>
-    <span class="n">isFailedUrl</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">failedURLs</span> <span class="nl">containsObject</span><span class="p">:</span><span class="n">url</span><span class="p">]</span><span class="p">;</span>
-    <span class="n">SD_UNLOCK</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">failedURLsLock</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">SD_LOCK</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">failedURLsLock</span><span class="p">);</span>
+    <span class="n">isFailedUrl</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">failedURLs</span> <span class="nl">containsObject</span><span class="p">:</span><span class="n">url</span><span class="p">];</span>
+    <span class="n">SD_UNLOCK</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">failedURLsLock</span><span class="p">);</span>
 <span class="p">}</span>
 
-<span class="k">if</span> <span class="p">(</span><span class="n">url</span><span class="p">.</span><span class="n">absoluteString</span><span class="p">.</span><span class="n">length</span> <span class="o">=</span><span class="o">=</span> <span class="mi">0</span> <span class="o">|</span><span class="o">|</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageRetryFailed</span><span class="p">)</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">isFailedUrl</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
-    <span class="p">[</span><span class="nb">self</span> <span class="nl">callCompletionBlockForOperation</span><span class="p">:</span><span class="n">operation</span> <span class="nl">completion</span><span class="p">:</span><span class="n">completedBlock</span> <span class="nl">error</span><span class="p">:</span><span class="p">[</span><span class="n">NSError</span> <span class="nl">errorWithDomain</span><span class="p">:</span><span class="n">SDWebImageErrorDomain</span> <span class="nl">code</span><span class="p">:</span><span class="n">SDWebImageErrorInvalidURL</span> <span class="nl">userInfo</span><span class="p">:</span><span class="l">@{</span><span class="nl">NSLocalizedDescriptionKey</span> <span class="p">:</span> <span class="s">@&#34;</span><span class="s">Image url is nil</span><span class="s">&#34;</span><span class="l">}</span><span class="p">]</span> <span class="nl">url</span><span class="p">:</span><span class="n">url</span><span class="p">]</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">url</span><span class="p">.</span><span class="n">absoluteString</span><span class="p">.</span><span class="n">length</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageRetryFailed</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">isFailedUrl</span><span class="p">))</span> <span class="p">{</span>
+    <span class="p">[</span><span class="nb">self</span> <span class="nl">callCompletionBlockForOperation</span><span class="p">:</span><span class="n">operation</span> <span class="nl">completion</span><span class="p">:</span><span class="n">completedBlock</span> <span class="nl">error</span><span class="p">:[</span><span class="n">NSError</span> <span class="nl">errorWithDomain</span><span class="p">:</span><span class="n">SDWebImageErrorDomain</span> <span class="nl">code</span><span class="p">:</span><span class="n">SDWebImageErrorInvalidURL</span> <span class="nl">userInfo</span><span class="p">:</span><span class="l">@{</span><span class="nl">NSLocalizedDescriptionKey</span> <span class="p">:</span> <span class="s">@&#34;Image url is nil&#34;</span><span class="l">}</span><span class="p">]</span> <span class="nl">url</span><span class="p">:</span><span class="n">url</span><span class="p">];</span>
     <span class="k">return</span> <span class="n">operation</span><span class="p">;</span>
 <span class="p">}</span>
 
-<span class="n">SD_LOCK</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">runningOperationsLock</span><span class="p">)</span><span class="p">;</span>
-<span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">runningOperations</span> <span class="nl">addObject</span><span class="p">:</span><span class="n">operation</span><span class="p">]</span><span class="p">;</span>
-<span class="n">SD_UNLOCK</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">runningOperationsLock</span><span class="p">)</span><span class="p">;</span>
+<span class="n">SD_LOCK</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">runningOperationsLock</span><span class="p">);</span>
+<span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">runningOperations</span> <span class="nl">addObject</span><span class="p">:</span><span class="n">operation</span><span class="p">];</span>
+<span class="n">SD_UNLOCK</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">runningOperationsLock</span><span class="p">);</span>
 
 <span class="c1">// 2. Preprocess the options and context arg to decide the final the result for manager
-</span><span class="c1"></span><span class="n">SDWebImageOptionsResult</span> <span class="o">*</span><span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="nl">processedResultForURL</span><span class="p">:</span><span class="n">url</span> <span class="nl">options</span><span class="p">:</span><span class="n">options</span> <span class="nl">context</span><span class="p">:</span><span class="n">context</span><span class="p">]</span><span class="p">;</span>
+</span><span class="c1"></span><span class="n">SDWebImageOptionsResult</span> <span class="o">*</span><span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="nl">processedResultForURL</span><span class="p">:</span><span class="n">url</span> <span class="nl">options</span><span class="p">:</span><span class="n">options</span> <span class="nl">context</span><span class="p">:</span><span class="n">context</span><span class="p">];</span>
 </code></pre></td></tr></table>
 </div>
 </div><p><strong>loadImage</strong> 方法本身不复杂，核心是生成 operation 然后转入缓存查询。</p>
@@ -1436,11 +1436,11 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">operation</span><span class="p">.</span><span class="n">cacheOperation</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">imageCache</span> <span class="nl">queryImageForKey</span><span class="p">:</span><span class="n">key</span> <span class="nl">options</span><span class="p">:</span><span class="n">options</span> <span class="nl">context</span><span class="p">:</span><span class="n">context</span> <span class="nl">completion</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">cachedImage</span><span class="p">,</span> <span class="n">NSData</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">cachedData</span><span class="p">,</span> <span class="n">SDImageCacheType</span> <span class="n">cacheType</span><span class="p">)</span> <span class="p">{</span>
-   <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">operation</span> <span class="o">|</span><span class="o">|</span> <span class="n">operation</span><span class="p">.</span><span class="n">isCancelled</span><span class="p">)</span> <span class="p">{</span>
+   <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">operation</span> <span class="o">||</span> <span class="n">operation</span><span class="p">.</span><span class="n">isCancelled</span><span class="p">)</span> <span class="p">{</span>
     	<span class="c1">/// 1  
 </span><span class="c1"></span>   <span class="p">}</span>
   	<span class="c1">/// 2
-</span><span class="c1"></span><span class="p">}</span><span class="p">]</span><span class="p">;</span>
+</span><span class="c1"></span><span class="p">}];</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>对缓存查询的结果有两种情况需要处理：</p>
@@ -1458,10 +1458,10 @@
 </span><span class="lnt">4
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="kt">BOOL</span> <span class="n">shouldDownload</span> <span class="o">=</span> <span class="o">!</span><span class="n">SD_OPTIONS_CONTAINS</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">SDWebImageFromCacheOnly</span><span class="p">)</span><span class="p">;</span>
-    <span class="n">shouldDownload</span> <span class="o">&amp;</span><span class="o">=</span> <span class="p">(</span><span class="o">!</span><span class="n">cachedImage</span> <span class="o">|</span><span class="o">|</span> <span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageRefreshCached</span><span class="p">)</span><span class="p">;</span>
-    <span class="n">shouldDownload</span> <span class="o">&amp;</span><span class="o">=</span> <span class="p">(</span><span class="o">!</span><span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">delegate</span> <span class="nl">respondsToSelector</span><span class="p">:</span><span class="k">@selector</span><span class="p">(</span><span class="nl">imageManager</span><span class="p">:</span><span class="nl">shouldDownloadImageForURL</span><span class="p">:</span><span class="p">)</span><span class="p">]</span> <span class="o">|</span><span class="o">|</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">delegate</span> <span class="nl">imageManager</span><span class="p">:</span><span class="nb">self</span> <span class="nl">shouldDownloadImageForURL</span><span class="p">:</span><span class="n">url</span><span class="p">]</span><span class="p">)</span><span class="p">;</span>
-    <span class="n">shouldDownload</span> <span class="o">&amp;</span><span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">imageLoader</span> <span class="nl">canRequestImageForURL</span><span class="p">:</span><span class="n">url</span><span class="p">]</span><span class="p">;</span>
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="kt">BOOL</span> <span class="n">shouldDownload</span> <span class="o">=</span> <span class="o">!</span><span class="n">SD_OPTIONS_CONTAINS</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">SDWebImageFromCacheOnly</span><span class="p">);</span>
+    <span class="n">shouldDownload</span> <span class="o">&amp;=</span> <span class="p">(</span><span class="o">!</span><span class="n">cachedImage</span> <span class="o">||</span> <span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageRefreshCached</span><span class="p">);</span>
+    <span class="n">shouldDownload</span> <span class="o">&amp;=</span> <span class="p">(</span><span class="o">!</span><span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">delegate</span> <span class="nl">respondsToSelector</span><span class="p">:</span><span class="k">@selector</span><span class="p">(</span><span class="nl">imageManager</span><span class="p">:</span><span class="nl">shouldDownloadImageForURL</span><span class="p">:)]</span> <span class="o">||</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">delegate</span> <span class="nl">imageManager</span><span class="p">:</span><span class="nb">self</span> <span class="nl">shouldDownloadImageForURL</span><span class="p">:</span><span class="n">url</span><span class="p">]);</span>
+    <span class="n">shouldDownload</span> <span class="o">&amp;=</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">imageLoader</span> <span class="nl">canRequestImageForURL</span><span class="p">:</span><span class="n">url</span><span class="p">];</span>
 </code></pre></td></tr></table>
 </div>
 </div><ul>
@@ -1497,9 +1497,9 @@
 </span><span class="lnt">3
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="kt">BOOL</span> <span class="n">shouldTransformImage</span> <span class="o">=</span> <span class="n">downloadedImage</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="p">(</span><span class="o">!</span><span class="n">downloadedImage</span><span class="p">.</span><span class="n">sd_isAnimated</span> <span class="o">|</span><span class="o">|</span> <span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageTransformAnimatedImage</span><span class="p">)</span><span class="p">)</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">transformer</span><span class="p">;</span>
-<span class="kt">BOOL</span> <span class="n">shouldCacheOriginal</span> <span class="o">=</span> <span class="n">downloadedImage</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">finished</span><span class="p">;</span>
-<span class="kt">BOOL</span> <span class="n">waitStoreCache</span> <span class="o">=</span> <span class="n">SD_OPTIONS_CONTAINS</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">SDWebImageWaitStoreCache</span><span class="p">)</span><span class="p">;</span>
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="kt">BOOL</span> <span class="n">shouldTransformImage</span> <span class="o">=</span> <span class="n">downloadedImage</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="o">!</span><span class="n">downloadedImage</span><span class="p">.</span><span class="n">sd_isAnimated</span> <span class="o">||</span> <span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageTransformAnimatedImage</span><span class="p">))</span> <span class="o">&amp;&amp;</span> <span class="n">transformer</span><span class="p">;</span>
+<span class="kt">BOOL</span> <span class="n">shouldCacheOriginal</span> <span class="o">=</span> <span class="n">downloadedImage</span> <span class="o">&amp;&amp;</span> <span class="n">finished</span><span class="p">;</span>
+<span class="kt">BOOL</span> <span class="n">waitStoreCache</span> <span class="o">=</span> <span class="n">SD_OPTIONS_CONTAINS</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">SDWebImageWaitStoreCache</span><span class="p">);</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>如果 shouldCacheOriginal 为 NO，直接转入 transformProcess。否则，先确认存储类型是否为原始数据：</p>
@@ -1525,10 +1525,10 @@
 </span><span class="lnt">4
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="kt">id</span><span class="o">&lt;</span><span class="n">SDImageTransformer</span><span class="o">&gt;</span> <span class="n">transformer</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">SDWebImageContextImageTransformer</span><span class="p">]</span><span class="p">;</span>
-<span class="kt">id</span><span class="o">&lt;</span><span class="n">SDWebImageCacheSerializer</span><span class="o">&gt;</span> <span class="n">cacheSerializer</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">SDWebImageContextCacheSerializer</span><span class="p">]</span><span class="p">;</span>
-<span class="kt">BOOL</span> <span class="n">shouldTransformImage</span> <span class="o">=</span> <span class="n">originalImage</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="p">(</span><span class="o">!</span><span class="n">originalImage</span><span class="p">.</span><span class="n">sd_isAnimated</span> <span class="o">|</span><span class="o">|</span> <span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageTransformAnimatedImage</span><span class="p">)</span><span class="p">)</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">transformer</span><span class="p">;</span>
-<span class="kt">BOOL</span> <span class="n">waitStoreCache</span> <span class="o">=</span> <span class="n">SD_OPTIONS_CONTAINS</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">SDWebImageWaitStoreCache</span><span class="p">)</span><span class="p">;</span>
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="kt">id</span><span class="o">&lt;</span><span class="n">SDImageTransformer</span><span class="o">&gt;</span> <span class="n">transformer</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">SDWebImageContextImageTransformer</span><span class="p">];</span>
+<span class="kt">id</span><span class="o">&lt;</span><span class="n">SDWebImageCacheSerializer</span><span class="o">&gt;</span> <span class="n">cacheSerializer</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">SDWebImageContextCacheSerializer</span><span class="p">];</span>
+<span class="kt">BOOL</span> <span class="n">shouldTransformImage</span> <span class="o">=</span> <span class="n">originalImage</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="o">!</span><span class="n">originalImage</span><span class="p">.</span><span class="n">sd_isAnimated</span> <span class="o">||</span> <span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageTransformAnimatedImage</span><span class="p">))</span> <span class="o">&amp;&amp;</span> <span class="n">transformer</span><span class="p">;</span>
+<span class="kt">BOOL</span> <span class="n">waitStoreCache</span> <span class="o">=</span> <span class="n">SD_OPTIONS_CONTAINS</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">SDWebImageWaitStoreCache</span><span class="p">);</span>
 </code></pre></td></tr></table>
 </div>
 </div><p>如果需要转换，会进入全局队列开始处理：</p>
@@ -1546,20 +1546,20 @@
 </span><span class="lnt">10
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_get_global_queue</span><span class="p">(</span><span class="n">DISPATCH_QUEUE_PRIORITY_HIGH</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span>
+<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_get_global_queue</span><span class="p">(</span><span class="n">DISPATCH_QUEUE_PRIORITY_HIGH</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="o">^</span><span class="p">{</span>
     <span class="k">@autoreleasepool</span> <span class="p">{</span>
-        <span class="n">UIImage</span> <span class="o">*</span><span class="n">transformedImage</span> <span class="o">=</span> <span class="p">[</span><span class="n">transformer</span> <span class="nl">transformedImageWithImage</span><span class="p">:</span><span class="n">originalImage</span> <span class="nl">forKey</span><span class="p">:</span><span class="n">key</span><span class="p">]</span><span class="p">;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">transformedImage</span> <span class="o">&amp;</span><span class="o">&amp;</span> <span class="n">finished</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">UIImage</span> <span class="o">*</span><span class="n">transformedImage</span> <span class="o">=</span> <span class="p">[</span><span class="n">transformer</span> <span class="nl">transformedImageWithImage</span><span class="p">:</span><span class="n">originalImage</span> <span class="nl">forKey</span><span class="p">:</span><span class="n">key</span><span class="p">];</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">transformedImage</span> <span class="o">&amp;&amp;</span> <span class="n">finished</span><span class="p">)</span> <span class="p">{</span>
 				<span class="c1">/// 1
 </span><span class="c1"></span>        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
 				<span class="n">callCompletionBlock</span>
         <span class="p">}</span>
     <span class="p">}</span>
-<span class="p">}</span><span class="p">)</span><span class="p">;</span>        
+<span class="p">});</span>        
 </code></pre></td></tr></table>
 </div>
 </div><p>转换成功后，会依据 <code>cacheData = [cacheSerializer cacheDataWithImage: originalData: imageURL:];</code>  进行 <code>[self storageImage: ...]</code>存储图片。存储结束后 callCompletionBlock。</p>
-<h2 id="heading-1">总结</h2>
+<h2 id="总结">总结</h2>
 <p>如果你能看到这里，还是很有耐心的。希望大家看完能够大概了解 SD 的 work-flow，以及一些细节上的处理和思考。在 SD 5.x 中，个人感受最多的是其架构的设计值得借鉴。</p>
 <ul>
 <li>如何设计一个稳定可扩展的 API 又能安全地支持动态添加参数？</li>

@@ -21,12 +21,12 @@
     </item>
     
     <item>
-      <title>浅析 Cocoapods-Binary 实现</title>
+      <title>浅析 cocoapods-binary</title>
       <link>http://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-1/</link>
       <pubDate>Sat, 21 Dec 2019 11:37:41 +2100</pubDate>
       
       <guid>http://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-1/</guid>
-      <description>背景 公司级别的项目在发展过程，不可避免会遇到项目过大，导致的编译和开发效率的降低。在如何提高编译速度，加快生产效率，各大厂都有各种尝试，可惜</description>
+      <description>#介绍 cocoapods-binary 最早是在 CocoaPods 的 Blog 中发现的：pre-compiling dependencies。虽非官方出品，但却是国内程序员的力作，medium 原版介</description>
     </item>
     
   </channel>

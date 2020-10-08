@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>📒个人备忘 - 队列、GCD、线程基础 - </title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="土土Edmond木" /><meta name="description" content="[toc] 引子 本篇内容大多来自网络上的一些文章，希望做一个 📝 和参考，如有出错的地方希望指正。 起因是公司内部的同学在开发中遇到了 FMDB 的一个 Crash，查" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.71.1 with theme even" />
+
+
+<link rel="canonical" href="http://looseyi.github.io/post/notes/01-gcd/" />
+  <link href="http://looseyi.github.io/post/notes/01-gcd/index.xml" rel="alternate" type="application/rss+xml" title="" />
+  <link href="http://looseyi.github.io/post/notes/01-gcd/index.xml" rel="feed" type="application/rss+xml" title="" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="📒个人备忘 - 队列、GCD、线程基础" />
+<meta property="og:description" content="[toc] 引子 本篇内容大多来自网络上的一些文章，希望做一个 📝 和参考，如有出错的地方希望指正。 起因是公司内部的同学在开发中遇到了 FMDB 的一个 Crash，查" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://looseyi.github.io/post/notes/01-gcd/" />
+<meta property="article:published_time" content="2020-06-16T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-06-16T00:00:00+00:00" />
+<meta itemprop="name" content="📒个人备忘 - 队列、GCD、线程基础">
+<meta itemprop="description" content="[toc] 引子 本篇内容大多来自网络上的一些文章，希望做一个 📝 和参考，如有出错的地方希望指正。 起因是公司内部的同学在开发中遇到了 FMDB 的一个 Crash，查">
+<meta itemprop="datePublished" content="2020-06-16T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2020-06-16T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="3545">
+
+
+
+<meta itemprop="keywords" content="iOS&#39;,📒,GCD," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="📒个人备忘 - 队列、GCD、线程基础"/>
+<meta name="twitter:description" content="[toc] 引子 本篇内容大多来自网络上的一些文章，希望做一个 📝 和参考，如有出错的地方希望指正。 起因是公司内部的同学在开发中遇到了 FMDB 的一个 Crash，查"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Aha Moment</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Aha Moment</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">📒个人备忘 - 队列、GCD、线程基础</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-06-16 </span>
+        <div class="post-category">
+            <a href="/categories/ios/"> iOS </a>
+            <a href="/categories//"> 📒 </a>
+            </div>
+          <span class="more-meta"> 约 3545 字 </span>
+          <span class="more-meta"> 预计阅读 8 分钟 </span>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#并行和并发">并行和并发</a></li>
+    <li><a href="#dispatch-queues">Dispatch Queues</a>
+      <ul>
+        <li><a href="#serial-dispatch-queue">Serial Dispatch Queue</a></li>
+        <li><a href="#concurrent-dispatch-queue">Concurrent Dispatch Queue</a></li>
+        <li><a href="#main-dispatch-queue">Main Dispatch Queue</a></li>
+      </ul>
+    </li>
+    <li><a href="#runloop">RunLoop</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#dispatch_sync">dispatch_sync</a></li>
+    <li><a href="#dispatch_async">dispatch_async</a></li>
+    <li><a href="#queues--dispatch">Queues &amp; Dispatch</a>
+      <ul>
+        <li><a href="#serial-queues-dispatch">Serial Queues Dispatch</a></li>
+        <li><a href="#concurrent-queue-dispatch">Concurrent Queue Dispatch</a></li>
+      </ul>
+    </li>
+  </ul>
+
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#不能嵌套调用-fmdatabasequeue-否则线程死锁">不能嵌套调用 FMDatabaseQueue 否则线程死锁</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p>[toc]</p>
+<h1 id="引子">引子</h1>
+<p>本篇内容大多来自网络上的一些文章，希望做一个 📝 和参考，如有出错的地方希望指正。</p>
+<p>起因是公司内部的同学在开发中遇到了 FMDB 的一个 Crash，查看源码：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">inDatabase:</span><span class="p">(</span><span class="n">__attribute__</span><span class="p">((</span><span class="n">noescape</span><span class="p">))</span> <span class="nv">void</span> <span class="p">(</span><span class="o">^</span><span class="p">)(</span><span class="n">FMDatabase</span> <span class="o">*</span><span class="n">db</span><span class="p">))</span><span class="nv">block</span> <span class="p">{</span>
+<span class="cp">#ifndef NDEBUG
+</span><span class="cp"></span>    <span class="n">FMDatabaseQueue</span> <span class="o">*</span><span class="n">currentSyncQueue</span> <span class="o">=</span> <span class="p">(</span><span class="k">__bridge</span> <span class="kt">id</span><span class="p">)</span><span class="n">dispatch_get_specific</span><span class="p">(</span><span class="n">kDispatchQueueSpecificKey</span><span class="p">);</span>
+    <span class="c1">// ...
+</span><span class="c1"></span><span class="cp">#endif
+</span><span class="cp"></span>    <span class="n">dispatch_sync</span><span class="p">(</span><span class="n">_queue</span><span class="p">,</span> <span class="o">^</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">FMDatabase</span> <span class="o">*</span><span class="n">db</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="n">database</span><span class="p">];</span>        
+        <span class="n">block</span><span class="p">(</span><span class="n">db</span><span class="p">);</span>
+	    <span class="c1">// ...
+</span><span class="c1"></span>    <span class="p">});</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>发现 FMDB 内部居然是使用了 <code>dispatch_sync</code>，我们从小就被教育要少用 sync 而这里居然明目张胆的使用了。。。</p>
+<p>看来一定是我哪里有所误解。</p>
+<h1 id="gcd-基础">GCD 基础</h1>
+<p>GCD 属于苹果核心系统，它封装了多线程操作并在其之上增加了任务容器 &mdash; Dispatch queues。可以说，Apple 希望淡化线程概念，强化易理解的任务队列。</p>
+<h2 id="并行和并发">并行和并发</h2>
+<p>在多线程模型的讨论中，搞明白 <strong>并行和并发</strong> 这两个概念十分重要，关于它们的解释也是各有不同，这里参考 StackOverflow 上的<a href="https://stackoverflow.com/questions/1050222/what-is-the-difference-between-concurrency-and-parallelism#:~:text=Concurrency%20is%20when%20two%20or,complete%20in%20overlapping%20time%20periods.&amp;text=Parallelism%20is%20when%20tasks%20literally,two%20threads%20are%20making%20progress.">回答</a>：</p>
+<p><strong>Concurrency</strong></p>
+<blockquote>
+<p>Concurrency is when two or more tasks can start, run, and complete in overlapping time <strong>periods</strong>. It doesn&rsquo;t necessarily mean they&rsquo;ll ever both be running <strong>at the same instant</strong>. For example, <em>multitasking</em> on a single-core machine.</p>
+</blockquote>
+<p><img src="https://ww1.sinaimg.cn/large/8157560cgy1ggt4oj7d0wj20hf090dfz.jpg" alt="01-Concurrency"></p>
+<p><strong>Parallelism</strong></p>
+<blockquote>
+<p>Parallelism is when tasks <em>literally</em> run at the same time, e.g., on a multicore processor.</p>
+</blockquote>
+<p><img src="http://ww1.sinaimg.cn/large/8157560cgy1ggt4ojabfzj20hf090dg8.jpg" alt="02-Parallelism"></p>
+<p>借用 <a href="http://ipn.li/kernelpanic/13">内核恐慌</a> 中 Rio 的描述：</p>
+<blockquote>
+<p>并发和并行是一种计算模型，使得计算机能够在同一时间处理多个任务；</p>
+<p>并发表示逻辑概念上的同时，并行表示物理概念上的同时。</p>
+</blockquote>
+<p>简单来说，若说两个任务 A 和 B 并发执行，则表示任务 A 和任务 B 在同一时间段里被执行（更多的可能是二者交替执行）；</p>
+<p>若说任务 A 和 B 并行执行，则表示任务 A 和任务 B 在同时被执行（这要求计算机有多个运算器）。</p>
+<p>一句话总结：并行要求并发，但并发并不能保证并行。</p>
+<p>关于并发和并行，<a href="https://www.raywenderlich.com/60749/grand-central-dispatch-in-depth-part-1">Grand Central Dispatch In-Depth: Part 1/2</a> 中有更详细生动的图文解释。</p>
+<h2 id="dispatch-queues">Dispatch Queues</h2>
+<blockquote>
+<p>A dispatch queue is an object-like structure that manages the tasks you submit to it. All dispatch queues are first-in, first-out data structures.</p>
+</blockquote>
+<p>关于什么是 dispatch queue <a href="https://developer.apple.com/library/archive/documentation/General/Conceptual/ConcurrencyProgrammingGuide/OperationQueues/OperationQueues.html">苹果文档</a> 已经给出了明确的定义，它是<strong>以 FIFO 的顺序来调度任务的一种数据结构。</strong></p>
+<p>GCD 提供了一些公共的 Dispatch Queue，但是用户也可以自定义一些 dispatch queue。GCD 的出现是为了淡化用户对于线程的操作，我们仅需关心任务与任务之间的关系，它们是顺序执行还是并发执行。不需要太在意任务是在哪个线程中执行的。</p>
+<p>iOS 对 dispatch queue 做了归类，分为三类：</p>
+<ul>
+<li>Serial Dispatch Queue</li>
+<li>Concurrent Dispatch Queue</li>
+<li>Main Dispatch Queue</li>
+</ul>
+<p>下面这张图，想必大家应该都不陌生吧：</p>
+<p><img src="https://www.objc.io/images/issue-2/gcd-queues@2x-82965db9.png" alt="gcd_pool"></p>
+<p>关于 GCD 的文章推荐 <a href="https://www.objc.io/issues/2-concurrency/concurrency-apis-and-pitfalls/?spm=a2c6h.12873639.0.0.ff803537RByKvJ#priority-inversion">objc.io 这篇</a></p>
+<h3 id="serial-dispatch-queue">Serial Dispatch Queue</h3>
+<blockquote>
+<p>Serial queues (also known as <em>private dispatch queues</em>) execute one task at a time in the order in which they are added to the queue. The currently executing task runs on a distinct thread (which can vary from task to task) that is managed by the dispatch queue. Serial queues are often used to synchronize access to a specific resource.</p>
+</blockquote>
+<p>serial dispatch queue 中的任务是依照 FIFO 的顺序执行，实际上为单线程执行。即每次从 queue 中取出一个 task 进行处理；用户可以根据需要创建任意多的 serial dispatch queue，serial dispatch queue 彼此之间是并发的；</p>
+<p>串行队列的创建方法如下，仅需注意参数：<code>DISPATCH_QUEUE_SERIAL</code>（即<code>NULL</code>）即可：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objectivec" data-lang="objectivec"><span class="n">dispatch_queue_t</span> <span class="n">queue</span> <span class="o">=</span> <span class="n">dispatch_queue_create</span><span class="p">(</span><span class="s">&#34;com.example.MySerialQueue&#34;</span><span class="p">,</span> <span class="n">DISPATCH_QUEUE_SERIAL</span><span class="p">);</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="concurrent-dispatch-queue">Concurrent Dispatch Queue</h3>
+<blockquote>
+<p>Concurrent queues (also known as a type of <em>global dispatch queue</em>) execute one or more tasks concurrently, but tasks are still started in the order in which they were added to the queue. The currently executing tasks run on distinct threads that are managed by the dispatch queue. The exact number of tasks executing at any given point is variable and depends on system conditions.</p>
+</blockquote>
+<p>Concurrent Dispatch Queue 一次性并发执行一个或者多个 task；作为全局调度队列，GCD 提供 <code>dispatch_get_global_queue</code> 以获取不同优先级的并发队列。用户也可以根据需要自己定义 concurrent queue：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objectivec" data-lang="objectivec"><span class="n">dispatch_queue_t</span> <span class="n">queue</span> <span class="o">=</span> <span class="n">dispatch_queue_create</span><span class="p">(</span><span class="s">&#34;com.example.MyConcurrentQueue&#34;</span><span class="p">,</span> <span class="n">DISPATCH_QUEUE_CONCURRENT</span><span class="p">);</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>并发队列类似于其他语言里的线程池，其管理的 task 可能在多个不同 thread 上执行，至于 GCD 管理多少个 thread 是未知的，这要视系统资源而定。</p>
+<h3 id="main-dispatch-queue">Main Dispatch Queue</h3>
+<blockquote>
+<p>The main dispatch queue is a globally available serial queue that executes tasks on the application’s main thread.</p>
+</blockquote>
+<p>main dispatch queue 是特殊的 serial dispatch queue，毕竟主线程只有一个。我们知道应用程序的主要任务 （例如 UI 操作）都在 main thread 中完成，而全局的 main disaptch queue 所调度的 task 都在 main thread 中运行。</p>
+<p>所以，如果想要更新 UI，则必须在 main dispatch queue 中处理，获取 main dispatch queue 也很容易，调用 <code>dispatch_get_main_queue()</code> 函数即可。</p>
+<h2 id="runloop">RunLoop</h2>
+<p>在 iOS 中对于多线程问题是逃不开 RunLoop 的，不过 RunLoop 与 GCD 基本没半毛钱关系。</p>
+<p>RunLoop 与线程才是一对好基友。</p>
+<blockquote>
+<p>线程和 RunLoop 之间是一一对应的，其关系是保存在一个全局的 Dictionary 里。线程刚创建时并没有 RunLoop，如果你不主动获取，那它一直都不会有。RunLoop 的创建是发生在第一次获取时，RunLoop 的销毁是发生在线程结束时。你只能在一个线程的内部获取其 RunLoop（主线程除外）。</p>
+</blockquote>
+<p>关于 RunLoop 应该没有比 <a href="https://blog.ibireme.com/2015/05/18/runloop/">深入理解RunLoop</a> 文章说的更清楚的了，要不就自行看源码。</p>
+<p>我们知道新开线程是需要开销的。如果执行一个任务，就开一次线程，执行完毕就释放了。当任务特别细碎，并且非常多时，这不断消费线程的开销会比处理这些任务的开销要大得多。RunLoop 就是为此而生的，有任务时唤醒线程，无任务的时候休眠但不退出，如此往复。</p>
+<p>因此，没有 RunLoop,  线程可能会 &ldquo;死&rdquo;;  线程 “死”了，RunLoop 才会停止运行。</p>
+<h1 id="dispatch-queues-的任务调度">Dispatch Queues 的任务调度</h1>
+<p>在 GCD 中，<code>dispatch_sync</code> 用于派发同步任务，<code>dispatch_async</code> 用于派发异步任务。</p>
+<h2 id="dispatch_sync">dispatch_sync</h2>
+<p>先来一段代码：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objectivec" data-lang="objectivec"><span class="c1">// dispatch task synchronously
+</span><span class="c1"></span><span class="n">dispatch_sync</span><span class="p">(</span><span class="n">someQueue1</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span>
+    <span class="c1">// do something 1
+</span><span class="c1"></span><span class="p">});</span>
+<span class="c1">// do something 2
+</span></code></pre></td></tr></table>
+</div>
+</div><p>当执行到  <code>dispatch_sync(...)</code> 时，其上下文被阻塞，直到 <code>dispatch_sync</code> 派发的 block 被执行完毕。</p>
+<p>正如上面代码，<code>do something 2</code> 一定会在 <code>do something 1</code> 完成之后执行，即所谓的<strong>同步</strong>。</p>
+<p>依据 <a href="https://developer.apple.com/documentation/dispatch/1452870-dispatch_sync">官方描述</a>：</p>
+<blockquote>
+<p>Submits a block to the specified dispatch queue for synchronous execution. Unlike <a href="https://developer.apple.com/documentation/dispatch/1453057-dispatch_async"><code>dispatch_async</code></a>, this function does not return until the block has finished. Calling this function and targeting the current queue results in deadlock.</p>
+<p>Unlike with <code>dispatch_async</code>, no retain is performed on the target queue. Because calls to this function are synchronous, it &ldquo;borrows&rdquo; the reference of the caller. Moreover, no <code>Block_copy</code> is performed on the block.</p>
+<p>As a performance optimization, this function executes blocks on the current thread whenever possible, with one obvious exception. Specifically, blocks submitted to the main dispatch queue always run on the main thread.</p>
+</blockquote>
+<p>由于是同步等待任务，<code>dispatch_sync</code> 并不会对派发的 block 进行 copy 操作，block 内如果有使用外部变量也都会直接 <strong>借用</strong> 外部的，而不会对其引用进行 retain。</p>
+<p>以性能优化的角度，<code>dispatch_sync</code> 派发的 block 会尽量在当前线程执行，如果我们在主队列中派发了 block，那 block 将会在主线程中执行。</p>
+<p>结论 1：<strong>dispatch_sync 派发的 block 所执的行线程与 dispatch_sync 上下文线程是同一个线程</strong></p>
+<p>结论 2：<strong>dispatch_sync 是不需要拷贝 block 的，理由为结论 1</strong></p>
+<h2 id="dispatch_async">dispatch_async</h2>
+<p>先来一段代码：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="c1">// dispatch task asynchronously
+</span><span class="c1"></span><span class="n">dispatch_async</span><span class="p">(</span><span class="n">someQueue2</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span>
+    <span class="c1">// do something 3
+</span><span class="c1"></span><span class="p">});</span>
+<span class="c1">// do something 4
+</span></code></pre></td></tr></table>
+</div>
+</div><p>当执行到 <code>dispatch_async(...)</code> 时，其上下文不被阻塞，继续运行。正如上面的代码， <code>do something 4</code> 会立即执行，而不会等到 <code>do something 3</code> 执行完，即所谓<strong>异步</strong>。</p>
+<p>依据 <a href="https://developer.apple.com/documentation/dispatch/1453057-dispatch_async">官方描述</a>：</p>
+<blockquote>
+<p>This function is the fundamental mechanism for submitting blocks to a dispatch queue. Calls to this function always return immediately after the block has been submitted and never wait for the block to be invoked. The target queue determines whether the block is invoked serially or concurrently with respect to other blocks submitted to that same queue. Independent serial queues are processed concurrently with respect to each other.</p>
+</blockquote>
+<p>结论 3：<strong>dispatch_async 派发的 block 所执行的线程和 dispatch_async 上下文线程不是同一个线程</strong>。</p>
+<h2 id="queues--dispatch">Queues &amp; Dispatch</h2>
+<p>队列与派发的组合如下：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>dispatch_sync</th>
+<th>dispatch_async</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>serial queue</strong></td>
+<td>同步串行队列</td>
+<td>异步串行队列</td>
+</tr>
+<tr>
+<td><strong>concurrent queue</strong></td>
+<td>同步并发队列</td>
+<td>异步并发队列</td>
+</tr>
+</tbody>
+</table>
+<h3 id="serial-queues-dispatch">Serial Queues Dispatch</h3>
+<p>来看一个示例：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objectivec" data-lang="objectivec"><span class="c1">// 1. create a serial dispatch queue
+</span><span class="c1"></span><span class="n">dispatch_queue_t</span> <span class="n">serial_queue</span><span class="o">=</span>
+<span class="n">dispatch_queue_create</span><span class="p">(</span><span class="s">&#34;com.zhangbuhuai.test&#34;</span><span class="p">,</span> <span class="n">DISPATCH_QUEUE_SERIAL</span><span class="p">);</span>	<span class="c1">// Thread main
+</span><span class="c1"></span>
+<span class="c1">// 2. add tasks to serial dispatch queue
+</span><span class="c1">// 1) add a task synchronously
+</span><span class="c1"></span><span class="n">dispatch_sync</span><span class="p">(</span><span class="n">serial_queue</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span>
+   <span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>	<span class="c1">// 休眠3秒
+</span><span class="c1"></span>   <span class="n">NSLog</span><span class="p">(</span><span class="s">@&#34;task 1 %@&#34;</span><span class="p">,</span> <span class="n">NSThread</span><span class="p">.</span><span class="n">currentThread</span><span class="p">);</span>
+<span class="p">});</span>
+<span class="c1">// 2) add a task synchronously too
+</span><span class="c1"></span><span class="n">dispatch_sync</span><span class="p">(</span><span class="n">serial_queue</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span>
+   <span class="n">NSLog</span><span class="p">(</span><span class="s">@&#34;task 2 %@&#34;</span><span class="p">,</span> <span class="n">NSThread</span><span class="p">.</span><span class="n">currentThread</span><span class="p">);</span>
+<span class="p">});</span>
+<span class="c1">// 3) add a task asynchronously
+</span><span class="c1"></span><span class="n">dispatch_async</span><span class="p">(</span><span class="n">serial_queue</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span>
+   <span class="n">NSLog</span><span class="p">(</span><span class="s">@&#34;task 3 %@&#34;</span><span class="p">,</span> <span class="n">NSThread</span><span class="p">.</span><span class="n">currentThread</span><span class="p">);</span>
+<span class="p">});</span>
+<span class="c1">// 4) add a task asynchronously too
+</span><span class="c1"></span><span class="n">dispatch_async</span><span class="p">(</span><span class="n">serial_queue</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span>
+   <span class="n">NSLog</span><span class="p">(</span><span class="s">@&#34;task 4 %@&#34;</span><span class="p">,</span> <span class="n">NSThread</span><span class="p">.</span><span class="n">currentThread</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="n">NSLog</span><span class="p">(</span><span class="s">@&#34;test end&#34;</span><span class="p">);</span>         <span class="c1">// Thread main
+</span></code></pre></td></tr></table>
+</div>
+</div><p>执行结果如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">task <span class="m">1</span> &lt;NSThread: 0x600002d04d00&gt;<span class="o">{</span><span class="nv">number</span> <span class="o">=</span> 1, <span class="nv">name</span> <span class="o">=</span> main<span class="o">}</span>
+task <span class="m">2</span> &lt;NSThread: 0x600002d04d00&gt;<span class="o">{</span><span class="nv">number</span> <span class="o">=</span> 1, <span class="nv">name</span> <span class="o">=</span> main<span class="o">}</span>
+<span class="nb">test</span> end
+task <span class="m">3</span> &lt;NSThread: 0x600002d452c0&gt;<span class="o">{</span><span class="nv">number</span> <span class="o">=</span> 4, <span class="nv">name</span> <span class="o">=</span> <span class="o">(</span>null<span class="o">)}</span>
+task <span class="m">4</span> &lt;NSThread: 0x600002d452c0&gt;<span class="o">{</span><span class="nv">number</span> <span class="o">=</span> 4, <span class="nv">name</span> <span class="o">=</span> <span class="o">(</span>null<span class="o">)}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>说明，对于 serial dispatch queue 中的 tasks，无论是同步派发还是异步派发，其执行顺序都遵循 FIFO；同样，这个示例也可以直观阐述 <code>dispatch_sync</code> 和 <code>dispatch_async</code> 的不同效果。</p>
+<p>结论 4：<strong>不存在所谓的 同步队列 和 异步队列</strong></p>
+<p>同步或异步描述的是 task 与其上下文之间的关系，因此，<em>同步队列</em> 和 <em>异步队列</em> 对于 GCD 而言是不靠谱的概念。</p>
+<p>结论 5：<strong>Serial Dispatch Queue 上的 tasks 并非只在同一个 thread 上执行</strong></p>
+<p>对于同步请求的任务，如果用 <code>dispatch_sync</code> 添加到 serial dispatch queue 中，其运行的 task 往往与所在的上下文是同一个 thread；</p>
+<p>对于异步请求的任务，如果用 <code>dispatch_async</code> 添加到 serial dispatch queue 中，其运行的 task 往往是另一个的 thread。</p>
+<p>总之，thread 和 dispatch queue 之间没有从属关系，也不存在一对一或者一对多的关系。</p>
+<h3 id="concurrent-queue-dispatch">Concurrent Queue Dispatch</h3>
+<p>再来看一个示例：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="c1">// 1. create a concurrent dispatch queue
+</span><span class="c1"></span><span class="n">dispatch_queue_t</span> <span class="n">serial_queue</span><span class="o">=</span>
+<span class="n">dispatch_queue_create</span><span class="p">(</span><span class="s">&#34;com.zhangbuhuai.test&#34;</span><span class="p">,</span> <span class="n">DISPATCH_QUEUE_CONCURRENT</span><span class="p">);</span>    <span class="c1">// Thread main
+</span><span class="c1"></span>
+<span class="c1">// 2. add tasks to concurrent dispatch queue
+</span><span class="c1">// 第二步逻辑与串行队列一致，此处不作展开 
+</span><span class="c1">// ... 
+</span></code></pre></td></tr></table>
+</div>
+</div><p>其执行结果：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">task 1 &lt;NSThread: 0x600000ff8d00&gt;{number = 1, name = main}
+task 2 &lt;NSThread: 0x600000ff8d00&gt;{number = 1, name = main}
+test end
+task 4 &lt;NSThread: 0x600000ff8c40&gt;{number = 5, name = (null)}
+task 3 &lt;NSThread: 0x600000ff2700&gt;{number = 4, name = (null)}
+</code></pre></td></tr></table>
+</div>
+</div><p>说明，对于 <code>dispatch_sync</code> 中的 tasks，不论是在 CONCURRENT 或是 SERIAL 队列中执行，同步派发的 block 所执的行线程与 其上下文线程是同一个线程；同步派发的执行顺序遵循 FIFO；而异步派发的执行顺序就不一定了；</p>
+<h1 id="使用同步串行队列保护代码">使用同步串行队列保护代码</h1>
+<p>最后，让我们回到引子中提到的 <code>FMDatabaseQueue</code> 的内部实现。它通过内部维护的 <code>serial dispatch queue</code> + <code>dispatch_sync</code> 来处理 <code>inDatabase:</code> 传入的 block，所以当我们调用 <code>inDatabase:</code> 时，代码实际上是同步执行的。</p>
+<blockquote>
+<p>FMDatabaseQueue will run the blocks on a serialized queue (hence the name of the class).  So if you call FMDatabaseQueue &lsquo;s methods from multiple threads at the same time, they will be executed in the order they are received.  This way queries and updates won&rsquo;t step on each other&rsquo;s toes, and every one is happy.</p>
+</blockquote>
+<p>FMDB 这么设计的目的是让我们避免发生并发访问数据库的问题，因为它无法保证用户访问数据库的时机。通过内置的同步串行队列后，<code>FMDatabaseQueue</code> 就变成线程安全了，所有的数据库访问都是同步执行，而且这比使用 @synchronized 或 NSLock 要高效得多。</p>
+<p>不过，需要注意的是 FMDB 这么做了之后，我们在使用 <code>FMDatabaseQueue</code> 时候就得小心了。</p>
+<h3 id="不能嵌套调用-fmdatabasequeue-否则线程死锁">不能嵌套调用 FMDatabaseQueue 否则线程死锁</h3>
+<p>参见如下代码：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="p">[</span><span class="n">queue</span> <span class="nl">inDatabase</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="n">FMDatabase</span> <span class="o">*</span><span class="n">db</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">[</span><span class="n">db</span> <span class="nl">executeUpdate</span><span class="p">:...</span>
+
+    <span class="p">[</span><span class="n">queue</span> <span class="nl">inDatabase</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="n">FMDatabase</span> <span class="o">*</span><span class="n">db</span><span class="p">)</span> <span class="p">{</span>
+        <span class="p">[</span><span class="n">db</span> <span class="nl">executeUpdate</span><span class="p">:...</span>
+    <span class="p">}];</span> 
+<span class="p">}];</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>由于是同步串行队列，嵌套调用会导致互相等待，造成死锁。这个也是我们常说到的少用 <code>dispatch_sync</code> 的主要原因。</p>
+<p>个人看法：<strong>存在即合理</strong>，看似安全的方法使用不当也可能造成严重异常。反之，在合理的场景下使用合适的方法，如： <code>dispatch_sync</code> 反而有不错的效果，不能因噎废食。</p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">土土Edmond木</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2020-06-16
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/ios/">iOS&#39;</a>
+          <a href="/tags//">📒</a>
+          <a href="/tags/gcd/">GCD</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/tool/cocoa-documentation-2/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">Cocoa 文档注释与生成工具使用 - Jazzy &#43; SourceKitten</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/tool/cocoa-documentation-1/">
+            <span class="next-text nav-default">Cocoa 文档注释与生成</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+    <script src="https://utteranc.es/client.js"
+            repo="looseyi/looseyi.github.io"
+            issue-term="pathname"
+            theme="github-light"
+            crossorigin="anonymous"
+            async>
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/utterance">comments powered by utterances.</a></noscript>
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:chun574271939@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://twitter.com/looseyi" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="https://github.com/looseyi" class="iconfont icon-github" title="github"></a>
+      <a href="https://www.weibo.com/foreverclp" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="https://www.zhihu.com/people/tu-tu-edmondmu" class="iconfont icon-zhihu" title="zhihu"></a>
+  <a href="http://looseyi.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2019-12-11 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">土土Edmond木</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-62789092-1', 'auto');
+	ga('set', 'anonymizeIp', true);
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>
