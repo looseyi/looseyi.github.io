@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>5. Podspec 文件分析 - </title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="土土Edmond木" /><meta name="description" content="引子 在上文 Podfile 解析逻辑 中，我们以 Xcode 工程结构作为切入点介绍了 Podfile 背后对应的数据结构，剖析了 Podfile 文件是如何解析与加载，并最终 &amp;ldquo;入侵&amp;rdq" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.71.1 with theme even" />
+
+
+<link rel="canonical" href="http://looseyi.github.io/post/sourcecode-cocoapods/05-cocoapods-podspec/" />
+  <link href="http://looseyi.github.io/post/sourcecode-cocoapods/05-cocoapods-podspec/index.xml" rel="alternate" type="application/rss+xml" title="" />
+  <link href="http://looseyi.github.io/post/sourcecode-cocoapods/05-cocoapods-podspec/index.xml" rel="feed" type="application/rss+xml" title="" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="5. Podspec 文件分析" />
+<meta property="og:description" content="引子 在上文 Podfile 解析逻辑 中，我们以 Xcode 工程结构作为切入点介绍了 Podfile 背后对应的数据结构，剖析了 Podfile 文件是如何解析与加载，并最终 &ldquo;入侵&rdq" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://looseyi.github.io/post/sourcecode-cocoapods/05-cocoapods-podspec/" />
+<meta property="article:published_time" content="2020-10-13T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-10-13T00:00:00+00:00" />
+<meta itemprop="name" content="5. Podspec 文件分析">
+<meta itemprop="description" content="引子 在上文 Podfile 解析逻辑 中，我们以 Xcode 工程结构作为切入点介绍了 Podfile 背后对应的数据结构，剖析了 Podfile 文件是如何解析与加载，并最终 &ldquo;入侵&rdq">
+<meta itemprop="datePublished" content="2020-10-13T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2020-10-13T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="4933">
+
+
+
+<meta itemprop="keywords" content="CocoaPods,iOS,Ruby," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="5. Podspec 文件分析"/>
+<meta name="twitter:description" content="引子 在上文 Podfile 解析逻辑 中，我们以 Xcode 工程结构作为切入点介绍了 Podfile 背后对应的数据结构，剖析了 Podfile 文件是如何解析与加载，并最终 &ldquo;入侵&rdq"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Aha Moment</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Aha Moment</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">5. Podspec 文件分析</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-10-13 </span>
+        <div class="post-category">
+            <a href="/categories/cocoapods/"> CocoaPods </a>
+            </div>
+          <span class="more-meta"> 约 4933 字 </span>
+          <span class="more-meta"> 预计阅读 10 分钟 </span>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#podspec-初探">PodSpec 初探</a>
+      <ul>
+        <li><a href="#podspec-1">PodSpec</a></li>
+        <li><a href="#convention-over-configuration">Convention Over Configuration</a></li>
+      </ul>
+    </li>
+    <li><a href="#spec-的核心数据结构">Spec 的核心数据结构</a>
+      <ul>
+        <li><a href="#specification">Specification</a></li>
+        <li><a href="#subspecs">Subspecs</a></li>
+      </ul>
+    </li>
+    <li><a href="#podspec-from-json">PodSpec From JSON</a></li>
+    <li><a href="#podspec-from-ruby">PodSpec From Ruby</a>
+      <ul>
+        <li><a href="#attribute-wrappter">attribute wrappter</a></li>
+        <li><a href="#subspec">#subspec</a></li>
+        <li><a href="#dependency">#dependency</a></li>
+      </ul>
+    </li>
+  </ul>
+
+  <ul>
+    <li><a href="#pod-创建">Pod 创建</a>
+      <ul>
+        <li><a href="#0x1-创建-pod">0x1 创建 Pod</a></li>
+        <li><a href="#0x2-发布-pod">0x2 发布 Pod</a></li>
+      </ul>
+    </li>
+    <li><a href="#subspecs-in-podfile">SubSpecs In Podfile</a>
+      <ul>
+        <li><a href="#0x1-single-target">0x1 Single Target</a></li>
+        <li><a href="#0x2-multiple-target">0x2 Multiple Target</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h1 id="引子">引子</h1>
+<p>在上文 <a href="https://zhuanlan.zhihu.com/p/248308670">Podfile 解析逻辑</a> 中，我们以 Xcode 工程结构作为切入点介绍了 Podfile 背后对应的数据结构，剖析了 <code>Podfile</code> 文件是如何解析与加载，并最终 <em>&ldquo;入侵&rdquo;</em> 项目影响其工程结构的。今天我们来聊一聊 <em><a href="https://link.zhihu.com/?target=https%3A//github.com/CocoaPods/Core">CocoaPods-Core</a></em> 中的另一个重要文件 &mdash; <code>PodSpec</code> 以及它所撑起的 CocoaPods 世界。</p>
+<p>一个 <code>Pod</code> 的创建和发布离不开 <code>PodSpec</code> 文件，它可以很简单也能复杂，如 <a href="https://github.com/Tencent/QMUI_iOS/blob/master/QMUIKit.podspec">QMUIKit</a>（后续介绍)。</p>
+<p>今天我们就直奔主题，来分析 <code>PodSpec</code> 文件。</p>
+<blockquote>
+<p>Tips：如果未看过<a href="https://zhuanlan.zhihu.com/p/248308670">前文</a>，强烈推荐。</p>
+</blockquote>
+<h1 id="podspec">PodSpec</h1>
+<blockquote>
+<p>The Specification provides a DSL to describe a Pod. A pod is defined as a library originating from a source. A specification can support detailed attributes for modules of code through subspecs.</p>
+</blockquote>
+<p><code>PodSpec</code> 是用于<strong>描述一个 Pod 库的源代码和资源将如何被打包编译成链接库或 framework 的文件</strong>，而 <code>PodSpec</code> 中的这些描述内容最终将映会映射到 <code>Specification</code> 类中（以下简称 <strong>Spec</strong>）。</p>
+<p><img src="https://i.loli.net/2020/10/08/3MFQxdCNgTHuBIW.png" alt="01-Spec"></p>
+<p>让我们来重新认识 <code>PodSpec</code>。</p>
+<h2 id="podspec-初探">PodSpec 初探</h2>
+<p><code>PodSpec</code> 支持的文件格式为 <code>.podspec</code> 和 <code>.json</code> 两种，而 <code>.podspec</code> 本质是 Ruby 文件。</p>
+<p>问题来了，为什么是 JSON 格式而不像 <code>Podfile</code> 一样支持 YAML 呢？</p>
+<p>笔者的理解：由于 <code>PodSpec</code> 文件会满世界跑，它可能存在于 CocoaPods 的 <a href="https://cdn.cocoapods.org/">CDN Service</a>、<a href="https://github.com/CocoaPods/Specs">Speces Repo</a> 或者你们的私有 Specs Repo 上，因此采用  JSON 的文件在网络传输中会更友好。而 <code>Podfile</code> 更多的场景是用于序列化，它需要在项目中生成一份经依赖仲裁后的 <code>Podfile</code> 快照，用于后续的对比。</p>
+<h3 id="podspec-1">PodSpec</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="no">Pod</span><span class="o">::</span><span class="no">Spec</span><span class="o">.</span><span class="n">new</span> <span class="k">do</span> <span class="o">|</span><span class="n">spec</span><span class="o">|</span>
+  <span class="n">spec</span><span class="o">.</span><span class="n">name</span>         <span class="o">=</span> <span class="s1">&#39;Reachability&#39;</span>
+  <span class="n">spec</span><span class="o">.</span><span class="n">version</span>      <span class="o">=</span> <span class="s1">&#39;3.1.0&#39;</span>
+  <span class="n">spec</span><span class="o">.</span><span class="n">license</span>      <span class="o">=</span> <span class="p">{</span> <span class="ss">:type</span> <span class="o">=&gt;</span> <span class="s1">&#39;BSD&#39;</span> <span class="p">}</span>
+  <span class="n">spec</span><span class="o">.</span><span class="n">homepage</span>     <span class="o">=</span> <span class="s1">&#39;https://github.com/tonymillion/Reachability&#39;</span>
+  <span class="n">spec</span><span class="o">.</span><span class="n">authors</span>      <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;Tony Million&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;tonymillion@gmail.com&#39;</span> <span class="p">}</span>
+  <span class="n">spec</span><span class="o">.</span><span class="n">summary</span>      <span class="o">=</span> <span class="s1">&#39;ARC and GCD Compatible Reachability Class for iOS and OS X.&#39;</span>
+  <span class="n">spec</span><span class="o">.</span><span class="n">source</span>       <span class="o">=</span> <span class="p">{</span> <span class="ss">:git</span> <span class="o">=&gt;</span> <span class="s1">&#39;https://github.com/tonymillion/Reachability.git&#39;</span><span class="p">,</span> <span class="ss">:tag</span> <span class="o">=&gt;</span> <span class="s2">&#34;v</span><span class="si">#{</span><span class="n">spec</span><span class="o">.</span><span class="n">version</span><span class="si">}</span><span class="s2">&#34;</span> <span class="p">}</span>
+  <span class="n">spec</span><span class="o">.</span><span class="n">source_files</span> <span class="o">=</span> <span class="s1">&#39;Reachability.{h,m}&#39;</span>
+  <span class="n">spec</span><span class="o">.</span><span class="n">framework</span>    <span class="o">=</span> <span class="s1">&#39;SystemConfiguration&#39;</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>上面这份 <code>Reachability.podspec</code> 配置，基本通过命令行 <code>pod lib create NAME</code> 就能帮我们完成。除此之外我们能做的更多，比如，默认情况下 CococaPods 会为每个 <code>pod</code> framework 生成一个对应的 <strong>modulemap</strong> 文件，它将包含 <code>PodSpec</code> 中指定的公共 headers。如果需要自定义引入的 header 文件，仅需配置 <code>moduel_map</code> 即可完成。</p>
+<p>下面是进阶版配置：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="no">Pod</span><span class="o">::</span><span class="no">Spec</span><span class="o">.</span><span class="n">new</span> <span class="k">do</span> <span class="o">|</span><span class="n">spec</span><span class="o">|</span>
+  <span class="n">spec</span><span class="o">.</span><span class="n">name</span>         <span class="o">=</span> <span class="s1">&#39;Reachability&#39;</span>
+  <span class="c1"># 省略与前面相同部分的配置 ...</span>
+  
+  <span class="n">spec</span><span class="o">.</span><span class="n">module_name</span>   <span class="o">=</span> <span class="s1">&#39;Rich&#39;</span>
+  <span class="n">spec</span><span class="o">.</span><span class="n">swift_version</span> <span class="o">=</span> <span class="s1">&#39;4.0&#39;</span>
+
+  <span class="n">spec</span><span class="o">.</span><span class="n">ios</span><span class="o">.</span><span class="n">deployment_target</span>  <span class="o">=</span> <span class="s1">&#39;9.0&#39;</span>
+  <span class="n">spec</span><span class="o">.</span><span class="n">osx</span><span class="o">.</span><span class="n">deployment_target</span>  <span class="o">=</span> <span class="s1">&#39;10.10&#39;</span>
+
+  <span class="n">spec</span><span class="o">.</span><span class="n">source_files</span>       <span class="o">=</span> <span class="s1">&#39;Reachability/common/*.swift&#39;</span>
+  <span class="n">spec</span><span class="o">.</span><span class="n">ios</span><span class="o">.</span><span class="n">source_files</span>   <span class="o">=</span> <span class="s1">&#39;Reachability/ios/*.swift&#39;</span><span class="p">,</span> <span class="s1">&#39;Reachability/extensions/*.swift&#39;</span>
+  <span class="n">spec</span><span class="o">.</span><span class="n">osx</span><span class="o">.</span><span class="n">source_files</span>   <span class="o">=</span> <span class="s1">&#39;Reachability/osx/*.swift&#39;</span>
+
+  <span class="n">spec</span><span class="o">.</span><span class="n">framework</span>      <span class="o">=</span> <span class="s1">&#39;SystemConfiguration&#39;</span>
+  <span class="n">spec</span><span class="o">.</span><span class="n">ios</span><span class="o">.</span><span class="n">framework</span>  <span class="o">=</span> <span class="s1">&#39;UIKit&#39;</span>
+  <span class="n">spec</span><span class="o">.</span><span class="n">osx</span><span class="o">.</span><span class="n">framework</span>  <span class="o">=</span> <span class="s1">&#39;AppKit&#39;</span>
+
+  <span class="n">spec</span><span class="o">.</span><span class="n">dependency</span> <span class="s1">&#39;SomeOtherPod&#39;</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>像 👆 我们为不同的系统指定了不同的源码和依赖等，当然可配置的不只这些。</p>
+<p><code>PodSpec</code> 支持的完整配置分类如下：</p>
+<p><img src="https://i.loli.net/2020/10/08/tDW3YNr4F2GXA1y.png" alt="01-Specification"></p>
+<p>想了解更多的配置选项：<a href="https://guides.cocoapods.org/syntax/podspec.html">传送门</a>。</p>
+<h3 id="convention-over-configuration">Convention Over Configuration</h3>
+<blockquote>
+<p>Convention over configuration (aka：coding by convention) is a software design paradigm used by software frameworks that attempts to decrease the number of decisions that a developer using the framework is required to make without necessarily losing flexibility.</p>
+</blockquote>
+<p>说到配置，不得不提一下 <code>CoC</code> 约定大于配置。约定大于配置算是在软件工程较早出现的概念的了，大意是：<strong>为了简单起见，我们的代码需要按照一定的约定来编写</strong>（如代码放在什么目录，用什么文件名，用什么类名等)。 这样既简化了配置文件，同时也降低了学习成本。</p>
+<p>约定大于配置可以说是通过 <a href="https://www.wikiwand.com/en/Ruby_on_Rails">Ruby on Rails</a> 发扬光大的。尽管它一直饱受争议，但是主流语言的依赖管理工具，如 <em>Maven，npm</em> 等都遵循 <code>CoC</code> 进行不断演进的，因为 <code>CoC</code> 能够有效帮助开发者减轻选择的痛感，减少无意义的选择。一些新的语言也吸收了这个思想，比如 Go 语言。如果用 C/C++ 可能需要定义复杂的 Makefile 来定义编译的规则，以及如何运行测试用例，而在 Go 中这些都是约定好的。</p>
+<p>举个 🌰 ：<code>Podfile</code> 中是可以指定 pod library 所链接的 Xcode project，不过大多情况下无需配置，CocoaPods 会自动查找 <code>Podfile</code> 所在的同级目录下所对应的工程文件 <code>.project</code> 。</p>
+<h2 id="spec-的核心数据结构">Spec 的核心数据结构</h2>
+<h3 id="specification">Specification</h3>
+<p>在数据结构上 <code>Specification</code> 与 <a href="https://looseyi.github.io/post/sourcecode-cocoapods/04-cocoapods-podfile/#targetdefinition">TargetDefinition</a> 是类似的，<strong>同为多叉树结构</strong>。简化后的 <code>Spec</code> 的类如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="nb">require</span> <span class="s1">&#39;active_support/core_ext/string/strip.rb&#39;</span>
+<span class="c1"># 记录对应 platform 上 Spec 的其他 pod 依赖</span>
+<span class="nb">require</span> <span class="s1">&#39;cocoapods-core/specification/consumer&#39;</span>
+<span class="c1"># 解析 DSL</span>
+<span class="nb">require</span> <span class="s1">&#39;cocoapods-core/specification/dsl&#39;</span>
+<span class="c1"># 校验 Spec 的正确性，并抛出对应的错误和警告</span>
+<span class="nb">require</span> <span class="s1">&#39;cocoapods-core/specification/linter&#39;</span>
+<span class="c1"># 用于解析 DSL 内容包含的配置信息</span>
+<span class="nb">require</span> <span class="s1">&#39;cocoapods-core/specification/root_attribute_accessors&#39;</span>
+<span class="c1"># 记录一个 Pod 所有依赖的 Spec 来源信息</span>
+<span class="nb">require</span> <span class="s1">&#39;cocoapods-core/specification/set&#39;</span>
+<span class="c1"># json 格式数据解析</span>
+<span class="nb">require</span> <span class="s1">&#39;cocoapods-core/specification/json&#39;</span>
+
+<span class="k">module</span> <span class="nn">Pod</span>
+  <span class="k">class</span> <span class="nc">Specification</span>
+    <span class="kp">include</span> <span class="no">Pod</span><span class="o">::</span><span class="no">Specification</span><span class="o">::</span><span class="no">DSL</span>
+    <span class="kp">include</span> <span class="no">Pod</span><span class="o">::</span><span class="no">Specification</span><span class="o">::</span><span class="no">DSL</span><span class="o">::</span><span class="no">Deprecations</span>
+    <span class="kp">include</span> <span class="no">Pod</span><span class="o">::</span><span class="no">Specification</span><span class="o">::</span><span class="no">RootAttributesAccessors</span>
+    <span class="kp">include</span> <span class="no">Pod</span><span class="o">::</span><span class="no">Specification</span><span class="o">::</span><span class="no">JSONSupport</span>
+ 
+    <span class="c1"># `subspec` 的父节点</span>
+    <span class="kp">attr_reader</span> <span class="ss">:parent</span>
+    <span class="c1"># `Spec` 的唯一 id，由 name + version 的 hash 构成</span>
+    <span class="kp">attr_reader</span> <span class="ss">:hash_value</span>
+    <span class="c1"># 记录 `Spec` 的配置信息 </span>
+    <span class="kp">attr_accessor</span> <span class="ss">:attributes_hash</span>
+    <span class="c1"># `Spec` 包含的 `subspec`</span>
+    <span class="kp">attr_accessor</span> <span class="ss">:subspecs</span>
+     
+    <span class="c1"># 递归调用获取 Specification 的根节点</span>
+    <span class="k">def</span> <span class="nf">root</span>
+      <span class="n">parent</span> <span class="p">?</span> <span class="n">parent</span><span class="o">.</span><span class="n">root</span> <span class="p">:</span> <span class="nb">self</span>
+    <span class="k">end</span>
+     
+	 <span class="k">def</span> <span class="nf">hash</span>
+   	<span class="k">if</span> <span class="vi">@hash_value</span><span class="o">.</span><span class="n">nil?</span>
+      	<span class="vi">@hash_value</span> <span class="o">=</span> <span class="p">(</span><span class="nb">name</span><span class="o">.</span><span class="n">hash</span> <span class="o">*</span> <span class="mi">53</span><span class="p">)</span> <span class="o">^</span> <span class="n">version</span><span class="o">.</span><span class="n">hash</span>
+		<span class="k">end</span>
+      <span class="vi">@hash_value</span>
+    <span class="k">end</span>
+    <span class="c1"># ...</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><code>Specification</code> 同样用 map <code>attributes_hash</code> 来记录配置信息。</p>
+<p>⚠️ 这里的 parent 是为 <code>subspec</code> 保留的，用于指向其父节点的 <code>Spec</code>。</p>
+<p><img src="https://i.loli.net/2020/10/08/L8MkIO3bD4dJXqR.png" alt="02-PodSpec-Dependency"></p>
+<h3 id="subspecs">Subspecs</h3>
+<blockquote>
+<p>A library can specify a dependency on either another library, a subspec of another library, or a subspec of itself.</p>
+</blockquote>
+<p>乍一听 <code>Subspec</code> 这个概念似乎有一些抽象，不过当你理解了上面的描述，就能明白什么是 <code>Subspec</code> 了。我们知道在 Xcode 项目中，target 作为最小的可编译单元，它编译后的产物为链接库或 framework。而在 CocoaPods 的世界里这些 targets 则是由 <code>Spec</code> 文件来描述的，它还能拆分成一个或者多个 <code>Subspec</code>，我们暂且把它称为 <code>Spec</code> 的<strong>子模块</strong>，子模块也是用 <strong>Specification</strong> 类来描述的。</p>
+<p>**子模块可以单独作为依赖被引入到项目中。**它有几个特点：</p>
+<ul>
+<li>未指定 <code>default_subspec</code> 的情况下，<code>Spec</code> 的全部子模块都将作为依赖被引入；</li>
+<li>子模块会主动继承其父节点 <code>Spec</code> 中定义的 <code>attributes_hash</code>；</li>
+<li>子模块可以指定自己的源代码、资源文件、编译配置、依赖等；</li>
+<li>同一 <code>Spec</code> 内部的子模块是可以有依赖关系的；</li>
+<li>每个子模块在 <code>pod push</code> 的时候是需要被 lint 通过的；</li>
+</ul>
+<p>光听总结似乎还是云里雾里，祭出 QMUI 让大家感受一下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="no">Pod</span><span class="o">::</span><span class="no">Spec</span><span class="o">.</span><span class="n">new</span> <span class="k">do</span> <span class="o">|</span><span class="n">s</span><span class="o">|</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">name</span>             <span class="o">=</span> <span class="s2">&#34;QMUIKit&#34;</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">version</span>          <span class="o">=</span> <span class="s2">&#34;4.2.1&#34;</span>
+  <span class="c1"># ...</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">subspec</span> <span class="s1">&#39;QMUICore&#39;</span> <span class="k">do</span> <span class="o">|</span><span class="n">ss</span><span class="o">|</span>
+    <span class="n">ss</span><span class="o">.</span><span class="n">source_files</span> <span class="o">=</span> <span class="s1">&#39;QMUIKit/QMUIKit.h&#39;</span><span class="p">,</span> <span class="s1">&#39;QMUIKit/QMUICore&#39;</span><span class="p">,</span> <span class="s1">&#39;QMUIKit/UIKitExtensions&#39;</span>
+    <span class="n">ss</span><span class="o">.</span><span class="n">dependency</span> <span class="s1">&#39;QMUIKit/QMUIWeakObjectContainer&#39;</span>
+    <span class="n">ss</span><span class="o">.</span><span class="n">dependency</span> <span class="s1">&#39;QMUIKit/QMUILog&#39;</span>
+  <span class="k">end</span>
+
+  <span class="n">s</span><span class="o">.</span><span class="n">subspec</span> <span class="s1">&#39;QMUIWeakObjectContainer&#39;</span> <span class="k">do</span> <span class="o">|</span><span class="n">ss</span><span class="o">|</span>
+    <span class="n">ss</span><span class="o">.</span><span class="n">source_files</span> <span class="o">=</span> <span class="s1">&#39;QMUIKit/QMUIComponents/QMUIWeakObjectContainer.{h,m}&#39;</span>
+  <span class="k">end</span>
+
+  <span class="n">s</span><span class="o">.</span><span class="n">subspec</span> <span class="s1">&#39;QMUILog&#39;</span> <span class="k">do</span> <span class="o">|</span><span class="n">ss</span><span class="o">|</span>
+    <span class="n">ss</span><span class="o">.</span><span class="n">source_files</span> <span class="o">=</span> <span class="s1">&#39;QMUIKit/QMUIComponents/QMUILog/*.{h,m}&#39;</span>
+  <span class="k">end</span>
+
+  <span class="n">s</span><span class="o">.</span><span class="n">subspec</span> <span class="s1">&#39;QMUIComponents&#39;</span> <span class="k">do</span> <span class="o">|</span><span class="n">ss</span><span class="o">|</span>
+    <span class="n">ss</span><span class="o">.</span><span class="n">dependency</span> <span class="s1">&#39;QMUIKit/QMUICore&#39;</span>
+     
+    <span class="n">ss</span><span class="o">.</span><span class="n">subspec</span> <span class="s1">&#39;QMUIButton&#39;</span> <span class="k">do</span> <span class="o">|</span><span class="n">sss</span><span class="o">|</span>
+      <span class="n">sss</span><span class="o">.</span><span class="n">source_files</span> <span class="o">=</span> <span class="s1">&#39;QMUIKit/QMUIComponents/QMUIButton/QMUIButton.{h,m}&#39;</span>
+    <span class="k">end</span>
+    <span class="c1"># 此处省略 59 个 Components</span>
+  <span class="k">end</span>
+  <span class="c1"># ...</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>不吹不黑，QMUI 是笔者见过国内开源作品中代码注释非常详尽且提供完整 Demo 的项目之一。</p>
+<p><strong>QMUI 🐂 🍺</strong></p>
+</blockquote>
+<p>整个 QMUIKit 的 <code>Spec</code> 文件中，总共定义了 <strong>64</strong> 个 <code>subspec</code> 子模块，同时这些子模块之间还做了分层。比如 QMUICore：</p>
+<p><img src="https://i.loli.net/2020/10/08/EQTshCgymAzUXnZ.png" alt="03-QMUICore"></p>
+<p>另外补充一点，CocoaPods 支持了不同类型的 <code>SubSpec</code>：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="c1"># lib/cocoapods-core/specification/dsl/attribute_support.rb</span>
+
+<span class="no">SUPPORTED_SPEC_TYPES</span> <span class="o">=</span> <span class="o">[</span><span class="ss">:library</span><span class="p">,</span> <span class="ss">:app</span><span class="p">,</span> <span class="ss">:test</span><span class="o">].</span><span class="n">freeze</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><code>:app</code> 和 <code>:test</code> 用于在项目中集成单元测试代码的 <code>Subspec</code>。</p>
+<h2 id="podspec-from-json">PodSpec From JSON</h2>
+<p>有了上文 <code>Podfile</code> 的了解，这次我们对 <code>PodSpec</code> 的文件加载会更加轻车熟路。首先是由 <code>#from_file</code> 方法进行文件路径和内容编码格式的检查，将加载的内容转入 <code>#from_string</code>：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">from_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">subspec_name</span> <span class="o">=</span> <span class="kp">nil</span><span class="p">)</span>
+  <span class="n">path</span> <span class="o">=</span> <span class="no">Pathname</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+  <span class="k">unless</span> <span class="n">path</span><span class="o">.</span><span class="n">exist?</span>
+    <span class="k">raise</span> <span class="no">Informative</span><span class="p">,</span> <span class="s2">&#34;No podspec exists at path `</span><span class="si">#{</span><span class="n">path</span><span class="si">}</span><span class="s2">`.&#34;</span>
+  <span class="k">end</span>
+
+  <span class="n">string</span> <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r:utf-8&#39;</span><span class="p">,</span> <span class="o">&amp;</span><span class="ss">:read</span><span class="p">)</span>
+  <span class="c1"># Work around for Rubinius incomplete encoding in 1.9 mode</span>
+  <span class="k">if</span> <span class="n">string</span><span class="o">.</span><span class="n">respond_to?</span><span class="p">(</span><span class="ss">:encoding</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">string</span><span class="o">.</span><span class="n">encoding</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s1">&#39;UTF-8&#39;</span>
+    <span class="n">string</span><span class="o">.</span><span class="n">encode!</span><span class="p">(</span><span class="s1">&#39;UTF-8&#39;</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="n">from_string</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">subspec_name</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">from_string</span><span class="p">(</span><span class="n">spec_contents</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">subspec_name</span> <span class="o">=</span> <span class="kp">nil</span><span class="p">)</span>
+  <span class="n">path</span> <span class="o">=</span> <span class="no">Pathname</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">expand_path</span>
+  <span class="n">spec</span> <span class="o">=</span> <span class="kp">nil</span>
+  <span class="k">case</span> <span class="n">path</span><span class="o">.</span><span class="n">extname</span>
+  <span class="k">when</span> <span class="s1">&#39;.podspec&#39;</span>
+    <span class="no">Dir</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">directory?</span> <span class="p">?</span> <span class="n">path</span><span class="o">.</span><span class="n">parent</span> <span class="p">:</span> <span class="no">Dir</span><span class="o">.</span><span class="n">pwd</span><span class="p">)</span> <span class="k">do</span>
+     <span class="n">spec</span> <span class="o">=</span> <span class="o">::</span><span class="no">Pod</span><span class="o">.</span><span class="n">_eval_podspec</span><span class="p">(</span><span class="n">spec_contents</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+     <span class="k">unless</span> <span class="n">spec</span><span class="o">.</span><span class="n">is_a?</span><span class="p">(</span><span class="no">Specification</span><span class="p">)</span>
+      <span class="k">raise</span> <span class="no">Informative</span><span class="p">,</span> <span class="s2">&#34;Invalid podspec file at path `</span><span class="si">#{</span><span class="n">path</span><span class="si">}</span><span class="s2">`.&#34;</span>
+     <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">when</span> <span class="s1">&#39;.json&#39;</span>
+    <span class="n">spec</span> <span class="o">=</span> <span class="no">Specification</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">spec_contents</span><span class="p">)</span>
+  <span class="k">else</span>
+ 	 <span class="k">raise</span> <span class="no">Informative</span><span class="p">,</span> <span class="s2">&#34;Unsupported specification format `</span><span class="si">#{</span><span class="n">path</span><span class="o">.</span><span class="n">extname</span><span class="si">}</span><span class="s2">` for spec at `</span><span class="si">#{</span><span class="n">path</span><span class="si">}</span><span class="s2">`.&#34;</span>
+  <span class="k">end</span>
+
+  <span class="n">spec</span><span class="o">.</span><span class="n">defined_in_file</span> <span class="o">=</span> <span class="n">path</span>
+  <span class="n">spec</span><span class="o">.</span><span class="n">subspec_by_name</span><span class="p">(</span><span class="n">subspec_name</span><span class="p">,</span> <span class="kp">true</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>接着根据文件类型为 <code>.podspec</code> 和 <code>.json</code> 分别采用不同的解析方式。在  <strong>JSONSupport</strong> 模块内将 <code>#from_json</code> 的逻辑拆成了两部分：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="c1"># `lib/cocoapods-core/specification/json.rb`</span>
+<span class="k">module</span> <span class="nn">Pod</span>
+  <span class="k">class</span> <span class="nc">Specification</span>
+    <span class="k">module</span> <span class="nn">JSONSupport</span>
+      <span class="c1"># ①</span>
+      <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">from_json</span><span class="p">(</span><span class="n">json</span><span class="p">)</span>
+        <span class="nb">require</span> <span class="s1">&#39;json&#39;</span>
+        <span class="nb">hash</span> <span class="o">=</span> <span class="no">JSON</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">json</span><span class="p">)</span>
+        <span class="n">from_hash</span><span class="p">(</span><span class="nb">hash</span><span class="p">)</span>
+      <span class="k">end</span>
+  <span class="c1"># ②</span>
+      <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">from_hash</span><span class="p">(</span><span class="nb">hash</span><span class="p">,</span> <span class="n">parent</span> <span class="o">=</span> <span class="kp">nil</span><span class="p">,</span> <span class="ss">test_specification</span><span class="p">:</span> <span class="kp">false</span><span class="p">,</span> <span class="ss">app_specification</span><span class="p">:</span> <span class="kp">false</span><span class="p">)</span>
+        <span class="n">attributes_hash</span> <span class="o">=</span> <span class="nb">hash</span><span class="o">.</span><span class="n">dup</span>
+        <span class="n">spec</span> <span class="o">=</span> <span class="no">Spec</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="kp">nil</span><span class="p">,</span> <span class="n">test_specification</span><span class="p">,</span> <span class="ss">:app_specification</span> <span class="o">=&gt;</span> <span class="n">app_specification</span><span class="p">)</span>
+        <span class="n">subspecs</span> <span class="o">=</span> <span class="n">attributes_hash</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s1">&#39;subspecs&#39;</span><span class="p">)</span>
+        <span class="n">testspecs</span> <span class="o">=</span> <span class="n">attributes_hash</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s1">&#39;testspecs&#39;</span><span class="p">)</span>
+        <span class="n">appspecs</span> <span class="o">=</span> <span class="n">attributes_hash</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s1">&#39;appspecs&#39;</span><span class="p">)</span>
+    
+        <span class="c1">## backwards compatibility with 1.3.0</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">test_specification</span> <span class="o">=</span> <span class="o">!</span><span class="n">attributes_hash</span><span class="o">[</span><span class="s1">&#39;test_type&#39;</span><span class="o">].</span><span class="n">nil?</span>
+    
+        <span class="n">spec</span><span class="o">.</span><span class="n">attributes_hash</span> <span class="o">=</span> <span class="n">attributes_hash</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">subspecs</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">subspecs_from_hash</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">subspecs</span><span class="p">,</span> <span class="kp">false</span><span class="p">,</span> <span class="kp">false</span><span class="p">))</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">subspecs</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">subspecs_from_hash</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">testspecs</span><span class="p">,</span> <span class="kp">true</span><span class="p">,</span> <span class="kp">false</span><span class="p">))</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">subspecs</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">subspecs_from_hash</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">appspecs</span><span class="p">,</span> <span class="kp">false</span><span class="p">,</span> <span class="kp">true</span><span class="p">))</span>
+    
+        <span class="n">spec</span>
+      <span class="k">end</span>
+  	  <span class="c1"># ③</span>
+      <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">subspecs_from_hash</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">subspecs</span><span class="p">,</span> <span class="n">test_specification</span><span class="p">,</span> <span class="n">app_specification</span><span class="p">)</span>
+        <span class="k">return</span> <span class="o">[]</span> <span class="k">if</span> <span class="n">subspecs</span><span class="o">.</span><span class="n">nil?</span>
+        <span class="n">subspecs</span><span class="o">.</span><span class="n">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">s_hash</span><span class="o">|</span>
+          <span class="no">Specification</span><span class="o">.</span><span class="n">from_hash</span><span class="p">(</span><span class="n">s_hash</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span>
+                                  <span class="ss">:test_specification</span> <span class="o">=&gt;</span> <span class="n">test_specification</span><span class="p">,</span>
+                                  <span class="ss">:app_specification</span> <span class="o">=&gt;</span> <span class="n">app_specification</span><span class="p">)</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这里的逻辑也是比较简单：</p>
+<p>①  将传入的字符串转换为 json；
+② 将转换后的 json 转换为 <code>Spec</code> 对象并将 json 转换为 <code>attributes_hash</code>，同时触发 ③；
+③ 通过 <code>self.subspecs_from_hash</code> 实现递归调用完成 <code>subspecs</code> 解析；</p>
+<blockquote>
+<p>Tips: 方法 ② 里的 <strong>Spec</strong> 是对 <code>Specification</code> 的别名。</p>
+</blockquote>
+<p><img src="https://i.loli.net/2020/10/08/fm3xhI5jZidwvuP.png" alt="04-podspec-from-json"></p>
+<h2 id="podspec-from-ruby">PodSpec From Ruby</h2>
+<p><code>QMUIKit.podspec</code> 的文件内容，大家是否注意到其开头的声明：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="no">Pod</span><span class="o">::</span><span class="no">Spec</span><span class="o">.</span><span class="n">new</span> <span class="k">do</span> <span class="o">|</span><span class="n">s</span><span class="o">|</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">name</span>             <span class="o">=</span> <span class="s2">&#34;QMUIKit&#34;</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">source_files</span>     <span class="o">=</span> <span class="s1">&#39;QMUIKit/QMUIKit.h&#39;</span>
+  <span class="c1"># ...</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>发现没 <code>.podspec</code> 文件就是<strong>简单直接地声明了一个 <code>Specifiction</code> 对象</strong>，然后通过 block 块定制来完成配置。像 <code>name</code>、<code>source_files</code> 这些配置参数最终都会转换为方法调用并将值存入 <code>attributes_hash</code> 中。这些方法调用的实现方式分两种：</p>
+<ol>
+<li>大部分配置是通过方法包装器 <code>attribute</code> 和 <code>root_attribute</code> 来动态添加的 setter 方法；</li>
+<li>对于复杂逻辑的配置则直接方法声明，如 <code>subspec</code> 、<code>dependency</code> 方法等（后续介绍)。</li>
+</ol>
+<h3 id="attribute-wrappter">attribute wrappter</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="c1"># `lib/cocoapods-core/specification/dsl.rb`</span>
+<span class="k">module</span> <span class="nn">Pod</span>
+   <span class="k">class</span> <span class="nc">Specification</span>
+      <span class="k">module</span> <span class="nn">DSL</span>
+         <span class="kp">extend</span> <span class="no">Pod</span><span class="o">::</span><span class="no">Specification</span><span class="o">::</span><span class="no">DSL</span><span class="o">::</span><span class="no">AttributeSupport</span>
+         <span class="c1"># Deprecations must be required after include AttributeSupport</span>
+         <span class="nb">require</span> <span class="s1">&#39;cocoapods-core/specification/dsl/deprecations&#39;</span>
+
+         <span class="n">attribute</span> <span class="ss">:name</span><span class="p">,</span>
+                   <span class="ss">:required</span> <span class="o">=&gt;</span> <span class="kp">true</span><span class="p">,</span>
+                   <span class="ss">:inherited</span> <span class="o">=&gt;</span> <span class="kp">false</span><span class="p">,</span>
+                   <span class="ss">:multi_platform</span> <span class="o">=&gt;</span> <span class="kp">false</span>
+
+         <span class="n">root_attribute</span> <span class="ss">:version</span><span class="p">,</span>
+                        <span class="ss">:required</span> <span class="o">=&gt;</span> <span class="kp">true</span>
+         <span class="c1"># ...</span>
+      <span class="k">end</span>
+   <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>可以看出 name 和 version 的方法声明与普通的不太一样，其实 <code>attribute</code> 和 <code>root_attribute</code> 是通过 Ruby 的方法包装器来实现的，感兴趣的同学看这里 「<a href="https://github.com/mxchenxiaodong/haha_day/issues/3#">Python装饰器 与 Ruby实现</a>」。</p>
+<blockquote>
+<p>Tips: Ruby 原生提供的属性访问器 &mdash; <code>attr_accessor</code> 大家应该不陌生，就是通过包装器实现的。</p>
+</blockquote>
+<p>这些<strong>装饰器所声明的方法会在其模块被加载时动态生成</strong>，来看其实现：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="c1"># `lib/cocoapods-core/specification/attribute_support.rb`</span>
+<span class="k">module</span> <span class="nn">Pod</span>
+ <span class="k">class</span> <span class="nc">Specification</span>
+   <span class="k">module</span> <span class="nn">DSL</span>
+     <span class="k">class</span> <span class="o">&lt;&lt;</span> <span class="nb">self</span>
+       <span class="kp">attr_reader</span> <span class="ss">:attributes</span>
+     <span class="k">end</span>
+
+     <span class="k">module</span> <span class="nn">AttributeSupport</span>
+         <span class="k">def</span> <span class="nf">root_attribute</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">options</span> <span class="o">=</span> <span class="p">{})</span>
+             <span class="n">options</span><span class="o">[</span><span class="ss">:root_only</span><span class="o">]</span> <span class="o">=</span> <span class="kp">true</span>
+             <span class="n">options</span><span class="o">[</span><span class="ss">:multi_platform</span><span class="o">]</span> <span class="o">=</span> <span class="kp">false</span>
+             <span class="n">store_attribute</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
+         <span class="k">end</span>
+
+         <span class="k">def</span> <span class="nf">attribute</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">options</span> <span class="o">=</span> <span class="p">{})</span>
+             <span class="n">store_attribute</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
+         <span class="k">end</span>
+
+         <span class="k">def</span> <span class="nf">store_attribute</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
+             <span class="kp">attr</span> <span class="o">=</span> <span class="no">Attribute</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
+             <span class="vi">@attributes</span> <span class="o">||=</span> <span class="p">{}</span>
+             <span class="vi">@attributes</span><span class="o">[</span><span class="nb">name</span><span class="o">]</span> <span class="o">=</span> <span class="kp">attr</span>
+         <span class="k">end</span>
+     <span class="k">end</span>
+ <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><code>attribute</code> 和 <code>root_attribute</code> 最终都走到了 <code>store_attribute</code> 保存在创建的 Attribute 对象内，并以配置的 Symbol 名称作为 KEY 存入 <code>@attributes</code>，用于生成最终的 attributes setter 方法。</p>
+<p>最关键的一步，让我们回到 <em>specification</em> 文件：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="c1"># `/lib/coocapods-core/specification`</span>
+<span class="k">module</span> <span class="nn">Pod</span>
+   <span class="k">class</span> <span class="nc">Specification</span>
+     <span class="c1"># ...</span>
+    
+      <span class="k">def</span> <span class="nf">store_attribute</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">platform_name</span> <span class="o">=</span> <span class="kp">nil</span><span class="p">)</span>
+         <span class="nb">name</span> <span class="o">=</span> <span class="nb">name</span><span class="o">.</span><span class="n">to_s</span>
+         <span class="n">value</span> <span class="o">=</span> <span class="no">Specification</span><span class="o">.</span><span class="n">convert_keys_to_string</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">is_a?</span><span class="p">(</span><span class="no">Hash</span><span class="p">)</span>
+         <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">strip_heredoc</span><span class="o">.</span><span class="n">strip</span> <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">respond_to?</span><span class="p">(</span><span class="ss">:strip_heredoc</span><span class="p">)</span>
+         <span class="k">if</span> <span class="n">platform_name</span>
+             <span class="n">platform_name</span> <span class="o">=</span> <span class="n">platform_name</span><span class="o">.</span><span class="n">to_s</span>
+             <span class="n">attributes_hash</span><span class="o">[</span><span class="n">platform_name</span><span class="o">]</span> <span class="o">||=</span> <span class="p">{}</span>
+             <span class="n">attributes_hash</span><span class="o">[</span><span class="n">platform_name</span><span class="o">][</span><span class="nb">name</span><span class="o">]</span> <span class="o">=</span> <span class="n">value</span>
+         <span class="k">else</span>
+             <span class="n">attributes_hash</span><span class="o">[</span><span class="nb">name</span><span class="o">]</span> <span class="o">=</span> <span class="n">value</span>
+         <span class="k">end</span>
+      <span class="k">end</span>
+
+      <span class="no">DSL</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">a</span><span class="o">|</span>
+         <span class="n">define_method</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">writer_name</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">value</span><span class="o">|</span>
+             <span class="n">store_attribute</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+         <span class="k">end</span>
+
+         <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">writer_singular_form</span>
+             <span class="n">alias_method</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">writer_singular_form</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">writer_name</span><span class="p">)</span>
+         <span class="k">end</span>
+      <span class="k">end</span>
+   <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><code>Specification</code> 类被加载时，会先遍历 <code>DSL</code> module 加载后所保存的 attributes，再通过 <code>define_method</code> 动态生成对应的配置方法。最终数据还是保存在 <code>attributes_hash</code> 中。</p>
+<p><img src="https://i.loli.net/2020/10/08/9zpkhrngNCG87yT.png" alt="05-PodSpec-Load"></p>
+<p><strong>Attribute</strong></p>
+<p>Attribute 是为了记录该配置的相关信息，例如，记录 <code>Spec</code> 是否为根节点、<code>Spec</code> 类型、所支持的 platforms、资源地址通配符等。</p>
+<ol>
+<li>
+<p>以 <code>root_attribute</code> 包装的配置仅用于修饰 <code>Spec</code> 根节点，比如版本号 <code>version</code> 只能由 <code>Spec</code> 根节点来设置，另外还有 <code>source</code>、<code>static_framework</code>、<code>module_name</code> 等；</p>
+</li>
+<li>
+<p>以 <code>attribute</code> 包装的配置则不限是否为 <code>Spec</code> 根结点。我们以 AFNetworking 的 <code>source_files</code> 为例：由于在 macOS 和 watchOS 上并没有 UIKit framwork，因此它单独将 UIKit 的相关功能拆分到了 <code>AFNetworking/UIKit</code> 中；</p>
+</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="no">Pod</span><span class="o">::</span><span class="no">Spec</span><span class="o">.</span><span class="n">new</span> <span class="k">do</span> <span class="o">|</span><span class="n">s</span><span class="o">|</span>
+  <span class="c1"># ...</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">subspec</span> <span class="s1">&#39;NSURLSession&#39;</span> <span class="k">do</span> <span class="o">|</span><span class="n">ss</span><span class="o">|</span>
+	 <span class="c1"># ...</span>
+  <span class="k">end</span>
+
+  <span class="n">s</span><span class="o">.</span><span class="n">subspec</span> <span class="s1">&#39;UIKit&#39;</span> <span class="k">do</span> <span class="o">|</span><span class="n">ss</span><span class="o">|</span>
+    <span class="n">ss</span><span class="o">.</span><span class="n">ios</span><span class="o">.</span><span class="n">deployment_target</span> <span class="o">=</span> <span class="s1">&#39;9.0&#39;</span>
+    <span class="n">ss</span><span class="o">.</span><span class="n">tvos</span><span class="o">.</span><span class="n">deployment_target</span> <span class="o">=</span> <span class="s1">&#39;9.0&#39;</span>
+    <span class="n">ss</span><span class="o">.</span><span class="n">dependency</span> <span class="s1">&#39;AFNetworking/NSURLSession&#39;</span>
+
+    <span class="n">ss</span><span class="o">.</span><span class="n">source_files</span> <span class="o">=</span> <span class="s1">&#39;UIKit+AFNetworking&#39;</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="subspec">#subspec</h3>
+<p>除了 attribute 装饰器声明的 setter 方法，还有几个自定义的方法是直接通过 eval 调用的。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">subspec</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+  <span class="n">subspec</span> <span class="o">=</span> <span class="no">Specification</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span> <span class="nb">name</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+  <span class="vi">@subspecs</span> <span class="o">&lt;&lt;</span> <span class="n">subspec</span>
+  <span class="n">subspec</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">test_spec</span><span class="p">(</span><span class="nb">name</span> <span class="o">=</span> <span class="s1">&#39;Tests&#39;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+  <span class="n">subspec</span> <span class="o">=</span> <span class="no">Specification</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span> <span class="nb">name</span><span class="p">,</span> <span class="kp">true</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+  <span class="vi">@subspecs</span> <span class="o">&lt;&lt;</span> <span class="n">subspec</span>
+  <span class="n">subspec</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">app_spec</span><span class="p">(</span><span class="nb">name</span> <span class="o">=</span> <span class="s1">&#39;App&#39;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+  <span class="n">appspec</span> <span class="o">=</span> <span class="no">Specification</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span> <span class="nb">name</span><span class="p">,</span> <span class="ss">:app_specification</span> <span class="o">=&gt;</span> <span class="kp">true</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+  <span class="vi">@subspecs</span> <span class="o">&lt;&lt;</span> <span class="n">appspec</span>
+  <span class="n">appspec</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这三种不同类型的 <code>Subspec</code> 经 <code>eval</code> 转换为对应的 <code>Specification</code> 对象，注意这里初始化后都将 parent 节点指向 <strong>self</strong> 同时存入 <code>@subspecs</code> 数组中，完成 <code>SubSpec</code> 依赖链的构造。</p>
+<h3 id="dependency">#dependency</h3>
+<p>对于其他 <code>pod</code> 依赖的添加我们通过 dependency 方法来实现：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">dependency</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+   <span class="nb">name</span><span class="p">,</span> <span class="o">*</span><span class="n">version_requirements</span> <span class="o">=</span> <span class="n">args</span>
+   <span class="c1"># dependency args 有效性校验 ...</span>
+
+   <span class="n">attributes_hash</span><span class="o">[</span><span class="s1">&#39;dependencies&#39;</span><span class="o">]</span> <span class="o">||=</span> <span class="p">{}</span>
+   <span class="n">attributes_hash</span><span class="o">[</span><span class="s1">&#39;dependencies&#39;</span><span class="o">][</span><span class="nb">name</span><span class="o">]</span> <span class="o">=</span> <span class="n">version_requirements</span>
+
+   <span class="k">unless</span> <span class="n">whitelisted_configurations</span><span class="o">.</span><span class="n">nil?</span>
+   <span class="c1"># configuration 白名单过滤和校验 ...</span>
+
+   <span class="n">attributes_hash</span><span class="o">[</span><span class="s1">&#39;configuration_pod_whitelist&#39;</span><span class="o">]</span> <span class="o">||=</span> <span class="p">{}</span>
+   <span class="n">attributes_hash</span><span class="o">[</span><span class="s1">&#39;configuration_pod_whitelist&#39;</span><span class="o">][</span><span class="nb">name</span><span class="o">]</span> <span class="o">=</span> <span class="n">whitelisted_configurations</span>
+   <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>dependency 方法内部主要是对依赖有效性的校验，限于篇幅这里不列出实现，核心要点如下：</p>
+<ol>
+<li><strong>检查依赖循环</strong>，根据 <code>Spec</code> 名称判断 <code>Spec</code> 与自身，<code>Spec</code> 与<code>SubSpec</code>之间是否存在循环依赖；</li>
+<li><strong>检查依赖来源</strong>，<code>PodSpec</code> 中不支持 <code>:git</code> 或 <code>:path</code> 形式的来源指定，如需设定可通过 <code>Podfile</code> 来修改;</li>
+<li><strong>检查 configuation 白名单</strong>，目前仅支持 Xcode 默认的 <code>Debug</code> 和 <code>Release</code> 的 configuration 配置；</li>
+</ol>
+<h1 id="创建并使用你的-pod">创建并使用你的 Pod</h1>
+<p>最后一节来两个实践：创建 Pod 以及在项目中使用 <code>SubSpecs</code>。</p>
+<h2 id="pod-创建">Pod 创建</h2>
+<p>pod 相关使用官方都提供了很详尽的都文档，本小节仅做介绍。</p>
+<h3 id="0x1-创建-pod">0x1 创建 Pod</h3>
+<p>仅需一行命令完成 <code>Pod</code> 创建（<a href="https://guides.cocoapods.org/making/using-pod-lib-create.html">文档</a>）：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">$ pod lib create <span class="sb">`</span>NAME<span class="sb">`</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>之后每一步都会输出友好提示，按照提示选择即可。在添加完 source code 和 dependency 之后，你还可以在 CocoaPods 为你提供的 Example 项目中运行和调试代码。</p>
+<p>准备就绪后，可以通过以下命令进行校验，检查 <code>Pod</code> 正确性：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">$ pod lib lint <span class="sb">`</span><span class="o">[</span>PODSPEC_PATHS ...<span class="o">]</span><span class="sb">`</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="0x2-发布-pod">0x2 发布 Pod</h3>
+<p>校验通过后就可以将 <code>Pod</code> 发布了，你可以将 <code>PodSepc</code> 发布到  Master Repo 上，或者发布到内部的 Spec Repo 上。</p>
+<p><strong>CocoaPods Master Repo</strong></p>
+<p>如果发布的 CocoaPods 的主仓库，那么需要通过 CocoaPods 提供的 <strong>Trunk</strong> 命令：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">$ pod trunk push <span class="sb">`</span><span class="o">[</span>NAME.podspec<span class="o">]</span><span class="sb">`</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>不过使用前需要先通过邮箱注册，详情查看<a href="https://guides.cocoapods.org/making/getting-setup-with-trunk.html">文档</a>。</p>
+<p><strong>Private Spec Repo</strong></p>
+<p>对于发布到私有仓库的，可通过 CocoaPods 提供的 <strong>Repo</strong> 命令：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">$ pod repo push <span class="sb">`</span>REPO_NAME<span class="sb">`</span> <span class="sb">`</span>SPEC_NAME.podspec<span class="sb">`</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>文档详情 &mdash; <a href="https://guides.cocoapods.org/making/private-cocoapods.html">传送门</a>。</p>
+<h2 id="subspecs-in-podfile">SubSpecs In Podfile</h2>
+<p>在 <code>SubSpec</code> 一节提到过，在 CocoaPods 中 <code>SubSpec</code> 是被作为单独的依赖来看待的，这里就借这个实操来证明一下。</p>
+<p>在上文的实践中，我们知道每一个 <code>Pod</code> 库对应为 Xcode 项目中的一个个 target，那么当明确指定部分 <code>SubSpec</code> 时，它们也将被作为独立的 target 进行编译。不过这里需要明确一下使用场景：</p>
+<h3 id="0x1-single-target">0x1 Single Target</h3>
+<p>当主项目中仅有一个 target 或多个 target 引用了同一个 <code>pod</code> 库的多个不同 <code>SubSpec</code> 时，生成的 target 只会有一个。我们以 QMUIKit 为例，项目 Demo.project 下的 Podfile 配置如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">target</span> <span class="s1">&#39;Demo&#39;</span> <span class="k">do</span>
+  <span class="n">pod</span> <span class="s1">&#39;QMUIKit/QMUIComponents/QMUILabel&#39;</span><span class="p">,</span> <span class="ss">:path</span> <span class="o">=&gt;</span> <span class="s1">&#39;../QMUI_iOS&#39;</span>
+  <span class="n">pod</span> <span class="s1">&#39;QMUIKit/QMUIComponents/QMUIButton&#39;</span><span class="p">,</span> <span class="ss">:path</span> <span class="o">=&gt;</span> <span class="s1">&#39;../QMUI_iOS&#39;</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><img src="https://i.loli.net/2020/10/08/UvaHxjwkI8CofhZ.png" alt="06-podspec-single"></p>
+<p>此时 <code>Pods.project</code> 下的 QMUIKit 的 target 名称为 <strong>QMUIKit</strong>。</p>
+<h3 id="0x2-multiple-target">0x2 Multiple Target</h3>
+<p>如果我们的主项目中存在多个 target 且使用同一个 <code>pod</code> 库的不同 <code>SubSpec</code> 时，结果则有所不同。</p>
+<p>现在我们在 0x1 的基础上添加如下配置：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">target</span> <span class="s1">&#39;Demo2&#39;</span> <span class="k">do</span>
+	<span class="n">pod</span> <span class="s1">&#39;QMUIKit/QMUIComponents/QMUILog&#39;</span><span class="p">,</span> <span class="ss">:path</span> <span class="o">=&gt;</span> <span class="s1">&#39;../QMUI_iOS&#39;</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><img src="https://i.loli.net/2020/10/08/OXEcuGNfoMHyJ6g.png" alt="07-podspec-mutil"></p>
+<p>可以发现，CocoaPods 为每个 tareget 对应的 <code>SubSpec</code> 依赖生成了不同的 QMUIKit targets。</p>
+<blockquote>
+<p>Tips: 当主工程 target 依赖的 <code>Subspec</code> 数量过多导致的名称超过 50 个字符，将会对 subspec 后缀做摘要处理作为唯一标识符。</p>
+</blockquote>
+<h1 id="总结">总结</h1>
+<p>本文是 CocoaPods-Core 的第二篇，重点介绍了 <code>PodSpec</code> 的类构成和解析实现，总结如下：</p>
+<ol>
+<li>初探 <code>PodSpec</code> 让我们对其能力边界和配置分类有了更好的了解；</li>
+<li>深入 <code>PodSpec</code> 我们发现其数据结构同 <code>Podfile</code> 类似，都是根据依赖关系建立对应的树结构；</li>
+<li><code>PodSpec</code> 针对单个库的源码和资源提供了更精细化的管理，<code>SubSpec</code> 结构的推出让大型 library 的内部分层提供了很好的工具；</li>
+<li>装饰器模式结合 Ruby 的动态特性，让 <code>PodSpec</code> 的 DSL 特性的实现起来更加优雅；</li>
+</ol>
+<h1 id="知识点问题梳理">知识点问题梳理</h1>
+<p>这里罗列了四个问题用来考察你是否已经掌握了这篇文章，如果没有建议你加入**收藏 **再次阅读：</p>
+<ol>
+<li>说说 <code>PodSpec</code> 所支持的配置有几类，分别具有哪些功能 ？</li>
+<li><code>PodSpec</code> 与 <code>SubSpec</code> 之间有哪些关系 ？</li>
+<li>说说 <code>SubSpec</code> 的特点以及作用 ？</li>
+<li>谈谈 <code>PodSpec</code> 中的 DSL 解析与 <code>Podfile</code> 的解析实现有哪些区别 ？</li>
+</ol>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">土土Edmond木</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2020-10-13
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/cocoapods/">CocoaPods</a>
+          <a href="/tags/ios/">iOS</a>
+          <a href="/tags/ruby/">Ruby</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/sourcecode-cocoapods/04-cocoapods-podfile/">
+            <span class="next-text nav-default">4. Podfile 的解析逻辑</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+    <script src="https://utteranc.es/client.js"
+            repo="looseyi/looseyi.github.io"
+            issue-term="pathname"
+            theme="github-light"
+            crossorigin="anonymous"
+            async>
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/utterance">comments powered by utterances.</a></noscript>
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:chun574271939@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://twitter.com/looseyi" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="https://github.com/looseyi" class="iconfont icon-github" title="github"></a>
+      <a href="https://www.weibo.com/foreverclp" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="https://www.zhihu.com/people/tu-tu-edmondmu" class="iconfont icon-zhihu" title="zhihu"></a>
+  <a href="http://looseyi.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2019-12-11 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">土土Edmond木</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-62789092-1', 'auto');
+	ga('set', 'anonymizeIp', true);
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>

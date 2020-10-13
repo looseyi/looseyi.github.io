@@ -17,7 +17,7 @@
       <pubDate>Thu, 17 Sep 2020 00:00:00 +0000</pubDate>
       
       <guid>http://looseyi.github.io/post/sourcecode-cocoapods/04-cocoapods-podfile/</guid>
-      <description>本文知识目录 引子 在上文 CocoaPods 命令解析 中，我们通过对 CLAide 的源码分析，了解了 CocoaPods 是如何处理 pod 命令，多级命令又是如何组织和嵌套的，并解释了命令行输出所代表</description>
+      <description>引子 在上文 CocoaPods 命令解析 中，我们通过对 CLAide 的源码分析，了解了 CocoaPods 是如何处理 pod 命令，多级命令又是如何组织和嵌套的，并解释了命令行输出所代表的含义。今天</description>
     </item>
     
     <item>
@@ -26,16 +26,7 @@
       <pubDate>Wed, 02 Sep 2020 00:00:00 +0000</pubDate>
       
       <guid>http://looseyi.github.io/post/sourcecode-cocoapods/03-cocoapods-claide/</guid>
-      <description>本文知识目录 引子 在上文 整体把握 CocoaPods 核心组件 中，我们通过对 pod install 的流程的介绍，引出 CocoaPods 的各个核心组件的角色分工和其主要作用，希望通过对这些组件的使用</description>
-    </item>
-    
-    <item>
-      <title>2. 整体把握 CocoaPods 核心组件</title>
-      <link>http://looseyi.github.io/post/sourcecode-cocoapods/02-cocoapods-corecomponents/</link>
-      <pubDate>Mon, 17 Aug 2020 00:00:00 +0000</pubDate>
-      
-      <guid>http://looseyi.github.io/post/sourcecode-cocoapods/02-cocoapods-corecomponents/</guid>
-      <description>本文知识目录 引子 在上文 版本管理工具及 Ruby 工具链环境 中，我们聊到如何统一管理团队小伙伴的 CocoaPods 生产环境及使用到的 Ruby 工具链。今天让我们将目光转到 CocoaPods 身上</description>
+      <description>引子 在上文 整体把握 CocoaPods 核心组件 中，我们通过对 pod install 的流程的介绍，引出 CocoaPods 的各个核心组件的角色分工和其主要作用，希望通过对这些组件的使用和介绍来帮助</description>
     </item>
     
     <item>
@@ -81,15 +72,6 @@
       
       <guid>http://looseyi.github.io/post/tool/cocoa-documentation-1/</guid>
       <description>Cocoa 代码注释与文档生成 本文的文档规范部分的内容参考自：NSHipster 的 Swift Documentation 作者 &amp;amp; Nate Cook 本文知识目录 背景 曾经以为好的代码是可以自我解释不需要注</description>
-    </item>
-    
-    <item>
-      <title>1. 版本管理工具及 Ruby 工具链环境</title>
-      <link>http://looseyi.github.io/post/sourcecode-cocoapods/01-cocoapods-toolchains/</link>
-      <pubDate>Wed, 10 Jun 2020 00:00:00 +0000</pubDate>
-      
-      <guid>http://looseyi.github.io/post/sourcecode-cocoapods/01-cocoapods-toolchains/</guid>
-      <description>1. 版本管理工具及 Ruby 工具链环境 CocoaPods 历险记这个专题是 Edmond 和冬瓜 是对于 iOS / macOS 工程中版本管理工具 CocoaPods 的实现细节、原理、源码、实践与经验的分享记录，旨在帮助</description>
     </item>
     
     <item>

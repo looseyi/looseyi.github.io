@@ -6,7 +6,7 @@
     <description>Recent content in Tags on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Thu, 17 Sep 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 13 Oct 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="http://looseyi.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
@@ -14,7 +14,7 @@
     <item>
       <title>CocoaPods</title>
       <link>http://looseyi.github.io/tags/cocoapods/</link>
-      <pubDate>Thu, 17 Sep 2020 00:00:00 +0000</pubDate>
+      <pubDate>Tue, 13 Oct 2020 00:00:00 +0000</pubDate>
       
       <guid>http://looseyi.github.io/tags/cocoapods/</guid>
       <description></description>
@@ -23,7 +23,7 @@
     <item>
       <title>iOS&#39;</title>
       <link>http://looseyi.github.io/tags/ios/</link>
-      <pubDate>Thu, 17 Sep 2020 00:00:00 +0000</pubDate>
+      <pubDate>Tue, 13 Oct 2020 00:00:00 +0000</pubDate>
       
       <guid>http://looseyi.github.io/tags/ios/</guid>
       <description></description>
@@ -32,7 +32,7 @@
     <item>
       <title>Ruby</title>
       <link>http://looseyi.github.io/tags/ruby/</link>
-      <pubDate>Thu, 17 Sep 2020 00:00:00 +0000</pubDate>
+      <pubDate>Tue, 13 Oct 2020 00:00:00 +0000</pubDate>
       
       <guid>http://looseyi.github.io/tags/ruby/</guid>
       <description></description>
@@ -98,15 +98,6 @@
       <pubDate>Tue, 16 Jun 2020 00:00:00 +0000</pubDate>
       
       <guid>http://looseyi.github.io/tags/gcd/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>CocoaPods Tour</title>
-      <link>http://looseyi.github.io/tags/cocoapods-tour/</link>
-      <pubDate>Wed, 10 Jun 2020 00:00:00 +0000</pubDate>
-      
-      <guid>http://looseyi.github.io/tags/cocoapods-tour/</guid>
       <description></description>
     </item>
     

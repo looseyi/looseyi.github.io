@@ -16,7 +16,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
 
-<meta name="author" content="土土Edmond木" /><meta name="description" content="1. 版本管理工具及 Ruby 工具链环境 CocoaPods 历险记这个专题是 Edmond 和冬瓜 是对于 iOS / macOS 工程中版本管理工具 CocoaPods 的实现细节、原理、源码、实践与经验的分享记录，旨在帮助" /><meta name="keywords" content="Hugo, theme, even" />
+<meta name="author" content="土土Edmond木" /><meta name="description" content="CocoaPods 历险记这个专题是 Edmond 和冬瓜 是对于 iOS / macOS 工程中版本管理工具 CocoaPods 的实现细节、原理、源码、实践与经验的分享记录，旨在帮助大家能够更加了解这个依赖管理" /><meta name="keywords" content="Hugo, theme, even" />
 
 
 
@@ -41,22 +41,22 @@
 
 
 <meta property="og:title" content="1. 版本管理工具及 Ruby 工具链环境" />
-<meta property="og:description" content="1. 版本管理工具及 Ruby 工具链环境 CocoaPods 历险记这个专题是 Edmond 和冬瓜 是对于 iOS / macOS 工程中版本管理工具 CocoaPods 的实现细节、原理、源码、实践与经验的分享记录，旨在帮助" />
+<meta property="og:description" content="CocoaPods 历险记这个专题是 Edmond 和冬瓜 是对于 iOS / macOS 工程中版本管理工具 CocoaPods 的实现细节、原理、源码、实践与经验的分享记录，旨在帮助大家能够更加了解这个依赖管理" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="http://looseyi.github.io/post/sourcecode-cocoapods/01-cocoapods-toolchains/" />
 <meta property="article:published_time" content="2020-06-10T00:00:00+00:00" />
 <meta property="article:modified_time" content="2020-06-10T00:00:00+00:00" />
 <meta itemprop="name" content="1. 版本管理工具及 Ruby 工具链环境">
-<meta itemprop="description" content="1. 版本管理工具及 Ruby 工具链环境 CocoaPods 历险记这个专题是 Edmond 和冬瓜 是对于 iOS / macOS 工程中版本管理工具 CocoaPods 的实现细节、原理、源码、实践与经验的分享记录，旨在帮助">
+<meta itemprop="description" content="CocoaPods 历险记这个专题是 Edmond 和冬瓜 是对于 iOS / macOS 工程中版本管理工具 CocoaPods 的实现细节、原理、源码、实践与经验的分享记录，旨在帮助大家能够更加了解这个依赖管理">
 <meta itemprop="datePublished" content="2020-06-10T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2020-06-10T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="4734">
+<meta itemprop="wordCount" content="4714">
 
 
 
-<meta itemprop="keywords" content="CocoaPods,iOS,CocoaPods Tour," /><meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="CocoaPods,iOS,Ruby," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="1. 版本管理工具及 Ruby 工具链环境"/>
-<meta name="twitter:description" content="1. 版本管理工具及 Ruby 工具链环境 CocoaPods 历险记这个专题是 Edmond 和冬瓜 是对于 iOS / macOS 工程中版本管理工具 CocoaPods 的实现细节、原理、源码、实践与经验的分享记录，旨在帮助"/>
+<meta name="twitter:description" content="CocoaPods 历险记这个专题是 Edmond 和冬瓜 是对于 iOS / macOS 工程中版本管理工具 CocoaPods 的实现细节、原理、源码、实践与经验的分享记录，旨在帮助大家能够更加了解这个依赖管理"/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -124,10 +124,9 @@
       <div class="post-meta">
         <span class="post-time"> 2020-06-10 </span>
         <div class="post-category">
-            <a href="/categories/ios/"> iOS </a>
             <a href="/categories/cocoapods/"> CocoaPods </a>
             </div>
-          <span class="more-meta"> 约 4734 字 </span>
+          <span class="more-meta"> 约 4714 字 </span>
           <span class="more-meta"> 预计阅读 10 分钟 </span>
         
       </div>
@@ -175,13 +174,9 @@
   </div>
 </div>
     <div class="post-content">
-      <h1 id="1-版本管理工具及-ruby-工具链环境">1. 版本管理工具及 Ruby 工具链环境</h1>
-<p><img src="https://user-gold-cdn.xitu.io/2020/6/13/172ae0ca6fa1f618?imageView2/0/w/1280/h/960/format/webp/ignore-error/1" alt="ruby tool tour"></p>
-<blockquote>
+      <blockquote>
 <p><strong>CocoaPods 历险记</strong>这个专题是 <strong>Edmond</strong> 和<strong>冬瓜</strong> 是对于 iOS / macOS 工程中版本管理工具 CocoaPods 的实现细节、原理、源码、实践与经验的分享记录，旨在帮助大家能够更加了解这个依赖管理工具，而不仅局限于 <code>pod install</code> 和 <code>pod update</code>。</p>
 </blockquote>
-<h1 id="本文知识目录">本文知识目录</h1>
-<p><img src="http://cdn.nlark.com/yuque/0/2020/png/227152/1591843099760-108a560f-53f3-4fd0-b894-b061141180c1.png" alt="版本管理工具及 Ruby 工具链"></p>
 <h1 id="背景">背景</h1>
 <p><code>CocoaPods</code> 作为业界标准，各位 iOS 开发同学应该都不陌生。不过很多同学对 <code>CocoaPods</code> 的使用基本停留在 <code>pod install</code> 和 <code>pod update</code> 上。一旦项目组件化，各业务线逻辑拆分到独立的 <code>Pod</code> 中后，光了解几个简单 <code>Pod</code> 命令是无法满足需求的，同时还面临开发环境的一致性，<code>Pod</code> 命令执行中的各种异常错误，都要求我们对其有更深层的认知和 🤔。</p>
 <p>关于 <code>CocoaPods</code> 深入的文章有很多，推荐 ObjC China 的这篇，<a href="https://objccn.io/issue-6-4/" title="深入理解 CocoaPods">深入理解 CocoaPods</a>，而本文希望从依赖管理工具的角度来谈谈 <code>CocoaPods</code> 的管理理念。</p>
@@ -682,7 +677,7 @@ Writing new Gemfile to /Users/Gua/GuaDemo/Gemfile
       <div class="post-tags">
           <a href="/tags/cocoapods/">CocoaPods</a>
           <a href="/tags/ios/">iOS</a>
-          <a href="/tags/cocoapods-tour/">CocoaPods Tour</a>
+          <a href="/tags/ruby/">Ruby</a>
           </div>
       <nav class="post-nav">
         <a class="prev" href="/post/tool/cocoa-documentation-1/">
