@@ -6,10 +6,19 @@
     <description>Recent content in iOS on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Thu, 17 Sep 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 13 Jan 2021 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="http://looseyi.github.io/categories/ios/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>雪球 iOS Widget 从零到壹</title>
+      <link>http://looseyi.github.io/post/snowball/snowball-widgets/</link>
+      <pubDate>Wed, 13 Jan 2021 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/post/snowball/snowball-widgets/</guid>
+      <description>本文知识目录 引言 在 2020 的 WWDC 上苹果发布了 WidgetKit 小组件，重新设计后的 Widgets，其展示不再局限于负一屏，而且支持在 macOS 和 iOS 的主屏幕上提供动态信息和个</description>
+    </item>
     
     <item>
       <title>4. Podfile 的解析逻辑</title>

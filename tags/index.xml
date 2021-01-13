@@ -6,44 +6,53 @@
     <description>Recent content in Tags on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Tue, 13 Oct 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 13 Jan 2021 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="http://looseyi.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>CocoaPods</title>
-      <link>http://looseyi.github.io/tags/cocoapods/</link>
-      <pubDate>Tue, 13 Oct 2020 00:00:00 +0000</pubDate>
-      
-      <guid>http://looseyi.github.io/tags/cocoapods/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>iOS&#39;</title>
       <link>http://looseyi.github.io/tags/ios/</link>
-      <pubDate>Tue, 13 Oct 2020 00:00:00 +0000</pubDate>
+      <pubDate>Wed, 13 Jan 2021 00:00:00 +0000</pubDate>
       
       <guid>http://looseyi.github.io/tags/ios/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>Ruby</title>
-      <link>http://looseyi.github.io/tags/ruby/</link>
-      <pubDate>Tue, 13 Oct 2020 00:00:00 +0000</pubDate>
+      <title>SwiftUI</title>
+      <link>http://looseyi.github.io/tags/swiftui/</link>
+      <pubDate>Wed, 13 Jan 2021 00:00:00 +0000</pubDate>
       
-      <guid>http://looseyi.github.io/tags/ruby/</guid>
+      <guid>http://looseyi.github.io/tags/swiftui/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>SwiftUI</title>
-      <link>http://looseyi.github.io/tags/swiftui/</link>
-      <pubDate>Sat, 27 Jun 2020 00:00:00 +0000</pubDate>
+      <title>Widgets&#39;</title>
+      <link>http://looseyi.github.io/tags/widgets/</link>
+      <pubDate>Wed, 13 Jan 2021 00:00:00 +0000</pubDate>
       
-      <guid>http://looseyi.github.io/tags/swiftui/</guid>
+      <guid>http://looseyi.github.io/tags/widgets/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>CocoaPods</title>
+      <link>http://looseyi.github.io/tags/cocoapods/</link>
+      <pubDate>Fri, 06 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/tags/cocoapods/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Ruby</title>
+      <link>http://looseyi.github.io/tags/ruby/</link>
+      <pubDate>Fri, 06 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/tags/ruby/</guid>
       <description></description>
     </item>
     

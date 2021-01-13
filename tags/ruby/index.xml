@@ -6,13 +6,22 @@
     <description>Recent content in Ruby on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Tue, 13 Oct 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 06 Nov 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="http://looseyi.github.io/tags/ruby/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>5. Podspec 文件分析</title>
+      <title>6. PodSpec 管理策略</title>
+      <link>http://looseyi.github.io/post/sourcecode-cocoapods/06-cocoapods-source/</link>
+      <pubDate>Fri, 06 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/post/sourcecode-cocoapods/06-cocoapods-source/</guid>
+      <description>本文目录 引子 本文是 Core 的最后一篇，它与另外两篇文章「Podfile 解析逻辑」和「PodSpec 文件分析」共同支撑起 CocoaPods 世界的骨架。CocoaPo</description>
+    </item>
+    
+    <item>
+      <title>5. PodSpec 文件分析</title>
       <link>http://looseyi.github.io/post/sourcecode-cocoapods/05-cocoapods-podspec/</link>
       <pubDate>Tue, 13 Oct 2020 00:00:00 +0000</pubDate>
       

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title> - </title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="土土Edmond木" /><meta name="description" content="title: &amp;ldquo;7. CocoaPods 的依赖校验 - Molinillo&amp;rdquo; date: 2020-12-31T00:00:00&#43;00:00 draft: true tags: [&amp;lsquo;CocoaPods&amp;rsquo;, &amp;lsquo;iOS&amp;rsquo;, &amp;lsquo;Ruby&amp;rsquo;] categories: [&amp;lsquo;CocoaPods&amp;rsquo;] author: &amp;ldquo;土土Edmond木&amp;rdquo; [toc] 引子 通过「前文」对 CocaPods-Core 的分析，我们大体了解了 Pod 是如何" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.71.1 with theme even" />
+
+
+<link rel="canonical" href="http://looseyi.github.io/post/sourcecode-cocoapods/07-cocoapods-molinillo/" />
+  <link href="http://looseyi.github.io/post/sourcecode-cocoapods/07-cocoapods-molinillo/index.xml" rel="alternate" type="application/rss+xml" title="" />
+  <link href="http://looseyi.github.io/post/sourcecode-cocoapods/07-cocoapods-molinillo/index.xml" rel="feed" type="application/rss+xml" title="" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="" />
+<meta property="og:description" content="title: &ldquo;7. CocoaPods 的依赖校验 - Molinillo&rdquo; date: 2020-12-31T00:00:00&#43;00:00 draft: true tags: [&lsquo;CocoaPods&rsquo;, &lsquo;iOS&rsquo;, &lsquo;Ruby&rsquo;] categories: [&lsquo;CocoaPods&rsquo;] author: &ldquo;土土Edmond木&rdquo; [toc] 引子 通过「前文」对 CocaPods-Core 的分析，我们大体了解了 Pod 是如何" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://looseyi.github.io/post/sourcecode-cocoapods/07-cocoapods-molinillo/" />
+
+<meta itemprop="name" content="">
+<meta itemprop="description" content="title: &ldquo;7. CocoaPods 的依赖校验 - Molinillo&rdquo; date: 2020-12-31T00:00:00&#43;00:00 draft: true tags: [&lsquo;CocoaPods&rsquo;, &lsquo;iOS&rsquo;, &lsquo;Ruby&rsquo;] categories: [&lsquo;CocoaPods&rsquo;] author: &ldquo;土土Edmond木&rdquo; [toc] 引子 通过「前文」对 CocaPods-Core 的分析，我们大体了解了 Pod 是如何">
+
+<meta itemprop="wordCount" content="1462">
+
+
+
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content=""/>
+<meta name="twitter:description" content="title: &ldquo;7. CocoaPods 的依赖校验 - Molinillo&rdquo; date: 2020-12-31T00:00:00&#43;00:00 draft: true tags: [&lsquo;CocoaPods&rsquo;, &lsquo;iOS&rsquo;, &lsquo;Ruby&rsquo;] categories: [&lsquo;CocoaPods&rsquo;] author: &ldquo;土土Edmond木&rdquo; [toc] 引子 通过「前文」对 CocaPods-Core 的分析，我们大体了解了 Pod 是如何"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Aha Moment</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Aha Moment</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title"></h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 0001-01-01 </span>
+        
+          <span class="more-meta"> 约 1462 字 </span>
+          <span class="more-meta"> 预计阅读 3 分钟 </span>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#问题类型">问题类型</a>
+      <ul>
+        <li><a href="#依赖过多多重依赖">依赖过多/多重依赖</a></li>
+        <li><a href="#依赖冲突">依赖冲突</a></li>
+        <li><a href="#依赖循环">依赖循环</a></li>
+      </ul>
+    </li>
+    <li><a href="#解决依赖关系">解决依赖关系</a>
+      <ul>
+        <li><a href="#0x01-版本冲突解决方案">0x01 版本冲突解决方案</a></li>
+        <li><a href="#0x02-循环依赖解决方案">0x02 循环依赖解决方案</a></li>
+      </ul>
+    </li>
+  </ul>
+
+  <ul>
+    <li>
+      <ul>
+        <li></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <blockquote>
+<p>title: &ldquo;7. CocoaPods 的依赖校验 - Molinillo&rdquo;
+date: 2020-12-31T00:00:00+00:00
+draft: true
+tags: [&lsquo;CocoaPods&rsquo;, &lsquo;iOS&rsquo;, &lsquo;Ruby&rsquo;]
+categories: [&lsquo;CocoaPods&rsquo;]
+author: &ldquo;土土Edmond木&rdquo;</p>
+</blockquote>
+<p>[toc]</p>
+<h1 id="引子">引子</h1>
+<p>通过「<a href="https://www.zhihu.com/column/c_1254403935512834048"><strong>前文</strong></a>」对 CocaPods-Core 的分析，我们大体了解了 <code>Pod</code> 是如何解析、查询与管理的。有了这些整体概念之后，我们就可以逐步深入 <code>pod install</code> 的各个细节。今天我们就来聊聊 <code>Pod</code> 的依赖校验工具 &mdash; <a href="https://github.com/CocoaPods/Molinillo">Molinillo</a>。开始前，需要聊聊依赖校验的背景。</p>
+<h1 id="依赖管理的挑战">依赖管理的挑战</h1>
+<p>同大多数包管理工具一样 <code>Pod</code> 会将传递依赖的包用扁平化的形式，安装至 workspace 目录 (即：<code>Pods/</code>)。</p>
+<p><strong>Case 1</strong>：<code>pod A</code> 依赖于 <code>pod B</code>，而 <code>pod B</code> 依赖 <code>Alamofire</code>：</p>
+<p><img src="../../../resources/cocoapods/07-Molinillo/01-dependency-flat.png" alt="01-dependency-flat"></p>
+<p>可以看到，经依赖解析原有的依赖树被拍平为了平面模型。</p>
+<blockquote>
+<p>Tips：包括 Molinillo 在内的依赖解析工具都会在运行期间对依赖关系进行建模来构建依赖图，毕竟这是我们表达依赖关系的方式。</p>
+</blockquote>
+<p>然而在大型项目中，遇到的更多情况可能像下面这样：</p>
+<p><img src="../../../resources/cocoapods/07-Molinillo/02-dependency-conflict.png" alt="02-dependency-conflict"></p>
+<p>**Case 2：<strong>即 <code>pod A</code> 和 <code>pod B</code> 分别依赖不同版本的 <code>Alamofire</code>。这就是</strong><a href="https://www.wikiwand.com/zh-hans/%E7%9B%B8%E4%BE%9D%E6%80%A7%E5%9C%B0%E7%8B%B1">依赖地狱</a>**的开始。</p>
+<blockquote>
+<p>依赖地狱：指在操作系统中由于软件之间的依赖性不能被满足而引发的问题。</p>
+</blockquote>
+<p>随着项目的迭代，我们不断引入依赖并最终形成错综复杂的网络。这使得项目的依赖性解析变得异常困难，甚至出现<a href="https://www.wikiwand.com/en/Fatal_exception_error">致命错误</a>。</p>
+<p>那么，产生的问题有哪些类型 ？</p>
+<h2 id="问题类型">问题类型</h2>
+<h3 id="依赖过多多重依赖">依赖过多/多重依赖</h3>
+<p>即项目存在大量依赖关系，或者依赖本身有其自身依赖，导致依赖层级过深。像淘宝或美团这样的超级应用，其中的单一业务模块都可能存在这些问题，这将使得依赖解析过于复杂，且容易产生依赖冲突和依赖循环。</p>
+<h3 id="依赖冲突">依赖冲突</h3>
+<p>即项目中的两个依赖包无法共存的情况。可能两个依赖库内部的代码冲突，也可能其底层依赖互相冲突。上面例子中因 <code>Alamofire</code> 版本不同产生的问题就是依赖冲突。</p>
+<h3 id="依赖循环">依赖循环</h3>
+<p>即依赖性关系形成一个闭合环路。如下图：</p>
+<p><img src="../../../resources/cocoapods/07-Molinillo/03-dependency-conflict.png" alt="03-dependency-conflict"></p>
+<p>要判断依赖关系中是否存在依赖环，则需要通依赖仲裁算法来解决。</p>
+<h2 id="解决依赖关系">解决依赖关系</h2>
+<p>对于依赖过多或者多重依赖问题，我们可通过合理的架构和设计模式来解决。而依赖校验主要解决的问题为：</p>
+<ol>
+<li>判断依赖图是否存在循环依赖；</li>
+<li>检查依赖图是否存在版本冲突；</li>
+</ol>
+<h3 id="0x01-版本冲突解决方案">0x01 版本冲突解决方案</h3>
+<p>对于版本冲突可通过修改指定版本为带兼容性的版本范围问题来避免。如 <strong>Case 2</strong> 问题可通过修改 <code>Alamofire</code> 版本约束为 <code>~&gt; 4.0</code> 来解决。</p>
+<p>还有一种方式，可基于语言特性来进行依赖性隔离，如 NPM 的每个传递依赖包都可以有自己的node_modules 目录。</p>
+<h3 id="0x02-循环依赖解决方案">0x02 循环依赖解决方案</h3>
+<p>循环依赖则需要需要进行数学建模生成 DAG 图，利用拓扑排序的拆点处理。通过确定依赖图是否为DAG 网图，来验证依赖关系的合理性。</p>
+<p>一个 DAG 图的示例：</p>
+<p><img src="../../../resources/cocoapods/07-Molinillo/04-DAG.png" alt="04-DAG"></p>
+<blockquote>
+<p>DAG 是图论中常见的一种描述问题的结构，全称**有向无环图 (Directed Acyclic Graph) **。想了解更多，可查看瓜瓜的文章 &mdash;「<a href="https://mp.weixin.qq.com/s/oj_cxBwKCxxbr0hYbrj21A">从拓扑排序到 Carthage 依赖校验算法</a>」。</p>
+</blockquote>
+<p>另外，各种包管理工具的依赖仲裁算法也各不相同，有如 Dart 和 SwiftPM 的 <a href="https://medium.com/@nex3/pubgrub-2fb6470504f">PubGrub</a>，Yarn 的 <a href="https://classic.yarnpkg.com/en/docs/selective-version-resolutions">Selective dependency resolutions</a>，还有我们今天聊到的 Molinillo。</p>
+<h1 id="molinillo">Molinillo</h1>
+<h4 id="解决依赖关系resolve-dependencies">解决依赖关系（Resolve Dependencies）</h4>
+<p>CocoaPods 为了解决 Podfile 中声明的依赖关系，使用了一个叫做 <a href="https://github.com/CocoaPods/Molinillo/blob/master/ARCHITECTURE.md">Milinillo</a> 的依赖关系解决算法；但是，笔者在 Google 上并没有找到与这个算法相关的其他信息，推测是 CocoaPods 为了解决 iOS 中的依赖关系创造的算法。</p>
+<p>Milinillo 算法的核心是 <a href="https://en.wikipedia.org/wiki/Backtracking">回溯（Backtracking）</a> 以及 <a href="https://en.wikipedia.org/wiki/Look-ahead_(backtracking)">向前检查（forward check）</a>，整个过程会追踪栈中的两个状态（依赖和可能性）。</p>
+<p>如果有兴趣可以看一下仓库中的 <a href="https://github.com/CocoaPods/Molinillo/blob/master/ARCHITECTURE.md">ARCHITECTURE.md</a> 文件，其中比较详细的解释了 Milinillo 算法的工作原理，并对其功能执行过程有一个比较详细的介绍。</p>
+<p><a href="https://www.cnblogs.com/wonyun/p/9692476.html">探讨npm依赖管理之peerDependencies</a></p>
+<p><a href="https://stackoverflow.com/questions/28099683/algorithm-for-dependency-resolution">Algorithm for dependency resolution</a></p>
+<p><a href="https://blog.csdn.net/afandaafandaafanda/article/details/82717441">深入理解NPM依赖模型</a></p>
+<p><a href="https://bbs.huaweicloud.com/blogs/201995">npm 依赖管理中一些重要的细节</a></p>
+<p><a href="https://www.zoo.team/article/npm-details">npm 依赖管理中被忽略的那些细节</a></p>
+<p><a href="https://juejin.cn/post/6844903833844318222">Rust如何解决依赖地狱</a></p>
+<p><a href="https://muchen.fun/passages/40/">40.拓扑排序</a></p>
+<p><a href="https://draveness.me/cocoapods/">CocoaPods 都做了什么？</a></p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">土土Edmond木</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        0001-01-01
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      
+      <nav class="post-nav">
+        <a class="prev" href="/post/sourcecode-ios/cocoapods-binary-1/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">浅析 cocoapods-binary</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+    <script src="https://utteranc.es/client.js"
+            repo="looseyi/looseyi.github.io"
+            issue-term="pathname"
+            theme="github-light"
+            crossorigin="anonymous"
+            async>
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/utterance">comments powered by utterances.</a></noscript>
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:chun574271939@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://twitter.com/looseyi" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="https://github.com/looseyi" class="iconfont icon-github" title="github"></a>
+      <a href="https://www.weibo.com/foreverclp" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="https://www.zhihu.com/people/tu-tu-edmondmu" class="iconfont icon-zhihu" title="zhihu"></a>
+  <a href="http://looseyi.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2019-12-11 - 
+    2021
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">土土Edmond木</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-62789092-1', 'auto');
+	ga('set', 'anonymizeIp', true);
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>
