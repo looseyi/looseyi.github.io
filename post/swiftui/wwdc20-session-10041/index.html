@@ -194,21 +194,21 @@
 <p>WWDC 2020 Session 10041 - <a href="https://developer.apple.com/videos/play/wwdc2020/10041/?time=3">What&rsquo;s new in SwiftUI</a></p>
 </blockquote>
 <h1 id="本文知识目录">本文知识目录</h1>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63nsjz1uj21fw1ekn3j.jpg#align=left&amp;display=inline&amp;height=1820&amp;margin=%5Bobject+Object%5D&amp;originHeight=1820&amp;originWidth=1868&amp;status=done&amp;style=none&amp;width=1868" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/tablecontent.png" alt=""></p>
 <p>对于 iOS 开发而言， WWDC 2019 中推出的 SwiftUI 无疑是最受关注的一项技术，它可以在所有 Apple 平台上构建出色的用户界面。而今年我们迎来了 SwiftUI 2.0，让我一起来看看 SwiftUI 有哪些新增功能。</p>
 <p>今年有很多新 feature，且数量远超出我们一次演讲所能涵盖的范围，但是我们将尽力涵盖尽可能多的内容。同时我们也会介绍相关的 Session，大家可以查看这些 Session 以了解更多信息。</p>
 <h1 id="apps-and-widgets">Apps and Widgets</h1>
 <p>让我们从 Apps 和 Widgets 开始。</p>
 <p>这是苹果第一次仅使用 SwiftUI 来构建整个应用程序，而不是将 SwiftUI 代码嵌入 <code>UIKit</code>，<code>AppKit</code> 或 <code>WatchKit</code> 应用程序中。</p>
 <p>我们来写一个简单的 Hello World! 应用。</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63np40izj21hc0u0nco.jpg#align=left&amp;display=inline&amp;height=1080&amp;margin=%5Bobject+Object%5D&amp;originHeight=1080&amp;originWidth=1920&amp;status=done&amp;style=none&amp;width=1920" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/00-swiftui.png" alt=""></p>
 <p>你没有看错，这是100％正常运行的应用程序。</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63nopucdj20qo0f0q3f.jpg#align=left&amp;display=inline&amp;height=540&amp;margin=%5Bobject+Object%5D&amp;originHeight=540&amp;originWidth=960&amp;status=done&amp;style=none&amp;width=960" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/00-Swift%2520UI.png" alt=""></p>
 <h2 id="app--scene">App &amp; Scene</h2>
 <p>SwiftUI 将大量智能，自动以及可自定义的行为统统打包到了简单灵活的声明式 API 中。</p>
 <p>我们先来展示一个用于跟踪正在阅读书籍进度的应用程序。</p>
 <p>在底部，有一个自定义视图来表示应用程序的主用户界面，而顶部使用该视图作为应用程序主窗口的内容。</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63nt79moj21hc0u0kjm.jpg#align=left&amp;display=inline&amp;height=1080&amp;margin=%5Bobject+Object%5D&amp;originHeight=1080&amp;originWidth=1920&amp;status=done&amp;style=none&amp;width=1920" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/03-currently%2520reading.png" alt=""></p>
 <p>首先要注意的是这两个声明的相似之处。我们都定义了一个遵循 protocol 的结构。</p>
 <p>我们设计了 SwiftUI 的新 <code>App API</code>，以遵循您在视图代码中已经习惯的声明式的 <code>State-Driven</code> 模式。 <code>App protocl</code> 使我们能够轻松地用一个结构来替换 <code>AppDelegate</code> 和 <code>SceneDelegate</code>，该结构将管理我们的场景和应用生命周期。</p>
 <p>另一个关键点在于 body 属性的返回类型。这里返回的 <code>Scene</code> 也是 SwiftUI 中的一个新概念，它表示界面可以由不同的平台独立显示。</p>
@@ -216,37 +216,37 @@
 <p><code>WindowGroup</code> 是 <code>Scence</code> 的具体应用之一，它是 SwiftUI 中 <code>Scene</code> 如何提供现成的智能，多平台功能的有力示例。</p>
 <p>在我们的 iOS 应用中，<code>WindowGroup</code> 正在为我们的应用创建和管理单个全屏窗口。相同的代码也可在 watchOS 上运行，还可以管理单个全屏窗口。</p>
 <p>尽管这两应用看起来有所不同，但是两个平台上的核心应用结构相同，因此它们可以共享一个应用声明。</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63nq6bxrj20ow0dx79x.jpg#align=left&amp;display=inline&amp;height=501&amp;margin=%5Bobject+Object%5D&amp;originHeight=501&amp;originWidth=896&amp;status=done&amp;style=none&amp;width=896" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/04-recently%2520reading%2520iOSwatchOS.png" alt=""></p>
 <p>实际上，我的应用程序也可以在 tvOS 和 iPadOS 上运行。</p>
 <p>由于 iPadOS 支持多窗口应用程序，因此我们免费获得了一些附加功能；就像能够创建可以并排显示的应用程序的多个实例。</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63npl0g6j20qb0f0wma.jpg#align=left&amp;display=inline&amp;height=540&amp;margin=%5Bobject+Object%5D&amp;originHeight=540&amp;originWidth=947&amp;status=done&amp;style=none&amp;width=947" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/06-recently%2520reading%2520tv-iPadOS.png" alt=""></p>
 <p>这也扩展到了 macOS，它也支持多个窗口。我们可以使用标准的 <code>Command-N</code> 快捷方式创建新窗口，并将它们收集到单个选项卡式窗口中。SwiftUI 甚至会自动将 “新窗口” 菜单命令添加到我的主菜单中。</p>
 <p>SwiftUI 还支持其他类型的场景，这些场景可以像视图一样组合在一起，构建出更复杂的应用程序。</p>
 <p>就像 macOS 上新增的 “设置” 场景一样，“偏好设置” 窗口的添加也很简单。</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63nq932jj20qo0f0wlk.jpg#align=left&amp;display=inline&amp;height=540&amp;margin=%5Bobject+Object%5D&amp;originHeight=540&amp;originWidth=960&amp;status=done&amp;style=none&amp;width=960" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/07-setting-options.jpg" alt=""></p>
 <p>设置场景将自动在应用程序菜单中设置标准的 “首选项” 命令，并为窗口提供正确的样式处理。</p>
 <h2 id="documentgroup">DocumentGroup</h2>
 <p>SwiftUI 的 <code>Scene API</code> 还支持基于文档的应用程序，例如我们为绘制矢量形状而构建的该应用程序。</p>
 <p>新增的 <code>DocumentGroup</code> 场景，它可以自动管理 iOS，iPadOS 和 macOS 支持的，基于文档的场景的打开，编辑和保存。</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63npkvvtj20qo0f00xm.jpg#align=left&amp;display=inline&amp;height=540&amp;margin=%5Bobject+Object%5D&amp;originHeight=540&amp;originWidth=960&amp;status=done&amp;style=none&amp;width=960" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/07-documentgroup.jpg" alt=""></p>
 <p>在 iOS 和 iPadOS 上，如果未提供其他主界面，<code>DocumentGroup</code> 将自动显示文档浏览器。</p>
 <p>在 Mac 上，<code>DocumentGroup</code> 将为每个新文档打开一个不同的窗口，并自动将命令添加到主菜单中以执行常见的文档操作。</p>
 <p>说到菜单命令，SwiftUI 允许您使用新的 <code>.commands</code> 修饰符添加其他命令。</p>
 <p>例如，在这里我们添加了一个自定义形状菜单，用于向画布添加新形状。macOS 将在主菜单的正确区域中自动添加自定义菜单，并显示其键盘快捷键。这些快捷键是我们使用新的 <code>.keyboardShortcut</code> 视图修饰符分配的。</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63nqbb6qj20qo0f0af1.jpg#align=left&amp;display=inline&amp;height=540&amp;margin=%5Bobject+Object%5D&amp;originHeight=540&amp;originWidth=960&amp;status=done&amp;style=none&amp;width=960" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/08-DocumentGroup-commands.jpg" alt=""></p>
 <p><code>.commands</code> API 所提供的功能比我们在此处显示的功能要多得多，例如能够基于用户焦点来定位命令等等。</p>
 <h2 id="xcode-support">Xcode Support</h2>
 <p>为了帮助您构建这些新应用，我们还添加专门用于 SwiftUI 应用的新的 Multiplatform 模板，更新了 Xcode 中的新项目体验。</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63now4bdj20qo0f0diu.jpg#align=left&amp;display=inline&amp;height=540&amp;margin=%5Bobject+Object%5D&amp;originHeight=540&amp;originWidth=960&amp;status=done&amp;style=none&amp;width=960" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/01-Mutiplatform.jpg" alt=""></p>
 <p>这些新模板针对多平台代码进行了优化，可自动为共享代码以及特定于平台的组件和资源。</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63npesccj20qo0f00y0.jpg#align=left&amp;display=inline&amp;height=540&amp;margin=%5Bobject+Object%5D&amp;originHeight=540&amp;originWidth=960&amp;status=done&amp;style=none&amp;width=960" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/01-Mutiplatform-folder.jpg" alt=""></p>
 <p>另一部分是如何配置应用程序的 <code>LaunchScreen</code>。</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63npfqlfj20qo0f0782.jpg#align=left&amp;display=inline&amp;height=540&amp;margin=%5Bobject+Object%5D&amp;originHeight=540&amp;originWidth=960&amp;status=done&amp;style=none&amp;width=960" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/01-launch_screen.jpg" alt=""></p>
 <p><code>infp.plist</code> 中新增的 <strong>“LaunchScreen”</strong> key，可以声明启动屏幕组件的各种组合。例如默认图像，背景色以及顶部和底部的空白栏（如上图配置的）。</p>
 <p>如果在现有项目中已经使用了 <code>Storyboard</code>，仍然可以正常工作无需更换。不过对于新的 SwiftUI 项目，<code>LaunchScreen</code> 配置是一种简单的选择。</p>
 <h2 id="swiftui-app-sessions">SwiftUI App Sessions</h2>
 <p>关于 SwiftUI Apps 我们已经准备了演讲，以更深入地介绍什么是场景以及它们与应用程序和视图的关系：</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63npejk9j20qo0f0ta3.jpg#align=left&amp;display=inline&amp;height=540&amp;margin=%5Bobject+Object%5D&amp;originHeight=540&amp;originWidth=960&amp;status=done&amp;style=none&amp;width=960" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/02-SwiftUI%2520App%2520Sessions.jpg" alt=""></p>
 <ul>
 <li><a href="https://wwdc.io/share/wwdc20/10037">App essentials in SwiftUI</a> - 带你解释了视图，场景和应用程序如何更深入地协同工作。</li>
 <li><a href="https://wwdc.io/share/wwdc20/10039">Build document-based apps in SwiftUI</a> - 将深入研究了如何在应用程序中打开和管理文档。</li>
@@ -255,7 +255,7 @@
 <p>现在让我们简单谈谈 Widgets ，这是 iOS，iPadOS 和 macOS 上的新作之一。 <code>Widget</code> 只能使用 SwiftUI 来构建的。它直接将 Swift 语言和 SwiftUI 的重要程度提升了一大截。</p>
 <p>我们可以使用符合 <strong>Widget protocol</strong> 的自定义结构来构建 Apps 和 View 一样的 Widget。</p>
 <p>我们可以制作许多种类型的 Widget，例如这种会定期向我推荐新专辑的 Widget。</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63nqhojlj20qo0f07ci.jpg#align=left&amp;display=inline&amp;height=540&amp;margin=%5Bobject+Object%5D&amp;originHeight=540&amp;originWidth=960&amp;status=done&amp;style=none&amp;width=960" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/09-recomment_album_widget.jpg" alt=""></p>
 <p>Widget 也可以配置其他类型的数据，例如 Siri Intents。</p>
 <p>关于构建 Widget，有很多要讨论的内容，并且我们有一些讲座可以帮助你入门：</p>
 <ul>
@@ -269,7 +269,7 @@
 <p>建议先观看 <a href="https://developer.apple.com/videos/play/wwdc2020/10033">Build SwiftUI views for widgets</a> 以了解更多信息。</p>
 <h3 id="widgets-in-watchos">Widgets in watchOS</h3>
 <p>我们现在可以使用 SwiftUI 为 Apple Watch 构建复杂的自定义功能。可以像我制作的本周咖啡图表那样构建全彩色功能。</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63nqgtk4j20qo0f0agl.jpg#align=left&amp;display=inline&amp;height=540&amp;margin=%5Bobject+Object%5D&amp;originHeight=540&amp;originWidth=960&amp;status=done&amp;style=none&amp;width=960" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/10-SwiftUI-watch.png" alt=""></p>
 <p>关于构建复杂的 watch 应用可参考如下 Sessions：</p>
 <ul>
 <li><a href="https://wwdc.io/share/wwdc20/10048">Build complications in SwiftUI</a></li>
@@ -278,22 +278,21 @@
 <h1 id="lists-and-collections">Lists and Collections</h1>
 <p>接下来，让我们讨论对 Lists 和 Collections 的改进。列表是许多应用程序的重要组成部分，通常代表用户与之交互的主要界面。在此版本中，Lists 获得了一些很棒的新功能。</p>
 <h2 id="outlines">Outlines</h2>
-<p>使用 <code>outlines</code>，我们只要简单声明具有动态性、数据驱动的内容就可完成常规列表的展示。</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63nqd2o4j20qo0f0djs.jpg#align=left&amp;display=inline&amp;height=540&amp;margin=%5Bobject+Object%5D&amp;originHeight=540&amp;originWidth=960&amp;status=done&amp;style=none&amp;width=960" alt=""></p>
+<p>使用 <code>outlines</code>，我们只要简单声明具有动态性、数据驱动的内容就可完成常规列表的展示。<img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/11-outlines-recursive.jpg" alt="11-outlines-recursive"></p>
 <p>还可以在初始化时提供 <code>.chldren</code> 的 KeyPath，来实现列表的嵌套显示。</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63nqv3tdj20qo0f0tdx.jpg#align=left&amp;display=inline&amp;height=540&amp;margin=%5Bobject+Object%5D&amp;originHeight=540&amp;originWidth=960&amp;status=done&amp;style=none&amp;width=960" alt=""></p>
+<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63nqv3tdj20qo0f0tdx.jpg" alt=""></p>
 <p>默认情况下，Lists 使用 macOS，iOS 和 iPadOS 上的系统标准样式来显示。</p>
 <p>我们希望通过易用性的 <code>outlines</code> 可以帮助和减少偏内容的应用程序对于 <code>push-pop</code> 导航栏模式的滥用。</p>
 <h2 id="grids">Grids</h2>
 <p>去年 SwiftUI 被人诟病最多的恐怕是对列表和网格的支持不友好。当我们有数百或上千个 Views 存在于 <code>Grids</code> 或 <code>Stacks</code> 中时，SwiftUI 可是会直接初始化并创建它们，这可是非常 😱 的事情。</p>
 <p>好在今年，SwiftUI 增加了对网格布局的 <code>Lazy-Loading</code>，可以将其与 <code>ScrollViews</code> 组合来实现网格内容的平滑滚动。</p>
 <p>网格具有强大布局功能，支持多种配置，例如调整列数以适应可用空间，就像我们在此处看到的横向和纵向一样。</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63nqn7ubj20qo0f0n4k.jpg#align=left&amp;display=inline&amp;height=540&amp;margin=%5Bobject+Object%5D&amp;originHeight=540&amp;originWidth=960&amp;status=done&amp;style=none&amp;width=960" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/12-grid-adapt.jpg" alt=""></p>
 <p>或强制固定数量的列，每个列都可以具有自己的大小调整参数，例如下面示例，每列固定为 4 栏。</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63nqmullj20qo0f0q8q.jpg#align=left&amp;display=inline&amp;height=540&amp;margin=%5Bobject+Object%5D&amp;originHeight=540&amp;originWidth=960&amp;status=done&amp;style=none&amp;width=960" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/12-grid-fix.jpg" alt=""></p>
 <p>当然，SwiftUI 也支持水平滚动的网格。除此之外，我们还提供了 <code>VStack</code> 和 <code>HStack</code> 的 <code>Lazy-Loading</code> 版本，这些版本非常适合构建自定义的可滚动布局。</p>
 <p>例如，这个图像瀑布流的展示：</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63nqpqc0j20qo0f0k0w.jpg#align=left&amp;display=inline&amp;height=540&amp;margin=%5Bobject+Object%5D&amp;originHeight=540&amp;originWidth=960&amp;status=done&amp;style=none&amp;width=960" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/13-lazy-grids.jpg" alt=""></p>
 <p>我们使用 <code>LazyVStack</code> 作为容器，同时利用 <code>ViewBuilder</code> 新增的 <code>switch</code> 控制功能，轻松支持图片的各种布局。例如顶部的单个大图，中间的多个小尺寸图片的不对称组合等。这些组件一起组合成一个无缝的图片流。</p>
 <p>在本文中，我们只是简单介绍了部分功能。还有更多新增的 View，比如 <code>ScrollViewReader</code>、<code>TextEditor</code> 等等。想要了解更多 SwfitUI 的 Lists 和 Grids 的强大功能，请查看 <a href="https://developer.apple.com/videos/play/wwdc2020/10031">Stacks, Grids, and Outlines in SwiftUI</a>.</p>
 <h1 id="toolbars-and-controls">Toolbars and Controls</h1>
@@ -385,10 +384,10 @@
 </code></pre></td></tr></table>
 </div>
 </div><p>上述代码的效果如下：</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63nqt3y6j20ok0ftjxi.jpg#align=left&amp;display=inline&amp;height=569&amp;margin=%5Bobject+Object%5D&amp;originHeight=569&amp;originWidth=884&amp;status=done&amp;style=none&amp;width=884" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/14-toolbaritem.png" alt=""></p>
 <p>上面代码列出了构造一个 toolbar 的多种方式。toolbar items 与 SwiftUI 中的其他视图组成基本相同，在上面的几个例子中，均由 button 实现的。</p>
 <p>另一个示例是 <code>principal</code> 语义的使用，它将在应用程序的突出位置中显示，就像我们下面看到的：</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63nqzqulj20qo0f045t.jpg#align=left&amp;display=inline&amp;height=540&amp;margin=%5Bobject+Object%5D&amp;originHeight=540&amp;originWidth=960&amp;status=done&amp;style=none&amp;width=960" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/15-toolbar-mac.png" alt=""></p>
 <p>toolbar 默认会放置在我们熟悉的位置，也可以通过使用 toolbar 进行显式自定义。</p>
 <p>我们只需在 SwiftUI 描述这些 toolbar item 的状态，然后 SwiftUI 会根据语义的定义自动找出正确的位置。例如，wathcOS 中的确认和取消操作就会置顶显示。</p>
 <p>我们也可以指定放置的位置来进行额外的控制，尤其是对于相对较小的屏幕。例如，在 iOS 中通过指定分享 item 的 <code>.bottomBar</code> 位置等。</p>
@@ -440,11 +439,11 @@
 </div><p><code>Label</code> 默认以 <code>large</code> 尺寸的布局展示。当更改为 <code>extraLarge</code> 时，图标和标题都会自动更新，而且能很好地重排文本和增加列表行。当然，还支持可以更大尺寸的 <code>accessibilityLarge</code>。</p>
 <p>对于更大的字体，Label 会更新为文字环绕，以最大程度地增加可见文字的数量。</p>
 <p>对比效果如下：</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63nrbkm4j212l0p7dz6.jpg#align=left&amp;display=inline&amp;height=907&amp;margin=%5Bobject+Object%5D&amp;originHeight=907&amp;originWidth=1389&amp;status=done&amp;style=none&amp;width=1389" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/17-list%2520label.png" alt=""></p>
 <h2 id="help">Help</h2>
 <p>现在，随着 toolbar 之类具有干净的仅图标样式的标签元素，为这些元素提供额外的帮助比以往任何时候都更加重要。</p>
 <p>使用新的 <code>.help</code> 修饰符，可以附加控件的作用说明，并在 macOS 上显示为工具提示。</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63nrdovvj20qo0f0wk6.jpg#align=left&amp;display=inline&amp;height=540&amp;margin=%5Bobject+Object%5D&amp;originHeight=540&amp;originWidth=960&amp;status=done&amp;style=none&amp;width=960" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/18-help.png" alt=""></p>
 <p>同样，此修饰符可在所有平台上使用，因为它还提供了可访问性提示，可为您的应用程序在任何地方提供更好的 <code>VoiceOver</code> 体验。</p>
 <h2 id="new-views">New Views</h2>
 <h3 id="progressview">ProgressView</h3>
@@ -461,22 +460,22 @@
 </div>
 </div><h3 id="gauges">Gauges</h3>
 <p>对于 <code>watchOS 7+</code> 现在可以在 SwiftUI 获取仪表盘视图了。</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63nrffr4j21260mpk11.jpg#align=left&amp;display=inline&amp;height=817&amp;margin=%5Bobject+Object%5D&amp;originHeight=817&amp;originWidth=1374&amp;status=done&amp;style=none&amp;width=1374" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/20-guage.jpg" alt=""></p>
 <p>对于 <code>Guage</code> 视图，我们可以对 minimum 和 maximum 值进行可选设置来控制是否显示。</p>
 <h1 id="new-effetct-and-styling">New Effetct and Styling</h1>
 <p>接下来，让我们看一下使用 SwiftUI 来制作一些炫酷的效果。</p>
 <h2 id="hovereffect">HoverEffect</h2>
 <p>macOS Big Sur 对 Notification Center 和菜单栏中的新 Control Center 均使用 SwiftUI 重写，同时 Control Center 正是使用了 SwiftUI 中的一项动效，实现了其在不同模块间平滑切换。</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63nrga7cj20qo0f011h.jpg#align=left&amp;display=inline&amp;height=540&amp;margin=%5Bobject+Object%5D&amp;originHeight=540&amp;originWidth=960&amp;status=done&amp;style=none&amp;width=960" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/21-new%2520effect%2520&amp;%2520styling.png" alt=""></p>
 <p>接下来，我们构建了一个 UI 原型来展示该效果的使用。</p>
 <p>这里以收集喜欢专辑的功能来展示，它由相册的 <code>LazyGrid</code> 和 <code>selectdAlbumRow</code> 组成。只需为每个按钮添加 <code>matchedGeometryEffect</code> 并绑定上每个专辑的 ID 和相对的 <code>NameSpace</code>。这样当我们选择喜欢的专辑后，它会从网格中流畅地过渡到底部我们喜欢的专辑那一行。</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63ns3vuwj20rs0fm4qp.jpg#align=left&amp;display=inline&amp;height=562&amp;margin=%5Bobject+Object%5D&amp;originHeight=562&amp;originWidth=1000&amp;status=done&amp;style=none&amp;width=1000" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/22-hovereffect.png" alt=""></p>
 <p>除了这个配预设效果之外，我们也可以通过提供的 API 配置自定义动画：</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63nslvpvj20ti0geb29.jpg#align=left&amp;display=inline&amp;height=590&amp;margin=%5Bobject+Object%5D&amp;originHeight=590&amp;originWidth=1062&amp;status=done&amp;style=none&amp;width=1062" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/23-hover-effect.png" alt=""></p>
 <h2 id="styling">Styling</h2>
 <p>SwiftUI 也新增了很多方便的样式修改功能。</p>
 <h3 id="containerrelativeshape">ContainerRelativeShape</h3>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63nscy7ij20qo0f0n55.jpg#align=left&amp;display=inline&amp;height=540&amp;margin=%5Bobject+Object%5D&amp;originHeight=540&amp;originWidth=960&amp;status=done&amp;style=none&amp;width=960" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/23-ContainerRelativeShape.png" alt=""></p>
 <p>我们从专辑的 widget 中可以看到，新增的 <code>ContainerRelativeShape</code> 将采用最接近所包含内容的形状来生成相似的路径。</p>
 <p>它有效的将该外部容器的形状进行偏移，并根据其偏移量自动保持与内容形状的同心度。</p>
 <p>还有一些其他改善和增强文本元素体验的效果等。</p>
@@ -512,7 +511,7 @@
 </code></pre></td></tr></table>
 </div>
 </div><p>缩放效果如下：</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63nrpdd4j212l0p7q8w.jpg#align=left&amp;display=inline&amp;height=907&amp;margin=%5Bobject+Object%5D&amp;originHeight=907&amp;originWidth=1389&amp;status=done&amp;style=none&amp;width=1389" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/25-dynamicTypeScaling.png" alt=""></p>
 <p>总之，通过这些使得基于响应式的自定义布局变得很容易，同时又具有良好的表现。当然，我们能做的不止于此，即使是系统控件，也能随心所欲的自定义它们的样式。</p>
 <p>哦，对了。颜色也是同样可以自定义的。</p>
 <h3 id="list-item-tinting">List Item Tinting</h3>
@@ -546,14 +545,14 @@
 </code></pre></td></tr></table>
 </div>
 </div><p>对比效果：</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63ns6cvgj218x0p7wyk.jpg#align=left&amp;display=inline&amp;height=907&amp;margin=%5Bobject+Object%5D&amp;originHeight=907&amp;originWidth=1617&amp;status=done&amp;style=none&amp;width=1617" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/30-List%2520Item%2520Tinting.png" alt=""></p>
 <h1 id="system-integration">System Integration</h1>
 <p>最后一节，来简单聊一聊，SwiftUI 与系统的深度集成。</p>
 <h2 id="链接跳转">链接跳转</h2>
 <p>通过新提供的 Link View，URLs 跳转现在也是 SwiftUI 中的一等公民了。它默认会使用浏览器打开链接。</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63ns1al4j21260mpwry.jpg#align=left&amp;display=inline&amp;height=817&amp;margin=%5Bobject+Object%5D&amp;originHeight=817&amp;originWidth=1374&amp;status=done&amp;style=none&amp;width=1374" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/31-link.jpg" alt=""></p>
 <p>同样，应用间的 <code>Universal Link</code> 跳转也支持啦，可以通过 <code>openURL</code> 来实现不同应用程序的访问。</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63ns0893j20ts0gywka.jpg#align=left&amp;display=inline&amp;height=610&amp;margin=%5Bobject+Object%5D&amp;originHeight=610&amp;originWidth=1072&amp;status=done&amp;style=none&amp;width=1072" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/32-openURL.png" alt=""></p>
 <p>除此之外，还有包括 <code>Drag and Drop</code>、<code>Uniform Type Identifiers frameworks</code>、<code>Sign In With Apple</code> 等各种功能等，就不一一介绍了。</p>
 <h1 id="总结">总结</h1>
 <p>很高兴看到 SwiftUI 的下一个迭代是如此强大和丰富的功能。</p>
