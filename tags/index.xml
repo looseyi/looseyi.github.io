@@ -6,17 +6,35 @@
     <description>Recent content in Tags on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Wed, 13 Jan 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 08 Mar 2021 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="http://looseyi.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
+      <title>CocoaPods</title>
+      <link>http://looseyi.github.io/tags/cocoapods/</link>
+      <pubDate>Mon, 08 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/tags/cocoapods/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>iOS&#39;</title>
       <link>http://looseyi.github.io/tags/ios/</link>
-      <pubDate>Wed, 13 Jan 2021 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 08 Mar 2021 00:00:00 +0000</pubDate>
       
       <guid>http://looseyi.github.io/tags/ios/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Ruby</title>
+      <link>http://looseyi.github.io/tags/ruby/</link>
+      <pubDate>Mon, 08 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/tags/ruby/</guid>
       <description></description>
     </item>
     
@@ -35,24 +53,6 @@
       <pubDate>Wed, 13 Jan 2021 00:00:00 +0000</pubDate>
       
       <guid>http://looseyi.github.io/tags/widgets/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>CocoaPods</title>
-      <link>http://looseyi.github.io/tags/cocoapods/</link>
-      <pubDate>Fri, 06 Nov 2020 00:00:00 +0000</pubDate>
-      
-      <guid>http://looseyi.github.io/tags/cocoapods/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Ruby</title>
-      <link>http://looseyi.github.io/tags/ruby/</link>
-      <pubDate>Fri, 06 Nov 2020 00:00:00 +0000</pubDate>
-      
-      <guid>http://looseyi.github.io/tags/ruby/</guid>
       <description></description>
     </item>
     

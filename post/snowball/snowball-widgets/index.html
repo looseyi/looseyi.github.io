@@ -174,14 +174,14 @@
 </div>
     <div class="post-content">
       <h1 id="本文知识目录">本文知识目录</h1>
-<p><img src="https://ww1.sinaimg.cn/large/8157560cly1gl7a7zmfvjj21ek0pa42f.jpg" alt="00-widget-toc"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gl7a7zmfvjj21ek0pa42f.jpg" alt="00-widget-toc"></p>
 <h1 id="引言">引言</h1>
 <p>在 2020 的 WWDC 上苹果发布了 <code>WidgetKit</code> 小组件，重新设计后的 Widgets，其展示不再局限于负一屏，而且支持在 macOS 和 iOS 的主屏幕上提供动态信息和个性化内容。苹果对小组件定位重点在于信息展示，而非应用程序的快捷方式或者小程序。因此，它的运行限制较多。如何在有限的条件里做好用户体验，就成为了雪球设计师和产品的重要挑战。</p>
 <h1 id="widgetkit-简介">WidgetKit 简介</h1>
 <p>为了提供符合苹果美学与规范的小组件，团队在雪球小组件的产品设计前期就召集相关设计师和产品经理，一起学习了 WWDC20 中关于 <a href="https://developer.apple.com/videos/play/wwdc2020/10103/">Widgets 的 Sessions</a>。</p>
 <h2 id="widgets-核心要素">Widgets 核心要素</h2>
 <p>苹果对于优秀 Widget 的介绍如下：</p>
-<p><img src="https://images.xiaozhuanlan.com/photo/2020/af9968384f462a0f7265800e19c480c2.png" alt="af9968384f462a0f7265800e19c480c2"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/af9968384f462a0f7265800e19c480c2.png" alt="af9968384f462a0f7265800e19c480c2"></p>
 <ol>
 <li>在快速切换应用的主屏幕里，复杂交互的应用界面并不切合用户需求，<strong>简单明了的内容才是用户关注的重点</strong>。</li>
 <li>Widget 会在<strong>恰当时机展示正确的内容</strong>， 同时支持预渲染、复用，并提供灵活可控的更新策略来保证内容即时性。</li>
@@ -197,7 +197,7 @@
 </ol>
 <h2 id="widget-的生命周期">Widget 的生命周期</h2>
 <p>运行在主屏幕的小组件，其生命周期理论上与桌面进程一致。不过由于系统的限制，小组件只能在预定的时间节点提交刷新请求，由系统来决定是否需要进行响应。在其生命周期中，小组件的逻辑有三次被系统调用的机会：</p>
-<p><img src="https://ww1.sinaimg.cn/large/8157560cly1gmlvbfy5zmj20ow0biweu.jpg" alt="03-Widget-timeline-provider"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gmlvbfy5zmj20ow0biweu.jpg" alt="03-Widget-timeline-provider"></p>
 <ol>
 <li>当用户编辑主屏幕添加小组件时，先触发 <code>placeholder(in:)</code> 来优先显示占位效果。</li>
 <li>在预览状态，触发 <code>getSnapshot(for:in:completion:)</code> 创建快照以提供相对完整的信息展示。</li>
@@ -208,7 +208,7 @@
 </blockquote>
 <p>要理解小组件的生命周期，读懂 timeline 的概念就十分重要了。小组件的内容变化都依赖于此。</p>
 <p>timeline 本质上是基于时间驱动的一连串静态视图。</p>
-<p><img src="https://ww1.sinaimg.cn/large/8157560cly1gmlvbki151j20n80ruabl.jpg" alt="02-timeline"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gmlvbki151j20n80ruabl.jpg" alt="02-timeline"></p>
 <p>通过 timeline Provider 提供在未来特定的时间节点的一连串 <code>TimelineEntry</code> 数据，并且可以设置更新策略：</p>
 <ul>
 <li>after：在特定时间后触发更新。</li>
@@ -226,10 +226,10 @@
 <h2 id="widget-设计">Widget 设计</h2>
 <p>雪球希望为用户提供其所关心的市场行情和及时的交易信息。而借助小组件这一新的内容展现形式，能够在一定程度上帮助用户聚集和触达他所关注的信息。</p>
 <p>然而 💡 想法无限，时间有限，我们最终决定先尝试几个实用功能：</p>
-<p><img src="https://ww1.sinaimg.cn/large/8157560cly1gmlvbus0kej23sn24p4g7.jpg" alt="01-Widget-snowball"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gmlvbus0kej23sn24p4g7.jpg" alt="01-Widget-snowball"></p>
 <p>分别选取了用户所关心的大盘行情、自选股、热门话题以及雪球日历。</p>
 <p>另外针对自选股还支持了大、中、小三种尺寸：</p>
-<p><img src="https://ww1.sinaimg.cn/large/8157560cly1gmlvc5oaiej23sn24pqm5.jpg" alt="03-Widget-family"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gmlvc5oaiej23sn24pqm5.jpg" alt="03-Widget-family"></p>
 <p>关于 Widget 设计可以参考这两个 Session：</p>
 <ul>
 <li><a href="https://developer.apple.com/videos/play/wwdc2020/10103">Design great Widgets</a></li>
@@ -318,7 +318,7 @@
 </div>
 </div><p>这里我们通过读取 <code>Info.plist</code> 中预设的 <code>GroupIdentifier</code> 作为 App GroupID。用来解决内网发布所用的企业证书和 App Store 的个人证书不同，导致 App GroupID 不同的问题。</p>
 <p>完整的 Widget token 获取流程如下：</p>
-<p><img src="https://ww1.sinaimg.cn/large/8157560cly1gl7a89pl2cj20ow0dijsa.jpg" alt="04-Widget-token"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gl7a89pl2cj20ow0dijsa.jpg" alt="04-Widget-token"></p>
 <ol>
 <li>用户在雪球登录后，从服务端获取 token。</li>
 <li>雪球 App 退到后台时，将 token 写入 App Group。</li>
@@ -326,7 +326,7 @@
 <li>用户在雪球退出后，将 token 从 App Group 中删除。</li>
 </ol>
 <p>不过，这个流程中还有一处缺陷，就是当用户首次添加小组件时，可能并未在雪球 App 上完成登录操作。这里就需要添加未登录 ⏰。</p>
-<p><img src="https://ww1.sinaimg.cn/large/8157560cly1gml9umivlnj23sn24pkjp.jpg" alt="05-Widget-logout"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gml9umivlnj23sn24pkjp.jpg" alt="05-Widget-logout"></p>
 <p>最后，对于数据量较大的文件共享，可以通过 <code>FileManager</code> 的 <code>containerURL(forSecurityApplicationGroupIdentifier:)</code> 获取 App Group 共享的储存空间地址，进行文件的存取操作。</p>
 <p>由于我们在 Userdefaults 中所使用到 key 都需要在主工程中赋值，在 Widget 中读取。为了避免 key 的多处重复定义，以及方便 API 的统一调用，将公共逻辑抽离到单独文件中，通过 <code>Comple Source</code> 分别在主工程和 Widget 中引用，来实现逻辑共用。</p>
 <div class="highlight"><div class="chroma">
@@ -486,23 +486,23 @@
 </code></pre></td></tr></table>
 </div>
 </div><p>完整代码和预览效果如下：</p>
-<p><img src="https://ww1.sinaimg.cn/large/8157560cly1gmlc9dbv45j225s1r6b29.jpg" alt="06-Widget-bg"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gmlc9dbv45j225s1r6b29.jpg" alt="06-Widget-bg"></p>
 <h3 id="自选列表项实现">自选列表项实现</h3>
 <p>自选列表项在整个小组件中算是相对复杂的布局了，需要支持用户的不同登录状态、自选展示内容和数量的可编辑、不同的画布尺寸以及用户涨跌幅颜色配置等。不过相比 UIKit 而言简，SwiftUI 进行页面编写直不要太爽，以自选列表项 <code>PortfolioItemView</code> 为例，仅需 50 行不到的代码就能完成 UI 与数据逻辑。</p>
 <p>效果如下：</p>
-<p><img src="https://ww1.sinaimg.cn/large/8157560cly1gmld7889cwj22e21r2hdt.jpg" alt="08-Widget-list"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gmld7889cwj22e21r2hdt.jpg" alt="08-Widget-list"></p>
 <p>另外，当获取的股票数据正常时，会将整个视图用 <code>Link</code> 包装，以响应用户点击。股票链接将会跳转到雪球上对应的个股页。</p>
 <p>这里需要 ⚠️ 的是，在 Widget 中自定义的 Button 事件时无法被响应的，我们能做的仅仅是配置 <code>Link</code>。除了 <code>Link</code> 控件之外，还可以通过 <code>WidgetURL</code> 来设置跳转链接，不过它仅针对最后一次设置的 URL 生效。</p>
 <h2 id="0x03-编辑你的自选">0x03 编辑你的自选</h2>
 <p>作为证券交易平台，雪球支持用户添加几百只的股票作为其关注标的，而自选小组件最多可展示的股票数量仅 6 只。为此，我们需要提供能够根据用户的选择来展示对应自选的配置项。而该功能需要利用 <code>Intents</code> 框架来定义股票选择界面，之后系统会根据事先定义好的数据来构建配置页。</p>
 <p>交互效果如下：</p>
-<p><img src="https://ww1.sinaimg.cn/large/8157560cly1gml9uogw6qj23sn24pnpe.jpg" alt="10-Widget-intent"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gml9uogw6qj23sn24pnpe.jpg" alt="10-Widget-intent"></p>
 <blockquote>
 <p>Tips: 关于如何创建和使用 <code>Intent</code> 框架，推荐 <a href="https://developer.apple.com/videos/play/wwdc2020/10036/">WWDC20 - Widgets Code-along, part 3: Advancing timelines</a>。</p>
 </blockquote>
 <h3 id="配置-intentdefinition">配置 IntentDefinition</h3>
 <p>当我们创建小组件时就可以选择对应的 Intent 配置:</p>
-<p><img src="https://ww1.sinaimg.cn/large/8157560cly1gmlvd6lt91j20ts0imdh2.jpg" alt="11-Widget-intentConfig"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gmlvd6lt91j20ts0imdh2.jpg" alt="11-Widget-intentConfig"></p>
 <p><code>Include Configuration Intent</code> 选框决定了 Xcode 所使用带配置，☑️ 表示支持用户配置，反之则不支持。</p>
 <ul>
 <li>StaticConfiguration：无配置属性的 Widget。</li>
@@ -514,10 +514,10 @@
 <p>勾选了 <code>Include Configuration Intent</code>，Xcode 会自动生成 <code>IntentDefinition</code> 文件，并且在编译通过后会自动生成一个名称为 <code>PortfolioSelectionIntent</code> 的 ConfigurationIntent 类。类名可通过 Custom Class 来指定。</p>
 <p>每当我们更新 <code>IntentDefintion</code> 配置，需要重新编译以生成对应的方法。</p>
 <p>自选小组件的 <code>IntentDefintion</code> 文件如下：</p>
-<p><img src="https://ww1.sinaimg.cn/large/8157560cly1gmlvd3rnxlj21490pu0vl.jpg" alt="12-Widget-intentDefine"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gmlvd3rnxlj21490pu0vl.jpg" alt="12-Widget-intentDefine"></p>
 <p>这里我们定义了一个 <code>Portfolio</code> 类用于处理股票数据，属于自定义的参数模版同样也由系统生成。另外，我们勾选了 <strong>Dynamic Optional</strong> 中的 <code>provides search results</code> 用于支持用户输入结果查询。</p>
 <p>编译后系统自动生成的 <code>PortfolioSelectionIntent</code> 类：</p>
-<p><img src="https://ww1.sinaimg.cn/large/8157560cly1gmlvci9cvuj21jv0qe42y.jpg" alt="13-Widget-portfolioSelection"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gmlvci9cvuj21jv0qe42y.jpg" alt="13-Widget-portfolioSelection"></p>
 <p>最终我们在 Widget 的 <strong>IntentTimelineProvider</strong> 入口关联 Intent：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -527,10 +527,10 @@
 <pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">typealias</span> <span class="n">Intent</span> <span class="p">=</span> <span class="n">PortfolioSelectionIntent</span>
 </code></pre></td></tr></table>
 </div>
-</div><p><img src="https://ww1.sinaimg.cn/large/8157560cly1gmlvcdd35tj21hq0zin2u.jpg" alt="14-Widgets"></p>
+</div><p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gmlvcdd35tj21hq0zin2u.jpg" alt="14-Widgets"></p>
 <h3 id="处理-intenthandler">处理 IntentHandler</h3>
 <p>完成绑定后，还需要新建一个 <code>PortfolioSelectionIntentHandler</code> 的 Target 用来处理和响应用户输入。</p>
-<p><img src="https://ww1.sinaimg.cn/large/8157560cly1gmlvale6qkj228418c47r.jpg" alt="15-intenthandler"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gmlvale6qkj228418c47r.jpg" alt="15-intenthandler"></p>
 <p>最后在 <code>IntentHandler</code> 文件中实现 <code>PortfolioSelectionIntentHandling</code> 协议即可。如果在开发过程找不到对应的协议，可以确认一下对应的 <code>.intentdefinition</code> 文件是否添加到 target 中。当用户完成操作后，系统会通过 <strong>IntentTimelineProvider</strong> 来刷新小组件。在 <code>getTimeline(for:in:completion:)</code> 的 configuration 中将返回包含了用户的所挑选的自选股票。</p>
 <p>至此，整个小组件开发就告一段落。大家可以前往 <a href="https://apps.apple.com/cn/App/%E9%9B%AA%E7%90%83-%E8%81%AA%E6%98%8E%E7%9A%84%E6%8A%95%E8%B5%84%E8%80%85%E9%83%BD%E5%9C%A8%E8%BF%99%E9%87%8C/id492180369?l=en">AppStore</a> 体验</p>
 <h1 id="总结">总结</h1>
@@ -573,7 +573,11 @@
           <a href="/tags/swiftui/">SwiftUI</a>
           </div>
       <nav class="post-nav">
-        
+        <a class="prev" href="/post/sourcecode-cocoapods/07-cocoapods-molinillo/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">7. Molinillo 依赖校验</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
         <a class="next" href="/post/sourcecode-cocoapods/06-cocoapods-source/">
             <span class="next-text nav-default">6. PodSpec 管理策略</span>
             <span class="next-text nav-mobile">下一篇</span>

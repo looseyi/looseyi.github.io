@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title> - </title>
+  <title>7. Molinillo 依赖校验 - </title>
   <meta name="renderer" content="webkit" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
@@ -16,7 +16,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
 
-<meta name="author" content="土土Edmond木" /><meta name="description" content="title: &amp;ldquo;7. CocoaPods 的依赖校验 - Molinillo&amp;rdquo; date: 2020-12-31T00:00:00&#43;00:00 draft: true tags: [&amp;lsquo;CocoaPods&amp;rsquo;, &amp;lsquo;iOS&amp;rsquo;, &amp;lsquo;Ruby&amp;rsquo;] categories: [&amp;lsquo;CocoaPods&amp;rsquo;] author: &amp;ldquo;土土Edmond木&amp;rdquo; [toc] 引子 通过「前文」对 CocaPods-Core 的分析，我们大体了解了 Pod 是如何" /><meta name="keywords" content="Hugo, theme, even" />
+<meta name="author" content="土土Edmond木" /><meta name="description" content="引子 通过「前文」对 CocaPods-Core 的分析，我们大体了解了 Pod 是如何被解析、查询与管理的。有了这些整体概念之后，我们就可以逐步深入 pod install 的各个细节。今天我们就来" /><meta name="keywords" content="Hugo, theme, even" />
 
 
 
@@ -40,21 +40,23 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 
 
-<meta property="og:title" content="" />
-<meta property="og:description" content="title: &ldquo;7. CocoaPods 的依赖校验 - Molinillo&rdquo; date: 2020-12-31T00:00:00&#43;00:00 draft: true tags: [&lsquo;CocoaPods&rsquo;, &lsquo;iOS&rsquo;, &lsquo;Ruby&rsquo;] categories: [&lsquo;CocoaPods&rsquo;] author: &ldquo;土土Edmond木&rdquo; [toc] 引子 通过「前文」对 CocaPods-Core 的分析，我们大体了解了 Pod 是如何" />
+<meta property="og:title" content="7. Molinillo 依赖校验" />
+<meta property="og:description" content="引子 通过「前文」对 CocaPods-Core 的分析，我们大体了解了 Pod 是如何被解析、查询与管理的。有了这些整体概念之后，我们就可以逐步深入 pod install 的各个细节。今天我们就来" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="http://looseyi.github.io/post/sourcecode-cocoapods/07-cocoapods-molinillo/" />
+<meta property="article:published_time" content="2021-03-08T00:00:00+00:00" />
+<meta property="article:modified_time" content="2021-03-08T00:00:00+00:00" />
+<meta itemprop="name" content="7. Molinillo 依赖校验">
+<meta itemprop="description" content="引子 通过「前文」对 CocaPods-Core 的分析，我们大体了解了 Pod 是如何被解析、查询与管理的。有了这些整体概念之后，我们就可以逐步深入 pod install 的各个细节。今天我们就来">
+<meta itemprop="datePublished" content="2021-03-08T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2021-03-08T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="6721">
 
-<meta itemprop="name" content="">
-<meta itemprop="description" content="title: &ldquo;7. CocoaPods 的依赖校验 - Molinillo&rdquo; date: 2020-12-31T00:00:00&#43;00:00 draft: true tags: [&lsquo;CocoaPods&rsquo;, &lsquo;iOS&rsquo;, &lsquo;Ruby&rsquo;] categories: [&lsquo;CocoaPods&rsquo;] author: &ldquo;土土Edmond木&rdquo; [toc] 引子 通过「前文」对 CocaPods-Core 的分析，我们大体了解了 Pod 是如何">
-
-<meta itemprop="wordCount" content="1462">
 
 
-
-<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content=""/>
-<meta name="twitter:description" content="title: &ldquo;7. CocoaPods 的依赖校验 - Molinillo&rdquo; date: 2020-12-31T00:00:00&#43;00:00 draft: true tags: [&lsquo;CocoaPods&rsquo;, &lsquo;iOS&rsquo;, &lsquo;Ruby&rsquo;] categories: [&lsquo;CocoaPods&rsquo;] author: &ldquo;土土Edmond木&rdquo; [toc] 引子 通过「前文」对 CocaPods-Core 的分析，我们大体了解了 Pod 是如何"/>
+<meta itemprop="keywords" content="CocoaPods,iOS,Ruby," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="7. Molinillo 依赖校验"/>
+<meta name="twitter:description" content="引子 通过「前文」对 CocaPods-Core 的分析，我们大体了解了 Pod 是如何被解析、查询与管理的。有了这些整体概念之后，我们就可以逐步深入 pod install 的各个细节。今天我们就来"/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -117,13 +119,15 @@
           <article class="post">
     
     <header class="post-header">
-      <h1 class="post-title"></h1>
+      <h1 class="post-title">7. Molinillo 依赖校验</h1>
 
       <div class="post-meta">
-        <span class="post-time"> 0001-01-01 </span>
-        
-          <span class="more-meta"> 约 1462 字 </span>
-          <span class="more-meta"> 预计阅读 3 分钟 </span>
+        <span class="post-time"> 2021-03-08 </span>
+        <div class="post-category">
+            <a href="/categories/cocoapods/"> CocoaPods </a>
+            </div>
+          <span class="more-meta"> 约 6721 字 </span>
+          <span class="more-meta"> 预计阅读 14 分钟 </span>
         
       </div>
     </header>
@@ -140,18 +144,35 @@
         <li><a href="#依赖循环">依赖循环</a></li>
       </ul>
     </li>
-    <li><a href="#解决依赖关系">解决依赖关系</a>
+    <li><a href="#依赖关系的解决">依赖关系的解决</a>
       <ul>
-        <li><a href="#0x01-版本冲突解决方案">0x01 版本冲突解决方案</a></li>
-        <li><a href="#0x02-循环依赖解决方案">0x02 循环依赖解决方案</a></li>
+        <li><a href="#0x01-版本冲突的解决方案">0x01 版本冲突的解决方案</a></li>
+        <li><a href="#0x02-循环依赖的解决方案">0x02 循环依赖的解决方案</a></li>
       </ul>
     </li>
   </ul>
 
   <ul>
-    <li>
+    <li><a href="#resolutionstate">ResolutionState</a>
       <ul>
-        <li></li>
+        <li><a href="#resolution-loop">Resolution Loop</a></li>
+        <li><a href="#resolutionstate-的变化">ResolutionState 的变化</a></li>
+      </ul>
+    </li>
+    <li><a href="#dependencygraph">DependencyGraph</a>
+      <ul>
+        <li><a href="#operation-log">Operation Log</a></li>
+      </ul>
+    </li>
+    <li><a href="#unwind-for-conflict">Unwind For Conflict</a>
+      <ul>
+        <li><a href="#0x1-可能性校验">0x1 可能性校验</a></li>
+        <li><a href="#0x2-冲突状态回撤">0x2 冲突状态回撤</a></li>
+      </ul>
+    </li>
+    <li><a href="#specificationprovider">SpecificationProvider</a>
+      <ul>
+        <li><a href="#nosuchdependencyerror">NoSuchDependencyError</a></li>
       </ul>
     </li>
   </ul>
@@ -159,28 +180,17 @@
   </div>
 </div>
     <div class="post-content">
-      <blockquote>
-<p>title: &ldquo;7. CocoaPods 的依赖校验 - Molinillo&rdquo;
-date: 2020-12-31T00:00:00+00:00
-draft: true
-tags: [&lsquo;CocoaPods&rsquo;, &lsquo;iOS&rsquo;, &lsquo;Ruby&rsquo;]
-categories: [&lsquo;CocoaPods&rsquo;]
-author: &ldquo;土土Edmond木&rdquo;</p>
-</blockquote>
-<p>[toc]</p>
+      <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/Molinillo%20%E4%BE%9D%E8%B5%96%E6%A0%A1%E9%AA%8C.png" alt="Molinillo 依赖校验"></p>
 <h1 id="引子">引子</h1>
-<p>通过「<a href="https://www.zhihu.com/column/c_1254403935512834048"><strong>前文</strong></a>」对 CocaPods-Core 的分析，我们大体了解了 <code>Pod</code> 是如何解析、查询与管理的。有了这些整体概念之后，我们就可以逐步深入 <code>pod install</code> 的各个细节。今天我们就来聊聊 <code>Pod</code> 的依赖校验工具 &mdash; <a href="https://github.com/CocoaPods/Molinillo">Molinillo</a>。开始前，需要聊聊依赖校验的背景。</p>
+<p>通过「<a href="https://www.zhihu.com/column/c_1254403935512834048"><strong>前文</strong></a>」对 CocaPods-Core 的分析，我们大体了解了 <code>Pod</code> 是如何被解析、查询与管理的。有了这些整体概念之后，我们就可以逐步深入 <code>pod install</code> 的各个细节。今天我们就来聊聊 <code>Pod</code> 的依赖校验工具 &mdash; <a href="https://github.com/CocoaPods/Molinillo">Molinillo</a>。开始前，需要聊聊依赖校验的背景。</p>
 <h1 id="依赖管理的挑战">依赖管理的挑战</h1>
 <p>同大多数包管理工具一样 <code>Pod</code> 会将传递依赖的包用扁平化的形式，安装至 workspace 目录 (即：<code>Pods/</code>)。</p>
-<p><strong>Case 1</strong>：<code>pod A</code> 依赖于 <code>pod B</code>，而 <code>pod B</code> 依赖 <code>Alamofire</code>：</p>
-<p><img src="../../../resources/cocoapods/07-Molinillo/01-dependency-flat.png" alt="01-dependency-flat"></p>
-<p>可以看到，经依赖解析原有的依赖树被拍平为了平面模型。</p>
-<blockquote>
-<p>Tips：包括 Molinillo 在内的依赖解析工具都会在运行期间对依赖关系进行建模来构建依赖图，毕竟这是我们表达依赖关系的方式。</p>
-</blockquote>
+<p><strong>依赖传递</strong>：<code>pod A</code> 依赖于 <code>pod B</code>，而 <code>pod B</code> 依赖 <code>Alamofire</code>。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/01-dependency-flat.png" alt="01-dependency-flat"></p>
+<p>可以看到，经依赖解析原有的依赖树被拍平了，安装在同层目录中。</p>
 <p>然而在大型项目中，遇到的更多情况可能像下面这样：</p>
-<p><img src="../../../resources/cocoapods/07-Molinillo/02-dependency-conflict.png" alt="02-dependency-conflict"></p>
-<p>**Case 2：<strong>即 <code>pod A</code> 和 <code>pod B</code> 分别依赖不同版本的 <code>Alamofire</code>。这就是</strong><a href="https://www.wikiwand.com/zh-hans/%E7%9B%B8%E4%BE%9D%E6%80%A7%E5%9C%B0%E7%8B%B1">依赖地狱</a>**的开始。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/02-dependency-conflict.png" alt="02-dependency-conflict"></p>
+<p>**依赖冲突：<strong>即 <code>pod A</code> 和 <code>pod B</code> 分别依赖不同版本的 <code>Alamofire</code>。这就是</strong><a href="https://www.wikiwand.com/zh-hans/%E7%9B%B8%E4%BE%9D%E6%80%A7%E5%9C%B0%E7%8B%B1">依赖地狱</a>**的开始。</p>
 <blockquote>
 <p>依赖地狱：指在操作系统中由于软件之间的依赖性不能被满足而引发的问题。</p>
 </blockquote>
@@ -188,43 +198,1429 @@ author: &ldquo;土土Edmond木&rdquo;</p>
 <p>那么，产生的问题有哪些类型 ？</p>
 <h2 id="问题类型">问题类型</h2>
 <h3 id="依赖过多多重依赖">依赖过多/多重依赖</h3>
-<p>即项目存在大量依赖关系，或者依赖本身有其自身依赖，导致依赖层级过深。像淘宝或美团这样的超级应用，其中的单一业务模块都可能存在这些问题，这将使得依赖解析过于复杂，且容易产生依赖冲突和依赖循环。</p>
+<p>即项目存在大量依赖关系，或者依赖本身有其自身依赖（依赖传递），导致依赖层级过深。像微信或淘宝这样的超级应用，其中的单一业务模块都可能存在这些问题，这将使得依赖解析过于复杂，且容易产生依赖冲突和依赖循环。</p>
 <h3 id="依赖冲突">依赖冲突</h3>
 <p>即项目中的两个依赖包无法共存的情况。可能两个依赖库内部的代码冲突，也可能其底层依赖互相冲突。上面例子中因 <code>Alamofire</code> 版本不同产生的问题就是依赖冲突。</p>
 <h3 id="依赖循环">依赖循环</h3>
-<p>即依赖性关系形成一个闭合环路。如下图：</p>
-<p><img src="../../../resources/cocoapods/07-Molinillo/03-dependency-conflict.png" alt="03-dependency-conflict"></p>
+<p>即依赖性关系形成一个闭合环路。如下图三个 pod 库之间互相依赖产生循环：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/03-dependency-conflict.png" alt="03-dependency-conflict"></p>
 <p>要判断依赖关系中是否存在依赖环，则需要通依赖仲裁算法来解决。</p>
-<h2 id="解决依赖关系">解决依赖关系</h2>
-<p>对于依赖过多或者多重依赖问题，我们可通过合理的架构和设计模式来解决。而依赖校验主要解决的问题为：</p>
+<h2 id="依赖关系的解决">依赖关系的解决</h2>
+<p>对于依赖过多或者多重依赖问题，我们可通过合理的架构和设计模式来解决。而<strong>依赖校验</strong>主要解决的问题为：</p>
 <ol>
-<li>判断依赖图是否存在循环依赖；</li>
 <li>检查依赖图是否存在版本冲突；</li>
+<li>判断依赖图是否存在循环依赖；</li>
 </ol>
-<h3 id="0x01-版本冲突解决方案">0x01 版本冲突解决方案</h3>
-<p>对于版本冲突可通过修改指定版本为带兼容性的版本范围问题来避免。如 <strong>Case 2</strong> 问题可通过修改 <code>Alamofire</code> 版本约束为 <code>~&gt; 4.0</code> 来解决。</p>
-<p>还有一种方式，可基于语言特性来进行依赖性隔离，如 NPM 的每个传递依赖包都可以有自己的node_modules 目录。</p>
-<h3 id="0x02-循环依赖解决方案">0x02 循环依赖解决方案</h3>
-<p>循环依赖则需要需要进行数学建模生成 DAG 图，利用拓扑排序的拆点处理。通过确定依赖图是否为DAG 网图，来验证依赖关系的合理性。</p>
+<h3 id="0x01-版本冲突的解决方案">0x01 版本冲突的解决方案</h3>
+<p>对于版本冲突可通过修改指定版本为带兼容性的版本范围问题来避免。如上面的问题有两个解决方案：</p>
+<ul>
+<li>通过修改两个 <code>pod</code> 的 <code>Alamofire</code> 版本约束为 <code>~&gt; 4.0</code> 来解决。</li>
+<li>去除两个 <code>pod</code> 的版本约束，交由项目中的 <code>Podfile</code> 来指定。</li>
+</ul>
+<p>不过这样会有一个隐患，由于两个 <code>Pod</code> 使用的主版本不同，可能带来 API 不兼容，导致 <code>pod install</code> 即使成功了，最终也无法编译或运行时报错。</p>
+<p>还有一种解决方案，是基于语言特性来进行依赖性隔离。如 npm 的每个传递依赖包如果冲突都可以有自己的 <code>node_modules</code> 依赖目录，即一个依赖库可以存在多个不同版本。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/04-dependency-conflict.png" alt="04-dependency-conflict"></p>
+<h3 id="0x02-循环依赖的解决方案">0x02 循环依赖的解决方案</h3>
+<p>循环依赖则需要需要进行数学建模生成 <code>DAG</code> 图，利用拓扑排序的拆点进行处理。通过确定依赖图是否为 <code>DAG</code> 图，来验证依赖关系的合理性。</p>
 <p>一个 DAG 图的示例：</p>
-<p><img src="../../../resources/cocoapods/07-Molinillo/04-DAG.png" alt="04-DAG"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/05-DAG.png" alt="04-DAG"></p>
 <blockquote>
 <p>DAG 是图论中常见的一种描述问题的结构，全称**有向无环图 (Directed Acyclic Graph) **。想了解更多，可查看瓜瓜的文章 &mdash;「<a href="https://mp.weixin.qq.com/s/oj_cxBwKCxxbr0hYbrj21A">从拓扑排序到 Carthage 依赖校验算法</a>」。</p>
 </blockquote>
-<p>另外，各种包管理工具的依赖仲裁算法也各不相同，有如 Dart 和 SwiftPM 的 <a href="https://medium.com/@nex3/pubgrub-2fb6470504f">PubGrub</a>，Yarn 的 <a href="https://classic.yarnpkg.com/en/docs/selective-version-resolutions">Selective dependency resolutions</a>，还有我们今天聊到的 Molinillo。</p>
+<p>另外，各种包管理工具的依赖校验算法也各不相同，有如 Dart 和 SwiftPM 所使用的 <a href="https://medium.com/@nex3/pubgrub-2fb6470504f">PubGrub</a>，作者号称其为下一代依赖校验算法，Yarn 的 <a href="https://classic.yarnpkg.com/en/docs/selective-version-resolutions">Selective dependency resolutions</a>，还有我们今天聊到的 Molinillo。</p>
 <h1 id="molinillo">Molinillo</h1>
-<h4 id="解决依赖关系resolve-dependencies">解决依赖关系（Resolve Dependencies）</h4>
-<p>CocoaPods 为了解决 Podfile 中声明的依赖关系，使用了一个叫做 <a href="https://github.com/CocoaPods/Molinillo/blob/master/ARCHITECTURE.md">Milinillo</a> 的依赖关系解决算法；但是，笔者在 Google 上并没有找到与这个算法相关的其他信息，推测是 CocoaPods 为了解决 iOS 中的依赖关系创造的算法。</p>
-<p>Milinillo 算法的核心是 <a href="https://en.wikipedia.org/wiki/Backtracking">回溯（Backtracking）</a> 以及 <a href="https://en.wikipedia.org/wiki/Look-ahead_(backtracking)">向前检查（forward check）</a>，整个过程会追踪栈中的两个状态（依赖和可能性）。</p>
-<p>如果有兴趣可以看一下仓库中的 <a href="https://github.com/CocoaPods/Molinillo/blob/master/ARCHITECTURE.md">ARCHITECTURE.md</a> 文件，其中比较详细的解释了 Milinillo 算法的工作原理，并对其功能执行过程有一个比较详细的介绍。</p>
-<p><a href="https://www.cnblogs.com/wonyun/p/9692476.html">探讨npm依赖管理之peerDependencies</a></p>
-<p><a href="https://stackoverflow.com/questions/28099683/algorithm-for-dependency-resolution">Algorithm for dependency resolution</a></p>
-<p><a href="https://blog.csdn.net/afandaafandaafanda/article/details/82717441">深入理解NPM依赖模型</a></p>
-<p><a href="https://bbs.huaweicloud.com/blogs/201995">npm 依赖管理中一些重要的细节</a></p>
-<p><a href="https://www.zoo.team/article/npm-details">npm 依赖管理中被忽略的那些细节</a></p>
-<p><a href="https://juejin.cn/post/6844903833844318222">Rust如何解决依赖地狱</a></p>
-<p><a href="https://muchen.fun/passages/40/">40.拓扑排序</a></p>
-<p><a href="https://draveness.me/cocoapods/">CocoaPods 都做了什么？</a></p>
+<p>Molinillo 作为通用的依赖解析工具，它不仅应用在 CocoaPods 中，在 Bundler 1.9 版本也采用 Molinillo。另外，值得注意的是 Bundler 在 Ruby 2.6 中被作为了默认的 gem 工具内嵌。可以说 Ruby 相关的依赖工具都通过 Molinillo 完成依赖解析。</p>
+<h2 id="resolutionstate">ResolutionState</h2>
+<p>Molinillo 算法的核心是基于<a href="https://en.wikipedia.org/wiki/Backtracking">回溯 (Backtracking)</a> 和 <a href="https://en.wikipedia.org/wiki/Look-ahead_(backtracking)">向前检查 (forward checking)</a>，整个过程会追踪栈中的两个状态 <code>DependencyState</code> 和 <code>PossibilityState</code>。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">module</span> <span class="nn">Molinillo</span>
+  <span class="c1"># 解析状态</span>
+  <span class="no">ResolutionState</span> <span class="o">=</span> <span class="no">Struct</span><span class="o">.</span><span class="n">new</span><span class="p">(</span>
+    <span class="c1"># [String] 当前需求名称</span>
+    <span class="ss">:name</span><span class="p">,</span>
+    <span class="c1"># [Array&lt;Object&gt;] 未处理的需求</span>
+    <span class="ss">:requirements</span><span class="p">,</span>
+    <span class="c1"># [DependencyGraph] 依赖关系图</span>
+    <span class="ss">:activated</span><span class="p">,</span>
+    <span class="c1"># [Object] 当前需求</span>
+    <span class="ss">:requirement</span><span class="p">,</span>
+    <span class="c1"># [Object] 满足当前需求的可能性</span>
+    <span class="ss">:possibilities</span><span class="p">,</span>
+    <span class="c1"># [Integer] 解析深度</span>
+    <span class="ss">:depth</span><span class="p">,</span>
+    <span class="c1"># [Hash] 未解决的冲突，以需求名为 key</span>
+    <span class="ss">:conflicts</span><span class="p">,</span>
+    <span class="c1"># [Array&lt;UnwindDetails&gt;] 记录着未处理过的需要用于回溯的信息</span>
+    <span class="ss">:unused_unwind_options</span>
+  <span class="p">)</span>
+
+  <span class="k">class</span> <span class="nc">ResolutionState</span>
+    <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">empty</span>
+      <span class="kp">new</span><span class="p">(</span><span class="kp">nil</span><span class="p">,</span> <span class="o">[]</span><span class="p">,</span> <span class="no">DependencyGraph</span><span class="o">.</span><span class="n">new</span><span class="p">,</span> <span class="kp">nil</span><span class="p">,</span> <span class="kp">nil</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">{},</span> <span class="o">[]</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="c1"># 记录一组需求和满足当前需求的可能性</span>
+  <span class="k">class</span> <span class="nc">DependencyState</span> <span class="o">&lt;</span> <span class="no">ResolutionState</span>
+	 <span class="c1"># 通过不断 pop 过滤包含的可能性，找出最符合需求的解</span>
+    <span class="k">def</span> <span class="nf">pop_possibility_state</span>
+      <span class="no">PossibilityState</span><span class="o">.</span><span class="n">new</span><span class="p">(</span>
+        <span class="nb">name</span><span class="p">,</span>
+        <span class="n">requirements</span><span class="o">.</span><span class="n">dup</span><span class="p">,</span>
+        <span class="n">activated</span><span class="p">,</span>
+        <span class="n">requirement</span><span class="p">,</span>
+        <span class="o">[</span><span class="n">possibilities</span><span class="o">.</span><span class="n">pop</span><span class="o">]</span><span class="p">,</span>
+        <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">conflicts</span><span class="o">.</span><span class="n">dup</span><span class="p">,</span>
+        <span class="n">unused_unwind_options</span><span class="o">.</span><span class="n">dup</span>
+      <span class="p">)</span><span class="o">.</span><span class="n">tap</span> <span class="k">do</span> <span class="o">|</span><span class="n">state</span><span class="o">|</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">activated</span><span class="o">.</span><span class="n">tag</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="c1"># 仅包含一个满足需求的可能性</span>
+  <span class="k">class</span> <span class="nc">PossibilityState</span> <span class="o">&lt;</span> <span class="no">ResolutionState</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>光看 state 定义大家可能觉得云里雾里。这里很有必要解释一下：</p>
+<p>我们说的需求 (<code>requirement</code>) 到底是指什么呢？大家可以理解为在 <code>Podfile</code> 中声明的 pod。**之所以称为需求，是由于无法判断定义的 dependency 是否合法。**假设它合法，又是否存在符合需求限制版本的解呢 ？即是否存在对应的 <code>PodSpec</code> 我们不而知。因此，这些未知状态称为统一被可能性 <code>possibility</code>。</p>
+<blockquote>
+<p>Tips: 了解这个概念非常重要，这也是笔者在几乎写完本文的情况下，才想明白这些变量名的意义。💔</p>
+</blockquote>
+<h3 id="resolution-loop">Resolution Loop</h3>
+<p>我们先通过图来了解一下 Molinillo 的核心流程 (先忽略异常流）：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/07-backtrack-state.png" alt="07-backtrack-state"></p>
+<p>可以看到整个流程就是不断的将 requirement 的 possibility 过滤和处理，一层层剥离转换为 <code>DependencyState</code>，如此循环往复。</p>
+<p>Molinillo 的入口为 <code>Resolution::resolve</code> 方法，也是上图对应的实现，逻辑如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="c1"># lib/molinillo/resolution.rb</span>
+
+<span class="k">def</span> <span class="nf">resolve</span>
+  <span class="c1"># 1. 初始化 timer 统计耗时初始位置打点</span>
+  <span class="c1"># 2. 内部会调用 push_initial_state 初始化 DependencyState 压栈</span>
+  <span class="c1"># 3. 初始化 DependencyGraph 实例</span>
+  <span class="n">start_resolution</span>
+
+  <span class="k">while</span> <span class="n">state</span>
+    <span class="k">break</span> <span class="k">if</span> <span class="o">!</span><span class="n">state</span><span class="o">.</span><span class="n">requirement</span> <span class="o">&amp;&amp;</span> <span class="n">state</span><span class="o">.</span><span class="n">requirements</span><span class="o">.</span><span class="n">empty?</span>
+    <span class="c1"># 输出一个进度占位</span>
+    <span class="n">indicate_progress</span>
+    <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">respond_to?</span><span class="p">(</span><span class="ss">:pop_possibility_state</span><span class="p">)</span> <span class="c1"># DependencyState</span>
+      <span class="c1"># 调试日志入口</span>
+      <span class="c1"># 如果环境变量 MOLINILLO_DEBUG 是非 nil 就输出 log</span>
+      <span class="c1"># 这里的调试日志有助于排查 Pod 组件的依赖问题</span>
+      <span class="n">debug</span><span class="p">(</span><span class="n">depth</span><span class="p">)</span> <span class="p">{</span> <span class="s2">&#34;Creating possibility state for </span><span class="si">#{</span><span class="n">requirement</span><span class="si">}</span><span class="s2"> (</span><span class="si">#{</span><span class="n">possibilities</span><span class="o">.</span><span class="n">count</span><span class="si">}</span><span class="s2"> remaining)&#34;</span> <span class="p">}</span>
+      <span class="n">state</span><span class="o">.</span><span class="n">pop_possibility_state</span><span class="o">.</span><span class="n">tap</span> <span class="k">do</span> <span class="o">|</span><span class="n">s</span><span class="o">|</span>
+        <span class="k">if</span> <span class="n">s</span>
+          <span class="n">states</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+          <span class="n">activated</span><span class="o">.</span><span class="n">tag</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+    <span class="c1"># 处理栈顶 Possibility State</span>
+    <span class="n">process_topmost_state</span>
+  <span class="k">end</span>
+  <span class="c1"># 遍历 Dependency Graph </span>
+  <span class="n">resolve_activated_specs</span>
+<span class="k">ensure</span>
+  <span class="n">end_resolution</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><ol>
+<li>首先 <code>#start_resolution</code> 会初始化 timer 用于统计解析耗时，并调用 <code>#push_initial_state</code> 初始化 <code>DependencyState</code> 入栈，以及 <strong>DependencyGraph</strong> 初始化。</li>
+<li>获取栈顶 state 检查是否存在待解析需求，接着调用 <code>#pop_possibility_state</code> 进行 state 转换并入栈。</li>
+<li>调用 <code>#process_topmost_state</code> 处理栈顶的 possiblity state，如果当前 state 可被激活，则将该 possiblity 存入 DependencyGraph 对应顶点的 payload 中。否则判定为冲突，需要进行状态回滚。</li>
+<li>循环直到 state 的可能性全部处理结束。</li>
+<li>调用 <code>#resolve_activated_specs</code> ，遍历 DependencyGraph 以存储更新需求的可能性，解析结束。</li>
+</ol>
+<p>当然，依赖处理并非这么简单，复杂的过滤和回溯逻辑都隐藏在 <code>#process_topmost_state</code> 中。</p>
+<h3 id="resolutionstate-的变化">ResolutionState 的变化</h3>
+<p>其实从 <code>ResolutionState</code> 的定义能够看出，为了方便回溯和数据还原，state 是以 Struct 结构定义的。同时在每次 <code>#pop_possibility_state</code> 中，通过 <strong><a href="https://stackoverflow.com/questions/10183370/whats-the-difference-between-rubys-dup-and-clone-methods">#dup</a></strong> 对 diff 数据进行了复制。</p>
+<p>这里用依赖传递的例子来展示解析后状态栈的变化。假设我们在 Podfile 中声明了 <code>A，B，C</code> 三个依赖，他们的关系为：<code>A -&gt; B -&gt; C</code>。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">target</span> <span class="s1">&#39;Example&#39;</span> <span class="k">do</span>
+  <span class="n">pod</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="ss">:path</span> <span class="o">=&gt;</span> <span class="s1">&#39;../&#39;</span>
+  <span class="n">pod</span> <span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="ss">:path</span> <span class="o">=&gt;</span> <span class="s1">&#39;../&#39;</span>  
+  <span class="n">pod</span> <span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="ss">:path</span> <span class="o">=&gt;</span> <span class="err">&#39;</span><span class="o">../</span><span class="err">’</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>在 <code>#resolve_activated_specs</code> 方法设置断点，在解析结束时打印状态栈 <code>@states</code>（简化处理后）如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"> <span class="o">[</span>
+   <span class="c1">#&lt;struct Molinillo::DependencyState name=&#34;C&#34;, requirements=[B, A], ...&gt;, </span>
+   <span class="c1">#&lt;struct Molinillo::PossibilityState name=&#34;C&#34;, requirements=[B, A], ...&gt;</span>
+   <span class="c1">#&lt;struct Molinillo::DependencyState name=&#34;B&#34;, requirements=[A], ...&gt;</span>
+   <span class="c1">#&lt;struct Molinillo::PossibilityState name=&#34;B&#34;, requirements=[A], ...&gt;</span>
+   <span class="c1"># 省略了 C、C、A、A...</span>
+   <span class="c1">#&lt;struct Molinillo::DependencyState name=&#34;B&#34;, requirements=[], ..., </span>
+   <span class="c1">#&lt;struct Molinillo::PossibilityState name=&#34;B&#34;, requirements=[], ..., </span>
+   <span class="c1">#&lt;struct Molinillo::DependencyState name=&#34;&#34;, requirements=[], ..., </span>
+<span class="o">]</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>可以看到栈内保存的 states 中 <code>DependencyState</code> 与 <code>PossibilityState</code> 是成对出现的。不过最后入栈的 <code>DependencyState</code> 是一个空状态，requirements 也为空，此时无法再 pop state 循环结束。</p>
+<h2 id="dependencygraph">DependencyGraph</h2>
+<p>其实包括 Molinillo 在内的依赖解析工具都会在运行期间对依赖关系进行建模来构建依赖图，毕竟这是我们表达依赖关系的方式。那么 DependencyGraph (以下简称 <code>dg</code> ) 是如何定义：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">module</span> <span class="nn">Molinillo</span>
+
+  <span class="k">class</span> <span class="nc">DependencyGraph</span>
+    <span class="c1"># 有向边</span>
+    <span class="no">Edge</span> <span class="o">=</span> <span class="no">Struct</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">:origin</span><span class="p">,</span> <span class="ss">:destination</span><span class="p">,</span> <span class="ss">:requirement</span><span class="p">)</span>
+    <span class="c1"># @return [{String =&gt; Vertex}] 用字典保存顶点, key 为顶点名称(即 requirement.name)</span>
+    <span class="kp">attr_reader</span> <span class="ss">:vertices</span>
+    <span class="c1"># @return [Log] 操作日志</span>
+    <span class="kp">attr_reader</span> <span class="ss">:log</span>
+	 <span class="o">...</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>另外 <strong>Vertex</strong> 定义如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">module</span> <span class="nn">Molinillo</span>
+  <span class="k">class</span> <span class="nc">DependencyGraph</span>
+    <span class="k">class</span> <span class="nc">Vertex</span>
+      <span class="kp">attr_accessor</span> <span class="ss">:name</span>
+      <span class="c1"># @return [Object] 顶点的元数据，reqiuremnt 对应的 possiblity</span>
+      <span class="kp">attr_accessor</span> <span class="ss">:payload</span>
+      <span class="c1"># @return [Array&lt;Object&gt;] 需要依赖该顶点可能性能的需求</span>
+      <span class="kp">attr_reader</span> <span class="ss">:explicit_requirements</span>
+      <span class="c1"># @return [Boolean] 是否为根结点</span>
+      <span class="kp">attr_accessor</span> <span class="ss">:root</span>
+      <span class="c1"># @return [Array&lt;Edge&gt;] 出度 {Edge#origin}</span>
+      <span class="kp">attr_accessor</span> <span class="ss">:outgoing_edges</span>
+      <span class="c1"># @return [Array&lt;Edge&gt;] 入度 {Edge#destination}</span>
+      <span class="kp">attr_accessor</span> <span class="ss">:incoming_edges</span>
+      <span class="c1"># @return [Array&lt;Vertex&gt;] 入度的起点</span>
+      <span class="k">def</span> <span class="nf">predecessors</span>
+        <span class="n">incoming_edges</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:origin</span><span class="p">)</span>
+      <span class="k">end</span>
+      <span class="c1"># @return [Array&lt;Vertex&gt;] 出度的终点</span>
+      <span class="k">def</span> <span class="nf">successors</span>
+        <span class="n">outgoing_edges</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:destination</span><span class="p">)</span>
+      <span class="k">end</span>
+      <span class="o">...</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>熟悉图论的同学都了解，图的保存常用的方式是<strong>邻接表</strong>和<strong>邻接矩阵</strong>。Molinillo 则通过 map + list，vertext 字典与边集数组来保存。如果仅用边集数组来查询顶点本身效率并不高，好在顶点直接用了字典保存了。Molinillo 通过栈来维护解析状态，不断将解析结果 possibility 存入 dg 的 payload 中，同时记录了各个顶点的依赖关系，即 dg 的出度和入度。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/06-Vertex.png" alt="06-Vertex"></p>
+<blockquote>
+<ul>
+<li>在有向图中对于一个顶点来说，如果一条边的终点是这个顶点，这条边就是这个顶点的入度；</li>
+<li>在有向图中对于一个顶点来说，如果一条边的起点是这个顶点，这条边就是这个顶点的出度。</li>
+</ul>
+</blockquote>
+<p>当成功解析的一刻，dg 图也构建完毕。</p>
+<h3 id="operation-log">Operation Log</h3>
+<p>当解析过程出现冲突时，状态栈要回溯直接 pop 一下就完事了，而 dg 咋办 ? 它可没法 pop。</p>
+<p>好在 Molinillo 设计了 Operation Log 机制，通过 Log 记录 dg 执行过的操作。这些操作类型包括：<strong>AddEdgeNoCircular、AddVertex、DeleteEdge、DetachVertexNamed、SetPayload、Tag</strong>。</p>
+<p>Log 结构如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="c1"># frozen_string_literal: true</span>
+
+<span class="k">module</span> <span class="nn">Molinillo</span>
+  <span class="k">class</span> <span class="nc">DependencyGraph</span>
+    <span class="k">class</span> <span class="nc">Log</span>
+      <span class="k">def</span> <span class="nf">initialize</span>
+        <span class="vi">@current_action</span> <span class="o">=</span> <span class="vi">@first_action</span> <span class="o">=</span> <span class="kp">nil</span>
+      <span class="k">end</span>
+
+      <span class="k">def</span> <span class="nf">pop!</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+        <span class="k">return</span> <span class="k">unless</span> <span class="n">action</span> <span class="o">=</span> <span class="vi">@current_action</span>
+        <span class="k">unless</span> <span class="vi">@current_action</span> <span class="o">=</span> <span class="n">action</span><span class="o">.</span><span class="n">previous</span>
+          <span class="vi">@first_action</span> <span class="o">=</span> <span class="kp">nil</span>
+        <span class="k">end</span>
+        <span class="n">action</span><span class="o">.</span><span class="n">down</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+        <span class="n">action</span>
+      <span class="k">end</span>
+
+      <span class="c1"># 回撤到指定的操作节点</span>
+      <span class="k">def</span> <span class="nf">rewind_to</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">tag</span><span class="p">)</span>
+        <span class="kp">loop</span> <span class="k">do</span>
+          <span class="n">action</span> <span class="o">=</span> <span class="n">pop!</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+          <span class="k">raise</span> <span class="s2">&#34;No tag </span><span class="si">#{</span><span class="n">tag</span><span class="o">.</span><span class="n">inspect</span><span class="si">}</span><span class="s2"> found&#34;</span> <span class="k">unless</span> <span class="n">action</span>
+          <span class="k">break</span> <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">class</span><span class="o">.</span><span class="n">action_name</span> <span class="o">==</span> <span class="ss">:tag</span> <span class="o">&amp;&amp;</span> <span class="n">action</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">tag</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+
+      <span class="kp">private</span>
+
+      <span class="c1"># 插入操作节点</span>
+      <span class="k">def</span> <span class="nf">push_action</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">action</span><span class="p">)</span>
+
+        <span class="n">action</span><span class="o">.</span><span class="n">previous</span> <span class="o">=</span> <span class="vi">@current_action</span>
+        <span class="vi">@current_action</span><span class="o">.</span><span class="n">next</span> <span class="o">=</span> <span class="n">action</span> <span class="k">if</span> <span class="vi">@current_action</span>
+        <span class="vi">@current_action</span> <span class="o">=</span> <span class="n">action</span>
+        <span class="vi">@first_action</span> <span class="o">||=</span> <span class="n">action</span>
+        <span class="n">action</span><span class="o">.</span><span class="n">up</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+      <span class="k">end</span>
+      <span class="o">...</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>标准的链表结构，Log 提供了当前指针 <code>@current_action</code> 和表头指针 <code>@first_action</code> 便于链表的遍历。接着看看 Action：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="c1"># frozen_string_literal: true</span>
+
+<span class="k">module</span> <span class="nn">Molinillo</span>
+  <span class="k">class</span> <span class="nc">DependencyGraph</span>
+
+    <span class="k">class</span> <span class="nc">Action</span>
+      <span class="c1"># @return [Symbol] action 名称</span>
+      <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">action_name</span>
+        <span class="k">raise</span> <span class="s1">&#39;Abstract&#39;</span>
+      <span class="k">end</span>
+
+      <span class="c1"># 对图执行正向操作</span>
+      <span class="k">def</span> <span class="nf">up</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="s1">&#39;Abstract&#39;</span>
+      <span class="k">end</span>
+
+      <span class="c1"># 撤销对图的操作</span>
+      <span class="k">def</span> <span class="nf">down</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="s1">&#39;Abstract&#39;</span>
+      <span class="k">end</span>
+       
+      <span class="c1"># @return [Action,Nil] 前序节点</span>
+      <span class="kp">attr_accessor</span> <span class="ss">:previous</span>
+      <span class="c1"># @return [Action,Nil] 后序节点</span>
+      <span class="kp">attr_accessor</span> <span class="ss">:next</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>Action 本身是个抽象类，Log 通过 Action 子类的 <code>#up</code>、<code>#down</code> 来完成对 dg 的操作和撤销。所提供的 Action 中除了 <strong>Tag</strong> 特殊一点，其余均是对 dg 的顶点和边的 CURD 操作。这里以 <code>AddVertex</code> 为例：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="c1"># frozen_string_literal: true</span>
+
+<span class="n">require_relative</span> <span class="s1">&#39;action&#39;</span>
+<span class="k">module</span> <span class="nn">Molinillo</span>
+  <span class="k">class</span> <span class="nc">DependencyGraph</span>
+	 <span class="c1"># @!visibility private</span>
+    <span class="k">class</span> <span class="nc">AddVertex</span> <span class="o">&lt;</span> <span class="no">Action</span> <span class="c1"># :nodoc:</span>
+      <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">action_name</span>
+        <span class="ss">:add_vertex</span>
+      <span class="k">end</span>
+      
+      <span class="c1"># 操作添加顶点</span>
+      <span class="k">def</span> <span class="nf">up</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">existing</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">vertices</span><span class="o">[</span><span class="nb">name</span><span class="o">]</span>
+          <span class="vi">@existing_payload</span> <span class="o">=</span> <span class="n">existing</span><span class="o">.</span><span class="n">payload</span>
+          <span class="vi">@existing_root</span> <span class="o">=</span> <span class="n">existing</span><span class="o">.</span><span class="n">root</span>
+        <span class="k">end</span>
+        <span class="n">vertex</span> <span class="o">=</span> <span class="n">existing</span> <span class="o">||</span> <span class="no">Vertex</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+        <span class="n">graph</span><span class="o">.</span><span class="n">vertices</span><span class="o">[</span><span class="n">vertex</span><span class="o">.</span><span class="n">name</span><span class="o">]</span> <span class="o">=</span> <span class="n">vertex</span>
+        <span class="n">vertex</span><span class="o">.</span><span class="n">payload</span> <span class="o">||=</span> <span class="n">payload</span>
+        <span class="n">vertex</span><span class="o">.</span><span class="n">root</span> <span class="o">||=</span> <span class="n">root</span>
+        <span class="n">vertex</span>
+      <span class="k">end</span>
+
+      <span class="c1"># 删除顶点</span>
+      <span class="k">def</span> <span class="nf">down</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">defined?</span><span class="p">(</span><span class="vi">@existing_payload</span><span class="p">)</span>
+          <span class="n">vertex</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">vertices</span><span class="o">[</span><span class="nb">name</span><span class="o">]</span>
+          <span class="n">vertex</span><span class="o">.</span><span class="n">payload</span> <span class="o">=</span> <span class="vi">@existing_payload</span>
+          <span class="n">vertex</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="vi">@existing_root</span>
+        <span class="k">else</span>
+          <span class="n">graph</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+
+      <span class="c1"># @return [String] 顶点名称 (或者说依赖名称)</span>
+      <span class="kp">attr_reader</span> <span class="ss">:name</span>
+      <span class="c1"># @return [Object] 顶点元数据</span>
+      <span class="kp">attr_reader</span> <span class="ss">:payload</span>
+      <span class="c1"># @return [Boolean] 是否为根</span>
+      <span class="kp">attr_reader</span> <span class="ss">:root</span>
+		<span class="o">...</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>Action 子类均声明为 private 的，通过 Log 提供的对应方法来执行。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">tag</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">tag</span><span class="p">)</span>
+  <span class="n">push_action</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="no">Tag</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">tag</span><span class="p">))</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">add_vertex</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="nb">name</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="n">root</span><span class="p">)</span>
+  <span class="n">push_action</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="no">AddVertex</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="n">root</span><span class="p">))</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">detach_vertex_named</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="nb">name</span><span class="p">)</span>
+  <span class="n">push_action</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="no">DetachVertexNamed</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="nb">name</span><span class="p">))</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">add_edge_no_circular</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">destination</span><span class="p">,</span> <span class="n">requirement</span><span class="p">)</span>
+  <span class="n">push_action</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="no">AddEdgeNoCircular</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">destination</span><span class="p">,</span> <span class="n">requirement</span><span class="p">))</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">delete_edge</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">origin_name</span><span class="p">,</span> <span class="n">destination_name</span><span class="p">,</span> <span class="n">requirement</span><span class="p">)</span>
+  <span class="n">push_action</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="no">DeleteEdge</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">origin_name</span><span class="p">,</span> <span class="n">destination_name</span><span class="p">,</span> <span class="n">requirement</span><span class="p">))</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">set_payload</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="nb">name</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+  <span class="n">push_action</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="no">SetPayload</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">payload</span><span class="p">))</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>最后 log 声明的这些方法会由 dg 直接调用，如 <code>#addVertext</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">module</span> <span class="nn">Molinillo</span>
+  <span class="k">class</span> <span class="nc">DependencyGraph</span>
+    <span class="k">def</span> <span class="nf">add_vertex</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="n">root</span> <span class="o">=</span> <span class="kp">false</span><span class="p">)</span>
+      <span class="n">log</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span> <span class="nb">name</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="n">root</span><span class="p">)</span>
+    <span class="k">end</span>
+    <span class="o">...</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="unwind-for-conflict">Unwind For Conflict</h2>
+<p>有了 op log 之后我们还需要一样重要的东西：<strong>哨兵节点</strong>。由 Tag 类来承载：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="c1"># frozen_string_literal: true</span>
+<span class="k">module</span> <span class="nn">Molinillo</span>
+  <span class="k">class</span> <span class="nc">DependencyGraph</span>
+    <span class="c1"># @!visibility private     </span>
+    <span class="k">class</span> <span class="nc">Tag</span> <span class="o">&lt;</span> <span class="no">Action</span>
+
+      <span class="k">def</span> <span class="nf">up</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+      <span class="k">end</span>
+       
+      <span class="k">def</span> <span class="nf">down</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+      <span class="k">end</span>
+
+      <span class="kp">attr_reader</span> <span class="ss">:tag</span>
+
+      <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+        <span class="vi">@tag</span> <span class="o">=</span> <span class="n">tag</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>作为哨兵节点 Tag 的 <strong>#up</strong> 与 <strong>#down</strong> 操作总是成对出现的。在 Molinillo 中有两处需要进行状态回溯，分别为可能性校验和冲突状态回撤。</p>
+<h3 id="0x1-可能性校验">0x1 可能性校验</h3>
+<p><code>#possibility_satisfies_requirements?</code> 方法用于冲突产生的前后，用于判断该可能性能否同时满足多个需求：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">possibility_satisfies_requirements?</span><span class="p">(</span><span class="n">possibility</span><span class="p">,</span> <span class="n">requirements</span><span class="p">)</span>
+  <span class="nb">name</span> <span class="o">=</span> <span class="n">name_for</span><span class="p">(</span><span class="n">possibility</span><span class="p">)</span>
+
+  <span class="n">activated</span><span class="o">.</span><span class="n">tag</span><span class="p">(</span><span class="ss">:swap</span><span class="p">)</span>
+  <span class="n">activated</span><span class="o">.</span><span class="n">set_payload</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">possibility</span><span class="p">)</span> <span class="k">if</span> <span class="n">activated</span><span class="o">.</span><span class="n">vertex_named</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
+  <span class="n">satisfied</span> <span class="o">=</span> <span class="n">requirements</span><span class="o">.</span><span class="n">all?</span> <span class="p">{</span> <span class="o">|</span><span class="n">r</span><span class="o">|</span> <span class="n">requirement_satisfied_by?</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">activated</span><span class="p">,</span> <span class="n">possibility</span><span class="p">)</span> <span class="p">}</span>
+  <span class="n">activated</span><span class="o">.</span><span class="n">rewind_to</span><span class="p">(</span><span class="ss">:swap</span><span class="p">)</span>
+
+  <span class="n">satisfied</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>为了直观的说明参数，我们举个例子。<code>Case 1</code>假设 <code>Podfile</code> 中存在 pod A 和 B，且 A、B 分别依赖了 Alamofire 3.0 和 4.0，那么对应的参数为：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="ss">possibility</span><span class="p">:</span> <span class="c1">#&lt;Pod::Specification name=&#34;Alamofire&#34; version=&#34;4.0.0&#34;&gt;</span>
+<span class="ss">requirements</span><span class="p">:</span> <span class="o">[</span>
+	<span class="o">&lt;</span><span class="no">Pod</span><span class="o">::</span><span class="no">Dependency</span> <span class="nb">name</span><span class="o">=</span><span class="no">Alamofire</span> <span class="n">requirements</span><span class="o">=~&gt;</span> <span class="mi">3</span><span class="o">.</span><span class="mi">0</span> <span class="n">source</span><span class="o">=</span><span class="kp">nil</span> <span class="n">external_source</span><span class="o">=</span><span class="kp">nil</span><span class="o">&gt;</span><span class="p">,</span> 		<span class="o">&lt;</span><span class="no">Pod</span><span class="o">::</span><span class="no">Dependency</span> <span class="nb">name</span><span class="o">=</span><span class="no">Alamofire</span> <span class="n">requirements</span><span class="o">=~&gt;</span> <span class="mi">4</span><span class="o">.</span><span class="mi">0</span> <span class="n">source</span><span class="o">=</span><span class="kp">nil</span> <span class="n">external_source</span><span class="o">=</span><span class="kp">nil</span><span class="o">&gt;</span>
+<span class="o">]</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>现在来看方法实现：</p>
+<ol>
+<li>首先 <code>activated</code> 就是 Podfile 解析生成的 dg 对象，这里将 symbol <code>:swap</code> 作为标识用于稍后的回撤；</li>
+<li>调用 <code>#set_payload</code> 将顶点 Alamofire 的 payload 修改为 possibility 版本；</li>
+<li>遍历 requirements 并调用代理的 <code>#requirement_satisfied_by</code> 以校验 possiblity 在 dg 中存在的可能性；</li>
+<li>调用 <code>#rewind_to</code> 将顶点的修改回撤至 <code>:swap</code> 前的状态，最后返回检验结果。</li>
+</ol>
+<blockquote>
+<p>Tips: 此处的代理是指 CocoaPods，它做为 Molinillo 的 client 实现了很多代理方法，后续会聊到。</p>
+</blockquote>
+<p>作为候选项 possibility 当然不止一个，代理提供的查询方法 <code>#search_for(dependency)</code> 会返回所有符合 requiremnt 名称的依赖。在 CocoaPods 中，就是通过 <code>Pod::Source</code> 查询获得所有版本的 <code>Pod::Specification</code>，具体可以看上一篇文章：<a href="https://zhuanlan.zhihu.com/p/275680356">PodSpec 管理策略</a>。</p>
+<h3 id="0x2-冲突状态回撤">0x2 冲突状态回撤</h3>
+<p>依赖解析过程出现冲突属于正常情况，此时通过回撤也许可以避免部分冲突，找出其它可行解。Molinillo 通过定义 <code>Conflict</code> 来记录当前的冲突的必要信息：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="no">Conflict</span> <span class="o">=</span> <span class="no">Struct</span><span class="o">.</span><span class="n">new</span><span class="p">(</span>
+  <span class="ss">:requirement</span><span class="p">,</span>
+  <span class="ss">:requirements</span><span class="p">,</span>
+  <span class="ss">:existing</span><span class="p">,</span>
+  <span class="ss">:possibility_set</span><span class="p">,</span>
+  <span class="ss">:locked_requirement</span><span class="p">,</span>
+  <span class="ss">:requirement_trees</span><span class="p">,</span>
+  <span class="ss">:activated_by_name</span><span class="p">,</span>
+  <span class="ss">:underlying_error</span>
+<span class="p">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>重点关注 <code>underlying_error</code>，它记录了所拦截的指定类型错误，并用于状态回撤时的一些判断依据 (后面会解释)。这里我们先看一下定义的错误类型：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="c1"># frozen_string_literal: true</span>
+
+<span class="k">module</span> <span class="nn">Molinillo</span>
+
+  <span class="k">class</span> <span class="nc">ResolverError</span> <span class="o">&lt;</span> <span class="no">StandardError</span><span class="p">;</span> <span class="k">end</span>
+   
+  <span class="c1"># 错误信息：&#34;Unable to find a specification for `#{dependency}`&#34;</span>
+  <span class="k">class</span> <span class="nc">NoSuchDependencyError</span> <span class="o">&lt;</span> <span class="no">ResolverError</span> <span class="o">...</span> <span class="k">end</span>
+        
+  <span class="c1"># 错误信息：&#34;There is a circular dependency between ...&#34;</span>
+  <span class="k">class</span> <span class="nc">CircularDependencyError</span> <span class="o">&lt;</span> <span class="no">ResolverError</span> <span class="o">...</span> <span class="k">end</span>
+        
+  <span class="c1"># 当出现版本冲突时抛出</span>
+  <span class="c1"># 错误信息：&#34;Unable to satisfy the following requirements:\n\n ...&#34;</span>
+  <span class="k">class</span> <span class="nc">VersionConflict</span> <span class="o">&lt;</span> <span class="no">ResolverError</span> <span class="o">...</span> <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>除了主动拦截错误之外，possiblity 不存在时也会主动生成冲突，同时进入状态回撤处理。发生冲突后调用 <code>#create_conflict</code> 和 <code>#unwind_for_conflict</code> 两个方法分别用于生成 Conflict 对象和状态回撤。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">process_topmost_state</span>
+  <span class="k">if</span> <span class="n">possibility</span>
+    <span class="n">attempt_to_activate</span>
+  <span class="k">else</span>
+    <span class="n">create_conflict</span>
+    <span class="n">unwind_for_conflict</span>
+  <span class="k">end</span>
+<span class="k">rescue</span> <span class="no">CircularDependencyError</span> <span class="o">=&gt;</span> <span class="n">underlying_error</span>
+  <span class="n">create_conflict</span><span class="p">(</span><span class="n">underlying_error</span><span class="p">)</span>
+  <span class="n">unwind_for_conflict</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">attempt_to_activate</span>
+  <span class="n">debug</span><span class="p">(</span><span class="n">depth</span><span class="p">)</span> <span class="p">{</span> <span class="s1">&#39;Attempting to activate &#39;</span> <span class="o">+</span> <span class="n">possibility</span><span class="o">.</span><span class="n">to_s</span> <span class="p">}</span>
+  <span class="n">existing_vertex</span> <span class="o">=</span> <span class="n">activated</span><span class="o">.</span><span class="n">vertex_named</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">existing_vertex</span><span class="o">.</span><span class="n">payload</span>
+    <span class="n">debug</span><span class="p">(</span><span class="n">depth</span><span class="p">)</span> <span class="p">{</span> <span class="s2">&#34;Found existing spec (</span><span class="si">#{</span><span class="n">existing_vertex</span><span class="o">.</span><span class="n">payload</span><span class="si">}</span><span class="s2">)&#34;</span> <span class="p">}</span>
+    <span class="n">attempt_to_filter_existing_spec</span><span class="p">(</span><span class="n">existing_vertex</span><span class="p">)</span>
+  <span class="k">else</span>
+    <span class="n">latest</span> <span class="o">=</span> <span class="n">possibility</span><span class="o">.</span><span class="n">latest_version</span>
+    <span class="n">possibility</span><span class="o">.</span><span class="n">possibilities</span><span class="o">.</span><span class="n">select!</span> <span class="k">do</span> <span class="o">|</span><span class="n">possibility</span><span class="o">|</span>
+      <span class="n">requirement_satisfied_by?</span><span class="p">(</span><span class="n">requirement</span><span class="p">,</span> <span class="n">activated</span><span class="p">,</span> <span class="n">possibility</span><span class="p">)</span>
+    <span class="k">end</span>
+    <span class="k">if</span> <span class="n">possibility</span><span class="o">.</span><span class="n">latest_version</span><span class="o">.</span><span class="n">nil?</span>
+      <span class="c1"># ensure there&#39;s a possibility for better error messages</span>
+      <span class="n">possibility</span><span class="o">.</span><span class="n">possibilities</span> <span class="o">&lt;&lt;</span> <span class="n">latest</span> <span class="k">if</span> <span class="n">latest</span>
+      <span class="n">create_conflict</span>
+      <span class="n">unwind_for_conflict</span>
+    <span class="k">else</span>
+      <span class="n">activate_new_spec</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">attempt_to_filter_existing_spec</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
+  <span class="n">filtered_set</span> <span class="o">=</span> <span class="n">filtered_possibility_set</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
+  <span class="k">if</span> <span class="o">!</span><span class="n">filtered_set</span><span class="o">.</span><span class="n">possibilities</span><span class="o">.</span><span class="n">empty?</span>
+    <span class="n">activated</span><span class="o">.</span><span class="n">set_payload</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">filtered_set</span><span class="p">)</span>
+    <span class="n">new_requirements</span> <span class="o">=</span> <span class="n">requirements</span><span class="o">.</span><span class="n">dup</span>
+    <span class="n">push_state_for_requirements</span><span class="p">(</span><span class="n">new_requirements</span><span class="p">,</span> <span class="kp">false</span><span class="p">)</span>
+  <span class="k">else</span>
+    <span class="n">create_conflict</span>
+    <span class="n">debug</span><span class="p">(</span><span class="n">depth</span><span class="p">)</span> <span class="p">{</span> <span class="s2">&#34;Unsatisfied by existing spec (</span><span class="si">#{</span><span class="n">vertex</span><span class="o">.</span><span class="n">payload</span><span class="si">}</span><span class="s2">)&#34;</span> <span class="p">}</span>
+    <span class="n">unwind_for_conflict</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>可以看到这 3 个方法中处理了 4 处冲突的情况。其中 <code>#process_topmost_state</code> 方法拦截了 <strong>CircularDependencyError</strong> 并将其记录在 Conflict 的 <code>underlying_error</code> 中，其余的都是因为 possibility 可行解不存在而主动抛出冲突。</p>
+<p>我们简化成下面的状态图：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/08-process-topmost-state.png" alt="08-process-topmost-state"></p>
+<p>可以理解 possiblity 状态机，通过不断检查可能性，一旦出错主动生成异常。为什么要这么做 ？ 因为状态回溯的成本是很高的，一旦发生意味着我们之前检查工作可能就白费了。这也是 Molinillo 前向查询的充电，通过提早暴露问题，提前回溯。</p>
+<p><strong>unwind_for_conflict</strong></p>
+<p>了解了冲突时如何产生之后，接下来该 <code>#unwind_for_conflict</code> 登场了：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">unwind_for_conflict</span>
+  <span class="n">details_for_unwind</span> <span class="o">=</span> <span class="n">build_details_for_unwind</span>
+  <span class="n">unwind_options</span> <span class="o">=</span> <span class="n">unused_unwind_options</span>
+  <span class="n">debug</span><span class="p">(</span><span class="n">depth</span><span class="p">)</span> <span class="p">{</span> <span class="s2">&#34;Unwinding for conflict: </span><span class="si">#{</span><span class="n">requirement</span><span class="si">}</span><span class="s2"> to </span><span class="si">#{</span><span class="n">details_for_unwind</span><span class="o">.</span><span class="n">state_index</span> <span class="o">/</span> <span class="mi">2</span><span class="si">}</span><span class="s2">&#34;</span> <span class="p">}</span>
+  <span class="n">conflicts</span><span class="o">.</span><span class="n">tap</span> <span class="k">do</span> <span class="o">|</span><span class="n">c</span><span class="o">|</span>
+    <span class="n">sliced_states</span> <span class="o">=</span> <span class="n">states</span><span class="o">.</span><span class="n">slice!</span><span class="p">((</span><span class="n">details_for_unwind</span><span class="o">.</span><span class="n">state_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">..-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">raise_error_unless_state</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+    <span class="n">activated</span><span class="o">.</span><span class="n">rewind_to</span><span class="p">(</span><span class="n">sliced_states</span><span class="o">.</span><span class="n">first</span> <span class="o">||</span> <span class="ss">:initial_state</span><span class="p">)</span> <span class="k">if</span> <span class="n">sliced_states</span>
+    <span class="n">state</span><span class="o">.</span><span class="n">conflicts</span> <span class="o">=</span> <span class="n">c</span>
+    <span class="n">state</span><span class="o">.</span><span class="n">unused_unwind_options</span> <span class="o">=</span> <span class="n">unwind_options</span>
+    <span class="n">filter_possibilities_after_unwind</span><span class="p">(</span><span class="n">details_for_unwind</span><span class="p">)</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="n">states</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="vi">@parents_of</span><span class="o">.</span><span class="n">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">_</span><span class="p">,</span> <span class="n">a</span><span class="o">|</span> <span class="n">a</span><span class="o">.</span><span class="n">reject!</span> <span class="p">{</span> <span class="o">|</span><span class="n">i</span><span class="o">|</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="n">index</span> <span class="p">}</span> <span class="p">}</span>
+    <span class="n">state</span><span class="o">.</span><span class="n">unused_unwind_options</span><span class="o">.</span><span class="n">reject!</span> <span class="p">{</span> <span class="o">|</span><span class="n">uw</span><span class="o">|</span> <span class="n">uw</span><span class="o">.</span><span class="n">state_index</span> <span class="o">&gt;=</span> <span class="n">index</span> <span class="p">}</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>冲突回溯就涉及到前面说过的两个状态需要处理，分别是状态栈 <code>@states</code> 和 dg 内容的回溯。 <code>@state</code> 本身是数组实现的，其元素是各个状态的 state, 要回溯到指定的 state 则要利用 <code>state_index</code>，它保存在 <code>UnwindDetails</code> 中：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="no">UnwindDetails</span> <span class="o">=</span> <span class="no">Struct</span><span class="o">.</span><span class="n">new</span><span class="p">(</span>
+  <span class="ss">:state_index</span><span class="p">,</span>
+  <span class="ss">:state_requirement</span><span class="p">,</span>
+  <span class="ss">:requirement_tree</span><span class="p">,</span>
+  <span class="ss">:conflicting_requirements</span><span class="p">,</span>
+  <span class="ss">:requirement_trees</span><span class="p">,</span>
+  <span class="ss">:requirements_unwound_to_instead</span>
+<span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">UnwindDetails</span>
+  <span class="kp">include</span> <span class="no">Comparable</span>
+  <span class="o">...</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这里解释一下 requirement_trees，这里是指以当前需求作为依赖的需求。以上面的 <code>Case 1</code> 为例，当前冲突的 requirement 就是 Alamofire，对应 requirement_trees 就是依赖了 Alamofire 的 Pod A 和 B：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="o">[</span>
+  <span class="o">[</span>
+    <span class="o">&lt;</span><span class="no">Pod</span><span class="o">::</span><span class="no">Dependency</span> <span class="nb">name</span><span class="o">=</span><span class="n">A</span> <span class="n">requirements</span><span class="o">=</span><span class="kp">nil</span> <span class="n">source</span><span class="o">=</span><span class="kp">nil</span> <span class="n">external_source</span><span class="o">=</span><span class="kp">nil</span><span class="o">&gt;</span><span class="p">,</span>
+    <span class="o">&lt;</span><span class="no">Pod</span><span class="o">::</span><span class="no">Dependency</span> <span class="nb">name</span><span class="o">=</span><span class="no">Alamofire</span> <span class="n">requirements</span><span class="o">=~&gt;</span> <span class="mi">3</span><span class="o">.</span><span class="mi">0</span> <span class="o">...&gt;</span>
+  <span class="o">]</span><span class="p">,</span><span class="o">[</span>
+    <span class="o">&lt;</span><span class="no">Pod</span><span class="o">::</span><span class="no">Dependency</span> <span class="nb">name</span><span class="o">=</span><span class="n">B</span> <span class="o">...&gt;</span><span class="p">,</span>
+    <span class="o">&lt;</span><span class="no">Pod</span><span class="o">::</span><span class="no">Dependency</span> <span class="nb">name</span><span class="o">=</span><span class="no">Alamofire</span> <span class="n">requirements</span><span class="o">=~&gt;</span> <span class="mi">4</span><span class="o">.</span><span class="mi">0</span> <span class="o">...&gt;</span>
+  <span class="o">]</span>
+<span class="o">]</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><code>#build_details_for_unwind</code> 主要用于生成 UnwindDetails，大致流程如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">build_details_for_unwind</span>
+  <span class="n">current_conflict</span> <span class="o">=</span> <span class="n">conflicts</span><span class="o">[</span><span class="nb">name</span><span class="o">]</span>
+  <span class="n">binding_requirements</span> <span class="o">=</span> <span class="n">binding_requirements_for_conflict</span><span class="p">(</span><span class="n">current_conflict</span><span class="p">)</span>
+  <span class="n">unwind_details</span> <span class="o">=</span> <span class="n">unwind_options_for_requirements</span><span class="p">(</span><span class="n">binding_requirements</span><span class="p">)</span>
+
+  <span class="n">last_detail_for_current_unwind</span> <span class="o">=</span> <span class="n">unwind_details</span><span class="o">.</span><span class="n">sort</span><span class="o">.</span><span class="n">last</span>
+  <span class="n">current_detail</span> <span class="o">=</span> <span class="n">last_detail_for_current_unwind</span>
+
+  <span class="c1"># filter &amp; update details options</span>
+  <span class="o">...</span>
+  <span class="n">current_detail</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><ol>
+<li>以 conflict.requirement 为参数，执行 <code>#binding_requirements_for_conflict</code> 以查找出存在冲突的需求 binding_requirements。查询是通过代理的 <code>#search_for(dependency)</code> 方法；</li>
+<li>通过 <code>#unwind_options_for_requirements</code> 遍历查询到的 binding_requirements 获取 requirement 对应的 state 以及该 state 在栈中的 index，用于生成 unwind_details；</li>
+<li>对 unwind_details 排序，取 last 作为 current_detail 并进行其他相关的修改。</li>
+</ol>
+<p><strong>关于如何获取 state_index 和 unwind_details</strong>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">unwind_options_for_requirements</span><span class="p">(</span><span class="n">binding_requirements</span><span class="p">)</span>
+  <span class="n">unwind_details</span> <span class="o">=</span> <span class="o">[]</span>
+
+  <span class="n">trees</span> <span class="o">=</span> <span class="o">[]</span>
+  <span class="n">binding_requirements</span><span class="o">.</span><span class="n">reverse_each</span> <span class="k">do</span> <span class="o">|</span><span class="n">r</span><span class="o">|</span>
+    <span class="n">partial_tree</span> <span class="o">=</span> <span class="o">[</span><span class="n">r</span><span class="o">]</span>
+    <span class="n">trees</span> <span class="o">&lt;&lt;</span> <span class="n">partial_tree</span>
+    <span class="n">unwind_details</span> <span class="o">&lt;&lt;</span> <span class="no">UnwindDetails</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="kp">nil</span><span class="p">,</span> <span class="n">partial_tree</span><span class="p">,</span> <span class="n">binding_requirements</span><span class="p">,</span> <span class="n">trees</span><span class="p">,</span> <span class="o">[]</span><span class="p">)</span>
+    <span class="c1"># 1.1 获取 requirement 对应的 state</span>
+    <span class="n">requirement_state</span> <span class="o">=</span> <span class="n">find_state_for</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+    <span class="c1"># 1.2 确认 possibility 存在</span>
+    <span class="k">if</span> <span class="n">conflict_fixing_possibilities?</span><span class="p">(</span><span class="n">requirement_state</span><span class="p">,</span> <span class="n">binding_requirements</span><span class="p">)</span>
+      <span class="c1"># 1.3 生成 detail 存入 unwind_details</span>
+      <span class="n">unwind_details</span> <span class="o">&lt;&lt;</span> <span class="no">UnwindDetails</span><span class="o">.</span><span class="n">new</span><span class="p">(</span>
+        <span class="n">states</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">requirement_state</span><span class="p">),</span>
+        <span class="n">r</span><span class="p">,</span>
+        <span class="n">partial_tree</span><span class="p">,</span>
+        <span class="n">binding_requirements</span><span class="p">,</span>
+        <span class="n">trees</span><span class="p">,</span>
+        <span class="o">[]</span>
+      <span class="p">)</span>
+    <span class="k">end</span>
+    
+    <span class="c1"># 2. 沿着 requirement 依赖树的父节点获取其 state</span>
+    <span class="n">parent_r</span> <span class="o">=</span> <span class="n">parent_of</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+    <span class="k">next</span> <span class="k">if</span> <span class="n">parent_r</span><span class="o">.</span><span class="n">nil?</span>
+    <span class="n">partial_tree</span><span class="o">.</span><span class="n">unshift</span><span class="p">(</span><span class="n">parent_r</span><span class="p">)</span>
+    <span class="n">requirement_state</span> <span class="o">=</span> <span class="n">find_state_for</span><span class="p">(</span><span class="n">parent_r</span><span class="p">)</span>
+    <span class="c1"># 重复 1.2， 1.3 步骤 ...</span>
+ 	
+    <span class="c1"># 6. 沿着依赖树，重复上述操作</span>
+    <span class="n">grandparent_r</span> <span class="o">=</span> <span class="n">parent_of</span><span class="p">(</span><span class="n">parent_r</span><span class="p">)</span>
+    <span class="k">until</span> <span class="n">grandparent_r</span><span class="o">.</span><span class="n">nil?</span>
+      <span class="n">partial_tree</span><span class="o">.</span><span class="n">unshift</span><span class="p">(</span><span class="n">grandparent_r</span><span class="p">)</span>
+      <span class="n">requirement_state</span> <span class="o">=</span> <span class="n">find_state_for</span><span class="p">(</span><span class="n">grandparent_r</span><span class="p">)</span>
+      <span class="c1"># 重复 1.2、1.3 步骤 ...</span>
+      <span class="n">parent_r</span> <span class="o">=</span> <span class="n">grandparent_r</span>
+      <span class="n">grandparent_r</span> <span class="o">=</span> <span class="n">parent_of</span><span class="p">(</span><span class="n">parent_r</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="n">unwind_details</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>确认 state_index 后，栈回溯反而比较简单了，直接 <code>#slice!</code> 即可：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">sliced_states = states.slice!((details_for_unwind.state_index + 1)..-1)
+</code></pre></td></tr></table>
+</div>
+</div><p>dg 回撤还是 <code>    activated.rewind_to(sliced_states.first || :initial_state) if sliced_states</code>。回撤结束后，流程重新回到 Resolution Loop。</p>
+<h2 id="specificationprovider">SpecificationProvider</h2>
+<p>最后一节简单聊聊 SpecificationProvider。为了更好的接入不同平台，同时保证 Molinillo 的通用性和灵活性，作者将依赖描述文件查询等逻辑抽象成了代理。</p>
+<p>SpecificationProvider 作为单独的 Module 声明了接入端必须实现的 API：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">module</span> <span class="nn">Molinillo</span>
+   <span class="k">module</span> <span class="nn">SpecificationProvider</span>
+
+    <span class="k">def</span> <span class="nf">search_for</span><span class="p">(</span><span class="n">dependency</span><span class="p">)</span>
+      <span class="o">[]</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">dependencies_for</span><span class="p">(</span><span class="n">specification</span><span class="p">)</span>
+      <span class="o">[]</span>
+    <span class="k">end</span>
+    <span class="o">...</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>而 Provider 就是在 Molinillo 初始化的时候注入的：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">require_relative</span> <span class="s1">&#39;dependency_graph&#39;</span>
+
+<span class="k">module</span> <span class="nn">Molinillo</span>
+
+  <span class="k">class</span> <span class="nc">Resolver</span>
+    <span class="n">require_relative</span> <span class="s1">&#39;resolution&#39;</span>
+
+    <span class="kp">attr_reader</span> <span class="ss">:specification_provider</span>
+    <span class="kp">attr_reader</span> <span class="ss">:resolver_ui</span>
+
+    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">specification_provider</span><span class="p">,</span> <span class="n">resolver_ui</span><span class="p">)</span>
+      <span class="vi">@specification_provider</span> <span class="o">=</span> <span class="n">specification_provider</span>
+      <span class="vi">@resolver_ui</span> <span class="o">=</span> <span class="n">resolver_ui</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">resolve</span><span class="p">(</span><span class="n">requested</span><span class="p">,</span> <span class="n">base</span> <span class="o">=</span> <span class="no">DependencyGraph</span><span class="o">.</span><span class="n">new</span><span class="p">)</span>
+      <span class="no">Resolution</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">specification_provider</span><span class="p">,</span>
+                     <span class="n">resolver_ui</span><span class="p">,</span>
+                     <span class="n">requested</span><span class="p">,</span>
+                     <span class="n">base</span><span class="p">)</span><span class="o">.</span>
+        <span class="n">resolve</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>而在 CocoaPods 中的初始化方法则是：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="c1"># /lib/CocoaPods/resolver.rb</span>
+<span class="k">def</span> <span class="nf">resolve</span>
+  <span class="n">dependencies</span> <span class="o">=</span> <span class="vi">@podfile_dependency_cache</span><span class="o">.</span><span class="n">target_definition_list</span><span class="o">.</span><span class="n">flat_map</span> <span class="k">do</span> <span class="o">|</span><span class="n">target</span><span class="o">|</span>
+    <span class="vi">@podfile_dependency_cache</span><span class="o">.</span><span class="n">target_definition_dependencies</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">dep</span><span class="o">|</span>
+      <span class="k">next</span> <span class="k">unless</span> <span class="n">target</span><span class="o">.</span><span class="n">platform</span>
+      <span class="vi">@platforms_by_dependency</span><span class="o">[</span><span class="n">dep</span><span class="o">].</span><span class="n">push</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">platform</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span><span class="o">.</span><span class="n">uniq</span>
+  <span class="vi">@platforms_by_dependency</span><span class="o">.</span><span class="n">each_value</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:uniq!</span><span class="p">)</span>
+  <span class="vi">@activated</span> <span class="o">=</span> <span class="no">Molinillo</span><span class="o">::</span><span class="no">Resolver</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span> <span class="nb">self</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">dependencies</span><span class="p">,</span> <span class="n">locked_dependencies</span><span class="p">)</span>
+  <span class="n">resolver_specs_by_target</span>
+<span class="k">rescue</span> <span class="no">Molinillo</span><span class="o">::</span><span class="no">ResolverError</span> <span class="o">=&gt;</span> <span class="n">e</span>
+  <span class="n">handle_resolver_error</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>该方法则处于 pod install 中的 resolve dependencies 阶段：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/01-pod-install.png" alt="01-pod-install"></p>
+<h3 id="nosuchdependencyerror">NoSuchDependencyError</h3>
+<p>另外，为了更好的处理产生的异常，同时保证核心逻辑对 provider 的无感知，Molinillo 将代理方法做了一层隔离，并且对异常做了统一拦截：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">module</span> <span class="nn">Molinillo</span>
+  <span class="k">module</span> <span class="nn">Delegates</span>
+
+    <span class="k">module</span> <span class="nn">SpecificationProvider</span>
+
+      <span class="k">def</span> <span class="nf">search_for</span><span class="p">(</span><span class="n">dependency</span><span class="p">)</span>
+        <span class="n">with_no_such_dependency_error_handling</span> <span class="k">do</span>
+          <span class="n">specification_provider</span><span class="o">.</span><span class="n">search_for</span><span class="p">(</span><span class="n">dependency</span><span class="p">)</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+
+      <span class="k">def</span> <span class="nf">dependencies_for</span><span class="p">(</span><span class="n">specification</span><span class="p">)</span>
+        <span class="n">with_no_such_dependency_error_handling</span> <span class="k">do</span>
+          <span class="n">specification_provider</span><span class="o">.</span><span class="n">dependencies_for</span><span class="p">(</span><span class="n">specification</span><span class="p">)</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+
+      <span class="o">...</span>
+
+      <span class="kp">private</span>
+
+      <span class="k">def</span> <span class="nf">with_no_such_dependency_error_handling</span>
+        <span class="k">yield</span>
+      <span class="k">rescue</span> <span class="no">NoSuchDependencyError</span> <span class="o">=&gt;</span> <span class="n">error</span>
+        <span class="k">if</span> <span class="n">state</span>
+          <span class="o">...</span>
+        <span class="k">end</span>
+        <span class="k">raise</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><h1 id="总结">总结</h1>
+<p>本篇文章从依赖解析的状态维护、状态存储、状态回溯三个维度来解构 Molinillo 的核心逻辑，它们分别对应了 ResolutionState、DependencyGraph、UnwindDetail 这三种数据结构。一开始写这篇内容时，头脑中对于这些概念是未知的，因为一开始就直接看了作者对 <a href="https://github.com/CocoaPods/Molinillo/blob/master/ARCHITECTURE.md">Molinillo 的架构阐述</a>更是完全找不到思绪，好在我有 VSCode ！！！最终依据不同 Case 下的数据呈现，一点点的进行源码调试，大致摸清的 Molinillo 的状态是如何变化转移的。最后一点，英文和数据结构还是很重要的，possiblity 你理解了吗 ？</p>
+<h1 id="知识点问题梳理">知识点问题梳理</h1>
+<p>这里罗列了五个问题用来考察你是否已经掌握了这篇文章，如果没有建议你加入<strong>收藏</strong>再次阅读：</p>
+<ol>
+<li>说说 Resolution 栈中的 state 是如何转移的 ？</li>
+<li>DependencyGraph 的数据通过什么方式进行回撤的 ？</li>
+<li><code>#process_topmost_state</code> 处理了几种 conflict 情况 ？</li>
+<li>UnwindDetail 的 state_index 是如何获取的 ？</li>
+<li>作者如何利用 SpecificationProvider 来解偶的 ？</li>
+</ol>
 
     </div>
 
@@ -236,7 +1632,7 @@ author: &ldquo;土土Edmond木&rdquo;</p>
   <p class="copyright-item">
     <span class="item-title">上次更新</span>
     <span class="item-content">
-        0001-01-01
+        2021-03-08
         
     </span>
   </p>
@@ -244,14 +1640,18 @@ author: &ldquo;土土Edmond木&rdquo;</p>
   
 </div>
 <footer class="post-footer">
-      
+      <div class="post-tags">
+          <a href="/tags/cocoapods/">CocoaPods</a>
+          <a href="/tags/ios/">iOS</a>
+          <a href="/tags/ruby/">Ruby</a>
+          </div>
       <nav class="post-nav">
-        <a class="prev" href="/post/sourcecode-ios/cocoapods-binary-1/">
-            <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">浅析 cocoapods-binary</span>
-            <span class="prev-text nav-mobile">上一篇</span>
-          </a>
         
+        <a class="next" href="/post/snowball/snowball-widgets/">
+            <span class="next-text nav-default">雪球 iOS Widget 从零到壹</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
       </nav>
     </footer>
   </article>

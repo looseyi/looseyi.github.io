@@ -268,7 +268,7 @@
 </div>
 </div><p><code>Source</code> 还有两个子类 <strong>CDNSource</strong> 和 <strong>TrunkSource</strong>，TrunkSouce 是 CocoaPods 的默认仓库。在版本 1.7.2 之前 Master Repo 的 URL 指向为 Github 的 <a href="https://github.com/CocoaPods/Specs">Specs 仓库</a>，这也是造成我们每次 <code>pod install</code> 或 <code>pod update</code> 慢的原因之一。它不仅保存了近 10 年来 PodSpec 文件同时还包括 Git 记录，再加上墙的原因，每次更新都非常痛苦。而在 1.7.2 之后 CocoaPods 的默认 Source 终于改为了 CDN 指向，同时支持按需下载，缓解了 <code>pod</code> 更新和磁盘占用过大问题。</p>
 <p><code>Source</code> 的依赖关系如下：</p>
-<p><img src="https://ww1.sinaimg.cn/large/8157560cly1gmmes1krayj20ow0bi3yp.jpg" alt="01-Source"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gmmes1krayj20ow0bi3yp.jpg" alt="01-Source"></p>
 <p>回到 <code>Source</code> 来看其如何初始化的，可以看到其构造函数 <code>#initialize(repo)</code> 将传入的 repo 地址保存后，直接调用了 <code>#refresh_metadata</code> 来完成元数据的加载：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -363,7 +363,7 @@
 </div>
 </div><p>最低支持版本为 <code>1.0.0</code>，最新可用版本为 <code> 1.10.0.beta.1</code>，以及最后这个 <code>prefix_lengths</code> 为 <code>[1, 1, 1]</code> 的数组。那么这个 <strong>prefix_lengths 的作用是什么呢 ？</strong></p>
 <p>要回答这个问题，我们先来看一张 <code>Spec Repo</code> 的目录结构图：</p>
-<p><img src="https://ww1.sinaimg.cn/large/8157560cly1gmmes6ydt8j22m60wg7bp.jpg" alt="02-trunk-folder"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gmmes6ydt8j22m60wg7bp.jpg" alt="02-trunk-folder"></p>
 <p>再 🤔 另外一个问题，<strong>为什么 CocoaPods 生成的目录结构是这样 ？</strong></p>
 <p>其实在 2016 年 CocoaPods Spec 仓库下的所有文件都在同级目录，不像现在这样做了分片。这个是为了解决当时用户的吐槽：<a href="https://github.com/CocoaPods/CocoaPods/issues/4989#issuecomment-193772935">Github 下载慢</a>，最终解决方案的结果就如你所见：<strong>将 Git 仓库进行了分片</strong>。</p>
 <p>那么问题来了，<strong>为什么分片能够提升 Github 下载速度？</strong></p>
@@ -421,7 +421,7 @@
 <h2 id="versions">Versions</h2>
 <p>要找到 <code>Podfile</code> 中限定版本号范围的 <code>PodSpec</code> 文件还需要需要最后一步，获取当前已发布的 Versions 列表，并通过比较 Version 得出最终所需的 <code>PodSpec</code> 文件。</p>
 <p>在上一步已通过 <code>metadata</code> 和 <code>pod_name</code> 计算出 <code>pod</code> 所在目录，接着就是找到 <code>pod</code> 目录下的 Versions 列表：</p>
-<p><img src="https://ww1.sinaimg.cn/large/8157560cly1gmmesdsd18j222g0qcwjb.jpg" alt="03-versons-folder"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gmmesdsd18j222g0qcwjb.jpg" alt="03-versons-folder"></p>
 <p>获取 Versions：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -639,7 +639,7 @@
 <h1 id="source-manager">Source Manager</h1>
 <p><code>Manager</code> 作为 source 的管理类，其主要任务为 source 的添加和获取，而对 <code>PodSpec</code> 文件的更新和查找行为则交由 source 各自实现。不过由于一个 <code>pod</code> 库可能对应多个不同的 source，这里又产生出 <code>Aggregate</code> 类来统一 <code>PodSpec</code> 的查询。</p>
 <p>它们的关系如下：</p>
-<p><img src="https://ww1.sinaimg.cn/large/8157560cly1gmmesjqrkbj20ow0bit93.jpg" alt="04-manager"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gmmesjqrkbj20ow0bit93.jpg" alt="04-manager"></p>
 <p>Manager 实现：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -804,7 +804,7 @@
 </div>
 </div><p>用于指定项目中 <code>PodSpec</code> 的查找源，这些指定源最终会保存在 <code>~/.cocoapods/repos</code> 目录下的仓库。</p>
 <p>当敲下 <code>pod install</code> 命令后，在 <code>#resolve_dependencies</code> 阶段的依赖分析中将同时完成 sources 的初始化。</p>
-<p><img src="https://ww1.sinaimg.cn/large/8157560cly1gmmeso77rcj20ow0biaap.jpg" alt="01-pod-install"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gmmeso77rcj20ow0biaap.jpg" alt="01-pod-install"></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -961,7 +961,7 @@
 <li><strong>Command::Repo::Add</strong>：即 <code>pod repo add</code> 命令，对于普通类型的 Source 仓库下载本质就是 <code>git clone</code> 操作。</li>
 </ul>
 <p>简化后源的添加流程如下：</p>
-<p><img src="https://ww1.sinaimg.cn/large/8157560cly1gmmess25w7j20ow0biwex.jpg" alt="05-source-add"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gmmess25w7j20ow0biwex.jpg" alt="05-source-add"></p>
 <h2 id="podspec-查询">PodSpec 查询</h2>
 <p>同样在 <code>#resolve_dependencies</code> 的依赖仲裁阶段，当 <strong>Molinillo</strong> 依赖仲裁开始前，会触发缓存查询 <code>#find_cached_set</code> 并最终调用到 Aggregate 的 <code>#search</code>。完整调用栈放在 <a href="https://gist.github.com/looseyi/492b220ea7e933e972b65876e491886f">gist</a> 上。</p>
 <p>我们来看看 <code>#search</code> 入口：</p>
@@ -1168,7 +1168,7 @@ DynamsoftBarcodeReader/7.1.0/...
 </code></pre></td></tr></table>
 </div>
 </div><p>绕了一圈后回到 Source 的 <code>#versions</code> 方法，由于 CDN Source 不会全量下载 pod 的 PodSpec 文件，在 <a href="https://www.rubydoc.info/gems/cocoapods-core/Pod/CDNSource#versions-instance_method"><strong>#version</strong></a> 的检查过程会进行下载操作。</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gk0tqzq5qoj20ow0bit9k.jpg" alt="08-cdn-search"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gk0tqzq5qoj20ow0bit9k.jpg" alt="08-cdn-search"></p>
 <h3 id="pod-search-查询命令">Pod Search 查询命令</h3>
 <p>CocoaPods 还提供了命令行工具 <code>cocoapods-search</code> 用于已发布的 <code>PodSpec</code> 查找：</p>
 <div class="highlight"><div class="chroma">
@@ -1180,7 +1180,7 @@ DynamsoftBarcodeReader/7.1.0/...
 </code></pre></td></tr></table>
 </div>
 </div><p>它提供了 Web 查询和本地查询。本地查询则不同于 <code>#search</code>，它需要调用 Aggregate 的 <code>#search_by_name</code> ，其实现同 <code>#search</code> 类似，最终也会走到 Source 的 <a href="https://www.rubydoc.info/gems/cocoapods-core/Pod/Source/Aggregate#search_by_name-instance_method">#versions</a> 方法。</p>
-<p><img src="https://ww1.sinaimg.cn/large/8157560cly1gmmesx1nzpj20ow0biwex.jpg" alt="07-pod-search"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gmmesx1nzpj20ow0biwex.jpg" alt="07-pod-search"></p>
 <blockquote>
 <p>注意，Gti 仓库的 <code>#search_by_name</code> 查询仍旧为文件查找，不会调用其 <code>#versions</code> 方法。</p>
 </blockquote>
@@ -1323,7 +1323,7 @@ DynamsoftBarcodeReader/7.1.0/...
 <p>像浏览器或本地缓存<strong>本质是利用 ETag 来进行 Cache-Control</strong>，关于 CDN 缓存可以看这篇：<a href="https://zhuanlan.zhihu.com/p/65722520">传送门</a>。</p>
 <p>而 ETag 就是一串字符，内容通常是数据的哈希值，由服务器返回。首次请求后会在本地缓存起来，并在后续的请求中携带上 ETag 来确定缓存是否需要更新。如果 ETag 值相同，说明资源未更改，服务器会返回 304（Not Modified）响应码。</p>
 <p>Core 的实现也是如此，它会将各请求所对应的 ETag 以文件形式存储：</p>
-<p><img src="https://ww1.sinaimg.cn/large/8157560cly1gmmet1emdjj20y50d9q4c.jpg" alt="06-source-cdn"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gmmet1emdjj20y50d9q4c.jpg" alt="06-source-cdn"></p>
 <p>⚠️ <strong>注意，在这个阶段 CDNSource 仅仅是更新当前目录下的索引文件</strong>，即 <code>all_pods_versions_x_x_x.txt</code>。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -1422,7 +1422,7 @@ DynamsoftBarcodeReader/7.1.0/...
 </div>
 </div><p>在命令初始化时会保存指定的 Source 仓库名称 <code>@name</code>，接着通过 Mixin 的 <code>config</code> 来获取 <code>sources_manager</code> 触发更新。</p>
 <p>最后用一张图来收尾 CocoaPods Workflow：</p>
-<p><img src="https://ww1.sinaimg.cn/large/8157560cly1gmmet7lhvwj20ow0biwet.jpg" alt="09-cocoapods-flow"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gmmet7lhvwj20ow0biwet.jpg" alt="09-cocoapods-flow"></p>
 <h1 id="总结">总结</h1>
 <p>最后一篇 Core 的分析文章，重点介绍了它是如何管理 <code>PodSpec</code> 仓库以及 <code>PodSpec</code> 文件的更新和查找，总结如下：</p>
 <ol>

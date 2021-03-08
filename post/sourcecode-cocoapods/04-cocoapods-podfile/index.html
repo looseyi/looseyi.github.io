@@ -192,7 +192,7 @@
 </code></pre></td></tr></table>
 </div>
 </div><p>它编译后的工程目录如下：</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cgy1gji200f30rj20o005haal.jpg" alt="02-xcode-structure"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cgy1gji200f30rj20o005haal.jpg" alt="02-xcode-structure"></p>
 <p>如你所见 Podfile 的配置是围绕 Xcode 的这些工程结构：<strong>Workspace、Project、Target 及 Build Setting</strong> 来展开的。
 作为包管理工具 CocoaPods 将所管理的 Pods 依赖库组装成一个个 Target，统一放入 <code>Pods.project</code> 中的 <code>Demo target</code>，并自动配置好 Target 间的依赖关系。</p>
 <p>之后将 <code>Example.project</code> 主工程和 <code>Pods.project</code> 工程一起打包到新建的 <code>Example.workspace</code>，配好主工程与 <code>Pods</code> 工程之间的依赖，完成最终转换。</p>
@@ -222,7 +222,7 @@ Project 所管理的资源都来自它所包含的 Targets。特点如下：</p>
 <li>能将其他 Project 作为依赖嵌入其中；</li>
 </ul>
 <p>下图为 Project 与所包含对 Targets 的关系：</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cgy1gji272r51bj21nk0q8wq4.jpg" alt="03-xcode-project"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cgy1gji272r51bj21nk0q8wq4.jpg" alt="03-xcode-project"></p>
 <h2 id="workspace---容器">Workspace - 容器</h2>
 <blockquote>
 <p>A <a href="https://developer.apple.com/library/archive/featuredarticles/XcodeConcepts/Concept-Workspace.html">workspace</a> is an Xcode document that groups projects</p>
@@ -233,14 +233,14 @@ Project 所管理的资源都来自它所包含的 Targets。特点如下：</p>
 <li>同一个 Workspace 中的 Proejct 文件对于其他 Project 是默认可见的，<strong>这些 Projcts 会共享 <code>workspace build directory</code></strong> ；</li>
 <li>一个 Xcode Project 可以被包含在多个不同的 Workspace 中，因为每个 Project 都有独立的 Identity，默认是 Project Name；</li>
 </ul>
-<p><img src="http://cdn.nlark.com/yuque/0/2020/jpeg/98641/1599993134181-70da3da0-70d6-46ff-b9ad-358e77f64466.jpeg#align=left&amp;display=inline&amp;height=309&amp;margin=%5Bobject%20Object%5D&amp;originHeight=309&amp;originWidth=532&amp;size=0&amp;status=done&amp;style=none&amp;width=532#align=left&amp;display=inline&amp;height=309&amp;margin=%5Bobject%20Object%5D&amp;originHeight=309&amp;originWidth=532&amp;status=done&amp;style=none&amp;width=532" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/1599993134181-70da3da0-70d6-46ff-b9ad-358e77f64466.jpeg" alt=""></p>
 <h2 id="scheme---描述-build-过程">Scheme - 描述 Build 过程</h2>
 <blockquote>
 <p>An <a href="https://developer.apple.com/library/archive/featuredarticles/XcodeConcepts/Concept-Schemes.html">Xcode scheme</a> defines a collection of targets to build, a configuration to use when building, and a collection of tests to execute.</p>
 </blockquote>
 <p><strong>Scheme 是对于整个 Build 过程的一个抽象</strong>，它描述了 Xcode 应该使用哪种 <a href="https://medium.com/practical-ios-development/some-practical-uses-for-xcode-build-schemes-and-build-configurations-swift-e50d15a1304f">Build Configurations</a> 、执行什么任务、环境参数等来构建我们所需的 Target。</p>
 <p>Scheme 中预设了六个主要过程： <strong>Build、Run、Test、Profile、Analyze、Archive</strong>。包括了我们对 Target 的所有操作，每一个过程都可以单独配置。</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cgy1gji27cghb4j21nk11kwsz.jpg" alt="05-xcode-scheme"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cgy1gji27cghb4j21nk11kwsz.jpg" alt="05-xcode-scheme"></p>
 <h1 id="cocoapods-core">CocoaPods-Core</h1>
 <blockquote>
 <p>The <a href="https://link.zhihu.com/?target=https%3A//github.com/CocoaPods/Core">CocoaPods-Core</a> gem provides support to work with the models of CocoaPods, for example the Podspecs or the Podfile.</p>
@@ -339,7 +339,7 @@ Project 所管理的资源都来自它所包含的 Targets。特点如下：</p>
 </code></pre></td></tr></table>
 </div>
 </div><p>将这些 Model 类按照对应的依赖关系进行划分，层级如下：</p>
-<p><img src="http://cdn.nlark.com/yuque/0/2020/jpeg/98641/1599993134206-3a7f8fdb-611d-44c1-a2c4-026365408d5e.jpeg?x-oss-process=image%2Fresize%2Cw_746#align=left&amp;display=inline&amp;height=384&amp;margin=%5Bobject%20Object%5D&amp;originHeight=384&amp;originWidth=783&amp;size=0&amp;status=done&amp;style=none&amp;width=783" alt=""></p>
+<p><img src="http://cdn.nlark.com/yuque/0/2020/jpeg/98641/1599993134206-3a7f8fdb-611d-44c1-a2c4-026365408d5e.jpeg" alt=""></p>
 <h2 id="podfile-的主要数据结构">Podfile 的主要数据结构</h2>
 <p>先来了解 Podfile 的主要数据结构</p>
 <h3 id="specification">Specification</h3>
@@ -418,7 +418,7 @@ Project 所管理的资源都来自它所包含的 Targets。特点如下：</p>
 </code></pre></td></tr></table>
 </div>
 </div><p>对应上一节 Xcode 工程结构中的 <code>Podfile</code> 关系如下：</p>
-<p><img src="http://cdn.nlark.com/yuque/0/2020/jpeg/98641/1599993134189-fdfc2639-938d-47c7-ad69-1a8141502f8f.jpeg#align=left&amp;display=inline&amp;height=280&amp;margin=%5Bobject%20Object%5D&amp;originHeight=280&amp;originWidth=357&amp;size=0&amp;status=done&amp;style=none&amp;width=357#align=left&amp;display=inline&amp;height=280&amp;margin=%5Bobject%20Object%5D&amp;originHeight=280&amp;originWidth=357&amp;status=done&amp;style=none&amp;width=357" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/1599993134189-fdfc2639-938d-47c7-ad69-1a8141502f8f.jpeg" alt=""></p>
 <p>CocoaPods 正是巧妙利用了 Xcode 工程结构的特点，引入  <code>Pods.project</code> 这一中间层，将主工程的 Pods 依赖全部转接到 <code>Pods.project</code> 上，最后再将 <code>Pods.project</code> 作为主项目的依赖。尽管这么做也受到了一些质疑和诟病（所谓的侵入性太强），但笔者的观点是，正得益于 <code>Pods.project</code> 这一设计隔绝了第三方依赖库对于主项目的频繁更改，也便于后续的管理和更新，体现了软件工程中的<strong>开放-关闭原则</strong>。</p>
 <p>比如，在 Pod 1.7.0 版本中支持的 <strong><a href="http://blog.cocoapods.org/CocoaPods-1.7.0-beta/">Multiple Xcodeproj Generation</a></strong> 就是解决随着项目的迭代而日益增大的 <code>Pods.project</code> 的问题。试想当你的项目中存在上百个依赖库，每个依赖库的变更都会影响到你的主工程，这将是非常可怕的事情。</p>
 <h3 id="podfile">Podfile</h3>
@@ -701,7 +701,7 @@ Project 所管理的资源都来自它所包含的 Targets。特点如下：</p>
 </div>
 </div><p>这里的方法 <code>podfile</code> 和 <code>podfile_path</code> 都是 lazy 加载的。最后 Core 的 <code>from_file</code> 将依据目录下的 <code>Podfile</code> 文件类型选择调用 <code>from_yaml</code> 或者 <code>from_ruby</code>。</p>
 <p>从 <code>Pod::Command::Install</code> 命令到 Podfile 文件加载的调用栈如下：</p>
-<p><img src="http://cdn.nlark.com/yuque/0/2020/jpeg/98641/1599993134203-782e510d-c084-4b57-98fe-970f5a38cc79.jpeg#align=left&amp;display=inline&amp;height=570&amp;margin=%5Bobject%20Object%5D&amp;originHeight=570&amp;originWidth=728&amp;size=0&amp;status=done&amp;style=none&amp;width=728" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/1599993134203-782e510d-c084-4b57-98fe-970f5a38cc79.jpeg" alt=""></p>
 <h3 id="podfile-from-ruby-解析">Podfile From Ruby 解析</h3>
 <p>当我们通过 <code>pod init</code> 来初始化 CocoaPods 项目时，默认生成的 Podfile 名称就是 <code>Podfile</code>，那就从 <code>Podfile.from_ruby</code> 开始。</p>
 <div class="highlight"><div class="chroma">
@@ -1081,7 +1081,7 @@ Project 所管理的资源都来自它所包含的 Targets。特点如下：</p>
 </code></pre></td></tr></table>
 </div>
 </div><p>整个映射过程如下：</p>
-<p><img src="http://cdn.nlark.com/yuque/0/2020/jpeg/98641/1599993134247-591416bf-8bbb-46cb-a8b9-86c41721acde.jpeg#align=left&amp;display=inline&amp;height=421&amp;margin=%5Bobject%20Object%5D&amp;originHeight=421&amp;originWidth=276&amp;size=0&amp;status=done&amp;style=none&amp;width=276" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/1599993134247-591416bf-8bbb-46cb-a8b9-86c41721acde.jpeg" alt=""></p>
 <h1 id="精细化的-podfile-配置">精细化的 Podfile 配置</h1>
 <p>最后一节让我们来展示一下 💪，看看 <code>Podfile</code> 所谓的 <code>targets</code> 之间的依赖关系可以玩出什么花来 😂。</p>
 <h2 id="target-嵌套">Target 嵌套</h2>
@@ -1109,9 +1109,9 @@ Project 所管理的资源都来自它所包含的 Targets。特点如下：</p>
 </code></pre></td></tr></table>
 </div>
 </div><p>编译后的 <code>Pods.project</code> 项目结构如下：</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cgy1gji2j7fb2pj21nk0q8wpl.jpg" alt="09-podfile-queue"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cgy1gji2j7fb2pj21nk0q8wpl.jpg" alt="09-podfile-queue"></p>
 <p>我们知道，CocoaPods 在 <code>Pods.project</code> 中为每个在 Podfile 中声明的 Target 生成一个与之对应的专属 Target 来集成它的 Pod 依赖。对于有依赖关系的 Target 其生成的专属 Target 名称则会按照依赖关系叠加来命名，如  <code>target Demo3</code> 的专属 Target 名称为 <strong>Pods-Demo1-Demo2-Demo3</strong>。安装完成后主项目将会引入该专属 Target 来完成依赖关联，如 Demo3：</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cgy1gji2kfu6xlj21nk0q8gw5.jpg" alt="10-podfile-link"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cgy1gji2kfu6xlj21nk0q8gw5.jpg" alt="10-podfile-link"></p>
 <p>关于 Target 嵌套，一个父节点是可以有多个子节点的：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -1172,7 +1172,7 @@ Project 所管理的资源都来自它所包含的 Targets。特点如下：</p>
 </code></pre></td></tr></table>
 </div>
 </div><p>将网络请求的 pod 依赖抽象到 <code>Networking</code> target 中，这样就能避免 Demo2 对 RxSwift 的依赖。这种方式配置所生成的 <code>Pods.project</code> 并不会存在名称为 <code>Networking</code> 的 Target，它仅会在主工程的专属 Target 中留下印记：</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gji2mw1b6fj21nk0q8aks.jpg" alt="11-podfile-abstract-target"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gji2mw1b6fj21nk0q8aks-20210223110216273.jpg" alt="11-podfile-abstract-target"></p>
 <h1 id="总结">总结</h1>
 <p>本文结合 Xcode 工程结构来展开 CocoaPods-Core 的 Podfile 之旅，主要感受如下：</p>
 <ol>

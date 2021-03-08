@@ -312,7 +312,7 @@
 </div>
 </div><h2 id="组件构成和对应职责">组件构成和对应职责</h2>
 <p>通过上面对于 <code>Gemfile</code> 的简单分析，可以看出 <em>CocoaPods</em> 不仅仅是一个仓库那么简单，它作为一个三方库版本管理工具，对自身组件的管理和组件化也是十分讲究的。我们继续来看这份 <code>Gemfile</code> 中的核心开发组件：</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1ghshm3q88lj20jg0g0myv.jpg" alt="00-Core Components"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1ghshm3q88lj20jg0g0myv.jpg" alt="00-Core Components"></p>
 <h3 id="claide">CLAide</h3>
 <blockquote>
 <p>The CLAide gem is a simple command line parser, which provides an API that allows you to quickly create a full featured command-line interface.</p>
@@ -538,7 +538,7 @@
 </div><p>上述所见的 <code>Command::Install</code> 类对应的命令为 <code>pod install</code>。<code>pod install</code> 过程是依赖于 <code>Podfile</code> 文件的，所以在入口处会做检测，如果不存在 <code>Podfile</code> 则直接抛出 <strong>No &lsquo;Podfile&rsquo; found in the project directory</strong> 的异常 警告并结束命令。</p>
 <h2 id="执行功能主体">执行功能主体</h2>
 <p>在 <code>installer</code> 实例组装完成之后，调用其 <code>install!</code> 方法，这时候才进入了我们 <code>pod install</code> 命令的主体部分，流程如下图：</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1ghshm3qdsuj20jg0g075y.jpg" alt="01-pod install.png"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1ghshm3qdsuj20jg0g075y.jpg" alt="01-pod install.png"></p>
 <p>对应的实现如下：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -990,7 +990,7 @@ Podfile 中使用 <code>use_frameworks!</code> 时是会生成相应的 .framewo
 检测是否所有的 <em>Pod Target</em> 中版本一致性问题。</li>
 </ol>
 <p>用一个流程图来概括这一验证环节：
-<img src="http://ww1.sinaimg.cn/large/8157560cly1ghtpxodnpuj21j91ez0vg.jpg" alt="validate targets"></p>
+<img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1ghtpxodnpuj21j91ez0vg.jpg" alt="validate targets"></p>
 <h3 id="0x5-生成工程-integrate">0x5 生成工程 (Integrate)</h3>
 <p>工程文件的生成是 <code>pod install</code> 的最后一步，他会将之前版本仲裁后的所有组件通过 Project 文件的形式组织起来，并且会对 Project 中做一些用户指定的配置。</p>
 <div class="highlight"><div class="chroma">
@@ -1093,7 +1093,7 @@ Podfile 中使用 <code>use_frameworks!</code> 时是会生成相应的 .framewo
 </code></pre></td></tr></table>
 </div>
 </div><p>核心组件在 <code>pod install</code> 各阶段的作用如下：</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1ghshm3qinpj20h80ir40e.jpg" alt="02-pod install integrate"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1ghshm3qinpj20h80ir40e.jpg" alt="02-pod install integrate"></p>
 <h1 id="总结">总结</h1>
 <p>当我们知道 CocoaPods 在 install 的大致过程后，我们可以对其做一些修改和控制。例如知道了插件的 <code>pre_install</code> 和 <code>post_install</code> 的具体时机，我们就可以在 <code>Podfile</code> 中执行对应的 Ruby 脚本，达到我们的预期。同时了解 install 过程也有助于我们进行每个阶段的性能分析，以优化和提高 Install 效率。</p>
 <p>后续，将学习 CocoaPods 中每一个组件的实现，将所有的问题在代码中找到答案。</p>

@@ -6,10 +6,19 @@
     <description>Recent content in Posts on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Wed, 13 Jan 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 08 Mar 2021 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="http://looseyi.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>7. Molinillo 依赖校验</title>
+      <link>http://looseyi.github.io/post/sourcecode-cocoapods/07-cocoapods-molinillo/</link>
+      <pubDate>Mon, 08 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/post/sourcecode-cocoapods/07-cocoapods-molinillo/</guid>
+      <description>引子 通过「前文」对 CocaPods-Core 的分析，我们大体了解了 Pod 是如何被解析、查询与管理的。有了这些整体概念之后，我们就可以逐步深入 pod install 的各个细节。今天我们就来</description>
+    </item>
     
     <item>
       <title>雪球 iOS Widget 从零到壹</title>
@@ -216,15 +225,6 @@
       
       <guid>http://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-1/</guid>
       <description>#介绍 cocoapods-binary 最早是在 CocoaPods 的 Blog 中发现的：pre-compiling dependencies。虽非官方出品，但却是国内程序员的力作，medium 原版介</description>
-    </item>
-    
-    <item>
-      <title></title>
-      <link>http://looseyi.github.io/post/sourcecode-cocoapods/07-cocoapods-molinillo/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>http://looseyi.github.io/post/sourcecode-cocoapods/07-cocoapods-molinillo/</guid>
-      <description>title: &amp;ldquo;7. CocoaPods 的依赖校验 - Molinillo&amp;rdquo; date: 2020-12-31T00:00:00+00:00 draft: true tags: [&amp;lsquo;CocoaPods&amp;rsquo;, &amp;lsquo;iOS&amp;rsquo;, &amp;lsquo;Ruby&amp;rsquo;] categories: [&amp;lsquo;CocoaPods&amp;rsquo;] author: &amp;ldquo;土土Edmond木&amp;rdquo; [toc] 引子 通过「前文」对 CocaPods-Core 的分析，我们大体了解了 Pod 是如何</description>
     </item>
     
   </channel>

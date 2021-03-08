@@ -6,10 +6,19 @@
     <description>Recent content in iOS&#39; on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Wed, 13 Jan 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 08 Mar 2021 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="http://looseyi.github.io/tags/ios/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>7. Molinillo 依赖校验</title>
+      <link>http://looseyi.github.io/post/sourcecode-cocoapods/07-cocoapods-molinillo/</link>
+      <pubDate>Mon, 08 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/post/sourcecode-cocoapods/07-cocoapods-molinillo/</guid>
+      <description>引子 通过「前文」对 CocaPods-Core 的分析，我们大体了解了 Pod 是如何被解析、查询与管理的。有了这些整体概念之后，我们就可以逐步深入 pod install 的各个细节。今天我们就来</description>
+    </item>
     
     <item>
       <title>雪球 iOS Widget 从零到壹</title>

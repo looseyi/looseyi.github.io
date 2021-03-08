@@ -189,7 +189,7 @@
 <p>The Specification provides a DSL to describe a Pod. A pod is defined as a library originating from a source. A specification can support detailed attributes for modules of code through subspecs.</p>
 </blockquote>
 <p><code>PodSpec</code> 是用于<strong>描述一个 Pod 库的源代码和资源将如何被打包编译成链接库或 framework 的文件</strong>，而 <code>PodSpec</code> 中的这些描述内容最终将映会映射到 <code>Specification</code> 类中（以下简称 <strong>Spec</strong>）。</p>
-<p><img src="https://i.loli.net/2020/10/08/3MFQxdCNgTHuBIW.png" alt="01-Spec"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/3MFQxdCNgTHuBIW.png" alt="01-Spec"></p>
 <p>让我们来重新认识 <code>PodSpec</code>。</p>
 <h2 id="podspec-初探">PodSpec 初探</h2>
 <p><code>PodSpec</code> 支持的文件格式为 <code>.podspec</code> 和 <code>.json</code> 两种，而 <code>.podspec</code> 本质是 Ruby 文件。</p>
@@ -274,7 +274,7 @@
 </div>
 </div><p>像 👆 我们为不同的系统指定了不同的源码和依赖等，当然可配置的不只这些。</p>
 <p><code>PodSpec</code> 支持的完整配置分类如下：</p>
-<p><img src="https://i.loli.net/2020/10/08/tDW3YNr4F2GXA1y.png" alt="01-Specification"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/tDW3YNr4F2GXA1y.png" alt="01-Specification"></p>
 <p>想了解更多的配置选项：<a href="https://guides.cocoapods.org/syntax/podspec.html">传送门</a>。</p>
 <h3 id="convention-over-configuration">Convention Over Configuration</h3>
 <blockquote>
@@ -380,7 +380,7 @@
 </div>
 </div><p><code>Specification</code> 同样用 map <code>attributes_hash</code> 来记录配置信息。</p>
 <p>⚠️ 这里的 parent 是为 <code>subspec</code> 保留的，用于指向其父节点的 <code>Spec</code>。</p>
-<p><img src="https://i.loli.net/2020/10/08/L8MkIO3bD4dJXqR.png" alt="02-PodSpec-Dependency"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/L8MkIO3bD4dJXqR.png" alt="02-PodSpec-Dependency"></p>
 <h3 id="subspecs">Subspecs</h3>
 <blockquote>
 <p>A library can specify a dependency on either another library, a subspec of another library, or a subspec of itself.</p>
@@ -462,7 +462,7 @@
 <p><strong>QMUI 🐂 🍺</strong></p>
 </blockquote>
 <p>整个 QMUIKit 的 <code>Spec</code> 文件中，总共定义了 <strong>64</strong> 个 <code>subspec</code> 子模块，同时这些子模块之间还做了分层。比如 QMUICore：</p>
-<p><img src="https://i.loli.net/2020/10/08/EQTshCgymAzUXnZ.png" alt="03-QMUICore"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/EQTshCgymAzUXnZ.png" alt="03-QMUICore"></p>
 <p>另外补充一点，CocoaPods 支持了不同类型的 <code>SubSpec</code>：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -647,7 +647,7 @@
 <blockquote>
 <p>Tips: 方法 ② 里的 <strong>Spec</strong> 是对 <code>Specification</code> 的别名。</p>
 </blockquote>
-<p><img src="https://i.loli.net/2020/10/08/fm3xhI5jZidwvuP.png" alt="04-podspec-from-json"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/fm3xhI5jZidwvuP.png" alt="04-podspec-from-json"></p>
 <h2 id="podspec-from-ruby">PodSpec From Ruby</h2>
 <p><code>QMUIKit.podspec</code> 的文件内容，大家是否注意到其开头的声明：</p>
 <div class="highlight"><div class="chroma">
@@ -848,7 +848,7 @@
 </code></pre></td></tr></table>
 </div>
 </div><p><code>Specification</code> 类被加载时，会先遍历 <code>DSL</code> module 加载后所保存的 attributes，再通过 <code>define_method</code> 动态生成对应的配置方法。最终数据还是保存在 <code>attributes_hash</code> 中。</p>
-<p><img src="https://i.loli.net/2020/10/08/9zpkhrngNCG87yT.png" alt="05-PodSpec-Load"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/9zpkhrngNCG87yT.png" alt="05-PodSpec-Load"></p>
 <p><strong>Attribute</strong></p>
 <p>Attribute 是为了记录该配置的相关信息，例如，记录 <code>Spec</code> 是否为根节点、<code>Spec</code> 类型、所支持的 platforms、资源地址通配符等。</p>
 <ol>
@@ -1045,7 +1045,7 @@
 <span class="k">end</span>
 </code></pre></td></tr></table>
 </div>
-</div><p><img src="https://i.loli.net/2020/10/08/UvaHxjwkI8CofhZ.png" alt="06-podspec-single"></p>
+</div><p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/UvaHxjwkI8CofhZ.png" alt="06-podspec-single"></p>
 <p>此时 <code>Pods.project</code> 下的 QMUIKit 的 target 名称为 <strong>QMUIKit</strong>。</p>
 <h3 id="0x2-multiple-target">0x2 Multiple Target</h3>
 <p>如果我们的主项目中存在多个 target 且使用同一个 <code>pod</code> 库的不同 <code>SubSpec</code> 时，结果则有所不同。</p>
@@ -1062,7 +1062,7 @@
 <span class="k">end</span>
 </code></pre></td></tr></table>
 </div>
-</div><p><img src="https://i.loli.net/2020/10/08/OXEcuGNfoMHyJ6g.png" alt="07-podspec-mutil"></p>
+</div><p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/OXEcuGNfoMHyJ6g.png" alt="07-podspec-mutil"></p>
 <p>可以发现，CocoaPods 为每个 tareget 对应的 <code>SubSpec</code> 依赖生成了不同的 QMUIKit targets。</p>
 <blockquote>
 <p>Tips: 当主工程 target 依赖的 <code>Subspec</code> 数量过多导致的名称超过 50 个字符，将会对 subspec 后缀做摘要处理作为唯一标识符。</p>
