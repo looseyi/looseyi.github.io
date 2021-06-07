@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.71.1 with theme even" />
+<meta name="generator" content="Hugo 0.82.1 with theme even" />
 
 
 <link rel="canonical" href="http://looseyi.github.io/post/sourcecode-cocoapods/06-cocoapods-source/" />
@@ -43,17 +43,14 @@
 <meta property="og:title" content="6. PodSpec 管理策略" />
 <meta property="og:description" content="本文目录 引子 本文是 Core 的最后一篇，它与另外两篇文章「Podfile 解析逻辑」和「PodSpec 文件分析」共同支撑起 CocoaPods 世界的骨架。CocoaPo" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="http://looseyi.github.io/post/sourcecode-cocoapods/06-cocoapods-source/" />
-<meta property="article:published_time" content="2020-11-06T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-11-06T00:00:00+00:00" />
+<meta property="og:url" content="http://looseyi.github.io/post/sourcecode-cocoapods/06-cocoapods-source/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2020-11-06T00:00:00&#43;00:00" />
+<meta property="article:modified_time" content="2020-11-06T00:00:00&#43;00:00" />
+
 <meta itemprop="name" content="6. PodSpec 管理策略">
-<meta itemprop="description" content="本文目录 引子 本文是 Core 的最后一篇，它与另外两篇文章「Podfile 解析逻辑」和「PodSpec 文件分析」共同支撑起 CocoaPods 世界的骨架。CocoaPo">
-<meta itemprop="datePublished" content="2020-11-06T00:00:00&#43;00:00" />
+<meta itemprop="description" content="本文目录 引子 本文是 Core 的最后一篇，它与另外两篇文章「Podfile 解析逻辑」和「PodSpec 文件分析」共同支撑起 CocoaPods 世界的骨架。CocoaPo"><meta itemprop="datePublished" content="2020-11-06T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2020-11-06T00:00:00&#43;00:00" />
 <meta itemprop="wordCount" content="6228">
-
-
-
 <meta itemprop="keywords" content="CocoaPods,iOS,Ruby," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="6. PodSpec 管理策略"/>
 <meta name="twitter:description" content="本文目录 引子 本文是 Core 的最后一篇，它与另外两篇文章「Podfile 解析逻辑」和「PodSpec 文件分析」共同支撑起 CocoaPods 世界的骨架。CocoaPo"/>
@@ -352,10 +349,10 @@
 </span><span class="lnt">7
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-yaml" data-lang="yaml">---<span class="w">
-</span><span class="w"></span><span class="k">min</span><span class="p">:</span><span class="w"> </span><span class="m">1.0.0</span><span class="w">
-</span><span class="w"></span><span class="k">last</span><span class="p">:</span><span class="w"> </span><span class="m">1.10.0</span>.beta<span class="m">.1</span><span class="w">
-</span><span class="w"></span><span class="k">prefix_lengths</span><span class="p">:</span><span class="w">
+<pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="nn">---</span><span class="w">
+</span><span class="w"></span><span class="nt">min</span><span class="p">:</span><span class="w"> </span><span class="m">1.0.0</span><span class="w">
+</span><span class="w"></span><span class="nt">last</span><span class="p">:</span><span class="w"> </span><span class="m">1.10.0</span><span class="l">.beta.1</span><span class="w">
+</span><span class="w"></span><span class="nt">prefix_lengths</span><span class="p">:</span><span class="w">
 </span><span class="w"></span>- <span class="m">1</span><span class="w">
 </span><span class="w"></span>- <span class="m">1</span><span class="w">
 </span><span class="w"></span>- <span class="m">1</span><span class="w">

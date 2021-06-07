@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.71.1 with theme even" />
+<meta name="generator" content="Hugo 0.82.1 with theme even" />
 
 
 <link rel="canonical" href="http://looseyi.github.io/post/sourcecode-cocoapods/05-cocoapods-podspec/" />
@@ -43,17 +43,14 @@
 <meta property="og:title" content="5. PodSpec 文件分析" />
 <meta property="og:description" content="引子 在上文 Podfile 解析逻辑 中，我们以 Xcode 工程结构作为切入点介绍了 Podfile 背后对应的数据结构，剖析了 Podfile 文件是如何解析与加载，并最终 &ldquo;入侵&rdq" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="http://looseyi.github.io/post/sourcecode-cocoapods/05-cocoapods-podspec/" />
-<meta property="article:published_time" content="2020-10-13T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-10-13T00:00:00+00:00" />
+<meta property="og:url" content="http://looseyi.github.io/post/sourcecode-cocoapods/05-cocoapods-podspec/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2020-10-13T00:00:00&#43;00:00" />
+<meta property="article:modified_time" content="2020-10-13T00:00:00&#43;00:00" />
+
 <meta itemprop="name" content="5. PodSpec 文件分析">
-<meta itemprop="description" content="引子 在上文 Podfile 解析逻辑 中，我们以 Xcode 工程结构作为切入点介绍了 Podfile 背后对应的数据结构，剖析了 Podfile 文件是如何解析与加载，并最终 &ldquo;入侵&rdq">
-<meta itemprop="datePublished" content="2020-10-13T00:00:00&#43;00:00" />
+<meta itemprop="description" content="引子 在上文 Podfile 解析逻辑 中，我们以 Xcode 工程结构作为切入点介绍了 Podfile 背后对应的数据结构，剖析了 Podfile 文件是如何解析与加载，并最终 &ldquo;入侵&rdq"><meta itemprop="datePublished" content="2020-10-13T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2020-10-13T00:00:00&#43;00:00" />
 <meta itemprop="wordCount" content="4929">
-
-
-
 <meta itemprop="keywords" content="CocoaPods,iOS,Ruby," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="5. PodSpec 文件分析"/>
 <meta name="twitter:description" content="引子 在上文 Podfile 解析逻辑 中，我们以 Xcode 工程结构作为切入点介绍了 Podfile 背后对应的数据结构，剖析了 Podfile 文件是如何解析与加载，并最终 &ldquo;入侵&rdq"/>

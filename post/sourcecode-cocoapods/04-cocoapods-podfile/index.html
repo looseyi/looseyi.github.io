@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.71.1 with theme even" />
+<meta name="generator" content="Hugo 0.82.1 with theme even" />
 
 
 <link rel="canonical" href="http://looseyi.github.io/post/sourcecode-cocoapods/04-cocoapods-podfile/" />
@@ -43,17 +43,14 @@
 <meta property="og:title" content="4. Podfile 的解析逻辑" />
 <meta property="og:description" content="引子 在上文 CocoaPods 命令解析 中，我们通过对 CLAide 的源码分析，了解了 CocoaPods 是如何处理 pod 命令，多级命令又是如何组织和嵌套的，并解释了命令行输出所代表的含义。今天" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="http://looseyi.github.io/post/sourcecode-cocoapods/04-cocoapods-podfile/" />
-<meta property="article:published_time" content="2020-09-17T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-09-17T00:00:00+00:00" />
+<meta property="og:url" content="http://looseyi.github.io/post/sourcecode-cocoapods/04-cocoapods-podfile/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2020-09-17T00:00:00&#43;00:00" />
+<meta property="article:modified_time" content="2020-09-17T00:00:00&#43;00:00" />
+
 <meta itemprop="name" content="4. Podfile 的解析逻辑">
-<meta itemprop="description" content="引子 在上文 CocoaPods 命令解析 中，我们通过对 CLAide 的源码分析，了解了 CocoaPods 是如何处理 pod 命令，多级命令又是如何组织和嵌套的，并解释了命令行输出所代表的含义。今天">
-<meta itemprop="datePublished" content="2020-09-17T00:00:00&#43;00:00" />
+<meta itemprop="description" content="引子 在上文 CocoaPods 命令解析 中，我们通过对 CLAide 的源码分析，了解了 CocoaPods 是如何处理 pod 命令，多级命令又是如何组织和嵌套的，并解释了命令行输出所代表的含义。今天"><meta itemprop="datePublished" content="2020-09-17T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2020-09-17T00:00:00&#43;00:00" />
 <meta itemprop="wordCount" content="5926">
-
-
-
 <meta itemprop="keywords" content="CocoaPods,iOS,Ruby," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="4. Podfile 的解析逻辑"/>
 <meta name="twitter:description" content="引子 在上文 CocoaPods 命令解析 中，我们通过对 CLAide 的源码分析，了解了 CocoaPods 是如何处理 pod 命令，多级命令又是如何组织和嵌套的，并解释了命令行输出所代表的含义。今天"/>

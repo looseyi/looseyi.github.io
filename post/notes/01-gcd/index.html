@@ -23,7 +23,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.71.1 with theme even" />
+<meta name="generator" content="Hugo 0.82.1 with theme even" />
 
 
 <link rel="canonical" href="http://looseyi.github.io/post/notes/01-gcd/" />
@@ -43,17 +43,14 @@
 <meta property="og:title" content="📒个人备忘 - 队列、GCD、线程基础" />
 <meta property="og:description" content="[toc] 引子 本篇内容大多来自网络上的一些文章，希望做一个 📝 和参考，如有出错的地方希望指正。 起因是公司内部的同学在开发中遇到了 FMDB 的一个 Crash，查" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="http://looseyi.github.io/post/notes/01-gcd/" />
-<meta property="article:published_time" content="2020-06-16T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-06-16T00:00:00+00:00" />
+<meta property="og:url" content="http://looseyi.github.io/post/notes/01-gcd/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2020-06-16T00:00:00&#43;00:00" />
+<meta property="article:modified_time" content="2020-06-16T00:00:00&#43;00:00" />
+
 <meta itemprop="name" content="📒个人备忘 - 队列、GCD、线程基础">
-<meta itemprop="description" content="[toc] 引子 本篇内容大多来自网络上的一些文章，希望做一个 📝 和参考，如有出错的地方希望指正。 起因是公司内部的同学在开发中遇到了 FMDB 的一个 Crash，查">
-<meta itemprop="datePublished" content="2020-06-16T00:00:00&#43;00:00" />
+<meta itemprop="description" content="[toc] 引子 本篇内容大多来自网络上的一些文章，希望做一个 📝 和参考，如有出错的地方希望指正。 起因是公司内部的同学在开发中遇到了 FMDB 的一个 Crash，查"><meta itemprop="datePublished" content="2020-06-16T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2020-06-16T00:00:00&#43;00:00" />
 <meta itemprop="wordCount" content="3545">
-
-
-
 <meta itemprop="keywords" content="iOS&#39;,📒,GCD," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="📒个人备忘 - 队列、GCD、线程基础"/>
 <meta name="twitter:description" content="[toc] 引子 本篇内容大多来自网络上的一些文章，希望做一个 📝 和参考，如有出错的地方希望指正。 起因是公司内部的同学在开发中遇到了 FMDB 的一个 Crash，查"/>
@@ -488,7 +485,7 @@ task 3 &lt;NSThread: 0x600000ff2700&gt;{number = 4, name = (null)}
 <h1 id="使用同步串行队列保护代码">使用同步串行队列保护代码</h1>
 <p>最后，让我们回到引子中提到的 <code>FMDatabaseQueue</code> 的内部实现。它通过内部维护的 <code>serial dispatch queue</code> + <code>dispatch_sync</code> 来处理 <code>inDatabase:</code> 传入的 block，所以当我们调用 <code>inDatabase:</code> 时，代码实际上是同步执行的。</p>
 <blockquote>
-<p>FMDatabaseQueue will run the blocks on a serialized queue (hence the name of the class).  So if you call FMDatabaseQueue &lsquo;s methods from multiple threads at the same time, they will be executed in the order they are received.  This way queries and updates won&rsquo;t step on each other&rsquo;s toes, and every one is happy.</p>
+<p>FMDatabaseQueue will run the blocks on a serialized queue (hence the name of the class).  So if you call FMDatabaseQueue &rsquo;s methods from multiple threads at the same time, they will be executed in the order they are received.  This way queries and updates won&rsquo;t step on each other&rsquo;s toes, and every one is happy.</p>
 </blockquote>
 <p>FMDB 这么设计的目的是让我们避免发生并发访问数据库的问题，因为它无法保证用户访问数据库的时机。通过内置的同步串行队列后，<code>FMDatabaseQueue</code> 就变成线程安全了，所有的数据库访问都是同步执行，而且这比使用 @synchronized 或 NSLock 要高效得多。</p>
 <p>不过，需要注意的是 FMDB 这么做了之后，我们在使用 <code>FMDatabaseQueue</code> 时候就得小心了。</p>

@@ -6,10 +6,15 @@
     <description>Recent content on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Mon, 08 Mar 2021 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="http://looseyi.github.io/index.xml" rel="self" type="application/rss+xml" />
-    
+    <lastBuildDate>Sun, 16 May 2021 00:00:00 +0000</lastBuildDate><atom:link href="http://looseyi.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>8. Xcode 工程文件解析</title>
+      <link>http://looseyi.github.io/post/sourcecode-cocoapods/08-cocoapods-xcodeproj/</link>
+      <pubDate>Sun, 16 May 2021 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/post/sourcecode-cocoapods/08-cocoapods-xcodeproj/</guid>
+      <description>引子 在「Molinillo 依赖校验」通过后，CocoaPods 会根据确定的 PodSpec 下载对应的源代码和资源，并为每个 PodSpec 生成对应的 Xcode Target。本文</description>
+    </item>
     
     <item>
       <title>7. Molinillo 依赖校验</title>
