@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>WWDC20 - What&#39;s new in SwiftUI - </title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="土土Edmond木" /><meta name="description" content="WWDC 2020 Session 10041 - What&amp;rsquo;s new in SwiftUI 本文知识目录 对于 iOS 开发而言， WWDC 2019 中推出的 SwiftUI 无疑是最受关注的一项技术，它可以在所有 Apple 平台上构建出色的用户界面。而今年我们迎来" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.82.1 with theme even" />
+
+
+<link rel="canonical" href="http://looseyi.github.io/post/wwdc/wwdc20/wwdc20-session-10041/" />
+  <link href="http://looseyi.github.io/post/wwdc/wwdc20/wwdc20-session-10041/index.xml" rel="alternate" type="application/rss+xml" title="" />
+  <link href="http://looseyi.github.io/post/wwdc/wwdc20/wwdc20-session-10041/index.xml" rel="feed" type="application/rss+xml" title="" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="WWDC20 - What&#39;s new in SwiftUI" />
+<meta property="og:description" content="WWDC 2020 Session 10041 - What&rsquo;s new in SwiftUI 本文知识目录 对于 iOS 开发而言， WWDC 2019 中推出的 SwiftUI 无疑是最受关注的一项技术，它可以在所有 Apple 平台上构建出色的用户界面。而今年我们迎来" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://looseyi.github.io/post/wwdc/wwdc20/wwdc20-session-10041/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2020-06-26T00:00:00&#43;00:00" />
+<meta property="article:modified_time" content="2020-06-26T00:00:00&#43;00:00" />
+
+<meta itemprop="name" content="WWDC20 - What&#39;s new in SwiftUI">
+<meta itemprop="description" content="WWDC 2020 Session 10041 - What&rsquo;s new in SwiftUI 本文知识目录 对于 iOS 开发而言， WWDC 2019 中推出的 SwiftUI 无疑是最受关注的一项技术，它可以在所有 Apple 平台上构建出色的用户界面。而今年我们迎来"><meta itemprop="datePublished" content="2020-06-26T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2020-06-26T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="5010">
+<meta itemprop="keywords" content="iOS&#39;,WWDC20&#39;,SwiftUI," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="WWDC20 - What&#39;s new in SwiftUI"/>
+<meta name="twitter:description" content="WWDC 2020 Session 10041 - What&rsquo;s new in SwiftUI 本文知识目录 对于 iOS 开发而言， WWDC 2019 中推出的 SwiftUI 无疑是最受关注的一项技术，它可以在所有 Apple 平台上构建出色的用户界面。而今年我们迎来"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Aha Moment</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Aha Moment</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">WWDC20 - What&#39;s new in SwiftUI</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-06-26 </span>
+        <div class="post-category">
+            <a href="/categories/ios/"> iOS </a>
+            <a href="/categories/wwdc/"> WWDC </a>
+            <a href="/categories/swiftui/"> SwiftUI </a>
+            </div>
+          <span class="more-meta"> 约 5010 字 </span>
+          <span class="more-meta"> 预计阅读 10 分钟 </span>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#app--scene">App &amp; Scene</a></li>
+    <li><a href="#windowgroup">WindowGroup</a></li>
+    <li><a href="#documentgroup">DocumentGroup</a></li>
+    <li><a href="#xcode-support">Xcode Support</a></li>
+    <li><a href="#swiftui-app-sessions">SwiftUI App Sessions</a></li>
+    <li><a href="#widgets">Widgets</a>
+      <ul>
+        <li><a href="#widgets-in-watchos">Widgets in watchOS</a></li>
+      </ul>
+    </li>
+  </ul>
+
+  <ul>
+    <li><a href="#outlines">Outlines</a></li>
+    <li><a href="#grids">Grids</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#toolbar">Toolbar</a></li>
+    <li><a href="#label">Label</a>
+      <ul>
+        <li><a href="#label-list">Label List</a></li>
+      </ul>
+    </li>
+    <li><a href="#help">Help</a></li>
+    <li><a href="#new-views">New Views</a>
+      <ul>
+        <li><a href="#progressview">ProgressView</a></li>
+        <li><a href="#gauges">Gauges</a></li>
+      </ul>
+    </li>
+  </ul>
+
+  <ul>
+    <li><a href="#hovereffect">HoverEffect</a></li>
+    <li><a href="#styling">Styling</a>
+      <ul>
+        <li><a href="#containerrelativeshape">ContainerRelativeShape</a></li>
+        <li><a href="#dynamic-type-scaling">Dynamic Type Scaling</a></li>
+        <li><a href="#list-item-tinting">List Item Tinting</a></li>
+      </ul>
+    </li>
+  </ul>
+
+  <ul>
+    <li><a href="#链接跳转">链接跳转</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <blockquote>
+<p>WWDC 2020 Session 10041 - <a href="https://developer.apple.com/videos/play/wwdc2020/10041/?time=3">What&rsquo;s new in SwiftUI</a></p>
+</blockquote>
+<h1 id="本文知识目录">本文知识目录</h1>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/tablecontent.png" alt=""></p>
+<p>对于 iOS 开发而言， WWDC 2019 中推出的 SwiftUI 无疑是最受关注的一项技术，它可以在所有 Apple 平台上构建出色的用户界面。而今年我们迎来了 SwiftUI 2.0，让我一起来看看 SwiftUI 有哪些新增功能。</p>
+<p>今年有很多新 feature，且数量远超出我们一次演讲所能涵盖的范围，但是我们将尽力涵盖尽可能多的内容。同时我们也会介绍相关的 Session，大家可以查看这些 Session 以了解更多信息。</p>
+<h1 id="apps-and-widgets">Apps and Widgets</h1>
+<p>让我们从 Apps 和 Widgets 开始。</p>
+<p>这是苹果第一次仅使用 SwiftUI 来构建整个应用程序，而不是将 SwiftUI 代码嵌入 <code>UIKit</code>，<code>AppKit</code> 或 <code>WatchKit</code> 应用程序中。</p>
+<p>我们来写一个简单的 Hello World! 应用。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/00-swiftui.png" alt=""></p>
+<p>你没有看错，这是100％正常运行的应用程序。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/00-Swift%2520UI.png" alt=""></p>
+<h2 id="app--scene">App &amp; Scene</h2>
+<p>SwiftUI 将大量智能，自动以及可自定义的行为统统打包到了简单灵活的声明式 API 中。</p>
+<p>我们先来展示一个用于跟踪正在阅读书籍进度的应用程序。</p>
+<p>在底部，有一个自定义视图来表示应用程序的主用户界面，而顶部使用该视图作为应用程序主窗口的内容。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/03-currently%2520reading.png" alt=""></p>
+<p>首先要注意的是这两个声明的相似之处。我们都定义了一个遵循 protocol 的结构。</p>
+<p>我们设计了 SwiftUI 的新 <code>App API</code>，以遵循您在视图代码中已经习惯的声明式的 <code>State-Driven</code> 模式。 <code>App protocl</code> 使我们能够轻松地用一个结构来替换 <code>AppDelegate</code> 和 <code>SceneDelegate</code>，该结构将管理我们的场景和应用生命周期。</p>
+<p>另一个关键点在于 body 属性的返回类型。这里返回的 <code>Scene</code> 也是 SwiftUI 中的一个新概念，它表示界面可以由不同的平台独立显示。</p>
+<h2 id="windowgroup">WindowGroup</h2>
+<p><code>WindowGroup</code> 是 <code>Scence</code> 的具体应用之一，它是 SwiftUI 中 <code>Scene</code> 如何提供现成的智能，多平台功能的有力示例。</p>
+<p>在我们的 iOS 应用中，<code>WindowGroup</code> 正在为我们的应用创建和管理单个全屏窗口。相同的代码也可在 watchOS 上运行，还可以管理单个全屏窗口。</p>
+<p>尽管这两应用看起来有所不同，但是两个平台上的核心应用结构相同，因此它们可以共享一个应用声明。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/04-recently%2520reading%2520iOSwatchOS.png" alt=""></p>
+<p>实际上，我的应用程序也可以在 tvOS 和 iPadOS 上运行。</p>
+<p>由于 iPadOS 支持多窗口应用程序，因此我们免费获得了一些附加功能；就像能够创建可以并排显示的应用程序的多个实例。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/06-recently%2520reading%2520tv-iPadOS.png" alt=""></p>
+<p>这也扩展到了 macOS，它也支持多个窗口。我们可以使用标准的 <code>Command-N</code> 快捷方式创建新窗口，并将它们收集到单个选项卡式窗口中。SwiftUI 甚至会自动将 “新窗口” 菜单命令添加到我的主菜单中。</p>
+<p>SwiftUI 还支持其他类型的场景，这些场景可以像视图一样组合在一起，构建出更复杂的应用程序。</p>
+<p>就像 macOS 上新增的 “设置” 场景一样，“偏好设置” 窗口的添加也很简单。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/07-setting-options.jpg" alt=""></p>
+<p>设置场景将自动在应用程序菜单中设置标准的 “首选项” 命令，并为窗口提供正确的样式处理。</p>
+<h2 id="documentgroup">DocumentGroup</h2>
+<p>SwiftUI 的 <code>Scene API</code> 还支持基于文档的应用程序，例如我们为绘制矢量形状而构建的该应用程序。</p>
+<p>新增的 <code>DocumentGroup</code> 场景，它可以自动管理 iOS，iPadOS 和 macOS 支持的，基于文档的场景的打开，编辑和保存。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/07-documentgroup.jpg" alt=""></p>
+<p>在 iOS 和 iPadOS 上，如果未提供其他主界面，<code>DocumentGroup</code> 将自动显示文档浏览器。</p>
+<p>在 Mac 上，<code>DocumentGroup</code> 将为每个新文档打开一个不同的窗口，并自动将命令添加到主菜单中以执行常见的文档操作。</p>
+<p>说到菜单命令，SwiftUI 允许您使用新的 <code>.commands</code> 修饰符添加其他命令。</p>
+<p>例如，在这里我们添加了一个自定义形状菜单，用于向画布添加新形状。macOS 将在主菜单的正确区域中自动添加自定义菜单，并显示其键盘快捷键。这些快捷键是我们使用新的 <code>.keyboardShortcut</code> 视图修饰符分配的。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/08-DocumentGroup-commands.jpg" alt=""></p>
+<p><code>.commands</code> API 所提供的功能比我们在此处显示的功能要多得多，例如能够基于用户焦点来定位命令等等。</p>
+<h2 id="xcode-support">Xcode Support</h2>
+<p>为了帮助您构建这些新应用，我们还添加专门用于 SwiftUI 应用的新的 Multiplatform 模板，更新了 Xcode 中的新项目体验。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/01-Mutiplatform.jpg" alt=""></p>
+<p>这些新模板针对多平台代码进行了优化，可自动为共享代码以及特定于平台的组件和资源。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/01-Mutiplatform-folder.jpg" alt=""></p>
+<p>另一部分是如何配置应用程序的 <code>LaunchScreen</code>。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/01-launch_screen.jpg" alt=""></p>
+<p><code>infp.plist</code> 中新增的 <strong>“LaunchScreen”</strong> key，可以声明启动屏幕组件的各种组合。例如默认图像，背景色以及顶部和底部的空白栏（如上图配置的）。</p>
+<p>如果在现有项目中已经使用了 <code>Storyboard</code>，仍然可以正常工作无需更换。不过对于新的 SwiftUI 项目，<code>LaunchScreen</code> 配置是一种简单的选择。</p>
+<h2 id="swiftui-app-sessions">SwiftUI App Sessions</h2>
+<p>关于 SwiftUI Apps 我们已经准备了演讲，以更深入地介绍什么是场景以及它们与应用程序和视图的关系：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/02-SwiftUI%2520App%2520Sessions.jpg" alt=""></p>
+<ul>
+<li><a href="https://wwdc.io/share/wwdc20/10037">App essentials in SwiftUI</a> - 带你解释了视图，场景和应用程序如何更深入地协同工作。</li>
+<li><a href="https://wwdc.io/share/wwdc20/10039">Build document-based apps in SwiftUI</a> - 将深入研究了如何在应用程序中打开和管理文档。</li>
+</ul>
+<h2 id="widgets">Widgets</h2>
+<p>现在让我们简单谈谈 Widgets ，这是 iOS，iPadOS 和 macOS 上的新作之一。 <code>Widget</code> 只能使用 SwiftUI 来构建的。它直接将 Swift 语言和 SwiftUI 的重要程度提升了一大截。</p>
+<p>我们可以使用符合 <strong>Widget protocol</strong> 的自定义结构来构建 Apps 和 View 一样的 Widget。</p>
+<p>我们可以制作许多种类型的 Widget，例如这种会定期向我推荐新专辑的 Widget。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/09-recomment_album_widget.jpg" alt=""></p>
+<p>Widget 也可以配置其他类型的数据，例如 Siri Intents。</p>
+<p>关于构建 Widget，有很多要讨论的内容，并且我们有一些讲座可以帮助你入门：</p>
+<ul>
+<li><a href="https://developer.apple.com/videos/play/wwdc2020/10103">Design great widgets</a></li>
+<li><a href="https://developer.apple.com/videos/play/wwdc2020/10028">Meet WidgetKit</a></li>
+<li><a href="https://developer.apple.com/videos/play/wwdc2020/10041">What&rsquo;s new in SwiftUI</a></li>
+<li><a href="https://developer.apple.com/videos/play/wwdc2020/10034">Widgets Code-along, part 1: The adventure begins</a></li>
+<li><a href="https://developer.apple.com/videos/play/wwdc2020/10035">Widgets Code-along, part 2: Alternate timelines</a></li>
+<li><a href="https://developer.apple.com/videos/play/wwdc2020/10036">Widgets Code-along, part 3: Advancing timelines</a></li>
+</ul>
+<p>建议先观看 <a href="https://developer.apple.com/videos/play/wwdc2020/10033">Build SwiftUI views for widgets</a> 以了解更多信息。</p>
+<h3 id="widgets-in-watchos">Widgets in watchOS</h3>
+<p>我们现在可以使用 SwiftUI 为 Apple Watch 构建复杂的自定义功能。可以像我制作的本周咖啡图表那样构建全彩色功能。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/10-SwiftUI-watch.png" alt=""></p>
+<p>关于构建复杂的 watch 应用可参考如下 Sessions：</p>
+<ul>
+<li><a href="https://wwdc.io/share/wwdc20/10048">Build complications in SwiftUI</a></li>
+<li><a href="https://developer.apple.com/videos/play/wwdc2020/10046">Create complications for Apple Watch</a></li>
+</ul>
+<h1 id="lists-and-collections">Lists and Collections</h1>
+<p>接下来，让我们讨论对 Lists 和 Collections 的改进。列表是许多应用程序的重要组成部分，通常代表用户与之交互的主要界面。在此版本中，Lists 获得了一些很棒的新功能。</p>
+<h2 id="outlines">Outlines</h2>
+<p>使用 <code>outlines</code>，我们只要简单声明具有动态性、数据驱动的内容就可完成常规列表的展示。<img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/11-outlines-recursive.jpg" alt="11-outlines-recursive"></p>
+<p>还可以在初始化时提供 <code>.chldren</code> 的 KeyPath，来实现列表的嵌套显示。</p>
+<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg63nqv3tdj20qo0f0tdx.jpg" alt=""></p>
+<p>默认情况下，Lists 使用 macOS，iOS 和 iPadOS 上的系统标准样式来显示。</p>
+<p>我们希望通过易用性的 <code>outlines</code> 可以帮助和减少偏内容的应用程序对于 <code>push-pop</code> 导航栏模式的滥用。</p>
+<h2 id="grids">Grids</h2>
+<p>去年 SwiftUI 被人诟病最多的恐怕是对列表和网格的支持不友好。当我们有数百或上千个 Views 存在于 <code>Grids</code> 或 <code>Stacks</code> 中时，SwiftUI 可是会直接初始化并创建它们，这可是非常 😱 的事情。</p>
+<p>好在今年，SwiftUI 增加了对网格布局的 <code>Lazy-Loading</code>，可以将其与 <code>ScrollViews</code> 组合来实现网格内容的平滑滚动。</p>
+<p>网格具有强大布局功能，支持多种配置，例如调整列数以适应可用空间，就像我们在此处看到的横向和纵向一样。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/12-grid-adapt.jpg" alt=""></p>
+<p>或强制固定数量的列，每个列都可以具有自己的大小调整参数，例如下面示例，每列固定为 4 栏。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/12-grid-fix.jpg" alt=""></p>
+<p>当然，SwiftUI 也支持水平滚动的网格。除此之外，我们还提供了 <code>VStack</code> 和 <code>HStack</code> 的 <code>Lazy-Loading</code> 版本，这些版本非常适合构建自定义的可滚动布局。</p>
+<p>例如，这个图像瀑布流的展示：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/13-lazy-grids.jpg" alt=""></p>
+<p>我们使用 <code>LazyVStack</code> 作为容器，同时利用 <code>ViewBuilder</code> 新增的 <code>switch</code> 控制功能，轻松支持图片的各种布局。例如顶部的单个大图，中间的多个小尺寸图片的不对称组合等。这些组件一起组合成一个无缝的图片流。</p>
+<p>在本文中，我们只是简单介绍了部分功能。还有更多新增的 View，比如 <code>ScrollViewReader</code>、<code>TextEditor</code> 等等。想要了解更多 SwfitUI 的 Lists 和 Grids 的强大功能，请查看 <a href="https://developer.apple.com/videos/play/wwdc2020/10031">Stacks, Grids, and Outlines in SwiftUI</a>.</p>
+<h1 id="toolbars-and-controls">Toolbars and Controls</h1>
+<p>现在，让我们跳到 SwiftUI 对 toolbar 的支持以及自定义控件的新方法。</p>
+<h2 id="toolbar">Toolbar</h2>
+<p>从 macOS Big Sur 中漂亮的外观到更新的 iPad 系统体验，再到 watchOS 上的 primary actions。今年，我们可使用 SwiftUI 新增的 <code>.toolbar</code> 修饰符构造所有这些API：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="c1">// Toolbar</span>
+<span class="n">BookList</span><span class="p">()</span>
+	<span class="p">.</span><span class="n">toolbar</span> <span class="p">{</span> <span class="c1">// #1</span>
+		<span class="n">Button</span><span class="p">(</span><span class="n">action</span><span class="p">:</span> <span class="p">.</span><span class="n">recordProgress</span><span class="p">)</span> <span class="p">{</span>
+			<span class="n">Label</span><span class="p">(</span><span class="s">&#34;Record Progress&#34;</span><span class="p">,</span> <span class="n">systemImage</span><span class="p">:</span> <span class="s">&#34;book.circle&#34;</span><span class="p">)</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+      
+<span class="n">BookList</span><span class="p">()</span>
+	<span class="p">.</span><span class="n">toolbar</span> <span class="p">{</span> <span class="c1">// #2 和 #1 是同等效果</span>
+		<span class="n">ToolbarItem</span><span class="p">(</span><span class="n">placement</span><span class="p">:</span> <span class="p">.</span><span class="n">primaryAction</span><span class="p">)</span> <span class="p">{</span>
+         <span class="n">Button</span><span class="p">(</span><span class="n">action</span><span class="p">:</span> <span class="n">recordProgress</span><span class="p">)</span> <span class="p">{</span>
+				<span class="n">Label</span><span class="p">(</span><span class="s">&#34;Record Progress&#34;</span><span class="p">,</span> <span class="n">systemImage</span><span class="p">:</span> <span class="s">&#34;book.circle&#34;</span><span class="p">)</span>
+      	<span class="p">}</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+      
+<span class="n">BookList</span><span class="p">()</span>
+	<span class="p">.</span><span class="n">toolbar</span> <span class="p">{</span> <span class="c1">// #3</span>
+		<span class="n">ToolbarItem</span><span class="p">(</span><span class="n">placement</span><span class="p">:</span> <span class="p">.</span><span class="n">confirmationAction</span><span class="p">)</span> <span class="p">{</span> 
+			<span class="n">Button</span><span class="p">(</span><span class="s">&#34;Save&#34;</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="n">saveProgress</span><span class="p">)</span>
+		<span class="p">}</span>
+      <span class="n">ToolbarItem</span><span class="p">(</span><span class="n">placement</span><span class="p">:</span> <span class="p">.</span><span class="n">cancellationAction</span><span class="p">)</span> <span class="p">{}</span>
+			<span class="n">Button</span><span class="p">(</span><span class="s">&#34;Cacnel&#34;</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="n">dismissSheet</span><span class="p">)</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+<span class="n">BooDetail</span><span class="p">()</span>
+	<span class="p">.</span><span class="n">toolbar</span> <span class="p">{</span> <span class="c1">// #4</span>
+      <span class="n">ToolbarItem</span> <span class="p">{</span>
+         <span class="n">Button</span><span class="p">(</span><span class="n">action</span><span class="p">:</span> <span class="n">recordProgress</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">Label</span><span class="p">(</span><span class="s">&#34;Progress&#34;</span><span class="p">,</span> <span class="n">systemImage</span><span class="p">:</span> <span class="s">&#34;book.circle&#34;</span><span class="p">)</span>
+         <span class="p">}</span>         
+      <span class="p">}</span>
+      <span class="n">ToolbarItem</span><span class="p">(</span><span class="n">placement</span><span class="p">:</span> <span class="p">.</span><span class="n">bottomBar</span><span class="p">)</span>
+      	<span class="n">Button</span><span class="p">(</span><span class="n">action</span><span class="p">:</span> <span class="p">.</span><span class="n">shareBook</span><span class="p">)</span> <span class="p">{</span>
+				<span class="n">Label</span><span class="p">(</span><span class="s">&#34;Share&#34;</span><span class="p">,</span> <span class="n">systemImage</span><span class="p">:</span> <span class="s">&#34;square.and.arrow.up&#34;</span><span class="p">)</span>
+      	<span class="p">}</span>
+      <span class="p">}</span>
+	<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>上述代码的效果如下：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/14-toolbaritem.png" alt=""></p>
+<p>上面代码列出了构造一个 toolbar 的多种方式。toolbar items 与 SwiftUI 中的其他视图组成基本相同，在上面的几个例子中，均由 button 实现的。</p>
+<p>另一个示例是 <code>principal</code> 语义的使用，它将在应用程序的突出位置中显示，就像我们下面看到的：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/15-toolbar-mac.png" alt=""></p>
+<p>toolbar 默认会放置在我们熟悉的位置，也可以通过使用 toolbar 进行显式自定义。</p>
+<p>我们只需在 SwiftUI 描述这些 toolbar item 的状态，然后 SwiftUI 会根据语义的定义自动找出正确的位置。例如，wathcOS 中的确认和取消操作就会置顶显示。</p>
+<p>我们也可以指定放置的位置来进行额外的控制，尤其是对于相对较小的屏幕。例如，在 iOS 中通过指定分享 item 的 <code>.bottomBar</code> 位置等。</p>
+<h2 id="label">Label</h2>
+<p>在上面的示例代码中，你应该发现了 SwiftUI 中 Label 视图的新用法：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="n">Label</span> <span class="p">{</span>
+	<span class="n">Text</span><span class="p">(</span><span class="s">&#34;Progress&#34;</span><span class="p">)</span>
+<span class="p">}</span> <span class="n">icon</span><span class="p">:</span> <span class="p">{</span>
+	<span class="n">Image</span><span class="p">(</span><span class="n">systemName</span><span class="p">:</span> <span class="s">&#34;book.circle&#34;</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><code>Label</code> 现在可以是 <code>Text</code> 和 <code>Image</code> 的组合，我们不仅可以使用国际化的 Key 来配置不同语言的标题，还能利用 <code>system image</code> 和 <code>SF Symbol</code> 来设置图标。想了解更多 <code>SF Symbol 2.0</code> 请访问 <a href="https://developer.apple.com/videos/play/wwdc2020/10207">Session - 10207</a>。</p>
+<p>对于前面的 toolbar 的示例，<code>Label</code> 默认仅会在按钮上显示出图标，而文本则用于辅助的目的。这一行为同样作用于 <code>menu list</code>。</p>
+<h3 id="label-list">Label List</h3>
+<p>我们的 <code>Label</code> 支持以列表展示啦。无论图标大小如何，本文都完美对齐，并且对于不同大小的的动态类型字体，<code>Label</code> 也能发挥作用。
+来看一段代码：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="n">List</span> <span class="p">{</span>
+	<span class="n">Label</span><span class="p">(</span><span class="s">&#34;Intruduction to SwiftUI&#34;</span><span class="p">,</span> 
+         <span class="n">systemImage</span><span class="p">:</span> <span class="s">&#34;hand.wawve&#34;</span><span class="p">)</span>
+   <span class="n">Label</span><span class="p">(</span><span class="s">&#34;SwiftUI Essentials&#34;</span><span class="p">,</span> 
+         <span class="n">systemImage</span><span class="p">:</span> <span class="s">&#34;handstudentdesk&#34;</span><span class="p">)</span>
+   <span class="n">Label</span><span class="p">(</span><span class="s">&#34;Data Essentials to SwiftUI&#34;</span><span class="p">,</span> 
+         <span class="n">systemImage</span><span class="p">:</span> <span class="s">&#34;flowchart&#34;</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><code>Label</code> 默认以 <code>large</code> 尺寸的布局展示。当更改为 <code>extraLarge</code> 时，图标和标题都会自动更新，而且能很好地重排文本和增加列表行。当然，还支持可以更大尺寸的 <code>accessibilityLarge</code>。</p>
+<p>对于更大的字体，Label 会更新为文字环绕，以最大程度地增加可见文字的数量。</p>
+<p>对比效果如下：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/17-list%2520label.png" alt=""></p>
+<h2 id="help">Help</h2>
+<p>现在，随着 toolbar 之类具有干净的仅图标样式的标签元素，为这些元素提供额外的帮助比以往任何时候都更加重要。</p>
+<p>使用新的 <code>.help</code> 修饰符，可以附加控件的作用说明，并在 macOS 上显示为工具提示。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/18-help.png" alt=""></p>
+<p>同样，此修饰符可在所有平台上使用，因为它还提供了可访问性提示，可为您的应用程序在任何地方提供更好的 <code>VoiceOver</code> 体验。</p>
+<h2 id="new-views">New Views</h2>
+<h3 id="progressview">ProgressView</h3>
+<p>SwiftUI 现在支持 <code>ProgressView</code> 了，它不仅支持线性样式，还带来了环形样式。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="n">ProgressView</span><span class="p">(</span><span class="s">&#34;Downloading Photo&#34;</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">percentComplet</span><span class="p">)</span>
+	<span class="p">.</span><span class="n">progressViewStyle</span><span class="p">(</span><span class="n">CircularProgressViewStyle</span><span class="p">(</span><span class="n">tint</span><span class="p">:</span> <span class="p">.</span><span class="n">blue</span><span class="p">))</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="gauges">Gauges</h3>
+<p>对于 <code>watchOS 7+</code> 现在可以在 SwiftUI 获取仪表盘视图了。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/20-guage.jpg" alt=""></p>
+<p>对于 <code>Guage</code> 视图，我们可以对 minimum 和 maximum 值进行可选设置来控制是否显示。</p>
+<h1 id="new-effetct-and-styling">New Effetct and Styling</h1>
+<p>接下来，让我们看一下使用 SwiftUI 来制作一些炫酷的效果。</p>
+<h2 id="hovereffect">HoverEffect</h2>
+<p>macOS Big Sur 对 Notification Center 和菜单栏中的新 Control Center 均使用 SwiftUI 重写，同时 Control Center 正是使用了 SwiftUI 中的一项动效，实现了其在不同模块间平滑切换。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/21-new%2520effect%2520&amp;%2520styling.png" alt=""></p>
+<p>接下来，我们构建了一个 UI 原型来展示该效果的使用。</p>
+<p>这里以收集喜欢专辑的功能来展示，它由相册的 <code>LazyGrid</code> 和 <code>selectdAlbumRow</code> 组成。只需为每个按钮添加 <code>matchedGeometryEffect</code> 并绑定上每个专辑的 ID 和相对的 <code>NameSpace</code>。这样当我们选择喜欢的专辑后，它会从网格中流畅地过渡到底部我们喜欢的专辑那一行。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/22-hovereffect.png" alt=""></p>
+<p>除了这个配预设效果之外，我们也可以通过提供的 API 配置自定义动画：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/23-hover-effect.png" alt=""></p>
+<h2 id="styling">Styling</h2>
+<p>SwiftUI 也新增了很多方便的样式修改功能。</p>
+<h3 id="containerrelativeshape">ContainerRelativeShape</h3>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/23-ContainerRelativeShape.png" alt=""></p>
+<p>我们从专辑的 widget 中可以看到，新增的 <code>ContainerRelativeShape</code> 将采用最接近所包含内容的形状来生成相似的路径。</p>
+<p>它有效的将该外部容器的形状进行偏移，并根据其偏移量自动保持与内容形状的同心度。</p>
+<p>还有一些其他改善和增强文本元素体验的效果等。</p>
+<h3 id="dynamic-type-scaling">Dynamic Type Scaling</h3>
+<p>现在在 SwiftUI 中，图像可以作为文本的一部分嵌入其中，并且作为统一的整理来响应动态的变化。</p>
+<p>这里其实是通过一个新的属性包装器 <code>ScaledMetric</code>，来描述自定义的非文本度量标准 (例如布局) <code>ScaledMetric</code> 会根据当前的基准值来自动缩放尺寸。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="c1">// Dynamic Type Scaling</span>
+<span class="p">@</span><span class="n">ScaledMetric</span> <span class="kd">private</span> <span class="kd">var</span> <span class="nv">padding</span><span class="p">:</span> <span class="n">CGFloat</span> <span class="p">=</span> <span class="mf">10.0</span>
+<span class="n">VStack</span> <span class="p">{</span>
+	<span class="n">Text</span><span class="p">(</span><span class="n">albmu</span><span class="p">.</span><span class="n">nmae</span><span class="p">)</span>
+		<span class="p">.</span><span class="n">font</span><span class="p">(.</span><span class="n">custom</span><span class="p">(</span><span class="s">&#34;AvenirNext-Regular&#34;</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="mi">30</span><span class="p">))</span>
+		
+	<span class="n">Text</span><span class="p">(</span><span class="s">&#34;</span><span class="si">\(</span><span class="n">Image</span><span class="si">(</span><span class="n">systemName</span><span class="p">:</span> <span class="s">&#34;music.mic&#34;</span><span class="si">))</span><span class="s"> </span><span class="si">\(</span><span class="n">album</span><span class="p">.</span><span class="n">artist</span><span class="si">)</span><span class="s">&#34;</span><span class="p">)</span>
+		<span class="p">.</span><span class="n">font</span><span class="p">(.</span><span class="n">custom</span><span class="p">(</span><span class="s">&#34;AvenirNext-Regular&#34;</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="mi">17</span><span class="p">))</span>
+<span class="p">}</span>
+<span class="p">.</span><span class="n">padding</span><span class="p">(</span><span class="n">padding</span><span class="p">)</span>
+<span class="p">.</span><span class="n">background</span><span class="p">(...)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>缩放效果如下：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/25-dynamicTypeScaling.png" alt=""></p>
+<p>总之，通过这些使得基于响应式的自定义布局变得很容易，同时又具有良好的表现。当然，我们能做的不止于此，即使是系统控件，也能随心所欲的自定义它们的样式。</p>
+<p>哦，对了。颜色也是同样可以自定义的。</p>
+<h3 id="list-item-tinting">List Item Tinting</h3>
+<p>最后再介绍一个列表元素的 tineColor，现在我们可以针对不同的 item 轻松配置不同的 tintingColor。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="n">List</span> <span class="p">{</span>
+	<span class="n">Section</span> <span class="p">{</span>
+		<span class="n">Label</span><span class="p">(</span><span class="s">&#34;Menu&#34;</span><span class="p">,</span> <span class="n">systemImage</span><span class="p">:</span> <span class="s">&#34;list.bullet&#34;</span><span class="p">)</span>
+		<span class="n">Label</span><span class="p">(</span><span class="s">&#34;Menu&#34;</span><span class="p">,</span> <span class="n">systemImage</span><span class="p">:</span> <span class="s">&#34;heart&#34;</span><span class="p">)</span>
+			<span class="p">.</span><span class="n">listItemTine</span><span class="p">(.</span><span class="n">red</span><span class="p">)</span>				
+		<span class="n">Label</span><span class="p">(</span><span class="s">&#34;Menu&#34;</span><span class="p">,</span> <span class="n">systemImage</span><span class="p">:</span> <span class="s">&#34;seal&#34;</span><span class="p">)</span>
+			<span class="p">.</span><span class="n">listItemTine</span><span class="p">(.</span><span class="n">purple</span><span class="p">)</span>		
+	<span class="p">}</span>
+	<span class="n">Section</span><span class="p">(</span><span class="n">header</span><span class="p">:</span> <span class="n">Text</span><span class="p">(</span><span class="s">&#34;Recipes&#34;</span><span class="p">))</span> <span class="p">{...</span> <span class="p">}</span>
+		<span class="p">.</span><span class="n">listItemTine</span><span class="p">(.</span><span class="n">monochrome</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>对比效果：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/30-List%2520Item%2520Tinting.png" alt=""></p>
+<h1 id="system-integration">System Integration</h1>
+<p>最后一节，来简单聊一聊，SwiftUI 与系统的深度集成。</p>
+<h2 id="链接跳转">链接跳转</h2>
+<p>通过新提供的 Link View，URLs 跳转现在也是 SwiftUI 中的一等公民了。它默认会使用浏览器打开链接。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/31-link.jpg" alt=""></p>
+<p>同样，应用间的 <code>Universal Link</code> 跳转也支持啦，可以通过 <code>openURL</code> 来实现不同应用程序的访问。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/32-openURL.png" alt=""></p>
+<p>除此之外，还有包括 <code>Drag and Drop</code>、<code>Uniform Type Identifiers frameworks</code>、<code>Sign In With Apple</code> 等各种功能等，就不一一介绍了。</p>
+<h1 id="总结">总结</h1>
+<p>很高兴看到 SwiftUI 的下一个迭代是如此强大和丰富的功能。</p>
+<ul>
+<li>通过提供更加简洁易用的 protocol，如 <code>App</code> 和 <code>Scene</code> 使得基于 SwiftUI 来构建应用程序变为了可能。</li>
+<li>通过全新的 Widget API 的支持，使得 SwfitUI 从一个简单玩具模型提升到可以成为实用工具的一部分。</li>
+<li>随着各种新的视图的出现、功能的完善和性能的提升，SwiftUI 将具有无限想象力，或许不久的将来会直接替代 storyboard 并且成为可视化编程的中流砥柱 😂。</li>
+</ul>
+<h1 id="知识点问题梳理">知识点问题梳理</h1>
+<p>这里罗列了四个问题用来考察你是否已经掌握了这篇文章，如果没有建议你加入<strong>收藏</strong> 再次阅读：</p>
+<ol>
+<li>都有哪些协议遵循 <code>Scene</code>，它们都有哪些功能和使用场景 ？</li>
+<li>说说 <code>toolbar</code> 有哪些构造方法 ？</li>
+<li>本文提到了哪些新增加的视图 ？</li>
+<li>本文提到了新增加了哪些与系统交互的功能 ？</li>
+</ol>
+<h1 id="相关阅读">相关阅读</h1>
+<ul>
+<li><a href="https://developer.apple.com/videos/play/wwdc2020/10037">App essentials in SwiftUI</a></li>
+<li><a href="https://developer.apple.com/videos/play/wwdc2020/10048">Build complications in SwiftUI</a></li>
+<li><a href="https://developer.apple.com/videos/play/wwdc2020/10039">Build document-based apps in SwiftUI</a></li>
+<li><a href="https://developer.apple.com/videos/play/wwdc2020/10042">Build SwiftUI apps for tvOS</a></li>
+<li><a href="https://developer.apple.com/videos/play/wwdc2020/10033">Build SwiftUI views for widgets</a></li>
+<li><a href="https://developer.apple.com/videos/play/wwdc2020/10040">Data Essentials in SwiftUI</a></li>
+<li><a href="https://developer.apple.com/videos/play/wwdc2020/10119">Introduction to SwiftUI</a></li>
+<li><a href="https://developer.apple.com/videos/play/wwdc2020/10031">Stacks, Grids, and Outlines in SwiftUI</a></li>
+</ul>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">土土Edmond木</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2020-06-26
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/ios/">iOS&#39;</a>
+          <a href="/tags/wwdc20/">WWDC20&#39;</a>
+          <a href="/tags/swiftui/">SwiftUI</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/wwdc/wwdc20/wwdc20-session-10033/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">WWDC20 - Build SwiftUI views for widgets</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/tool/cocoa-documentation-2/">
+            <span class="next-text nav-default">Cocoa 文档注释与生成工具使用 - Jazzy &#43; SourceKitten</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+    <script src="https://utteranc.es/client.js"
+            repo="looseyi/looseyi.github.io"
+            issue-term="pathname"
+            theme="github-light"
+            crossorigin="anonymous"
+            async>
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/utterance">comments powered by utterances.</a></noscript>
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:chun574271939@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://twitter.com/looseyi" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="https://github.com/looseyi" class="iconfont icon-github" title="github"></a>
+      <a href="https://www.weibo.com/foreverclp" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="https://www.zhihu.com/people/tu-tu-edmondmu" class="iconfont icon-zhihu" title="zhihu"></a>
+  <a href="http://looseyi.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2019-12-11 - 
+    2021
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">土土Edmond木</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-62789092-1', 'auto');
+	ga('set', 'anonymizeIp', true);
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>WWDC21 - Discover concurrency in SwiftUI - </title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="土土Edmond木" /><meta name="description" content="WWDC21 Session 10019 - Discover concurrency in SwiftUI 本文知识目录 本文属于 WWDC21 中 SwiftUI 与 Concurrency 结合应用的文章。 关于 SwiftUI 可以查看这篇介绍：Introduction to SwiftUI，而 Swift Concurrency 算是今" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.82.1 with theme even" />
+
+
+<link rel="canonical" href="http://looseyi.github.io/post/wwdc/wwdc21/wwdc21-session-10019/" />
+  <link href="http://looseyi.github.io/post/wwdc/wwdc21/wwdc21-session-10019/index.xml" rel="alternate" type="application/rss+xml" title="" />
+  <link href="http://looseyi.github.io/post/wwdc/wwdc21/wwdc21-session-10019/index.xml" rel="feed" type="application/rss+xml" title="" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="WWDC21 - Discover concurrency in SwiftUI" />
+<meta property="og:description" content="WWDC21 Session 10019 - Discover concurrency in SwiftUI 本文知识目录 本文属于 WWDC21 中 SwiftUI 与 Concurrency 结合应用的文章。 关于 SwiftUI 可以查看这篇介绍：Introduction to SwiftUI，而 Swift Concurrency 算是今" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://looseyi.github.io/post/wwdc/wwdc21/wwdc21-session-10019/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2021-06-11T00:00:00&#43;00:00" />
+<meta property="article:modified_time" content="2021-06-11T00:00:00&#43;00:00" />
+
+<meta itemprop="name" content="WWDC21 - Discover concurrency in SwiftUI">
+<meta itemprop="description" content="WWDC21 Session 10019 - Discover concurrency in SwiftUI 本文知识目录 本文属于 WWDC21 中 SwiftUI 与 Concurrency 结合应用的文章。 关于 SwiftUI 可以查看这篇介绍：Introduction to SwiftUI，而 Swift Concurrency 算是今"><meta itemprop="datePublished" content="2021-06-11T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2021-06-11T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="3310">
+<meta itemprop="keywords" content="iOS&#39;,WWDC21&#39;,SwiftUI," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="WWDC21 - Discover concurrency in SwiftUI"/>
+<meta name="twitter:description" content="WWDC21 Session 10019 - Discover concurrency in SwiftUI 本文知识目录 本文属于 WWDC21 中 SwiftUI 与 Concurrency 结合应用的文章。 关于 SwiftUI 可以查看这篇介绍：Introduction to SwiftUI，而 Swift Concurrency 算是今"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Aha Moment</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Aha Moment</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">WWDC21 - Discover concurrency in SwiftUI</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2021-06-11 </span>
+        <div class="post-category">
+            <a href="/categories/ios/"> iOS </a>
+            <a href="/categories/wwdc/"> WWDC </a>
+            <a href="/categories/swiftui/"> SwiftUI </a>
+            </div>
+          <span class="more-meta"> 约 3310 字 </span>
+          <span class="more-meta"> 预计阅读 7 分钟 </span>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#本文知识目录">本文知识目录</a></li>
+    <li><a href="#引言">引言</a></li>
+    <li><a href="#concurrent-data-models">Concurrent Data Models</a>
+      <ul>
+        <li><a href="#identifiable">Identifiable</a></li>
+        <li><a href="#user-interface">User Interface</a></li>
+        <li><a href="#observableobject">ObservableObject</a></li>
+      </ul>
+    </li>
+    <li><a href="#swiftui--mainactor">SwiftUI &amp; MainActor</a>
+      <ul>
+        <li><a href="#actor">Actor</a></li>
+        <li><a href="#swiftui-run-loop">SwiftUI run loop</a></li>
+        <li><a href="#using-await">Using await</a></li>
+      </ul>
+    </li>
+    <li><a href="#new-concurrency-tools">New concurrency tools</a>
+      <ul>
+        <li><a href="#task--refreshable">Task &amp; Refreshable</a></li>
+        <li><a href="#asyncimage">AsyncImage</a></li>
+        <li><a href="#custom-button-action">Custom Button Action</a></li>
+      </ul>
+    </li>
+    <li><a href="#总结">总结</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/10019-00-background.png" alt="10019-00-background"></p>
+<blockquote>
+<p>WWDC21 Session 10019 - <a href="https://developer.apple.com/videos/play/wwdc2021/10019/">Discover concurrency in SwiftUI</a></p>
+</blockquote>
+<h2 id="本文知识目录">本文知识目录</h2>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/10019-Discover-concurrency-in-SwiftUI.png" alt="Discover-concurrency-in-SwiftUI"></p>
+<p>本文属于 WWDC21 中 SwiftUI 与 Concurrency 结合应用的文章。</p>
+<p>关于 SwiftUI 可以查看这篇介绍：<a href="https://wwdc.io/share/wwdc20/10119">Introduction to SwiftUI</a>，而 Swift Concurrency 算是今年 WWDC 的重头戏，从使用层面来看，就是引入了 <a href="https://developer.apple.com/videos/play/wwdc2021/10132/">Async / Await</a> 这一语法，但是解决的却是软件工程中最令人头疼的问题之一。</p>
+<p>接下来让我们看看 Concurrency 新工具是如何与 SwiftUI 结合的。</p>
+<blockquote>
+<p>Tips：文末有示例代码地址。</p>
+</blockquote>
+<h2 id="引言">引言</h2>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/10019-01-table.png" alt="10019-01-table">众所周知，在计算机领域并发是很棘手的一个难题，现在您拥有了管理应用程序中这种复杂性的工具。我们希望您喜欢并了解 Swift 5.5 和 SwiftUI 中出色的新并发工具，我们期待看到您使用它们解决应用程序中棘手问题。
+该 Session 主要包括三个方面的内容，分别为：<code>Concurrent Data Models</code>、<code>SwiftUI &amp; MainActor</code>、<code>New concurrency tools</code>。
+我们将通过一个星云图片浏览的 Demo 向您展示在 SwiftUI 中，现有的异步工具存在的问题，并运用新的并发工具来解决这些问题。最后我们会介绍 SwiftUI 中新引入的并发工具。</p>
+<h2 id="concurrent-data-models">Concurrent Data Models</h2>
+<p>在 Swift 中想要使用并发编程，对数据模型有哪些要求呢 ？让我们从零开始造火箭。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/10019-02-model-spacephoto.png" alt="10019-02-model-spacephoto"></p>
+<p>首先，定义了 <code>SpacePhoto</code>，它需要遵循 Codable 和 <a href="https://developer.apple.com/documentation/swift/identifiable">Identifiable</a> 这两个协议。Codeable 自不必多说，用于将原始数据解析成您定义的数据模型。而 Identifiable 协议则最早是在 SwiftUI 中出现的，在 Swift 5.1 被加入到 Swift 标准库中的。</p>
+<h3 id="identifiable">Identifiable</h3>
+<p>从字面看应该不难理解，它用来表示所关联的数据结构具有唯一标识。其定义如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">public</span> <span class="kd">protocol</span> <span class="nc">Identifiable</span> <span class="p">{</span>
+    <span class="n">associatedtype</span> <span class="n">ID</span> <span class="p">:</span> <span class="nb">Hashable</span>
+    <span class="kd">var</span> <span class="nv">id</span><span class="p">:</span> <span class="kc">Self</span><span class="p">.</span><span class="n">ID</span> <span class="p">{</span> <span class="kr">get</span> <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>在之前版本的 SwiftUI 中，您使用 ForEach 遍历 Array 时需要提供一个 ID 来标识 Element 的唯一性：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="n">ForEach</span><span class="p">(</span><span class="n">photos</span><span class="p">.</span><span class="n">items</span><span class="p">,</span> <span class="n">id</span><span class="p">:</span> <span class="err">\</span><span class="p">.</span><span class="n">id</span><span class="p">)</span> <span class="p">{</span> <span class="n">item</span> <span class="k">in</span>
+  <span class="n">PhotoView</span><span class="p">(</span><span class="n">photo</span><span class="p">:</span> <span class="n">item</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>当你的 Model 遵循了 Identifiable 协议就可以直接使用：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="n">ForEach</span><span class="p">(</span><span class="n">photos</span><span class="p">.</span><span class="n">items</span><span class="p">)</span> <span class="p">{</span> <span class="n">item</span> <span class="k">in</span>
+  <span class="n">PhotoView</span><span class="p">(</span><span class="n">photo</span><span class="p">:</span> <span class="n">item</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>下面是苹果给出的定义，Identifiable 的唯一性是<strong>不限定持续时间和使用范围</strong>，可以是下面的任意场景：</p>
+<ul>
+<li>保证始终唯一（例如：UUID)。</li>
+<li>每个环境永久唯一（例如：database record keys)。</li>
+<li>在进程的生命周期内是唯一的（例如：global incrementing integers)。</li>
+<li>在对象的生命周期内是唯一的（例如：object identifiers)。</li>
+<li>在当前集合中是唯一的（例如：collection index)。</li>
+</ul>
+<p>另外有意思的是，Identifiable 将引用语义扩展到值类型，Swift 为 AnyObject 提供了默认实现：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">extension</span> <span class="nc">Identifiable</span> <span class="k">where</span> <span class="kc">Self</span><span class="p">:</span> <span class="nb">AnyObject</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nv">id</span><span class="p">:</span> <span class="nb">ObjectIdentifier</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nb">ObjectIdentifier</span><span class="p">(</span><span class="kc">self</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>关于 Identifiable 更详细的讨论强烈推荐 Mattt 的这篇文章 <a href="https://nshipster.com/identifiable/">Identifiable</a>。</p>
+</blockquote>
+<h3 id="user-interface">User Interface</h3>
+<p>展开下一个 Model 前，预览一下您要做出的星云 Demo 的效果：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/10019-02-view-spacephoto.png" alt="10019-02-view-spacephoto"></p>
+<h3 id="observableobject">ObservableObject</h3>
+<p>接着使用 <code>ObservableObject</code> 来声明 Photos 用于监听数据的变更。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/10019-03-model-photos.png" alt="10019-03-model-photos"></p>
+<p>当有数据变更时，<code>ObservableObject</code> 中声明了 <strong>@Published</strong> 的属性将会收到 publisher 通过 <code>objectWillChange</code> 发来的通知。</p>
+<p>我们先提供一个简单的 PhotoView 来展示每个星云的 title：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">struct</span> <span class="nc">PhotoView</span><span class="p">:</span> <span class="n">View</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nv">photo</span><span class="p">:</span> <span class="n">SpacePhoto</span>
+    <span class="kd">var</span> <span class="nv">body</span><span class="p">:</span> <span class="n">some</span> <span class="n">View</span> <span class="p">{</span>
+        <span class="n">Text</span><span class="p">(</span><span class="n">photo</span><span class="p">.</span><span class="n">title</span><span class="p">)</span>
+	  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>接着我们在 Catalog 列表中来消费 photos。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/10019-04-view-photo.png" alt="10019-04-view-photo"></p>
+<p>逻辑也很简单，仅需在对应属性前增加 <code>@StateObject</code> 来表明 photos 数据是可变化的。</p>
+<p>上面的 Preview 效果就是纯文本版本的 Catalog list。这个最终效果是使用了两个特性：</p>
+<ul>
+<li><strong>.listStyle(.plain)</strong></li>
+<li><strong>.listRowSeparator(.hidden)</strong></li>
+</ul>
+<p>使用前后比对如下：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/10019-04-new-api.png" alt="10019-04-new-api"></p>
+<h2 id="swiftui--mainactor">SwiftUI &amp; MainActor</h2>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/10019-06-run-loop.png" alt="10019-06-run-loop"></p>
+<p>在 WWDC20 的 “<a href="https://developer.apple.com/videos/play/wwdc2020/10040/">Data essentials in SwiftUI</a>” 中，Raj 谈到了 SwiftUI 的生命周期，而 run loop 则是驱动该生命周期的工具。在 Swift 5.5 中 run loop 将运行在 <strong>MainActor</strong> 中。</p>
+<h3 id="actor">Actor</h3>
+<blockquote>
+<p>关于 Actior 详细信息，可查看 “<a href="https://developer.apple.com/videos/play/wwdc2021/10133/">Protect mutable state with Swift actors</a>”。</p>
+</blockquote>
+<p>这里做简单了解，Actor 是定义成一个遵循 Sendable 的协议：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">public</span> <span class="kd">protocol</span> <span class="nc">Actor</span> <span class="p">:</span> <span class="nb">AnyObject</span><span class="p">,</span> <span class="n">Sendable</span> <span class="p">{</span> <span class="p">}</span>
+
+<span class="kd">public</span> <span class="kd">protocol</span> <span class="nc">Sendable</span> <span class="p">{</span> <span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>Swift 提供了 <code>actor</code> 关键字，同时也是一种新的具体名义类型，同 class、struct、enum 等。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="n">actor</span> <span class="n">Photos</span> <span class="p">{</span>
+	<span class="kd">var</span> <span class="nv">items</span><span class="p">:</span> <span class="p">[</span><span class="n">SpacePhoto</span><span class="p">]</span>
+	<span class="p">...</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>Actor 在概念上类似于在并发环境中可以安全使用的类。 因为 Swift 确保在任何给定时间只能由单个线程访问 actor 内的可变状态，这有助于在编译器级别消除各种严重的错误。</p>
+<p>而 main actor 是 actor 的一个全局单例，其声明如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="p">@</span><span class="n">globalActor</span> <span class="kd">public</span> <span class="n">actor</span> <span class="n">MainActor</span> <span class="p">{</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">let</span> <span class="nv">shared</span><span class="p">:</span> <span class="n">MainActor</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>我们通过添加 <code>@MainActor</code> 修饰后，Swift 会确保所修饰的代码会执行在主线程中。</p>
+<h3 id="swiftui-run-loop">SwiftUI run loop</h3>
+<p>run loop 过程，应用会不断接收用户事件，更新模型，最终将 SwiftUI 视图呈现到屏幕上。这里把每次循环的更新称作 “ticks of the run loop“。让我们展开这个循环，每个刻度表示一个循环，以便您可以连续查看多个刻度。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/10019-06-run-loop-tick.png" alt="10019-06-run-loop-tick"></p>
+<p>在 SwiftUI 中，ObservableObjects 可以通过一些有趣的方式与 SwiftUI run loop 交互。让我们回到 Photos ObservableObject 并查看 updateItems 方法。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/10019-07-run-loop-code.png" alt="10019-07-run-loop-code"></p>
+<p>在上图表示的是 <code>updateItems</code> 方法的执行在 SwiftUI run loop 中的状态变化，具体如下：</p>
+<ul>
+<li>蓝色矩形框：表示在一个 run loop 周期内执行 <code>updateItems</code> 方法的耗时。</li>
+<li>橙色部分：表示获取到新数据后，会通过 publiser 的 <code>objectWillChange</code> 通知观察者有 photos 更新；</li>
+<li>绿色 Snapshot：SwiftUI 在收到数据更新的通知后会对当前状态进行快照，为后续对比准备；</li>
+<li>紫色部分：表示 items 数据已更新；</li>
+<li>绿色 tick：在下一个 run loop tick 节点，SwiftUI 同样进行 items 快照，并与之前快照对比。</li>
+</ul>
+<p>从 SwiftUI 视图中调用 updateItems 时，这些逻辑均在 <code>MainActor</code> 上被顺序执行。不过上面描述的属于理想状态，很多时候您的数据更新会产生延迟。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/10019-08-run-loop-blocking.png" alt="10019-08-run-loop-blocking"></p>
+<p>上述为发生了主线程 block 的情况，错失一次 tick 的刷新机会，对于用户而言则算是一次障碍。过去解决方式就是使用 dispatch queues</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/10019-09-poor-dispatch.png" alt="10019-09-poor-dispatch"></p>
+<p>将 <code>updateItems</code> 的逻辑切换到了异步线程执行，而这将导致 run loop 的快照状态产生了变化。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/10019-09-dispatch.png" alt="10019-09-dispatch"></p>
+<p>可以看到在下一个 run loop 周期的 tick 节点，由于 <code>fetchPhotos</code> 的异步更新，SwfitUI 未能正确捕捉到 <code>objectWIllChange</code> 变化，导致快照数据对比结果为未更新。而如果您能保证如下状态的顺序执行，则可以避免上述的情况。</p>
+<ol>
+<li><code>objectWillChange</code></li>
+<li>The state changes</li>
+<li>The run loop ticks</li>
+</ol>
+<p>解决方案就是：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/10019-11-await.png" alt="10019-11-await"></p>
+<h3 id="using-await">Using await</h3>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/10019-12-await-code.png" alt="10019-12-await-code"></p>
+<p>通过 <code>async / await</code> 的使用，使得状态变更能够在主线程被及时感知。上图中跳过的一段 tick 周期就是由于网络延迟等导致的 tick 空转。接下来就是实现 <code>fetchPhotos</code> 方法，逻辑很简单就是遍历 photos 然后获取对应 entity 和 image 即可：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="p">@</span><span class="n">MainActor</span>
+<span class="kd">class</span> <span class="nc">Photos</span><span class="p">:</span> <span class="n">ObservableObject</span> <span class="p">{</span>
+
+    <span class="p">@</span><span class="n">Published</span> <span class="kd">private</span><span class="p">(</span><span class="kr">set</span><span class="p">)</span> <span class="kd">var</span> <span class="nv">items</span><span class="p">:</span> <span class="p">[</span><span class="n">SpacePhoto</span><span class="p">]</span> <span class="p">=</span> <span class="p">[]</span>
+
+    <span class="c1">// Updates `items` to a new, random list of photos.</span>
+    <span class="kd">func</span> <span class="nf">updateItems</span><span class="p">()</span> <span class="n">async</span> <span class="p">{</span>
+        <span class="kd">let</span> <span class="nv">fetched</span> <span class="p">=</span> <span class="n">await</span> <span class="n">fetchPhotos</span><span class="p">()</span>
+        <span class="n">items</span> <span class="p">=</span> <span class="n">fetched</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Fetches a new, random list of photos.</span>
+    <span class="kd">func</span> <span class="nf">fetchPhotos</span><span class="p">()</span> <span class="n">async</span> <span class="p">-&gt;</span> <span class="p">[</span><span class="n">SpacePhoto</span><span class="p">]</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nv">downloaded</span><span class="p">:</span> <span class="p">[</span><span class="n">SpacePhoto</span><span class="p">]</span> <span class="p">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">query</span> <span class="k">in</span> <span class="n">Photos</span><span class="p">.</span><span class="n">keys</span> <span class="p">{</span>
+            <span class="kd">let</span> <span class="nv">url</span> <span class="p">=</span> <span class="n">SpacePhoto</span><span class="p">.</span><span class="n">request</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="n">query</span><span class="p">)</span>
+            <span class="k">if</span> <span class="kd">let</span> <span class="nv">photo</span> <span class="p">=</span> <span class="n">await</span> <span class="n">fetchPhoto</span><span class="p">(</span><span class="n">from</span><span class="p">:</span> <span class="n">url</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">downloaded</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">photo</span><span class="p">)</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">downloaded</span>
+    <span class="p">}</span>
+
+    <span class="kd">func</span> <span class="nf">fetchPhoto</span><span class="p">(</span><span class="n">from</span> <span class="n">url</span><span class="p">:</span> <span class="n">URL</span><span class="p">)</span> <span class="n">async</span> <span class="p">-&gt;</span> <span class="n">SpacePhoto</span><span class="p">?</span> <span class="p">{</span>
+        <span class="k">do</span> <span class="p">{</span>
+            <span class="kd">let</span> <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="kc">_</span><span class="p">)</span> <span class="p">=</span> <span class="k">try</span> <span class="n">await</span> <span class="n">URLSession</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">data</span><span class="p">(</span><span class="n">from</span><span class="p">:</span> <span class="n">url</span><span class="p">)</span>
+            <span class="kd">let</span> <span class="nv">decoder</span> <span class="p">=</span> <span class="n">JSONDecoder</span><span class="p">()</span>
+            <span class="kd">let</span> <span class="nv">response</span> <span class="p">=</span> <span class="k">try</span> <span class="n">decoder</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="n">NASAResponse</span><span class="p">.</span><span class="kc">self</span><span class="p">,</span> <span class="n">from</span><span class="p">:</span> <span class="n">data</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">response</span><span class="p">.</span><span class="n">collection</span><span class="p">.</span><span class="n">items</span><span class="p">.</span><span class="n">randomElement</span><span class="p">()?.</span><span class="n">data</span>
+        <span class="p">}</span> <span class="k">catch</span> <span class="p">{</span>
+            <span class="bp">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">nil</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>这里提供的代码与官方 Demo 展示的 Photos 数据获取 API 稍有不同，本文采用了 NASA 提供的 <a href="https://images.nasa.gov/docs/images.nasa.gov_api_docs.pdf">image search API</a>。</p>
+</blockquote>
+<p>这里您用 <code>@MainActor</code> 来修饰了 Photos 类，之后 Swift Complier 会保证所有 Photos 的属性和方法都将通过  main actor 来访问。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="n">updateItems</span><span class="p">()</span> <span class="n">async</span> <span class="p">-&gt;</span>
+	<span class="n">fetchPhotos</span><span class="p">()</span> <span class="n">async</span> <span class="p">-&gt;</span>
+		<span class="n">fetchPhoto</span><span class="p">(</span><span class="n">from</span><span class="p">:)</span> <span class="n">async</span> <span class="p">-&gt;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>可以看到三个方法都是使用了 async 关键字来声明其为异步执行。而对于 async 声明的方法，对应的需要配上 <strong>await</strong> 关键字。</p>
+<p>最后就差 updateItems 的调用，让我们在 CatalogView 中来完成最后一步。</p>
+<h2 id="new-concurrency-tools">New concurrency tools</h2>
+<p>最后一节，我们来介绍几个支持异步更新的 API，为您的程序添加更友好的用户体验。</p>
+<h3 id="task--refreshable">Task &amp; Refreshable</h3>
+<p>SwiftUI 为 View 提供了新的入口来执行任务。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">struct</span> <span class="nc">CatalogView</span><span class="p">:</span> <span class="n">View</span> <span class="p">{</span>
+
+    <span class="p">@</span><span class="n">StateObject</span> <span class="kd">private</span> <span class="kd">var</span> <span class="nv">photos</span> <span class="p">=</span> <span class="n">Photos</span><span class="p">()</span>
+
+    <span class="kd">private</span> <span class="kd">var</span> <span class="nv">photoKey</span> <span class="p">=</span> <span class="p">[</span><span class="nb">String</span> <span class="p">:</span> <span class="n">SpacePhoto</span><span class="p">]()</span>
+
+    <span class="kd">var</span> <span class="nv">body</span><span class="p">:</span> <span class="n">some</span> <span class="n">View</span> <span class="p">{</span>
+        <span class="n">NavigationView</span> <span class="p">{</span>
+            <span class="n">List</span> <span class="p">{</span>
+                <span class="n">ForEach</span><span class="p">(</span><span class="n">photos</span><span class="p">.</span><span class="n">items</span><span class="p">)</span> <span class="p">{</span> <span class="n">item</span> <span class="k">in</span>
+                    <span class="n">PhotoView</span><span class="p">(</span><span class="n">photo</span><span class="p">:</span> <span class="n">item</span><span class="p">)</span>
+                        <span class="p">.</span><span class="n">listRowSeparator</span><span class="p">(.</span><span class="n">hidden</span><span class="p">)</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+            <span class="p">.</span><span class="n">navigationTitle</span><span class="p">(</span><span class="s">&#34;Catalog&#34;</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">listStyle</span><span class="p">(.</span><span class="n">plain</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">refreshable</span> <span class="p">{</span>
+                <span class="n">await</span> <span class="n">photos</span><span class="p">.</span><span class="n">updateItems</span><span class="p">()</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="p">.</span><span class="n">task</span> <span class="p">{</span>
+            <span class="n">await</span> <span class="n">photos</span><span class="p">.</span><span class="n">updateItems</span><span class="p">()</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>当 View 展现屏幕上时候会触发任务的执行，在 View 消失时则会取消对应的任务。其定义如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">extension</span> <span class="nc">View</span> <span class="p">{</span>
+    <span class="p">@</span><span class="n">inlinable</span> <span class="kd">public</span> <span class="kd">func</span> <span class="nf">task</span><span class="p">(</span><span class="kc">_</span> <span class="n">action</span><span class="p">:</span> <span class="p">@</span><span class="n">escaping</span> <span class="p">()</span> <span class="n">async</span> <span class="p">-&gt;</span> <span class="nb">Void</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">some</span> <span class="n">View</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>另外一个 New API 是 <code>refreshable</code>，本质上是一个 <a href="https://developer.apple.com/documentation/swiftui/viewmodifier">ViewModifier</a>，这里我们给 List 添加上 <code>refreshable</code> 后，它就能响应用户的下拉刷新动作。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/10019-14-refreshable.gif" alt="10019-14-refreshable"></p>
+<h3 id="asyncimage">AsyncImage</h3>
+<p>AsyncImage 可以帮助您实现异步下载和展示图片，再结合上 ProgressView 让 Image 在下载过程中作为 placeholder 展示。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/10019-13-fetch-image.png" alt="10019-13-fetch-image"></p>
+<h3 id="custom-button-action">Custom Button Action</h3>
+<p>同 AsyncImage 一样的思路，您可以为 SaveButton 添加 ProgressView，当图片正在保存时以展示 ProgeessView 作为中间状态。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">struct</span> <span class="nc">SavePhotoButton</span><span class="p">:</span> <span class="n">View</span> <span class="p">{</span>
+
+    <span class="kd">var</span> <span class="nv">photo</span><span class="p">:</span> <span class="n">SpacePhoto</span>
+    <span class="p">@</span><span class="n">State</span> <span class="kd">private</span> <span class="kd">var</span> <span class="nv">isSaving</span> <span class="p">=</span> <span class="kc">false</span>
+
+    <span class="kd">var</span> <span class="nv">body</span><span class="p">:</span> <span class="n">some</span> <span class="n">View</span> <span class="p">{</span>
+        <span class="n">Button</span> <span class="p">{</span>
+            <span class="n">async</span> <span class="p">{</span>
+                <span class="n">isSaving</span> <span class="p">=</span> <span class="kc">true</span>
+                <span class="n">await</span> <span class="n">photo</span><span class="p">.</span><span class="n">save</span><span class="p">()</span>
+                <span class="n">isSaving</span> <span class="p">=</span> <span class="kc">false</span>
+            <span class="p">}</span>
+        <span class="p">}</span> <span class="n">label</span><span class="p">:</span> <span class="p">{</span>
+            <span class="n">Text</span><span class="p">(</span><span class="s">&#34;Saved&#34;</span><span class="p">)</span>
+                <span class="p">.</span><span class="n">opacity</span><span class="p">(</span><span class="n">isSaving</span> <span class="p">?</span> <span class="mi">0</span> <span class="p">:</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="p">.</span><span class="n">overlay</span> <span class="p">{</span>
+                    <span class="k">if</span> <span class="n">isSaving</span> <span class="p">{</span>
+                        <span class="n">ProgressView</span><span class="p">()</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="p">.</span><span class="n">disabled</span><span class="p">(</span><span class="n">isSaving</span><span class="p">)</span>
+        <span class="p">.</span><span class="n">buttonStyle</span><span class="p">(.</span><span class="n">bordered</span><span class="p">)</span>
+        <span class="p">.</span><span class="n">controlSize</span><span class="p">(.</span><span class="n">small</span><span class="p">)</span> <span class="c1">// .large, .medium or .small</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>效果如下：</p>
+<p><!-- raw HTML omitted --></p>
+<h4 id="tips">Tips</h4>
+<p>由于本文脱水过程 Apple 还未提供 Session 中的示例工程，这里作者参照视频中的代码提供了功能完备的 <a href="https://github.com/looseyi/WWDC-SampleCode.git">Demo Project</a>，有兴趣的小伙伴自取。记得用 Xcode 13 打开 😊。</p>
+<h2 id="总结">总结</h2>
+<p>这里您看到了 SwiftUI 与 Swift 的并发特性很好地集成在一起，默认情况下为用户提供了最佳行为。
+在许多情况下，您只需要使用 <code>await</code> 来使用并发的能力。将 <code>ObservableObject</code> 标记为 <code>@MainActor</code>，以便更可靠地检查您的对象是否以适合您的视图的方式更新。</p>
+<ul>
+<li>使用 SwiftUI 的 API 附加功能，以最少的工作量编写安全且高性能的并发应用程序。</li>
+<li>使用 <code>AsyncImage</code> 并发加载图像。</li>
+<li>使用 <code>refreshable</code> 修饰符添加到视图层次结构中，以允许用户手动刷新数据。</li>
+<li>就像您在 Save 按钮上看到的那样，您可以在自己的自定义视图中使用 Swift 的新并发功能。</li>
+</ul>
+<p>众所周知，在计算机领域并发是很棘手的一个难题，现在您拥有了管理应用程序中这种复杂性的工具。我们希望您喜欢并了解 Swift 5.5 和 SwiftUI 中出色的新并发工具，我们期待看到您使用它们解决应用程序中棘手问题。</p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">土土Edmond木</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2021-06-11
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/ios/">iOS&#39;</a>
+          <a href="/tags/wwdc21/">WWDC21&#39;</a>
+          <a href="/tags/swiftui/">SwiftUI</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/sourcecode-cocoapods/08-cocoapods-xcodeproj/">
+            <span class="next-text nav-default">8. Xcode 工程文件解析</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+    <script src="https://utteranc.es/client.js"
+            repo="looseyi/looseyi.github.io"
+            issue-term="pathname"
+            theme="github-light"
+            crossorigin="anonymous"
+            async>
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/utterance">comments powered by utterances.</a></noscript>
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:chun574271939@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://twitter.com/looseyi" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="https://github.com/looseyi" class="iconfont icon-github" title="github"></a>
+      <a href="https://www.weibo.com/foreverclp" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="https://www.zhihu.com/people/tu-tu-edmondmu" class="iconfont icon-zhihu" title="zhihu"></a>
+  <a href="http://looseyi.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2019-12-11 - 
+    2021
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">土土Edmond木</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-62789092-1', 'auto');
+	ga('set', 'anonymizeIp', true);
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>

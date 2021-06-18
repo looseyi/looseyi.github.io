@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>WWDC20 - Build SwiftUI views for widgets - </title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="土土Edmond木" /><meta name="description" content="WWDC20 Session 10033 - Build SwiftUI views for widgets 本文知识目录 本文属于 WWDC20 中 Widgets 系列的文章。Widgets 是使用 SwiftUI 进行开发的，如果您对 SwiftUI 还不是很了解请翻看 Introduction to SwiftUI。如" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.82.1 with theme even" />
+
+
+<link rel="canonical" href="http://looseyi.github.io/post/wwdc/wwdc20/wwdc20-session-10033/" />
+  <link href="http://looseyi.github.io/post/wwdc/wwdc20/wwdc20-session-10033/index.xml" rel="alternate" type="application/rss+xml" title="" />
+  <link href="http://looseyi.github.io/post/wwdc/wwdc20/wwdc20-session-10033/index.xml" rel="feed" type="application/rss+xml" title="" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="WWDC20 - Build SwiftUI views for widgets" />
+<meta property="og:description" content="WWDC20 Session 10033 - Build SwiftUI views for widgets 本文知识目录 本文属于 WWDC20 中 Widgets 系列的文章。Widgets 是使用 SwiftUI 进行开发的，如果您对 SwiftUI 还不是很了解请翻看 Introduction to SwiftUI。如" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://looseyi.github.io/post/wwdc/wwdc20/wwdc20-session-10033/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2020-06-27T00:00:00&#43;00:00" />
+<meta property="article:modified_time" content="2020-06-27T00:00:00&#43;00:00" />
+
+<meta itemprop="name" content="WWDC20 - Build SwiftUI views for widgets">
+<meta itemprop="description" content="WWDC20 Session 10033 - Build SwiftUI views for widgets 本文知识目录 本文属于 WWDC20 中 Widgets 系列的文章。Widgets 是使用 SwiftUI 进行开发的，如果您对 SwiftUI 还不是很了解请翻看 Introduction to SwiftUI。如"><meta itemprop="datePublished" content="2020-06-27T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2020-06-27T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="2444">
+<meta itemprop="keywords" content="iOS&#39;,WWDC20&#39;,SwiftUI," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="WWDC20 - Build SwiftUI views for widgets"/>
+<meta name="twitter:description" content="WWDC20 Session 10033 - Build SwiftUI views for widgets 本文知识目录 本文属于 WWDC20 中 Widgets 系列的文章。Widgets 是使用 SwiftUI 进行开发的，如果您对 SwiftUI 还不是很了解请翻看 Introduction to SwiftUI。如"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Aha Moment</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Aha Moment</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">WWDC20 - Build SwiftUI views for widgets</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-06-27 </span>
+        <div class="post-category">
+            <a href="/categories/ios/"> iOS </a>
+            <a href="/categories/wwdc/"> WWDC </a>
+            <a href="/categories/swiftui/"> SwiftUI </a>
+            </div>
+          <span class="more-meta"> 约 2444 字 </span>
+          <span class="more-meta"> 预计阅读 5 分钟 </span>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#hello-widget">Hello Widget!</a></li>
+    <li><a href="#data-configuration">Data Configuration</a>
+      <ul>
+        <li><a href="#datestyle">DateStyle</a></li>
+      </ul>
+    </li>
+    <li><a href="#restructuring">Restructuring</a>
+      <ul>
+        <li><a href="#caffineamountview">CaffineAmountView</a></li>
+        <li><a href="#containerrelativeshape">ContainerRelativeShape</a></li>
+        <li><a href="#darkmode">DarkMode</a></li>
+        <li><a href="#sizecategory">SizeCategory</a></li>
+        <li><a href="#placeholder">Placeholder</a></li>
+        <li><a href="#widgetfamily">WidgetFamily</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <blockquote>
+<p>WWDC20 Session 10033 - <a href="https://wwdc.io/share/wwdc20/10033">Build SwiftUI views for widgets</a></p>
+</blockquote>
+<h1 id="本文知识目录">本文知识目录</h1>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gg7aao2inhj21hc10sn1q.jpg" alt="Build SwiftUI views for widgets"></p>
+<p>本文属于 WWDC20 中 Widgets 系列的文章。Widgets 是使用 SwiftUI 进行开发的，如果您对 SwiftUI 还不是很了解请翻看 <a href="https://wwdc.io/share/wwdc20/10119">Introduction to SwiftUI</a>。如果希望先了解更多 Widgets 请移步文末的相关链接。</p>
+<h1 id="swiftui-in-widgets">SwiftUI in widgets</h1>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gg7aani6pjj21ao0qa47o.jpg" alt="00-opportunityToLearnSwiftUI"></p>
+<p>我们可以为 Widgets 提供基于时间线的内容，它将在适当的时机展示在 iOS 14 或 macOS Big Sur 系统的主屏幕上。得益于 SwiftUI 良好的屏幕自适应能力，Widgets 可以在不同的系统上展示出不错的效果。因此，尽管我们的应用程序发布在旧版本的系统中 (无法使用 SwiftUI)，Widgets 也将是我们学习和使用 SwiftUI 的绝佳机会。</p>
+<p>Widgets 的展示效果如下：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gg7aankyrfj212l0p77u8.jpg" alt="01-SwiftUI&Widgets"></p>
+<p>事不宜迟，让我们直接通过 Demo 来体验如何使用 SwiftUI 来开发一个 Widgets</p>
+<h1 id="caffiine-drink-demo">Caffiine Drink Demo</h1>
+<p>我们将要创建一个应用程序，用于记录和跟踪我们所喝的含咖啡因的饮料，并估算出我们体内的咖啡因含量。 应用如下：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gg7aanlzjqj21ao0qa45r.jpg" alt="03-coffeineDrinks"></p>
+<p>而 Widgets 正好可以作为该应用程序的重要补充，以便能够一目了然地知道我们当前的咖啡因含量。</p>
+<p>这个是我们希望展示的 Widget 效果：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gg7aannftyj21ao0qadhd.jpg" alt="04-coffeineDrinksItem"></p>
+<p>首先，可以看到它的视觉和配色方案与我们的应用程序相同。</p>
+<p>在顶部，我们显示了我们体内目前的咖啡因含量，底部记录的是我们喝的最后一杯咖啡的时间。请注意 ⚠️，咖啡因含量的背景形状与 widget 形状是同心圆的关系，它可是使用我们新出的 API 来实现的哦。</p>
+<p>最后，也希望 widget 底部的持续时间能够实时更新以始终正确。</p>
+<h2 id="hello-widget">Hello Widget!</h2>
+<p>我们先新建一个项目，可以是 iOS、macOS 或 Multiplatform：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gg63now4bdj20qo0f0diu.jpg" alt="mutliplatform"></p>
+<p>接着需要再新建一个 widge 的 target，这里我们选择基于 iOS 项目的 widget：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gg7aanjpejj20ka0em76h.jpg" alt="01-xcode-widget"></p>
+<p>生成之后，让我们配上 <code>Hello Widget！</code>，并在 <code>PreviewProvider</code> 处添加上 <strong><a href="https://developer.apple.com/documentation/widgetkit/widgetpreviewcontext">WidgetPreviewContext</a></strong>：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">struct</span> <span class="nc">CafeineDrinkWidget_Previews</span><span class="p">:</span> <span class="n">PreviewProvider</span> <span class="p">{</span>
+
+    <span class="kd">static</span> <span class="kd">var</span> <span class="nv">previews</span><span class="p">:</span> <span class="n">some</span> <span class="n">View</span> <span class="p">{</span>
+        <span class="n">Group</span> <span class="p">{</span>
+            <span class="n">CafeineDrinkWidgetEntryView</span><span class="p">(</span><span class="n">entry</span><span class="p">:</span> <span class="p">.</span><span class="n">preivewEntry</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="p">.</span><span class="n">previewData</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="p">.</span><span class="n">previewContext</span><span class="p">(</span><span class="n">WidgetPreviewContext</span><span class="p">(</span><span class="n">family</span><span class="p">:</span> <span class="p">.</span><span class="n">systemSmall</span><span class="p">))</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>我们目前提供的 widget 样式分为三种：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">public</span> <span class="kd">enum</span> <span class="nc">WidgetFamily</span> <span class="p">:</span> <span class="nb">Int</span><span class="p">,</span> <span class="nb">RawRepresentable</span><span class="p">,</span> <span class="n">CustomDebugStringConvertible</span><span class="p">,</span> <span class="n">CustomStringConvertible</span> <span class="p">{</span>
+    <span class="c1">/// A small widget.</span>
+    <span class="k">case</span> <span class="n">systemSmall</span>
+    <span class="c1">/// A medium-sized widget.</span>
+    <span class="k">case</span> <span class="n">systemMedium</span>
+    <span class="c1">/// A large widget.</span>
+    <span class="k">case</span> <span class="n">systemLarge</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>让我们一起来看看最简版本的 widget 😄 。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gg7aannd6ej216u0rs1c4.jpg" alt="02-HelloWidget"></p>
+<h2 id="data-configuration">Data Configuration</h2>
+<p>接着，让我们把 <code>CaffeineWidgetData</code>  配置起来：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">struct</span> <span class="nc">CaffeineWidgetData</span> <span class="p">{</span>
+
+    <span class="kd">public</span> <span class="kd">let</span> <span class="nv">drinkName</span><span class="p">:</span> <span class="nb">String</span>
+    <span class="kd">public</span> <span class="kd">let</span> <span class="nv">drinkData</span><span class="p">:</span> <span class="n">Date</span>
+    <span class="kd">public</span> <span class="kd">let</span> <span class="nv">caffeineAmount</span><span class="p">:</span> <span class="n">Measurement</span><span class="p">&lt;</span><span class="n">UnitMass</span><span class="p">&gt;</span>
+<span class="p">}</span>
+
+<span class="kd">extension</span> <span class="nc">CaffeineWidgetData</span> <span class="p">{</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">let</span> <span class="nv">previewData</span> <span class="p">=</span> <span class="n">CaffeineWidgetData</span><span class="p">(</span>
+        <span class="n">drinkName</span><span class="p">:</span> <span class="s">&#34;Cappuccino&#34;</span><span class="p">,</span>
+        <span class="n">drinkData</span><span class="p">:</span> <span class="n">Date</span><span class="p">().</span><span class="n">advanced</span><span class="p">(</span><span class="n">by</span><span class="p">:</span> <span class="o">-</span><span class="mi">60</span> <span class="o">*</span> <span class="mi">29</span> <span class="o">+</span> <span class="mi">5</span><span class="p">),</span>
+        <span class="n">caffeineAmount</span><span class="p">:</span> <span class="n">Measurement</span><span class="p">&lt;</span><span class="n">UnitMass</span><span class="p">&gt;(</span><span class="n">value</span><span class="p">:</span> <span class="mf">56.23</span><span class="p">,</span> <span class="n">unit</span><span class="p">:</span> <span class="p">.</span><span class="n">milligrams</span><span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>接着再加上简单的 View  <code>LazyVStack</code> 和 <code>Text</code> 来承载我们新添的数据。效果如下：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gg7aanormsj211n0sjh5a.jpg" alt="04-previewData"></p>
+<p>有了基本结构后，我们再丰富一下。先加点背景色，这里我们用 <code>ZStack</code> 来包装：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">var</span> <span class="nv">body</span><span class="p">:</span> <span class="n">some</span> <span class="n">View</span> <span class="p">{</span>
+  	<span class="n">ZStack</span> <span class="p">{</span>
+      <span class="n">Color</span><span class="p">(</span><span class="s">&#34;cappuccino&#34;</span><span class="p">)</span>
+
+      <span class="n">LazyVStack</span><span class="p">(</span><span class="n">alignment</span><span class="p">:</span> <span class="p">.</span><span class="n">leading</span><span class="p">)</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
+   <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>让我们把 <code>drinkName</code> 和 <code>drinkDate</code> 也展示出来：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="n">Text</span><span class="p">(</span><span class="s">&#34;</span><span class="si">\(</span><span class="n">data</span><span class="p">.</span><span class="n">drinkName</span><span class="si">)</span><span class="s"> ☕️&#34;</span><span class="p">)</span>
+   <span class="p">.</span><span class="n">font</span><span class="p">(.</span><span class="n">body</span><span class="p">)</span>
+   <span class="p">.</span><span class="n">bold</span><span class="p">()</span>
+   <span class="p">.</span><span class="n">foregroundColor</span><span class="p">(</span><span class="n">Color</span><span class="p">(</span><span class="s">&#34;milk&#34;</span><span class="p">))</span>
+
+<span class="c1">/// NOTE: *New* Date provider API</span>
+<span class="n">Text</span><span class="p">(</span><span class="s">&#34;</span><span class="si">\(</span><span class="n">data</span><span class="p">.</span><span class="n">drinkDate</span><span class="p">,</span> <span class="n">style</span><span class="p">:</span> <span class="p">.</span><span class="n">relative</span><span class="si">)</span><span class="s"> ago&#34;</span><span class="p">)</span>
+   <span class="p">.</span><span class="n">font</span><span class="p">(.</span><span class="n">caption</span><span class="p">)</span>
+   <span class="p">.</span><span class="n">foregroundColor</span><span class="p">(</span><span class="n">Color</span><span class="p">(</span><span class="s">&#34;milk&#34;</span><span class="p">))</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>注意，这里我们使用了 SwiftUI 新出的 <code>DateStyle</code> API</p>
+<h3 id="datestyle">DateStyle</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">public</span> <span class="kd">struct</span> <span class="nc">DateStyle</span> <span class="p">{</span>
+
+    <span class="c1">/// A style displaying only the time component for a date.</span>
+    <span class="c1">/// Example output: </span>
+    <span class="c1">///     11:23PM</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">let</span> <span class="nv">time</span><span class="p">:</span> <span class="n">Text</span><span class="p">.</span><span class="n">DateStyle</span>
+
+    <span class="c1">/// A style displaying a date.</span>
+    <span class="c1">/// Example output:</span>
+    <span class="c1">///     June 3, 2019</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">let</span> <span class="nv">date</span><span class="p">:</span> <span class="n">Text</span><span class="p">.</span><span class="n">DateStyle</span>
+
+    <span class="c1">/// A style displaying a date as relative to now.</span>
+    <span class="c1">/// Example output:</span>
+    <span class="c1">///     2 hours, 23 minutes</span>
+    <span class="c1">///     1 year, 1 month</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">let</span> <span class="nv">relative</span><span class="p">:</span> <span class="n">Text</span><span class="p">.</span><span class="n">DateStyle</span>
+
+    <span class="c1">/// A style displaying a date as offset from now.</span>
+    <span class="c1">/// Example output:</span>
+    <span class="c1">///     +2 hours</span>
+    <span class="c1">///     -3 months</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">let</span> <span class="nv">offset</span><span class="p">:</span> <span class="n">Text</span><span class="p">.</span><span class="n">DateStyle</span>
+
+    <span class="c1">/// A style displaying a date as timer counting from now.</span>
+    <span class="c1">/// Example output:</span>
+    <span class="c1">///    2:32</span>
+    <span class="c1">///    36:59:01</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">let</span> <span class="nv">timer</span><span class="p">:</span> <span class="n">Text</span><span class="p">.</span><span class="n">DateStyle</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>再来看一眼效果：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gg7aanrer2j214m0rr4ep.jpg" alt="05-allDataUsage"></p>
+<h2 id="restructuring">Restructuring</h2>
+<p>接下来，我们稍微调整一下代码结构，将内部的两个 <code>LazyStack</code> 抽离成单独的 View。这里可以用 Xcode 的 <code>Extra Subview</code> 来帮我们完成工作，我们只需将 🖱️移动到 <code>LazyStack</code> 上，按住 <code>Command</code> 并点击 🖱️ 就可以弹出如下窗口：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gg7aanun9zj20j20ib11g.jpg" alt="06-Extrack Subview"></p>
+<p>调整后，我们的结构就清爽很多了：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">var</span> <span class="nv">body</span><span class="p">:</span> <span class="n">some</span> <span class="n">View</span> <span class="p">{</span>
+    <span class="n">ZStack</span> <span class="p">{</span>
+        <span class="n">Color</span><span class="p">(</span><span class="s">&#34;cappuccino&#34;</span><span class="p">)</span>
+
+        <span class="n">LazyVStack</span><span class="p">(</span><span class="n">alignment</span><span class="p">:</span> <span class="p">.</span><span class="n">leading</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">CaffineAmountView</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">data</span><span class="p">)</span>
+            <span class="n">Spacer</span><span class="p">()</span>
+            <span class="n">DrinkView</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">data</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="p">.</span><span class="n">padding</span><span class="p">(.</span><span class="n">all</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>记得为我们新加的 <code>CaffineAmountView</code> 和 <code>DrinkView</code> 加上 <code>CaffeineWidgetData</code> 数据。</p>
+<h3 id="caffineamountview">CaffineAmountView</h3>
+<p>最后再用我们的另一个新的 API 来修改 <code>CaffineAmountView</code>。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">var</span> <span class="nv">body</span><span class="p">:</span> <span class="n">some</span> <span class="n">View</span> <span class="p">{</span>
+    <span class="n">LazyHStack</span> <span class="p">{</span>
+        <span class="n">VStack</span><span class="p">(</span><span class="n">alignment</span><span class="p">:</span> <span class="p">.</span><span class="n">leading</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">Text</span><span class="p">(</span><span class="s">&#34;Caffeine&#34;</span><span class="p">)</span>
+                <span class="p">.</span><span class="n">font</span><span class="p">(.</span><span class="n">body</span><span class="p">)</span>
+                <span class="p">.</span><span class="n">foregroundColor</span><span class="p">(</span><span class="n">Color</span><span class="p">(</span><span class="s">&#34;espresso&#34;</span><span class="p">))</span>
+                <span class="p">.</span><span class="n">bold</span><span class="p">()</span>
+
+            <span class="n">Text</span><span class="p">(</span><span class="n">Formatter</span><span class="p">.</span><span class="n">measurement</span><span class="p">.</span><span class="n">string</span><span class="p">(</span><span class="n">from</span><span class="p">:</span> <span class="n">data</span><span class="p">.</span><span class="n">caffeineAmount</span><span class="p">))</span>
+                <span class="p">.</span><span class="n">font</span><span class="p">(.</span><span class="n">title</span><span class="p">)</span>
+                <span class="p">.</span><span class="n">bold</span><span class="p">()</span>
+                <span class="p">.</span><span class="n">foregroundColor</span><span class="p">(</span><span class="n">Color</span><span class="p">(</span><span class="s">&#34;espresso&#34;</span><span class="p">))</span>
+                <span class="p">.</span><span class="n">minimumScaleFactor</span><span class="p">(</span><span class="mf">0.8</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="n">Spacer</span><span class="p">(</span><span class="n">minLength</span><span class="p">:</span> <span class="mi">0</span><span class="p">)</span> <span class="c1">// #1</span>
+    <span class="p">}</span>
+    <span class="p">.</span><span class="n">padding</span><span class="p">(.</span><span class="n">all</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">)</span>
+    <span class="p">.</span><span class="n">background</span><span class="p">(</span><span class="n">ContainerRelativeShape</span><span class="p">().</span><span class="n">fill</span><span class="p">(</span><span class="n">Color</span><span class="p">(</span><span class="s">&#34;latte&#34;</span><span class="p">)))</span> <span class="c1">// #2</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>先注意一下，这里将 <code>Spacer</code> 的 minLength 设置为 0 是为了将整个 AmountView 的内容撑满。然后在编写 Demo 的过程中发现新增的 <code>LazyVStack</code> 在 layout 过程中有 bug，无法正常将内容撑满，所以这里改回用 <code>VStack</code>。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gg7aanvwo6j21ds0n00wu.jpg" alt="07-LazyVStack"></p>
+<h3 id="containerrelativeshape">ContainerRelativeShape</h3>
+<blockquote>
+<p>A shape that is replaced by an inset version of the current container shape. If no container shape was defined, is replaced by a rectangle.</p>
+</blockquote>
+<p>由于不同大小的设备可能对其 widget 使用不同的半径，这可能会导致情况变得有些麻烦。 而新出的 <code>ContainerRelativeShape</code> 是一种新的形状类型，它将采用最接近父视图容器形状的路径，并根据形状的位置使用适当的倒角半径。</p>
+<p>通过添加 <code>ContainerRelativeShape</code>，我们的 AmountView 会采用与系统为 widget 定义容器形状相同的同心的角半径。如果更改主 <code>VStack</code> 的 padding 的值，则 AmountView 的倒角将发生变化，以使围绕它的边框在拐角曲线周围保持恒定的厚度。</p>
+<p>例如，我们修改容器的 padding 为 10，AmountView 的倒角变化效果如下：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gg7aanx48dj20n5081god.jpg" alt="08-adjust padding"></p>
+<p>##PreviewProvider</p>
+<p>我们来看看 Widge 在不同场景下的实际效果。</p>
+<h3 id="darkmode">DarkMode</h3>
+<p>首先是 <code>.envrioment</code> 修饰符在 DarkMode 下的效果，这个其实完全由我们配置的 ColorSet 来保证的。</p>
+<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg7aao0f8cj20jt05fgmr.jpg" alt="10-colorSet"></p>
+<p>然后我们在 View 上添加 <code>colorScheme</code> 的环境配置就可以了。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="n">CafeineDrinkWidgetEntryView</span><span class="p">(</span><span class="n">entry</span><span class="p">:</span> <span class="p">.</span><span class="n">preivewEntry</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="p">.</span><span class="n">previewData</span><span class="p">)</span>
+    <span class="p">.</span><span class="n">previewContext</span><span class="p">(</span><span class="n">WidgetPreviewContext</span><span class="p">(</span><span class="n">family</span><span class="p">:</span> <span class="p">.</span><span class="n">systemSmall</span><span class="p">))</span>
+    <span class="p">.</span><span class="n">environment</span><span class="p">(</span><span class="err">\</span><span class="p">.</span><span class="n">colorScheme</span><span class="p">,</span> <span class="p">.</span><span class="n">dark</span><span class="p">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="sizecategory">SizeCategory</h3>
+<p>可通过  <code>.envrioment</code> 修饰符的  <code>sizeCategory</code> 来控制 widget 的字体大小。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="n">CafeineDrinkWidgetEntryView</span><span class="p">(</span><span class="n">entry</span><span class="p">:</span> <span class="p">.</span><span class="n">preivewEntry</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="p">.</span><span class="n">previewData</span><span class="p">)</span>
+    <span class="p">.</span><span class="n">previewContext</span><span class="p">(</span><span class="n">WidgetPreviewContext</span><span class="p">(</span><span class="n">family</span><span class="p">:</span> <span class="p">.</span><span class="n">systemSmall</span><span class="p">))</span>
+    <span class="p">.</span><span class="n">environment</span><span class="p">(</span><span class="err">\</span><span class="p">.</span><span class="n">sizeCategory</span><span class="p">,</span> <span class="p">.</span><span class="n">extraExtraLarge</span><span class="p">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>让我们先来看看这两种情况的效果：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gg7aanyx89j218p0sjh3g.jpg" alt="09-previewSize"></p>
+<h3 id="placeholder">Placeholder</h3>
+<p>今年的 SwiftUI 还提供了一个特别棒的功能，我们可以通过 <code>isPlaceholder</code> 修饰符来设置骨架图。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gg7aanzjjqj20v006jach.jpg" alt="11-isPlaceholder"></p>
+<p><code>.isPlaceholder</code>  还支持对单个视图的控制等。不过，目前的 Xcode 12 Beta1 版本还无法使用 😅。大家就且看一下吧。</p>
+<h3 id="widgetfamily">WidgetFamily</h3>
+<p>最后一个预览，让我们一起看看如何通过 <code>WidgetFamily</code> 来控制 Widge 的展示。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">struct</span> <span class="nc">CafeineDrinkWidgetEntryView</span> <span class="p">:</span> <span class="n">View</span> <span class="p">{</span>
+    <span class="p">...</span>    
+    <span class="p">@</span><span class="n">Environment</span><span class="p">(</span><span class="err">\</span><span class="p">.</span><span class="n">widgetFamily</span><span class="p">)</span> <span class="kd">var</span> <span class="nv">widgetFamily</span>
+
+    <span class="kd">var</span> <span class="nv">body</span><span class="p">:</span> <span class="n">some</span> <span class="n">View</span> <span class="p">{</span>
+        <span class="n">ZStack</span> <span class="p">{</span>
+            <span class="p">...</span>
+            <span class="n">LazyHStack</span> <span class="p">{</span>
+                <span class="n">LazyVStack</span><span class="p">(</span><span class="n">alignment</span><span class="p">:</span> <span class="p">.</span><span class="n">leading</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="n">CaffineAmountView</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">data</span><span class="p">)</span>
+                    <span class="n">Spacer</span><span class="p">()</span>
+                    <span class="n">DrinkView</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">data</span><span class="p">)</span>
+                <span class="p">}</span>
+                <span class="p">.</span><span class="n">padding</span><span class="p">(.</span><span class="n">all</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">widgetFamily</span> <span class="p">==</span> <span class="p">.</span><span class="n">systemMedium</span><span class="p">,</span> <span class="kd">let</span> <span class="nv">phoneName</span> <span class="p">=</span> <span class="n">data</span><span class="p">.</span><span class="n">phoneName</span> <span class="p">{</span>
+                    <span class="n">Image</span><span class="p">(</span><span class="n">phoneName</span><span class="p">).</span><span class="n">resizable</span><span class="p">()</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这里我们在 <code>widgetFamily</code> 为 <code>.systemMedium</code> 的情况下，为其添加了一张最后喝过的咖啡的图片。</p>
+<p>效果如下：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gg7aao6wfij20y3077n1x.jpg" alt="12-widgetFamily"></p>
+<h1 id="new-apis">New APIs</h1>
+<p>最后一节，再来回顾一下我们使用到的新 API</p>
+<p><strong>DateStyle</strong></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gg7aanu0ekj20nc0d5jxx.jpg" alt="06-dateTeimAPI"></p>
+<p><strong>ContainerRelativeShape</strong></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gg7aant2jjj20nc0d5q6i.jpg" alt="05-relativeShape"></p>
+<p><strong>文末福利</strong></p>
+<p>由于本文的 Session 并未提供相应的 SampleCode。本人在文章撰写的过程中，顺带写了完整的 Demo，如有需要的同学可以自取：<a href="https://github.com/looseyi/WWDC20-100330-SampleCode.git">Github</a>。⚠️  注意，在有的 macOS 系统上通过 Xcode 12 Beta 运行后可能无法在模拟器上查看 widget，不过在 Xcode 的 sidebar 预览，完整效果建议在真实设备体验。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gg89svkl11g20cg0qo1l3.gif" alt="widget.gif"></p>
+<h1 id="总结">总结</h1>
+<ul>
+<li>苹果通过独立的 taget 将 <code>Widget</code> 与主项目隔离开来，很好的支持了 Widget 发展，因为不会有历史包袱。</li>
+<li><code>Widge</code> 的定位还是比较清晰的，用于弥补宿主应用程序无法及时展示用户所关心的数据，而 Widget 正好很适合展示。</li>
+<li>配合越来越丰富的 SwiftUI 的功能和性能的提升，Widget 也能够与现有的苹果生态更好的集成。</li>
+<li>Widget 也使得苹果在 iOS 和 macOS 生态的融合了也更进了一步。</li>
+</ul>
+<h1 id="知识点问题梳理">知识点问题梳理</h1>
+<ol>
+<li><code>Widget</code> 支持在所有的苹果系统中使用吗 ？</li>
+<li>本文的示例中使用了哪几种新 API，试着描述它们的功能 ？</li>
+<li>本文的示例展示了几种环境描述符 ?</li>
+</ol>
+<h1 id="widges-相关视频">Widges 相关视频</h1>
+<ul>
+<li><a href="https://developer.apple.com/videos/play/wwdc2020/10103">Design great widgets</a></li>
+<li><a href="https://developer.apple.com/videos/play/wwdc2020/10028">Meet WidgetKit</a></li>
+<li><a href="https://developer.apple.com/videos/play/wwdc2020/10034">Widgets Code-along, part 1: The adventure begins</a></li>
+<li><a href="https://developer.apple.com/videos/play/wwdc2020/10035">Widgets Code-along, part 2: Alternate timelines</a></li>
+<li><a href="https://developer.apple.com/videos/play/wwdc2020/10036">Widgets Code-along, part 3: Advancing timelines</a></li>
+</ul>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">土土Edmond木</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2020-06-27
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/ios/">iOS&#39;</a>
+          <a href="/tags/wwdc20/">WWDC20&#39;</a>
+          <a href="/tags/swiftui/">SwiftUI</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/sourcecode-cocoapods/02-cocoapods-corecomponents/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">2. 整体把握 CocoaPods 核心组件</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/wwdc/wwdc20/wwdc20-session-10041/">
+            <span class="next-text nav-default">WWDC20 - What&#39;s new in SwiftUI</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+    <script src="https://utteranc.es/client.js"
+            repo="looseyi/looseyi.github.io"
+            issue-term="pathname"
+            theme="github-light"
+            crossorigin="anonymous"
+            async>
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/utterance">comments powered by utterances.</a></noscript>
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:chun574271939@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://twitter.com/looseyi" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="https://github.com/looseyi" class="iconfont icon-github" title="github"></a>
+      <a href="https://www.weibo.com/foreverclp" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="https://www.zhihu.com/people/tu-tu-edmondmu" class="iconfont icon-zhihu" title="zhihu"></a>
+  <a href="http://looseyi.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2019-12-11 - 
+    2021
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">土土Edmond木</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-62789092-1', 'auto');
+	ga('set', 'anonymizeIp', true);
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>
