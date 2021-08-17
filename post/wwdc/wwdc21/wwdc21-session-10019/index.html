@@ -50,8 +50,8 @@
 <meta itemprop="name" content="WWDC21 - Discover concurrency in SwiftUI">
 <meta itemprop="description" content="WWDC21 Session 10019 - Discover concurrency in SwiftUI 本文知识目录 本文属于 WWDC21 中 SwiftUI 与 Concurrency 结合应用的文章。 关于 SwiftUI 可以查看这篇介绍：Introduction to SwiftUI，而 Swift Concurrency 算是今"><meta itemprop="datePublished" content="2021-06-11T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2021-06-11T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="3310">
-<meta itemprop="keywords" content="iOS&#39;,WWDC21&#39;,SwiftUI," /><meta name="twitter:card" content="summary"/>
+<meta itemprop="wordCount" content="3267">
+<meta itemprop="keywords" content="iOS&#39;,WWDC&#39;,SwiftUI," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="WWDC21 - Discover concurrency in SwiftUI"/>
 <meta name="twitter:description" content="WWDC21 Session 10019 - Discover concurrency in SwiftUI 本文知识目录 本文属于 WWDC21 中 SwiftUI 与 Concurrency 结合应用的文章。 关于 SwiftUI 可以查看这篇介绍：Introduction to SwiftUI，而 Swift Concurrency 算是今"/>
 
@@ -125,7 +125,7 @@
             <a href="/categories/wwdc/"> WWDC </a>
             <a href="/categories/swiftui/"> SwiftUI </a>
             </div>
-          <span class="more-meta"> 约 3310 字 </span>
+          <span class="more-meta"> 约 3267 字 </span>
           <span class="more-meta"> 预计阅读 7 分钟 </span>
         
       </div>
@@ -170,7 +170,7 @@
 <p>WWDC21 Session 10019 - <a href="https://developer.apple.com/videos/play/wwdc2021/10019/">Discover concurrency in SwiftUI</a></p>
 </blockquote>
 <h2 id="本文知识目录">本文知识目录</h2>
-<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/10019-Discover-concurrency-in-SwiftUI.png" alt="Discover-concurrency-in-SwiftUI"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/10019-Discover-concurrency-in-SwiftUI.png" alt="Build SwiftUI views for widgets"></p>
 <p>本文属于 WWDC21 中 SwiftUI 与 Concurrency 结合应用的文章。</p>
 <p>关于 SwiftUI 可以查看这篇介绍：<a href="https://wwdc.io/share/wwdc20/10119">Introduction to SwiftUI</a>，而 Swift Concurrency 算是今年 WWDC 的重头戏，从使用层面来看，就是引入了 <a href="https://developer.apple.com/videos/play/wwdc2021/10132/">Async / Await</a> 这一语法，但是解决的却是软件工程中最令人头疼的问题之一。</p>
 <p>接下来让我们看看 Concurrency 新工具是如何与 SwiftUI 结合的。</p>
@@ -178,9 +178,8 @@
 <p>Tips：文末有示例代码地址。</p>
 </blockquote>
 <h2 id="引言">引言</h2>
-<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/10019-01-table.png" alt="10019-01-table">众所周知，在计算机领域并发是很棘手的一个难题，现在您拥有了管理应用程序中这种复杂性的工具。我们希望您喜欢并了解 Swift 5.5 和 SwiftUI 中出色的新并发工具，我们期待看到您使用它们解决应用程序中棘手问题。
-该 Session 主要包括三个方面的内容，分别为：<code>Concurrent Data Models</code>、<code>SwiftUI &amp; MainActor</code>、<code>New concurrency tools</code>。
-我们将通过一个星云图片浏览的 Demo 向您展示在 SwiftUI 中，现有的异步工具存在的问题，并运用新的并发工具来解决这些问题。最后我们会介绍 SwiftUI 中新引入的并发工具。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/10019-01-table.png" alt="10019-01-table">
+随着Swift 5.5 及 SwiftUI 的更新，您将拥有一系列新的并发编程工具。本文将重点介绍在 SwiftUI 中的相关新特性，主要包括三个方面，分别为：<code>Concurrent Data Models</code>、<code>SwiftUI &amp; MainActor</code>、<code>New concurrency tools</code>。我们将通过一个星云图片浏览的 Demo 向您展示在 SwiftUI 中，现有的异步工具存在的问题，并运用新的并发工具来解决这些问题。最后我们会介绍 SwiftUI 中新引入的并发工具。</p>
 <h2 id="concurrent-data-models">Concurrent Data Models</h2>
 <p>在 Swift 中想要使用并发编程，对数据模型有哪些要求呢 ？让我们从零开始造火箭。</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/10019-02-model-spacephoto.png" alt="10019-02-model-spacephoto"></p>
@@ -360,7 +359,7 @@
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/10019-09-poor-dispatch.png" alt="10019-09-poor-dispatch"></p>
 <p>将 <code>updateItems</code> 的逻辑切换到了异步线程执行，而这将导致 run loop 的快照状态产生了变化。</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/10019-09-dispatch.png" alt="10019-09-dispatch"></p>
-<p>可以看到在下一个 run loop 周期的 tick 节点，由于 <code>fetchPhotos</code> 的异步更新，SwfitUI 未能正确捕捉到 <code>objectWIllChange</code> 变化，导致快照数据对比结果为未更新。而如果您能保证如下状态的顺序执行，则可以避免上述的情况。</p>
+<p>可以看到，在异步更新的 <code>updateItems</code> 方法中，虽然触发了 <code>objectWIllChange</code> 调用，但 items 赋值还未完成，SwiftUI 却已进入下一个 run loop 周期，导致快照对比结果为未更新。而如果您能保证如下状态的顺序执行，则可以避免上述的情况。</p>
 <ol>
 <li><code>objectWillChange</code></li>
 <li>The state changes</li>
@@ -638,11 +637,15 @@
 <footer class="post-footer">
       <div class="post-tags">
           <a href="/tags/ios/">iOS&#39;</a>
-          <a href="/tags/wwdc21/">WWDC21&#39;</a>
+          <a href="/tags/wwdc/">WWDC&#39;</a>
           <a href="/tags/swiftui/">SwiftUI</a>
           </div>
       <nav class="post-nav">
-        
+        <a class="prev" href="/post/wwdc/wwdc21/wwdc21-session-10056/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">WWDC21 - 让您的 iPad 与 iPhon 应用程序在 M1 的 Mac 上大放异彩</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
         <a class="next" href="/post/sourcecode-cocoapods/08-cocoapods-xcodeproj/">
             <span class="next-text nav-default">8. Xcode 工程文件解析</span>
             <span class="next-text nav-mobile">下一篇</span>

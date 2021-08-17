@@ -6,13 +6,31 @@
     <description>Recent content in Categories on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Fri, 11 Jun 2021 00:00:00 +0000</lastBuildDate><atom:link href="http://looseyi.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 20 Jun 2021 00:00:00 +0000</lastBuildDate><atom:link href="http://looseyi.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>iOS</title>
       <link>http://looseyi.github.io/categories/ios/</link>
-      <pubDate>Fri, 11 Jun 2021 00:00:00 +0000</pubDate>
+      <pubDate>Sun, 20 Jun 2021 00:00:00 +0000</pubDate>
       
       <guid>http://looseyi.github.io/categories/ios/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>WWDC</title>
+      <link>http://looseyi.github.io/categories/wwdc/</link>
+      <pubDate>Sun, 20 Jun 2021 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/categories/wwdc/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Xcodeproj</title>
+      <link>http://looseyi.github.io/categories/xcodeproj/</link>
+      <pubDate>Sun, 20 Jun 2021 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/categories/xcodeproj/</guid>
       <description></description>
     </item>
     
@@ -22,15 +40,6 @@
       <pubDate>Fri, 11 Jun 2021 00:00:00 +0000</pubDate>
       
       <guid>http://looseyi.github.io/categories/swiftui/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>WWDC</title>
-      <link>http://looseyi.github.io/categories/wwdc/</link>
-      <pubDate>Fri, 11 Jun 2021 00:00:00 +0000</pubDate>
-      
-      <guid>http://looseyi.github.io/categories/wwdc/</guid>
       <description></description>
     </item>
     

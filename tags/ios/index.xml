@@ -6,7 +6,25 @@
     <description>Recent content in iOS&#39; on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Fri, 11 Jun 2021 00:00:00 +0000</lastBuildDate><atom:link href="http://looseyi.github.io/tags/ios/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 20 Jun 2021 00:00:00 +0000</lastBuildDate><atom:link href="http://looseyi.github.io/tags/ios/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>WWDC21 - 探索 Xcode 项目中构建配置的高级技巧</title>
+      <link>http://looseyi.github.io/post/wwdc/wwdc21/wwdc21-session-10210/</link>
+      <pubDate>Sun, 20 Jun 2021 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/post/wwdc/wwdc21/wwdc21-session-10210/</guid>
+      <description>WWDC21 Session 10210 - Explore advanced project configuration in Xcode。由于官方视频资源有问题，可访问 Youtube 链接。 本文知识目录 引言 大多时候我们都关注如何进行高效、高质量的完成任务或技术需</description>
+    </item>
+    
+    <item>
+      <title>WWDC21 - 让您的 iPad 与 iPhon 应用程序在 M1 的 Mac 上大放异彩</title>
+      <link>http://looseyi.github.io/post/wwdc/wwdc21/wwdc21-session-10056/</link>
+      <pubDate>Sun, 20 Jun 2021 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/post/wwdc/wwdc21/wwdc21-session-10056/</guid>
+      <description>让您的 iPad 与 iPhon 应用程序在 M1 的 Mac 上大放异彩 WWDC21 Session 10056 - Qualities of great iPad and iPhone apps on Macs with M1 主讲人：Nils Beck 本文知识目录 引言 在 2020 年 11 月的发布会上，苹果正式发布了搭</description>
+    </item>
+    
     <item>
       <title>WWDC21 - Discover concurrency in SwiftUI</title>
       <link>http://looseyi.github.io/post/wwdc/wwdc21/wwdc21-session-10019/</link>

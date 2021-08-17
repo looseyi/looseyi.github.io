@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>WWDC21 - 让您的 iPad 与 iPhon 应用程序在 M1 的 Mac 上大放异彩 - </title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="土土Edmond木" /><meta name="description" content="让您的 iPad 与 iPhon 应用程序在 M1 的 Mac 上大放异彩 WWDC21 Session 10056 - Qualities of great iPad and iPhone apps on Macs with M1 主讲人：Nils Beck 本文知识目录 引言 在 2020 年 11 月的发布会上，苹果正式发布了搭" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.82.1 with theme even" />
+
+
+<link rel="canonical" href="http://looseyi.github.io/post/wwdc/wwdc21/wwdc21-session-10056/" />
+  <link href="http://looseyi.github.io/post/wwdc/wwdc21/wwdc21-session-10056/index.xml" rel="alternate" type="application/rss+xml" title="" />
+  <link href="http://looseyi.github.io/post/wwdc/wwdc21/wwdc21-session-10056/index.xml" rel="feed" type="application/rss+xml" title="" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="WWDC21 - 让您的 iPad 与 iPhon 应用程序在 M1 的 Mac 上大放异彩" />
+<meta property="og:description" content="让您的 iPad 与 iPhon 应用程序在 M1 的 Mac 上大放异彩 WWDC21 Session 10056 - Qualities of great iPad and iPhone apps on Macs with M1 主讲人：Nils Beck 本文知识目录 引言 在 2020 年 11 月的发布会上，苹果正式发布了搭" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://looseyi.github.io/post/wwdc/wwdc21/wwdc21-session-10056/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2021-06-20T00:00:00&#43;00:00" />
+<meta property="article:modified_time" content="2021-06-20T00:00:00&#43;00:00" />
+
+<meta itemprop="name" content="WWDC21 - 让您的 iPad 与 iPhon 应用程序在 M1 的 Mac 上大放异彩">
+<meta itemprop="description" content="让您的 iPad 与 iPhon 应用程序在 M1 的 Mac 上大放异彩 WWDC21 Session 10056 - Qualities of great iPad and iPhone apps on Macs with M1 主讲人：Nils Beck 本文知识目录 引言 在 2020 年 11 月的发布会上，苹果正式发布了搭"><meta itemprop="datePublished" content="2021-06-20T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2021-06-20T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="6458">
+<meta itemprop="keywords" content="iOS&#39;,WWDC&#39;,Xcode," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="WWDC21 - 让您的 iPad 与 iPhon 应用程序在 M1 的 Mac 上大放异彩"/>
+<meta name="twitter:description" content="让您的 iPad 与 iPhon 应用程序在 M1 的 Mac 上大放异彩 WWDC21 Session 10056 - Qualities of great iPad and iPhone apps on Macs with M1 主讲人：Nils Beck 本文知识目录 引言 在 2020 年 11 月的发布会上，苹果正式发布了搭"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Aha Moment</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Aha Moment</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">WWDC21 - 让您的 iPad 与 iPhon 应用程序在 M1 的 Mac 上大放异彩</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2021-06-20 </span>
+        <div class="post-category">
+            <a href="/categories/ios/"> iOS </a>
+            <a href="/categories/wwdc/"> WWDC </a>
+            </div>
+          <span class="more-meta"> 约 6458 字 </span>
+          <span class="more-meta"> 预计阅读 13 分钟 </span>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#本文知识目录">本文知识目录</a></li>
+    <li><a href="#引言">引言</a></li>
+    <li><a href="#api-mappings">API mappings</a>
+      <ul>
+        <li><a href="#compatibility-focused">Compatibility focused</a></li>
+        <li><a href="#keyboard-input">Keyboard input</a></li>
+        <li><a href="#menu-bar">Menu bar</a></li>
+        <li><a href="#drag--drop">Drag &amp; Drop</a></li>
+        <li><a href="#printing">Printing</a></li>
+        <li><a href="#settings-bundle">Settings bundle</a></li>
+        <li><a href="#multi-scene-support">Multi scene support</a></li>
+        <li><a href="#multitasking-support">MultiTasking support</a></li>
+        <li><a href="#full-screen-apps">Full screen apps</a></li>
+      </ul>
+    </li>
+    <li><a href="#best-pratices">Best pratices</a>
+      <ul>
+        <li><a href="#write-portable-code">Write portable code</a></li>
+        <li><a href="#camera-properties">Camera properties</a></li>
+        <li><a href="#unavailable-hardware">Unavailable hardware</a></li>
+      </ul>
+    </li>
+    <li><a href="#recent-improvements">Recent improvements</a>
+      <ul>
+        <li><a href="#better-window-sizing">Better window sizing</a></li>
+        <li><a href="#virtual-game-controller">Virtual game controller</a></li>
+        <li><a href="#better-touch-alternatives">Better Touch Alternatives</a></li>
+        <li><a href="#macos-monterey-improvements">macOS Monterey improvements</a></li>
+      </ul>
+    </li>
+    <li><a href="#mac-deployment">Mac deployment</a>
+      <ul>
+        <li><a href="#mac-deployment-1">Mac deployment</a></li>
+        <li><a href="#custom-availability">Custom availability</a></li>
+        <li><a href="#local-testing">Local testing</a></li>
+      </ul>
+    </li>
+    <li><a href="#总结">总结</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h1 id="让您的-ipad-与-iphon-应用程序在-m1-的-mac-上大放异彩">让您的 iPad 与 iPhon 应用程序在 M1 的 Mac 上大放异彩</h1>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10056-banner.png" alt="wwdc21-10210-00-background"></p>
+<blockquote>
+<p>WWDC21 Session 10056 - <a href="https://developer.apple.com/videos/play/wwdc2021/10056">Qualities of great iPad and iPhone apps on Macs with M1</a></p>
+<p>主讲人：Nils Beck</p>
+</blockquote>
+<h2 id="本文知识目录">本文知识目录</h2>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10056-table-content.png" alt="wwdc21-10056-table-content"></p>
+<h2 id="引言">引言</h2>
+<p>在 2020 年 11 月的发布会上，苹果正式发布了搭载自研 M1 芯片的 Mac 与 <code>macOS Big Sur</code>，它们的正式亮相，宣告，苹果正式打通了旗下 iOS、iPadOS  及 macOS 三大独立操作系统之间的壁垒，实现了苹果生态的大一统。</p>
+<p>为了帮助开发者们快速过渡到 ARM 平台，苹果推出了 <code>Universal</code>、<code>Rosetta</code>、虚拟化技术等一整套解决方案，它可以将现有的 Mac 应用高效快捷的移植到 ARM 架构能兼容的系统中。也使得 iPhone 和 iPad 上的各种 App 也能直接在 <code>macOSBig Sur</code> 且配置了 M1 芯片 的 Mac上运行。也让 <code>Mac App Store</code> 上有了过百万的 iPad 和 iPhone 应用程序，它们在 <code>macOS Big Sur</code> 上有着很棒的体验，而在 <code>macOS Monterey</code> 中他们的体验将会更进一步。</p>
+<p>在本演讲中，我们将讨论 4 个主题：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10056-00-contents.png" alt="wwdc21-10056-00-contents"></p>
+<ul>
+<li>如何将多个 iOS API 映射到 Mac 的相应功能上；</li>
+<li>一些通用的最佳实践，将帮助您的应用程序在配备 M1 的 Mac 上大放异彩；</li>
+<li>在 <code>macOS Big Sur</code> 以及 <code>macOS Monterey</code> 的软件更新中所做的改进；</li>
+<li>Mac App Store 部署的注意事项。</li>
+</ul>
+<h2 id="api-mappings">API mappings</h2>
+<p>配备 M1 芯片的 Mac 让现有的 iPad 和 iPhone 应用程序轻松扩展到 Mac。无需变更 iPad 或 iPhone 应用程序，那些已在 <code>iOS App Store</code> 提交并获得批准的应用程序，也将通过 <code>Mac App Store</code> 向拥有 <code>Macs with M1</code> 的任何人提供服务。</p>
+<p>为此，我们非常注重兼容性。让系统 API 尽可能自然的映射到 Mac 的等效功能上。<strong>我们的目标是确保在 Mac 上获得流畅的应用体验，而无需您进行任何更改。</strong></p>
+<h3 id="compatibility-focused">Compatibility focused</h3>
+<p>目前，大多数现有应用程序在 Mac with M1 上运行良好！</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10056-3-extesnion-topics.png" alt="wwdc21-10056-3-extesnion-topics"></p>
+<p>小到 iPhone 的效率工具，大到极致的 iPad 游戏和专业应用程序，以及各种扩展。例如，分享扩展、WidgetKit 小组件、照片编辑扩展、VPN 网络扩展、音频单元等等。可以说您现有的 iPad 或 iPhone 应用程序很可能已经在 Mac 上运行良好，开箱即用。</p>
+<p>当然，我们支持所有基本功能，例如文本交互、复制和粘贴、Mac 菜单栏等，但也有很多高级功能，例如后台应用程序刷新、用户通知、相机访问、<code>Siri Intent</code> 等。</p>
+<blockquote>
+<p>Tips：<a href="https://developer.apple.com/videos/play/wwdc2020/10114/">iPad and iPhone apps on Apple silicon Macs</a> 中讨论了其中许多主题，建议查看该视频以了解更多详细信息。</p>
+</blockquote>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10056-3-more.png" alt="wwdc21-10056-3-more"></p>
+<p>如果您希望您的应用程序利用 Mac 提供的更多功能，请考虑构建 Mac Catalyst 版本的应用程序。</p>
+<p>可参阅 <a href="https://developer.apple.com/videos/play/wwdc2021/10053/">Qualities of a great Mac Catalyst app</a> 和 <a href="https://developer.apple.com/videos/play/wwdc2021/10052">What&rsquo;s new in Mac Catalyst</a> 以了解更多相关信息。</p>
+<h3 id="keyboard-input">Keyboard input</h3>
+<p>现在，让我们深入了解我刚才提到的一些 API 的更多细节，为您在 Mac 上提供出色的功能。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10056-4-keyboard.png" alt="wwdc21-10056-4-keyboard"></p>
+<p>您可以使用 Mac 键盘将文本输入到 <code>Text fileds</code> 或者使用 <code>UIKeyCommand</code> 定义键盘快捷键。</p>
+<h4 id="uikeycommand"><code>UIKeyCommand</code></h4>
+<p>早在 <code>iOS 7</code> 里，我们就增加了 <code>UIKeyCommand</code> 特性来支持快捷方式。不过当外部键盘发送键盘命令时，并没有直观的办法知道他们的存在。不像 <code>macOS</code> 用户可以在他们常用的菜单里找到快捷方式。好在 <code>iOS 9</code> 上为了使 iPad 更高效的工作，我们增加了<strong>可发现特性</strong>，这是一个叠加层，用于显示一个应用程序内当前可用的键盘命令。这个微小的变化使得键盘命令瞬间变得比以往有用多了，并且也使得 <code>UIKeyCommand</code> 成为你的应用程序的一个必要的附加功能。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10056-4-uikeycommand-discoverability.png" alt="wwdc21-10056-4-uikeycommand-discoverability"></p>
+<blockquote>
+<p>更多可参阅 NSHipster 的文章 <a href="https://nshipster.cn/uikeycommand/">UIKeyCommand</a>。</p>
+</blockquote>
+<h4 id="uipress"><code>UIPress</code></h4>
+<p>如果您希望编写自定义的按键处理来获取更多的控制，则可以使用 <code>UIResponder</code> 上的 <code>UIPress</code> API 来实现。毕竟所有 Mac 都有一个物理键盘，每个 <code>UIPress</code> 对象背后都对应一次物理按键的输入，或记录了一次手势操作。与之对应的 <code>UITouch</code> 则是对屏幕上虚拟键盘或手势操作输入的记录。</p>
+<p>因此，对于那些已经花费精力支持物理键盘的  iPad 或 iPhone 的应用程序，在 Mac 上的体验同时得到了极大的改进。</p>
+<h3 id="menu-bar">Menu bar</h3>
+<p>菜单栏旨在帮助发现应用程序功能和键盘快捷键。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10056-4-menu-bar-animation.png" alt="wwdc21-10056-4-menu-bar"></p>
+<p><strong>菜单栏结构在启动时确定，之后应该或多或少保持不变</strong>。menu items 不会被添加或删除，而是被启用或禁用，具体取决于它们当前是否适用。我们考虑到您应用功能的同时，会自动填充您应用的菜单栏。例如，我们可能会添加菜单项来创建新窗口、处理富文本或更改设备方向。</p>
+<p><strong>使用 keyCommands 的注意事项</strong></p>
+<ul>
+<li>通过 <code>UIResponders.keyCommands</code> 属性直接附加的快捷方式不会出现在菜单栏中；</li>
+<li>但无论何时应用，<code>UIResponders.keyCommands</code> 都优先于菜单项的快捷键。</li>
+</ul>
+<h4 id="uimenubuilder"><code>UIMenuBuilder</code></h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="p">@</span><span class="n">MainActor</span> <span class="kd">protocol</span> <span class="nc">UIMenuBuilder</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>您可能已经在使用我们在 <code>iOS 13</code> 中更新的 <code>UIMenuBuilder</code> API。**<code>UIMenuBuilder</code> 为您的 <code>UIKeyCommands</code> 添加了语义结构。**仅需在 <code>App Delegate</code> 或 <code>ViewController</code> 中覆盖  <code>buildMenu(with:)</code> 方法以修改 builder 对象。覆盖后的菜单结构决定了系统如何展示菜单的内容。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kr">override</span> <span class="kd">func</span> <span class="nf">buildMenu</span><span class="p">(</span><span class="n">with</span> <span class="n">builder</span><span class="p">:</span> <span class="n">UIMenuBuilder</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">if</span> <span class="n">builder</span><span class="p">.</span><span class="n">system</span> <span class="p">==</span> <span class="p">.</span><span class="n">main</span> <span class="p">{</span>
+		<span class="n">menuController</span> <span class="p">=</span> <span class="n">MenuController</span><span class="p">(</span><span class="n">with</span><span class="p">:</span> <span class="n">builder</span><span class="p">)</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>要查看如何使用 <code>UIMenuBuilder</code> 对象的示例，请参阅 <a href="https://developer.apple.com/documentation/uikit/uicommand/adding_menus_and_shortcuts_to_the_menu_bar_and_user_interface?language=objc">Adding Menus and Shortcuts to the Menu Bar and User Interface</a>。</p>
+<p>前面提到，带有键盘的 iPad 上按住 Command 键时，会展示叠加层用于显示当前应用程序可用的键盘命令。在 Mac 上，传递到构建器的默认结构会有所不同，但您对结构的自定义将反映在主菜单中。<code>UIKeyCommands</code> 依赖响应者链来为其操作找到适用的目标，这决定了是否启用菜单项。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10056-4-menu-bar-tipics.png" alt="wwdc21-10056-4-menu-bar-tipics"></p>
+<p>有关更多信息，请参阅 &ldquo;<a href="https://developer.apple.com/videos/play/wwdc2021/10057/">Take your iPad apps to the next level</a>&rdquo; 和 &ldquo;<a href="https://developer.apple.com/videos/play/wwdc2021/10260/">Focus on iPad keyboard navigation,&rdquo; and &ldquo;Qualities of a great Mac Catalyst app</a>&rdquo; 。</p>
+<h3 id="drag--drop">Drag &amp; Drop</h3>
+<p>对于在 iPad 和 iPhone 上使用拖放的应用程序，使用 <code>UIDragInteraction</code> 和 <code>UIDropInteraction</code>，这也会自动转移到 Mac。这让人们可以在您的应用程序和其他应用程序之间无缝拖动内容，就像下面的示例中，我将 QR 码从 Qrafter 拖动到我的桌面。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10056-5-drag-drop-qrcode.png" alt="wwdc21-10056-5-drag-drop-qrcode"></p>
+<h3 id="printing">Printing</h3>
+<p>对于使用 <code>UIPrintInteractionController</code> 打印的应用程序，当在您的代码中启动打印时，它会自动桥接到 Mac 打印对话框。当您采用新的 <code>Info.plist</code> 键 “<code>UIApplicationSupports PrintCommand</code>” 并实现相应的标准打印操作，打印和导出为 PDF 菜单项将自动添加到应用程序的菜单栏中。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10056-5-printing.png" alt="wwdc21-10056-5-printing"></p>
+<p>有关此新 API 的更多详细信息，请参阅 <a href="https://developer.apple.com/videos/play/wwdc2021/10052">What&rsquo;s new in Mac Catalyst</a>。</p>
+<h3 id="settings-bundle">Settings bundle</h3>
+<p>许多应用程序使用 settings bundle，我们将由此自动生成一个 Mac 风格的首选项面板。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10056-5-settings-bundle.png" alt="wwdc21-10056-5-settings-bundle"></p>
+<p>在 settings bundle 中放置 <code>credits file</code> 也很常见，我们会识别此类情况并将该文本移至 “关于” 窗口中。
+但是，如果您想要更多地控制 Mac 上 “关于” 框中显示的内容，您现在还可以选择将 <code>credits file</code> 添加到您的 bundle 中。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10056-5-settings-bundle-credites.png" alt="wwdc21-10056-5-settings-bundle-credites"></p>
+<p>您可以使用 RTF、RTFD 或 HTML 文件，与 Mac 应用程序执行此操作的方式相同。</p>
+<h3 id="multi-scene-support">Multi scene support</h3>
+<p>有许多以 iPad 为中心的 API 可以帮助您的应用程序成为出色的 iPad 应用程序。这些都能在 Mac 上完美呈现。因此，通过制作出色的 iPad 应用程序，您还可以让您的应用程序在配备 M1 的 Mac 上变得更好。</p>
+<p>如果您的应用程序根据 <code>UIApplicationSupportsMultipleScenes</code> 的 <code>Info.plist</code> key 支持多个场景，每个场景将被转换成一个单独的 window，我们自动添加一个 <code>menu item</code> 来创建一个新场景。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10056-6-multi-scene-01.png" alt="wwdc21-10056-6-multi-scene-01"></p>
+<p>在 Mac 上，提供了系统级的设置决定了应用程序退出时是否关闭所有窗口，或者是否在下次启动时恢复现有窗口。如果您的应用支持多个场景，我们会尊重此设置，因此如果所有场景都未生效，或者在某些情况下未发生状态恢复，属于预期范围。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10056-6-multi-scene-02.png" alt="wwdc21-10056-6-multi-scene-02"></p>
+<h3 id="multitasking-support">MultiTasking support</h3>
+<p>iPad 多任务支持会自动转换为 macOS 上可调整大小的窗口。如果您的应用程序已经支持 iPad 上的动态布局更改，则可以在 Mac 上实时调整窗口大小。您可以使用 UIWindowScene 上的 <code>minimumSize</code> 和 <code>maximumSize</code> API 限制允许的场景大小范围。请注意，调整 window 尺寸时，只有 <code>window scene</code> 尺寸会发生变化。而 <code>UIScreen size</code> 在这种情况下不会改变，仍旧返回的是设备大小。因此，<strong>即使在 iPad 上也不要将 <code>UIScreen size</code> 用于布局计算，否则您的 UI 元素最终会出现在错误的位置。</strong></p>
+<h3 id="full-screen-apps">Full screen apps</h3>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10056-7-full-screen-apps.png" alt="wwdc21-10056-7-full-screen-apps"></p>
+<p>如果您的应用程序希望控制设备的整个屏幕，我们将使用固定的场景大小和宽高比。但是 window 内容可以根据需要自动进行缩放。如果您的应用程序支持屏幕转向，则可以使用自动添加的菜单栏或通过拖动窗口边缘来更改窗口方向。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10056-7-interface-orientations.png" alt="wwdc21-10056-7-interface-orientations"></p>
+<p>上图中，通过菜单栏项来更改国际象棋应用程序的方向，并且用户界面会适应以最佳利用每个设备方向。</p>
+<h2 id="best-pratices">Best pratices</h2>
+<p>在将 iPad 或 iPhone 应用程序带到 Mac 时，一些最佳实践和 API map 能够消除大部分兼容问题，但让我们谈谈您应该遵循的一些编码实践，以确保您的应用程序在所有平台上都能正常运行，包括 Mac。</p>
+<h3 id="write-portable-code">Write portable code</h3>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10056-8-0-portable-code.png" alt="wwdc21-10056-8-0-portable-code"></p>
+<ol>
+<li><strong>使用 Apple 框架时，请务必仅使用官方支持的 API</strong>，因为我们框架中未记录的方法在 Mac 上可能不存在，或者可能随时更改。</li>
+<li><strong>避免硬编码文件系统位置的路径</strong>，因为这些路径在 Mac 上可能不同。例如，不要在路径前加上 “<code>/private</code>” 或 “<code>var mobile</code>&quot; 相反，使用适当的 API 在运行时确定每个路径。</li>
+<li><strong>避免对 View 和 Alert 的屏幕定位或此类视图层次结构的确切设置进行假设</strong>，因为这些在 Mac 上可能完全不同。</li>
+</ol>
+<h3 id="camera-properties">Camera properties</h3>
+<p>注意，Mac 上可用的相机分辨率和方向可能大不相同。例如，如果您的 iPhone 应用程序在拍照时处于纵向，您可能希望生成的相机图片也处于纵向。但是当应用程序在 Mac 上处于纵向时，情况不一定如此。您可能会收到横向图像，因为这是相机的定位方式。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10056-8-camera-orientaion.png" alt="wwdc21-10056-8-camera-orientaion"></p>
+<p>我们已经包含了许多启发式方法来提高与许多应用程序的兼容性。例如，<strong>即使您要求提供后置摄像头，我们也会为您提供 Mac 前置摄像头的图片</strong>。当然，如果您使用 <code>AVCaptureDeviceDiscoverySession</code> 和相关的 <code>AVFoundation</code> API 来收集相机有关的可用信息或真实属性（例如预览尺寸），那就更好了。并且您应该在您的 UI 中致力于处理所有可能的配置。</p>
+<h3 id="unavailable-hardware">Unavailable hardware</h3>
+<p>某些硬件功能在 Mac 上不可用。您的代码应该能够优雅地处理这种情况，并提供替代方案。</p>
+<h4 id="arkit">ARKit</h4>
+<p>例如，Mac 不支持 ARKit 增强现实。如果 ARKit 是您的应用程序的核心功能，您可能已将其设为必需的设备功能，因此您的应用程序将不会出现在 <code>Mac App Store</code> 中。但是如果 ARKit 是一个可选功能，您应该已经检查了相应 <strong>ARConfiguration</strong> 子类的 <code>isSupported</code> 属性。</p>
+<blockquote>
+<p>为了在 Mac 和其他地方获得最佳体验，请确保仅在具有此功能的设备上的 UI 中显示增强现实功能。</p>
+</blockquote>
+<h4 id="multi-touch-或-coremotion">Multi-Touch 或 CoreMotion</h4>
+<p>如果您的应用依赖于直接 <code>Multi-Touch</code> 或 <code>CoreMotion</code>，请考虑另外提供更适合 Mac 键盘和触控板的替代品。也就是说，在这种情况下，<code>Touch Alternatives</code> 可能会有所帮助。稍后我们将详细讨论这一点。</p>
+<h4 id="corelocation">CoreLocation</h4>
+<p>如果您使用 CoreLocation，即使没有准确的位置数据可用，您的应用程序也应该保持可用。例如，您可以提供手动位置输入作为替代，就像 Lowe&rsquo;s 应用程序在这里所做的那样。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10056-9-map.png" alt="wwdc21-10056-9-map"></p>
+<h2 id="recent-improvements">Recent improvements</h2>
+<p>接下来，让我们回顾一下，自 M1 芯片的 Mac 首次发布以来我们所做的一些改进。</p>
+<h3 id="better-window-sizing">Better window sizing</h3>
+<p>在 <code>macOS Big Sur 11.3</code>，我们对 iPad 和 iPhone 应用程序窗口在 Mac 上的行为方式进行了一些改进。如果您的应用由于不支持 multitasking 而具有固定的内容大小，但它确实支持大型设备尺寸，那么在启动时，我们现在将选择适合应用启动屏幕的最大支持设备尺寸。就您的应用程序而言，设置尺寸在整个会话中仍然保持不变，但window 可以更好地利用可用空间。还可以优先使用支持的最小设备尺寸。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10056-10-window-size-preference.png" alt="wwdc21-10056-10-window-size-preference"></p>
+<p>正如我之前提到的，窗口内容将根据需要放大或缩小。例如：</p>
+<ul>
+<li>当窗口全屏显示时，内容会自动放大以适应可用空间，同时保持原始场景宽高比。</li>
+<li>当窗口在启动后移动到较小的屏幕，我们将根据需要自动缩小比例以确保窗口仍然适合。</li>
+</ul>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10056-10-window-size.png" alt="wwdc21-10056-11-game-improvements"></p>
+<p>现在还可以使用 window 的缩放功能在两个缩放因子之间切换，一个优先考虑 UI 元素的自然大小，另一个优先考虑像素完美的准确性。</p>
+<h3 id="virtual-game-controller">Virtual game controller</h3>
+<p><code>GameController.framework</code> 自发布起就支持在我们所有支持游戏的平台上使用游戏控制。从 <code>macOS Big Sur 11.3</code>，我们已经可以将 Mac 的键盘和触控板用作虚拟游戏控制器。因此，即使您手边没有实际的控制器，也可以轻松使用键盘访问游戏，映射到控制器按钮的所有功能。在 <code>macOS Monterey</code> 中，我们通过添加灵敏度滑块和指针隐藏进一步完善了这一点，如相应首选项面板的这张图片所示。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10056-11-game-improvements.png" alt="wwdc21-10056-11-game-improvements"></p>
+<p>有关此框架的更多信息，请查看 &ldquo;<a href="https://developer.apple.com/videos/play/wwdc2020/10614/">Advancements in Game Controllers</a>&quot;。</p>
+<h3 id="better-touch-alternatives">Better Touch Alternatives</h3>
+<p>从第一天起，<code>Touch Alternatives</code> 就将键盘和触控板映射到为 Mac 上的其他交互方式，例如多点触控、拖动、点击和滑动。并且我们在 MacOS 11.3 做了一些改进。例如，您现在可以虚拟倾斜您的设备。这为许多其他游戏打开了大门。</p>
+<p>此外，首选项面板现在包括一个有用的图形表示，说明如何通过键盘和触控板访问五种交互风格中的每一种。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10056-12-touch-alternative.png" alt="wwdc21-10056-12-touch-alternative">
+我们还让应用程序可以自动选择加入 <code>Touch Alternatives</code>。当您选择加入时，首次启动时会显示一个入门对话框，以帮助发现此功能。您需要做的就是添加一个新的 plist 文件 <code>com.apple.uikit.inputalternatives.plist</code> 到您的 bundle 中。如下图配置：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10056-12-touch-alternative-enable.png" alt="wwdc21-10056-12-touch-alternative-enable"></p>
+<p>当然您可以根据您的应用程序来配置 <code>requiredOnboarding</code> 数组。这样，在首次对话框中只会突出显示所需的功能。</p>
+<p>图形与首选项面板中的图形类似，但我们仅突出显示您选择的交互样式。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10056-12-touch-alternative-dialog.png" alt="wwdc21-10056-12-touch-alternative-dialog"></p>
+<p>在此示例中，仅显示倾斜和多点触控。如果您确定您的应用将从这些触控替代方案中的任何一个中受益，请从一开始就为您的应用启用 <code>Touch Alternatives</code> 方案。</p>
+<p>最后，我们将演示一款名为 “<code>Assoluto Racing</code>” 的 iPad 游戏，它在配备 M1 的 Mac 上未经修改地运行。该应用程序从一开始就自动启用 <code>Touch Alternatives</code>，因此在首次启动将向我们展示键盘控件。另外，这个应用程序在 iPad 上使用 CoreMotion，所以我们可以通过倾斜设备来转向。在配备 M1 的 Mac 上启用 <code>Touch Alternatives</code> 后，我们可以通过 W、A、S 和 D 键模拟倾斜。</p>
+<blockquote>
+<p>Tips: 演示效果可以查看演讲视频。</p>
+</blockquote>
+<h3 id="macos-monterey-improvements">macOS Monterey improvements</h3>
+<p>借助 <code>macOS Monterey</code>，我们进行了更多改进。</p>
+<h4 id="support-for-apple-pay">Support for Apple Pay</h4>
+<p>Apple Pay 现在可用于 M1 Mac 上的 iPad 和 iPhone 应用程序，它使用我们为 <code>macOS Big Sur</code> 中的 <code>Mac Catalyst</code> 应用程序引入的相同增强型跨平台 API。这意味着您现在可以一处实现，就能支持 Apple Pay 在不同平台上接受付款。</p>
+<p>只要确保您已经实现了如下代理。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">protocol</span> <span class="nc">PKPaymentAuthorizationControllerDelegate</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10056-14-motery-authorizet.png" alt="wwdc21-10056-14-motery-authorizet">
+有关更多详细信息，请查看视频 <a href="https://developer.apple.com/videos/play/wwdc2021/10092/">What&rsquo;s new in Wallet and Apple Pay</a>。</p>
+<h4 id="better-avkit">Better AVKit</h4>
+<p>我们还使用 AVKit 制作了更好的全屏视频。</p>
+<p><code>AVPlayerView</code> 和 <code>AVPlayerViewController</code> 现在可以使用单独的窗口自动全屏拍摄视频。这意味着即使窗口在启动时分辨率和宽高比方面受到其他限制的应用程序也将充分利用 Mac 显示器，视视频内容而定。如果您需要更多地控制全屏体验，我们已经为 <code>AVPlayerViewDelegate</code> 和 <code>AVPlayerViewControllerDelegate</code> 添加了新的 API。**最重要的是，AVFoundation 支持在配置 M1 的 Mac 上 进行 HDR 播放和流式传输。**而你无需任何针对性的修改就能支持。</p>
+<p>最后，在 iPad 和 iPhone 应用程序中的 AVKit 控件，在 Mac 上也保持了同步。并且我们充分利用了支持新手势的 Mac 触控板。有关更多详细信息，可查阅 &ldquo;<a href="https://developer.apple.com/videos/play/wwdc2021/10290/">What&rsquo;s new in AVKit</a>&quot;。</p>
+<h4 id="shortcuts">Shortcuts</h4>
+<p>如果您的应用程序使用 SiriKit 的 Intens 来提供自定义 SiriKit 快捷方式，那么在配置 M1 的 Mac 并且操作系统为  <code>macOS Monterey</code> 的 iPad 和 iPhone 应用程序，现在也能支持这些快捷方式。</p>
+<p>有关快捷方式的更多信息，请查看演讲 &ldquo;<a href="https://developer.apple.com/videos/play/wwdc2021/10232/">Meet Shortcuts for macOS</a>&rdquo; and &ldquo;<a href="https://developer.apple.com/videos/play/wwdc2021/10283/">Design great actions for Shortcuts, Siri, and Suggestions</a>。</p>
+<h2 id="mac-deployment">Mac deployment</h2>
+<p>有了上述这些工具，在 <code>Mac App Store</code> 将会有越来越多应用程序。事实上，大多数应用程序都是自动存在的。正如之前提到的，在大多数情况下，使用 Mac 是有意义的。即使是专为移动设计的蓝牙门锁应用程序，如果您刚好把手机落在家里，但您手上有带 M1 芯片的 Mac，也可能会很有帮助。因此，如果您之前选择退出 <code>Mac App Store</code> 是时候重新考虑了。</p>
+<h3 id="mac-deployment-1">Mac deployment</h3>
+<p>在这种情况下，只需在 <code>App Store Connect</code> 中重新选中 “<code>Make this app available</code>” 复选框即可使该应用程序在 <code>Mac App Store</code> 上可用。无论您之前是否选择退出，您都需要确认您的应用程序在配备 M1 的 Mac 上确实运行良好。一旦您确信用户体验符合您的标准，请在 <code>App Store Connect</code> 中的验证兼容性链接。这将删除 <code>Mac App Store</code> 中您的应用程序旁边显示的 “<code>Not verified for macOS</code>” 文本，并将其替换为 “<code>Designed for iPad</code>&quot;。</p>
+<p>应用程序购物者会将此视为您花时间确保他们在 Mac 上使用您的应用程序的良好体验的标志。每个应用程序只需执行一次此操作。</p>
+<h3 id="custom-availability">Custom availability</h3>
+<p>另外 iPad 和 iPhone 应用程序在 <code>Mac App Store</code> 上将更容易被发现。当客户按名称搜索它们时，他们不再需要切换到 iPhone 和 iPad 应用程序选项卡。Apple 会自动选择兼容性所需的推荐最低 macOS 版本。但在某些极少数情况下，您可能希望使用自定义 macOS 可用性来覆盖它。例如，您的视频应用程序可能在 Big Sur 上运行良好，但如果您想确保您可以访问 AVKit 全屏改进，您可能会决定它应该只在 Monterey 及其他地方可用。</p>
+<p>在这种情况下，您有两个选择：</p>
+<ol>
+<li>不久之后，您将能够在 <code>App Store Connect</code> 的定价和可用性页面上选择不同的最低 macOS 版本。这对于商店中已有的应用程序非常有用，因为您无需重新提交新版本。</li>
+<li>您可以在信息中指定 <code>LSMinimumSystemVersion.plist</code>，并提交此更改作为您下次更新的一部分。</li>
+</ol>
+<p>这是正在积极开发的应用程序的推荐方法。注意，这不会替换 <code>MinimumOSVersion</code> 键，该键指定 iOS 最低系统版本。但实际上，很少需要这两种选择。</p>
+<h3 id="local-testing">Local testing</h3>
+<p>最后，让我们谈谈测试。在 macOS 上进行测试与在 iPad 上进行测试非常相似。您可以使用您已经熟悉的相同工作流程。对于 Xcode 中的本地测试，只需选择 <code>My Mac (Designed for iPad)</code> 作为运行目标。调试、单元测试等都可以像在其他设备上一样工作。</p>
+<p>对于 Beta 测试，我们为 <code>macOS Monterey</code> 中的所有应用程序（包括 iPhone 和 iPad 应用程序）添加了 <code>TestFlight</code> 支持，因此您现在可以将您的应用程序分发给使用配备 M1 的 Mac 的 Beta 测试人员。
+有关这方面的更多信息，请转到视频 “<a href="https://developer.apple.com/videos/play/wwdc2021/10170/">Meet TestFlight on Mac</a>&quot;。</p>
+<p>最后，欢迎使用 Mac！去验证您的应用程序并选择加入。
+请记住，随着您不断改进 iPad 和 iPhone 应用程序，您也在使用改进配置了 M1 的 Mac 上的这些应用程序。</p>
+<h2 id="总结">总结</h2>
+<p>本文围绕如何让您的 iPad 和 iPhone 的应用程序在 M1 的 Mac 上有更好的使用体验。对此分了四个章节展开，有系统升级带来的优化，API 映射功能的更佳丰富，同时还提供了大量的最佳实践。通过这些内容和相关视频的了解，相信您的应用程序在使用 M1 的 Mac 上能够大放异彩。</p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">土土Edmond木</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2021-06-20
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/ios/">iOS&#39;</a>
+          <a href="/tags/wwdc/">WWDC&#39;</a>
+          <a href="/tags/xcode/">Xcode</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/wwdc/wwdc21/wwdc21-session-10210/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">WWDC21 - 探索 Xcode 项目中构建配置的高级技巧</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/wwdc/wwdc21/wwdc21-session-10019/">
+            <span class="next-text nav-default">WWDC21 - Discover concurrency in SwiftUI</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+    <script src="https://utteranc.es/client.js"
+            repo="looseyi/looseyi.github.io"
+            issue-term="pathname"
+            theme="github-light"
+            crossorigin="anonymous"
+            async>
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/utterance">comments powered by utterances.</a></noscript>
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:chun574271939@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://twitter.com/looseyi" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="https://github.com/looseyi" class="iconfont icon-github" title="github"></a>
+      <a href="https://www.weibo.com/foreverclp" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="https://www.zhihu.com/people/tu-tu-edmondmu" class="iconfont icon-zhihu" title="zhihu"></a>
+  <a href="http://looseyi.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2019-12-11 - 
+    2021
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">土土Edmond木</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-62789092-1', 'auto');
+	ga('set', 'anonymizeIp', true);
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>

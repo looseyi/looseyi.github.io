@@ -6,13 +6,31 @@
     <description>Recent content in Tags on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Fri, 11 Jun 2021 00:00:00 +0000</lastBuildDate><atom:link href="http://looseyi.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 20 Jun 2021 00:00:00 +0000</lastBuildDate><atom:link href="http://looseyi.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>iOS&#39;</title>
       <link>http://looseyi.github.io/tags/ios/</link>
-      <pubDate>Fri, 11 Jun 2021 00:00:00 +0000</pubDate>
+      <pubDate>Sun, 20 Jun 2021 00:00:00 +0000</pubDate>
       
       <guid>http://looseyi.github.io/tags/ios/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>WWDC&#39;</title>
+      <link>http://looseyi.github.io/tags/wwdc/</link>
+      <pubDate>Sun, 20 Jun 2021 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/tags/wwdc/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Xcode</title>
+      <link>http://looseyi.github.io/tags/xcode/</link>
+      <pubDate>Sun, 20 Jun 2021 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/tags/xcode/</guid>
       <description></description>
     </item>
     
@@ -22,15 +40,6 @@
       <pubDate>Fri, 11 Jun 2021 00:00:00 +0000</pubDate>
       
       <guid>http://looseyi.github.io/tags/swiftui/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>WWDC21&#39;</title>
-      <link>http://looseyi.github.io/tags/wwdc21/</link>
-      <pubDate>Fri, 11 Jun 2021 00:00:00 +0000</pubDate>
-      
-      <guid>http://looseyi.github.io/tags/wwdc21/</guid>
       <description></description>
     </item>
     
@@ -58,15 +67,6 @@
       <pubDate>Wed, 13 Jan 2021 00:00:00 +0000</pubDate>
       
       <guid>http://looseyi.github.io/tags/widgets/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>WWDC20&#39;</title>
-      <link>http://looseyi.github.io/tags/wwdc20/</link>
-      <pubDate>Sat, 27 Jun 2020 00:00:00 +0000</pubDate>
-      
-      <guid>http://looseyi.github.io/tags/wwdc20/</guid>
       <description></description>
     </item>
     

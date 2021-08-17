@@ -3,35 +3,84 @@
   
   <url>
     <loc>http://looseyi.github.io/</loc>
-    <lastmod>2021-06-11T00:00:00+00:00</lastmod>
+    <lastmod>2021-06-20T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>http://looseyi.github.io/categories/</loc>
-    <lastmod>2021-06-11T00:00:00+00:00</lastmod>
+    <lastmod>2021-06-20T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>http://looseyi.github.io/categories/ios/</loc>
-    <lastmod>2021-06-11T00:00:00+00:00</lastmod>
+    <lastmod>2021-06-20T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>http://looseyi.github.io/tags/ios/</loc>
-    <lastmod>2021-06-11T00:00:00+00:00</lastmod>
+    <lastmod>2021-06-20T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>http://looseyi.github.io/post/</loc>
-    <lastmod>2021-06-11T00:00:00+00:00</lastmod>
+    <lastmod>2021-06-20T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/tags/</loc>
+    <lastmod>2021-06-20T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/categories/wwdc/</loc>
+    <lastmod>2021-06-20T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/tags/wwdc/</loc>
+    <lastmod>2021-06-20T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/post/wwdc/wwdc21/wwdc21-session-10210/</loc>
+    <lastmod>2021-06-20T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/post/wwdc/wwdc21/wwdc21-session-10056/</loc>
+    <lastmod>2021-06-20T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/tags/xcode/</loc>
+    <lastmod>2021-06-20T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://looseyi.github.io/categories/xcodeproj/</loc>
+    <lastmod>2021-06-20T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -51,28 +100,7 @@
   </url>
   
   <url>
-    <loc>http://looseyi.github.io/tags/</loc>
-    <lastmod>2021-06-11T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>http://looseyi.github.io/categories/wwdc/</loc>
-    <lastmod>2021-06-11T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
     <loc>http://looseyi.github.io/post/wwdc/wwdc21/wwdc21-session-10019/</loc>
-    <lastmod>2021-06-11T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>http://looseyi.github.io/tags/wwdc21/</loc>
     <lastmod>2021-06-11T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -171,13 +199,6 @@
   
   <url>
     <loc>http://looseyi.github.io/post/wwdc/wwdc20/wwdc20-session-10033/</loc>
-    <lastmod>2020-06-27T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>http://looseyi.github.io/tags/wwdc20/</loc>
     <lastmod>2020-06-27T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>

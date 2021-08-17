@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>WWDC21 - 探索 Xcode 项目中构建配置的高级技巧 - </title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="土土Edmond木" /><meta name="description" content="WWDC21 Session 10210 - Explore advanced project configuration in Xcode。由于官方视频资源有问题，可访问 Youtube 链接。 本文知识目录 引言 大多时候我们都关注如何进行高效、高质量的完成任务或技术需" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.82.1 with theme even" />
+
+
+<link rel="canonical" href="http://looseyi.github.io/post/wwdc/wwdc21/wwdc21-session-10210/" />
+  <link href="http://looseyi.github.io/post/wwdc/wwdc21/wwdc21-session-10210/index.xml" rel="alternate" type="application/rss+xml" title="" />
+  <link href="http://looseyi.github.io/post/wwdc/wwdc21/wwdc21-session-10210/index.xml" rel="feed" type="application/rss+xml" title="" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="WWDC21 - 探索 Xcode 项目中构建配置的高级技巧" />
+<meta property="og:description" content="WWDC21 Session 10210 - Explore advanced project configuration in Xcode。由于官方视频资源有问题，可访问 Youtube 链接。 本文知识目录 引言 大多时候我们都关注如何进行高效、高质量的完成任务或技术需" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://looseyi.github.io/post/wwdc/wwdc21/wwdc21-session-10210/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2021-06-20T00:00:00&#43;00:00" />
+<meta property="article:modified_time" content="2021-06-20T00:00:00&#43;00:00" />
+
+<meta itemprop="name" content="WWDC21 - 探索 Xcode 项目中构建配置的高级技巧">
+<meta itemprop="description" content="WWDC21 Session 10210 - Explore advanced project configuration in Xcode。由于官方视频资源有问题，可访问 Youtube 链接。 本文知识目录 引言 大多时候我们都关注如何进行高效、高质量的完成任务或技术需"><meta itemprop="datePublished" content="2021-06-20T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2021-06-20T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="6929">
+<meta itemprop="keywords" content="iOS&#39;,WWDC&#39;,Xcode," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="WWDC21 - 探索 Xcode 项目中构建配置的高级技巧"/>
+<meta name="twitter:description" content="WWDC21 Session 10210 - Explore advanced project configuration in Xcode。由于官方视频资源有问题，可访问 Youtube 链接。 本文知识目录 引言 大多时候我们都关注如何进行高效、高质量的完成任务或技术需"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Aha Moment</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Aha Moment</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">WWDC21 - 探索 Xcode 项目中构建配置的高级技巧</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2021-06-20 </span>
+        <div class="post-category">
+            <a href="/categories/ios/"> iOS </a>
+            <a href="/categories/wwdc/"> WWDC </a>
+            <a href="/categories/xcodeproj/"> Xcodeproj </a>
+            </div>
+          <span class="more-meta"> 约 6929 字 </span>
+          <span class="more-meta"> 预计阅读 14 分钟 </span>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#本文知识目录">本文知识目录</a></li>
+    <li><a href="#引言">引言</a></li>
+    <li><a href="#multiplatform-frameworks">Multiplatform Frameworks</a>
+      <ul>
+        <li><a href="#xcode-project">Xcode Project</a></li>
+        <li><a href="#multiplatform-frameworks-配置">Multiplatform Frameworks 配置</a></li>
+      </ul>
+    </li>
+    <li><a href="#project-model-and-configuraton">Project model and configuraton</a>
+      <ul>
+        <li><a href="#build-options"><code>Build Options</code></a></li>
+        <li><a href="#dependencies">Dependencies</a></li>
+        <li><a href="#build-phases--build-rules"><code>Build Phases</code> &amp; <code>Build Rules</code></a></li>
+      </ul>
+    </li>
+    <li><a href="#build-settings-deep-dive">Build settings deep dive</a>
+      <ul>
+        <li><a href="#build-settings-编辑器">Build Settings 编辑器</a></li>
+        <li><a href="#configuration-settings-file">Configuration settings file</a></li>
+        <li><a href="#practial-example">Practial example</a></li>
+      </ul>
+    </li>
+    <li><a href="#总结">总结</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-00-background.png" alt="wwdc21-10210-00-background"></p>
+<blockquote>
+<p>WWDC21 Session 10210 - <a href="https://developer.apple.com/videos/play/wwdc2021/10210/">Explore advanced project configuration in Xcode</a>。由于官方视频资源有问题，可访问 Youtube <a href="https://www.youtube.com/watch?v=wxISCtR0Po4">链接</a>。</p>
+</blockquote>
+<h2 id="本文知识目录">本文知识目录</h2>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/Explore%20advanced%20project%20configuration%20in%20Xcode.png" alt="Explore advanced project configuration in Xcode"></p>
+<h2 id="引言">引言</h2>
+<p>大多时候我们都关注如何进行高效、高质量的完成任务或技术需求，而对于 Xcode 项目的构成、构建系统和构建配置并不太了解。在今年 WWDC 21 上，苹果将带我们探索 Xcode 项目中构建配置的高级技巧。</p>
+<p>本文将重点分三个主题展开：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-01-table.png" alt="wwdc21-10210-01-table"></p>
+<ol>
+<li>讨论 multiplatform 项目和 Xcode 13 对于 <code>multiplatform framework</code> target 的支持。</li>
+<li>介绍 target 的 scheme 设置、依赖管理、<code>Build Phases</code> 和 <code>Build Rules</code>，并提供了最佳实践。</li>
+<li>带您深入了解 <code>Build settings</code>，包括其结构和行为、UI 编辑器的使用以及 <code>xcconfig</code> 的语法等。</li>
+</ol>
+<h2 id="multiplatform-frameworks">Multiplatform Frameworks</h2>
+<p>在整个演讲中，我们将使用一个名为 Fruta 的 multiplatform 项目来展示如何将这些技术应用到真实项目中。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-02-multi-platform-code.png" alt="wwdc21-10210-02-xcode"></p>
+<blockquote>
+<p>Tips: 可从官方下载 Fruta 项目的 <a href="https://developer.apple.com/documentation/swiftui/fruta_building_a_feature-rich_app_with_swiftui">SampleCode</a>，不过与本文中的项目有所出入。</p>
+</blockquote>
+<p>首先讨论的是 <code>multiplatform frameworks</code>，它是由 Xcode 13 的带来的一项新功能。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-03-multi-platform-feature.png" alt="wwdc21-10210-03-multi-platform-feature"></p>
+<p><code>multiplatform frameworks</code> 允许我们将多个框架合并为一个框架，并提供了以下优点：</p>
+<ol>
+<li>简化 target 管理；</li>
+<li>一组要管理的构建阶段；</li>
+<li>一组要管理的 Build Settings。</li>
+</ol>
+<p>为了方便理解，这里简单对齐一下 Xcode 的几个概念。</p>
+<h3 id="xcode-project">Xcode Project</h3>
+<p>正如上图的 Fruta 所示，我们熟悉的 Xcode 项目是由几部分组成的：Project、Target、Build Configuration、Build Settings、Build Phases 等。其概念如下：</p>
+<ul>
+<li><strong>Project</strong>：为 Target 的管理器，组织源码和资源；</li>
+<li><strong>Scheme</strong>：指定构建的 target 和 action，action 包括  Build、Run、Test、Profile、Analyze、Archive；</li>
+<li><strong>Target</strong>：通过定义的 Build Settings、Build Phases、Build Rules 来描述如何构建一个完整产物；</li>
+<li><strong>Build Settings</strong>：构建设置，提供构建产物的必要信息，如指定使用的编译器、头文件搜索路径、编译参数等；</li>
+<li><strong>Build Phases</strong>：构建阶段，描述构建 target 产物时候需要执行的各种任务，如编译源码和复制资源等；</li>
+<li><strong>Build Configuration</strong>：构建配置，描述自定义的构建配置参数，默认有 Debug 和 Release 配置；</li>
+</ul>
+<blockquote>
+<p>Tips：更多内容推荐阅读 <a href="https://help.apple.com/xcode/mac/current/#/dev5948b27d3">what is the build system</a>。</p>
+</blockquote>
+<p><!-- raw HTML omitted --></p>
+<h3 id="multiplatform-frameworks-配置">Multiplatform Frameworks 配置</h3>
+<p>Fruta 是一个多平台应用程序，专为 macOS、iOS 和 watchOS 构建。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-04-multi-platform-app.png" alt="wwdc21-10210-04-multi-platform-app"></p>
+<p>它还具有三个 framework target，每个平台一个，它们之间共享部分代码。另外值得注意的是，还有一份只能在 macOS 上编译的文件。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-05-multi-platform-targets.png" alt="wwdc21-10210-05-multi-platform-targets"></p>
+<p>维护三个独立的 framework 可能会带来挑战，例如保持 Build Settings 同步，并确保所有源文件都正确添加到编译源的 Build Phases 中。</p>
+<p>为了应对这些挑战，先将我们的一个 framework 转换为 <code>multiplatform framework</code>。首先让我们导航到 macOS framework target 的 Build Settings 选项卡。 接下来定位到 Build Settings 中的 <strong>Supported Platforms</strong> 设置项，并选择 <strong>Any Platform</strong> 来配置 framework 以针对所有平台构建。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-06-multi-platform-buildSettings-support-platforms.png" alt="wwdc21-10210-06-multi-platform-buildSettings-support-platforms">
+修改之后，您还可以看到 <strong>Allow Multiplatform Builds</strong> 已自动设置为 &ldquo;<strong>Yes</strong>”。这会通知构建系统根据需要为其每个受支持的平台构建此 target 一次。既然这是一个 multiplatform framework target，回想一下原始 macOS framework 上有一个额外的文件，它只能为 macOS 构建时构建。为此，我们可以添加一个平台过滤器来指定这个文件应该只为 macOS 构建。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-08-multi-platform-buildPhases-Filters.png" alt="wwdc21-10210-08-multi-platform-buildPhases-Filters"></p>
+<p>切换到 <code>Build Phases</code> 选项卡，展开 Compile Sources 构建阶段，找到 <code>Ingredient+macOS.swift</code> 文件并单击“<strong>Filter</strong>” 项，取消选中除 macOS 之外的所有内容，可以快速为 macOS 构建。配置了新的 multiplatform target 之后，我们可以删除其他两个 frameworks。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-09-multi-platform-buildSettings-delete.png" alt="wwdc21-10210-09-multi-platform-buildSettings-delete"></p>
+<p>此外，由于我们只有一个framework，我们必须配置所有应用程序以链接和嵌入该新目标。而 macOS 应用程序已经配置了 Multiplatform。我们需要转到每个应用程序 Target 的 <strong>General</strong> 选项卡，并将 framework 添加到 <code>Frameworks and Libraries Build Phases</code> 中。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-10-multi-platform-buildSettings-frameworks.png" alt="wwdc21-10210-10-multi-platform-buildSettings-frameworks"></p>
+<p>以上就是 Xcode 13 中的 multiplatform frameworks，小结一下：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-11-multi-platform-summary.png" alt="wwdc21-10210-11-multi-platform-summary"></p>
+<ol>
+<li>基于 macOS framework target 将其改造为 multiplatform framework；</li>
+<li>使用 <code>platform filter</code> 来过滤各平台独有的代码和资源文件；</li>
+<li>在 Target 的 <code>Link &amp; Embed </code> 的 Buld Phases 中接入新的 multiplatform framework。</li>
+</ol>
+<h2 id="project-model-and-configuraton">Project model and configuraton</h2>
+<p>本节我们将讨论建模和配置 Xcode 项目的最佳实践，并展示一些可以提高构建的性能和准确性。</p>
+<h3 id="build-options"><code>Build Options</code></h3>
+<p>首先，让我们看一下该 Scheme 的 <code>Build Options</code>，单击 Scheme 选择器进编辑，然后转到 Build 部分配置一些简单的东西。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-12-project-setting-buildOrder.png" alt="wwdc21-10210-12-project-setting-buildOrder"></p>
+<p>对于 Build Order，我们建议选择 <strong>Dependency Order</strong>，这样项目的 target 将根据依赖关系图并行构建。这可以极大地提高多核构建性能，还可以让您更快地从持续集成中获得结果。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-13-project-setting-buildOrder-manual.png" alt="wwdc21-10210-13-project-setting-buildOrder-manual"></p>
+<p>相比之下，不推荐使用 <strong>Manual Order</strong>。使用此选项会减慢您的构建速度，并且当 Scheme 中列出的 target 顺序与您的 Build Phases 中定义的 target 依赖不一致时，可能会导致循环依赖错误。亦或者 Scheme 中列出的 target 顺序与 <strong>Find Implicit Dependencies</strong> 生成依赖关系不同时，同样会造成依赖冲突。</p>
+<p>说到这里就要提一下在 Xcode 10 中提出的 <strong>Parallelize Build</strong>：</p>
+<blockquote>
+<p>This option allows Xcode to speed up total build time by building targets that do not depend on each other at the same time. This is a time-saver on projects with many smaller dependencies that can easily be run in parallel.</p>
+</blockquote>
+<p>它的提出时为了加速构建的，不过也引入了一些问题。就像上述 Manual Order 的场景，<code>Parallelize Build</code> 会导致依赖错误。为解决这个问题，Xcode 13 提供了 Dependency Order。</p>
+<p>为此，我们简单看看 Xcode 中存在哪些targets 的依赖关系 ？</p>
+<h3 id="dependencies">Dependencies</h3>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-13-scheme-build-options-dependency.gif" alt="wwdc21-10210-13-scheme-build-options-dependency"></p>
+<p>Xcode 是如何判别 task 之间的依赖关系，主要通过下面 5 类方式：</p>
+<ul>
+<li><strong>Build in</strong>：构建系统的内置信息，即 <code>Build Rules</code>，它描述了编译器、链接器、资源目录和 storyboard 处理器等规则，指定了接受什么样的输入和输出文件；</li>
+<li><strong>Target dependencies</strong>：如 <code>Build Phases</code> 中 <code>Dependencies</code> 阶段指定的 target 依赖；</li>
+<li><strong>Implict dependencies</strong>：隐式依赖，它是成功构建 target 的必要条件，但是却未明确指定的依赖，如在 <code>Build Phases</code> 的 <code>Link Binary With Libraries</code> 阶段指定的二进制文件；</li>
+<li><strong>Build Phases dependencies</strong>：构建阶段间的依赖关系，如 headers 拷贝、编译源码、Bundle 拷贝等构建阶段；</li>
+<li><strong>Scheme order dependencies</strong>：未开启 <em>隐式依赖查找</em> 的情况下，以 scheme 列出的 target 顺序依次构建。</li>
+</ul>
+<blockquote>
+<p>Tips：关于 target dependencies 建议翻看 WWDC 2018 - <a href="https://developer.apple.com/videos/play/wwdc2018/415/">Behind the Scenes of the Xcode Build Process</a>。</p>
+</blockquote>
+<h4 id="find-implicit-dependencies">Find Implicit Dependencies</h4>
+<p>Scheme Build Options 中的另一个重要设置是 <strong>Find Implicit Dependencies</strong>（隐式依赖查找）。<strong>开启后，它允许 Xcode 根据项目中的信息自动添加 target 之间的依赖项</strong>，例如 <code>Build Settings</code> 中的 <code>Links Flag</code> 以及在 <code>Build Phases</code> 的 <code>Link Binary With Libraries</code> 阶段所指定的二进制文件。</p>
+<p>当不同 project 中的 target 存在关联关系时，该特性非常有效。当不同 project 之间无法添加显式目标依赖时，相比于使用 <code>manual order</code> 来指定 target 构建顺序的方式，此时启用 <code>Find Implicit Dependencies</code> 和 <code>Dependency Order</code> 通常是更好的解决方案。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-13-scheme-find-implict-dependencies.png" alt="wwdc21-10210-13-scheme-find-implict-dependencies"></p>
+<h3 id="build-phases--build-rules"><code>Build Phases</code> &amp; <code>Build Rules</code></h3>
+<p>现在将从项目的 targets 列表中选择 SmoothieKit，然后选择 <code>Build Phases</code> 选项卡。这里我们有一个 Process Recipes 的 <code>Script Phase</code>，其中包含一些自定义构建逻辑。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-14-buildPhase-recipes.png" alt="wwdc21-10210-14-buildPhase-recipes"></p>
+<p>这段脚本的职责之一是从多个配置文件中生成代码，每个输入有对应的输出文件，它们将按顺序依次处理。您可能会意识到这些计算是完全相互独立的，而现在 <strong>Build Rules 允许我们通过并行执行来优化任务执行效率</strong>。</p>
+<h4 id="build-rules"><code>Build Rules</code></h4>
+<p>让我们看看如何将这项工作提取到 <code>Build Rules</code> 中：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-15-buildRules.png" alt="wwdc21-10210-15-buildRules"></p>
+<p>切到 framework 项目编辑器的 <code>Build Rules</code> 选项卡，然后单击 <strong>+</strong> 以添加新的构建规则。然后输入文件通配符 <code>*.recipe</code>，对应我们希望处理的的文件类型的扩展名。接着添加依赖项，<strong>注意：这里不需要向 <code>Build Rules</code> 添加任何额外的输入</strong>，因为它会自动获取它处理的每个输入文件作为输入。但是，我们确实需要告诉构建系统所产生的输出文件的路径规则，在 <code>Output Files</code> 下新建一个输出路径：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">// Output Files
+<span class="k">$(</span>DERIVED_FILE_DIR<span class="k">)</span>/<span class="k">$(</span>INPUT_FILE_BASE<span class="k">)</span>.compiledrecipe
+</code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>Tips：这里将生成文件写入 <code>DERIVED_FILE_DIR</code> 交由构建系统来管理适当的存储路径。我们应该避免在源根目录下生成输出文件，因为这会干扰源代码控制并在同时运行多个构建时导致冲突。</p>
+</blockquote>
+<p>接着将 <code>Build Phase</code> 的 <code>Process Recipes</code> 阶段的脚本复制到 <code>Build Rules</code> 中。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-18-buildPhase-recipes.png" alt="wwdc21-10210-18-buildPhase-recipes"></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">// BuildRules 
+<span class="s2">&#34;</span><span class="nv">$SRCROOT</span><span class="s2">/Scripts/gen-code.sh&#34;</span> <span class="s2">&#34;</span><span class="nv">$SCRIPT_INPUT_FILE</span><span class="s2">&#34;</span> <span class="s2">&#34;</span><span class="nv">$SCRIPT_OUTPUT_FILE_0</span><span class="s2">&#34;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>可以看到这里的 Script 有些不同：</p>
+<ol>
+<li>删除了 for 循环，因为 Build Rule 会为它们处理的每个输入运行一次；</li>
+<li><code>$RECIPE</code> 替换为 <code>$SCRIPT_INPUT_FILE</code>;</li>
+<li><code>$RECIPE $DERIVED_FILE_DIR/$RECIPE.compiledrecipe</code> 替换为 <code>$SCRIPT_OUTPUT_FILE_0</code>;</li>
+</ol>
+<p>现在还有一件事要在 Build Rule 中配置，由于 <code>Build Rule</code> 不仅对它们处理的每个输入运行一次。<strong>默认情况下，它们还会为 target 在每个不同的 CPU 架构下运行一次</strong>。例如，Mac 应用程序 target 中的规则可能会针对 arm64 运行一次，针对 x86_64 的每个输入运行一次。因此，如果有 4 个输入乘以两个架构，则该规则将被调用八次。这对于依赖于 <code>CPU-架构</code> 的输入（例如：目标源码）时就很有用。反之，针对不依赖于 <code>CPU-架构</code> 的输出，我们可以取消选中 <strong><code>Run once per architecture</code></strong>。</p>
+<p>最后，为了让构建系统将输入文件传播到 <code>Build Rules</code> 中，我需要将所有 <code>.recipe</code> 文件添加到 framework 的 <code>Comiple Source Build Phase</code> 中。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-21-recipes.gif" alt="wwdc21-10210-21-recipes"></p>
+<h4 id="shell-script"><code>Shell Script</code></h4>
+<p>现在让我们回到 <code>Build Phases</code> 将多个文本文件的内容合并到一个文件中，这样可以在运行时更有效地在应用程序中加载。为了获得更好的代码管理体验，我将脚本保留在项目文件外部，并从此处的内联脚本编辑器中调用它们。<img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-19-package.png" alt="wwdc21-10210-19-package"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-20-package-call.png" alt="wwdc21-10210-20-package-call"></p>
+<p>因为我们需要一次处理所有输入以将它们合并为一个。在这种情况下，不合适使用 <code>Build Rules</code>，因为我们无法将其分解为可以并行运行的独立单元，因此将这项工作保留在 <code>Script Phases</code> 是有意义的。</p>
+<p>但这给我们带来了很重要的隐患：<strong>脚本没有指定输入和输出依赖项。这可能会导致构建任务以错误的顺序运行并减慢构建速度</strong>，Xcode 在并行运行其他任务方面必须更加保守，因为它不知道 <code>Script Phases</code> 可能使用哪些文件。因此，需要添加输入和输出依赖项，以确保 <code>Script Phases</code> 任务与构建中的其他任务，是按照合理顺序完成的。</p>
+<h4 id="xcfilelist">XCFileList</h4>
+<p>对于这个需要大量输入的特定脚本，我们可以使用 XCFilelist 通过外部文件管理这个输入列表，而不是一个一个地在项目文件中输入。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-22-fileLists.gif" alt="wwdc21-10210-22-fileLists"></p>
+<p>完整的操作路径如上图，我们将 xcfilelist 作为指定的 <strong>Input File List</strong>。另外还需要指定 Output File List：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">// Output File list
+<span class="k">$(</span>PROJECT_TEMP_DIR<span class="k">)</span>/instructions.mdarchive
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="environment-variables">Environment Variables</h4>
+<p>与 <code>Build Rules</code> 类似，<code>Script Phases</code> 为您提供了一些关键的环境变量。来看一下 package.sh 的内容：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># Package up the recipes.</span>
+
+<span class="nb">echo</span> <span class="s2">&#34;packaging...&#34;</span>
+
+<span class="k">for</span> i in <span class="k">$(</span>seq <span class="m">0</span> <span class="k">$(</span>expr <span class="si">${</span><span class="nv">SCRIPT_INPUT_FILE_LIST_COUNT</span><span class="si">}</span> - 1<span class="k">))</span> <span class="p">;</span> <span class="k">do</span>
+    <span class="nv">infile_</span><span class="o">=</span><span class="s2">&#34;SCRIPT_INPUT_FILE_LIST_</span><span class="nv">$i</span><span class="s2">&#34;</span>
+    <span class="nb">eval</span> <span class="nv">infile</span><span class="o">=</span><span class="se">\$</span><span class="nv">$infile_</span>
+
+    <span class="k">while</span> <span class="nv">IFS</span><span class="o">=</span> <span class="nb">read</span> -r file<span class="p">;</span> <span class="k">do</span>
+        cat <span class="s2">&#34;</span><span class="nv">$file</span><span class="s2">&#34;</span> &gt;&gt; <span class="s2">&#34;</span><span class="nv">$SCRIPT_OUTPUT_FILE_0</span><span class="s2">&#34;</span>
+    <span class="k">done</span> &lt; <span class="s2">&#34;</span><span class="nv">$infile</span><span class="s2">&#34;</span>
+<span class="k">done</span>
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><code>SCRIPT_INPUT_FILE_LIST_COUNT</code>：指传递给我们的 <code>Script Phases</code> 的输入文件列表的总数；</li>
+<li><code>SCRIPT_INPUT_FILE_LIST_n</code>：指解析出的输入文件列表在第 n 个索引处的绝对文件路径;</li>
+<li><code>SCRIPT_OUTPUT_FILE_0</code>：指第一个解析的绝对文件路径，在这种情况下只有输出文件；</li>
+</ul>
+<p><strong>0x01</strong>：以下是提供给 <code>Script Phases</code> 的一些关键环境变量的概述：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">// These environment variables are available in script phases:
+
+SCRIPT_INPUT_FILE_COUNT // This specifies the number of paths from the Input Files table.
+SCRIPT_INPUT_FILE_n // This specifies the absolute path of the nth file from the Input Files table, with build settings expanded.
+
+SCRIPT_INPUT_FILE_LIST_COUNT // This specifies the number of input file lists.
+SCRIPT_INPUT_FILE_LIST_n // This specifies the absolute path of the nth <span class="s2">&#34;resolved&#34;</span> input file list with contained paths made absolute, build settings expanded, and comments removed.
+
+SCRIPT_OUTPUT_FILE_COUNT // This specifies the number of paths from the Output Files table.
+SCRIPT_OUTPUT_FILE_n // This specifies the absolute path of the nth file from the Output Files table, with build settings expanded.
+
+SCRIPT_OUTPUT_FILE_LIST_COUNT // This specifies the number of output file lists.
+SCRIPT_OUTPUT_FILE_LIST_n // This specifies the absolute path of the nth <span class="s2">&#34;resolved&#34;</span> output file list with contained paths made absolute, build settings expanded, and comments removed.
+
+* n in the above examples refers to a 0-based index.
+</code></pre></td></tr></table>
+</div>
+</div><p>target 的 <code>Build Settings</code> 可用于 <code>Script Phases</code> 环境。</p>
+<p><strong>0x02</strong>：以下是提供给 <code>Build Rules</code> 的一些关键环境变量的概述：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">// These environment variables are available in build rules:
+
+SCRIPT_INPUT_FILE // This specifies the absolute path of the main input file being processed by the rule.
+
+OTHER_INPUT_FILE_FLAGS // This specifies custom <span class="nb">command</span> line flags defined <span class="k">for</span> the input file in the Compile Sources build phase.
+
+SCRIPT_INPUT_FILE_COUNT // This specifies the number of paths from the Input Files table.
+SCRIPT_INPUT_FILE_n // This specifies the absolute path of the nth file from the Input Files table, with build settings expanded.
+
+SCRIPT_OUTPUT_FILE_COUNT // This specifies the number of paths from the Output Files table.
+SCRIPT_OUTPUT_FILE_n // This specifies the absolute path of the nth file from the Output Files table, with build settings expanded.
+
+SCRIPT_HEADER_VISIBILITY // This is <span class="nb">set</span> to <span class="s2">&#34;public&#34;</span> or <span class="s2">&#34;private&#34;</span> <span class="k">if</span> the input file being processed is a header file in a Headers build phase, and its Header Visibility is <span class="nb">set</span> to one of those values.
+
+HEADER_OUTPUT_DIR // This specifies the output directory to which the input file should be copied, <span class="k">if</span> the input file being processed is a header file in a Headers build phase.
+
+* n in the above examples refers to a 0-based index.
+</code></pre></td></tr></table>
+</div>
+</div><p>这里概述了一些 Build Rules 特有的及一些不太常见的环境变量。另外 <code>Build Settings</code> 设置也可用于 <code>Build Rules</code> 环境。</p>
+<h4 id="aggregate-target">Aggregate target</h4>
+<p>现在，如果尝试构建项目，则会遇到问题。让我们去构建日志仔细看看。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-23-prebuild.png" alt="wwdc21-10210-23-prebuild"></p>
+<p>因为 SmoothieKit 是一个 multiplatform target，它构建了两次：一次用于 iOS，一次用于 watchOS，这意味着这些构建中的每一个都试图在同一路径上生成脚本阶段的输出。<strong>这是不允许的，因为构建系统要求整个构建中只有一个任务可以在给定路径上产生输出。</strong></p>
+<p>有几种不同的方法可以解决这个问题。一种简单的解决方案是更改 <code>Script Phases</code> 的输出路径，以便每次构建目标时它都是唯一的。在这种情况下，可以考虑使用不同的 <code>Build Settings</code>，如 <code>DERIVED_FILE_DIR</code>，它是特定于平台的，可以使路径足够独特并解决冲突。但是，如果 <code>Script Phases</code> 正在执行的实际工作在每个 target 的上下文中是相同的，那只会导致相同的工作被执行两次。在这种情况下，将 <code>Scirpt Phase</code> 移动到共享 framework target 所依赖的 Aggregate target 中可能是更好的选择。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-28-Resources.gif" alt="wwdc21-10210-28-Resources"></p>
+<p>这就是我们要为该项目做的事情：</p>
+<ol>
+<li>将 Process Recipes 的内容复制到新建的 aggregate target 中；</li>
+<li>将 aggregate target 作为 SmoothieKit 的依赖项引入；</li>
+<li>删除原有的 Process Recipes 的 Script Phase；</li>
+</ol>
+<p>这样改造后工作只会完成一次，不会有输出文件冲突，并且框架的 iOS 和 watchOS 变体都将按照相对于该脚本阶段的正确顺序构建。</p>
+<h2 id="build-settings-deep-dive">Build settings deep dive</h2>
+<p>最后一节，我们深入探讨一下 <code>Build Settings</code> 的有关内容。</p>
+<p>那什么是 <code>Build Settings</code> ？它作为 Xcode target 的属性，用于配置任务构建的方方面面。Xcode 提供了两种配置方式：</p>
+<ol>
+<li>通过 <code>Build Settings</code> 编辑器;</li>
+<li>通过 configuration settings file 即 <code>.xcconfig</code> 文件;</li>
+</ol>
+<h3 id="build-settings-编辑器">Build Settings 编辑器</h3>
+<p>让我们看看如何使用 Build Settings 编辑器来管理我们项目中的设置。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-32-buildsetting-level.png" alt="wwdc21-10210-32-buildsetting-level"></p>
+<p>首先需要在项目导航器中选择对应的 Project 和 Target，并单击选项卡栏上的 <code>Build Settings</code> 选项卡。上图我们打开的是 Fruta Project -&gt; Fruta macOS Target 的 Build Settings 编辑器。</p>
+<p>从这里，您可以添加新的 Build Settings 或修改现有的设置。您还可以通过打开快速帮助检查器来查找所选 <code>Build Settings</code> 的其他信息。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-33-buildsetting-quickhelp.png" alt="wwdc21-10210-33-buildsetting-quickhelp"></p>
+<p><code>Build Settings</code> 存在在多个 “级别” 的定义，可以通过单击上图中的 <code>Levels</code> 过滤器来可视化这些级别。您可以将其视为一个定义栈，settting 值从栈底到栈顶优先级逐级覆盖。</p>
+<p>下图中，每列代表了不同级别的 Build Settings 定义，它们从右到左进行 evaluation。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-33-buildsetting-colume.png" alt="wwdc21-10210-33-buildsetting-colume"></p>
+<ul>
+<li>上图中红框的为默认值，由当前选择的 SDK 定义；</li>
+<li>Project 级别的配置，由 configuration settings file 指定；</li>
+<li>Project 级别的配置，由 Xcode 项目文件 (.xcodeproj) 指定；</li>
+<li>Target 级别的配置，由 configuration settings file 指定；</li>
+<li>Target 级别的配置，由 Xcode 项目文件 (.xcodeproj) 指定；</li>
+<li>最后一个为 Resolved Value，<code>Build Settings</code> 的最终解析值；</li>
+</ul>
+<p>请注意，如果您看到一个粗体的设置，表示该级别对于 Build Settings 具有明确指定的值。</p>
+<h3 id="configuration-settings-file">Configuration settings file</h3>
+<p>Xcode 提供的另一种管理 Build Settings 的机制是 <code>configuration settings file</code> 或 <code>.xcconfig</code> 文件。</p>
+<p>它有以下优点：</p>
+<ul>
+<li>更好的源代码控制管理；</li>
+<li>跨目标或配置以共享设置；</li>
+<li>Build Settings 的高级组合；</li>
+<li>基于开发或测试环境来配置不同 xcconfig 文件的能力。</li>
+</ul>
+<p>让我们来看看如何在 xcconfig 文件中创作 Build Settings。</p>
+<h4 id="build-setting-definition-with-conditions">Build setting definition with conditions</h4>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-34-buildsettings-conditions.png" alt="wwdc21-10210-34-buildsettings-conditions"></p>
+<p>最基本的 <code>Build Settings</code> 由名称、赋值运算符和值组成。您可以使用条件语法缩小 <code>Build Settings</code> 的值。条件设置使用方括号定义，支持的条件包括 <code>config</code>、<code>arch</code> 和 <code>sdk</code>。如上图中的 <code>sdk</code> 条件所示，通配符也可用于匹配目的。另外也可以使用熟悉的双斜线语法来添加注释。</p>
+<h4 id="build-setting-evaluation">Build setting evaluation</h4>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-35-buildsettings-evaluation.png" alt="wwdc21-10210-35-buildsettings-evaluation"></p>
+<p>在此处的示例中，<code>MY_OTHER_BUILD_SETTING</code> 已设置为 YES。<code>MY_BUILD_SETTING_NAME</code> 的值使用 <code>$</code> 括号来引用 <code>MY_OTHER_BUILD_SETTING</code> 所生成的值。也可以在这里生成多个值，就像我们在 <code>MORE_SETTINGS</code> 中看到的那样。
+最后，您可以通过 <code>$(inherited)</code> 变量在保留现有值的情况下来添加新的附加值。这是一种方便的形式，因为您还可以使用 <code>Build Settings</code> 名称 <code>APPEND_TO_EXISTING_SETTINGS</code>。</p>
+<h4 id="build-setting-composition">Build setting composition</h4>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-36-buildsettings-composition.png" alt="wwdc21-10210-36-buildsettings-composition"></p>
+<p><code>Build Settings</code> evalution 语法的另一个用途是将 <code>Build Settings</code> 从一组其他 <code>Build Settings</code> 组合在一起。</p>
+<ol>
+<li>我们从一个控制设置开始：<code>IS_BUILD_SETTING_ENABLED</code>，将使用此设置的值作为两个附加 <code>Build Settings</code> 的后缀，<code>MY_BUILD_SETTING_NO</code> 和 <code>MY_BUILD_SETTING_YES</code>。</li>
+<li>将 <code>MY_BUILD_SETTING</code> 定义为一个由 <code>MY_BUILD_SETTING</code> 和 <code>IS_BUILD_SETTING_ENABLED</code> 组成的值。因为 <code>Build Settings</code> 的 evaluation 是由内而外发生的，所以最里面的设置被评估并返回 NO，这是 <code>IS_BUILD_SETTING_ENABLED</code> 的值。</li>
+<li>最终组合的 <code>BUILD_SETTING_NO</code> 被评估为 <code>-use_this_one</code> 的值。</li>
+</ol>
+<h4 id="build-setting-evaluation-operators">Build setting evaluation operators</h4>
+<p>在 Build Settings evaluations 时，您可以使用一组运算符来提供您的值的一些基本转换。
+提供的运算符有三类：<code>字符串运算符</code>、<code>路径运算符</code>和<code>替换运算符</code>。</p>
+<p><strong>String operators</strong></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-38-buildsettings-evaluation-operators-string.png" alt="wwdc21-10210-38-buildsettings-evaluation-operators-string"></p>
+<p>支持的字符串运算符:</p>
+<ul>
+<li><code>quote</code>，它对字符串中的字符进行转义；</li>
+<li><code>lower &amp; upper</code>，转换字符的大小写；</li>
+<li><code>identifier</code>，将字符串转换为各种格式的有效标识符;</li>
+</ul>
+<p><strong>Path operators</strong></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-39-buildsettings-evaluation-operators-path.png" alt="wwdc21-10210-39-buildsettings-evaluation-operators-path"></p>
+<p>路径运算符可以用来获取目录、文件名、基本名称、后缀和标准化路径。</p>
+<p><strong>Replacement operators</strong></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-40-buildsettings-evaluation-operators-replacement.png" alt="wwdc21-10210-40-buildsettings-evaluation-operators-replacement"></p>
+<p>对于每个路径运算符，都有一个替换的对应物，允许您替换值的一部分。还有一个默认操作符，如果 <code>Build Settings</code> 为空，它会提供替换值，否则它使用现有值。</p>
+<h4 id="including-other-configuration-settings-files">Including other configuration settings files</h4>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-41-buildsettings-including.png" alt="wwdc21-10210-41-buildsettings-including"></p>
+<p>要查看的最后一项是 <code>xcconfig</code> 文件的引用能力，它可在其他 <code>xcconfig</code> 文件中被引用。我们提供了两种机制：</p>
+<ul>
+<li>强制引用，它要求引用的 <code>xcconfig</code> 文件在于磁盘上一定存在。如果找不到该文件，则会产生编译器错误。</li>
+<li>可选引用，它允许包含一个 <code>xconfig</code> 文件（如果存在于磁盘上）。如果文件不存在也不会失败。</li>
+</ul>
+<p>请注意，该路径与 Xcode 项目文件的位置相关。</p>
+<h3 id="practial-example">Practial example</h3>
+<p>让我们来看看如何在真实场景中将所有这些信息放在一起。在这个例子中，我们将看看如何解决以下问题。在我们的开发机器上，编译器应该主动警告那些需要太长时间进行类型检查的表达式。但是，CI 机器速度较慢，因此应该增加表达式检查的时间。对于我们的解决方案，有三个 <code>configuration setting files</code>：debug、common 和 ci:</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-43-xcconfig.png" alt="wwdc21-10210-43-xcconfig"></p>
+<p><strong>debug.xcconfig file</strong>
+用于我们的调试构建，并通过 <code>OTHER_SWIFT_FLAGS</code> 设置将一些额外的标志传递给 Swift 编译器。</p>
+<p><strong>common.xcconfig file</strong>
+以可选地方式引入 <code>ci.xcconfig</code> 文件。它还定义了 <code>OTHER_SWIFT_FLAGS</code> 来控制类型表达式警告。它使用 <code>$(inherited)</code> 来确保包含任何其他标志设置，例如是否来自 <code>debug.xcconfig</code> 文件。另外设置了默认值为 200 的 <code>MAX _EXPRESSION_TIME</code> 的 evaluation 设置。</p>
+<p><strong>ci.xcconfig file</strong><br>
+它覆盖了 <code>MAX_EXPRESSION_TIME</code> 的值。</p>
+<p>最后，需要告诉 Xcode 如何将这些 xcconfig 文件应用到支持的配置级别。这是通过项目编辑器完成的。您可以在 Project 或 Target 级别应用项目中的任何配置文件，用于任何定义的 <code>Build settings</code>。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-44-example-configuration.png" alt="wwdc21-10210-44-example-configuration"></p>
+<p>在这里，您可以看到 <code>debug.xcconfig</code> 文件正在 Project 级别应用于 Fruta 的调试配置。还有 <code>common.xcconfig</code> 文件应用这在多个 target 的配置中。</p>
+<p>最后总结一下解决方案：</p>
+<ul>
+<li>默认运算符用于定义 <code>MAX_EXPRESSION_TIME</code> 的默认值。</li>
+<li><code>ci.xcconfig</code> 文件是可选的，因为它只存在于 CI 系统上。</li>
+<li><code>ci.xcconfig</code> 文件中使用了 <code>MAX_EXPRESSION_TIME</code> 的默认值。</li>
+</ul>
+<blockquote>
+<p>上述 Fruta 项目的 <code>Build Settings</code> 截图根据官方 Sessions 内部修改而来，详见 SampleCode 地址</p>
+</blockquote>
+<h2 id="总结">总结</h2>
+<p>本文算是苹果对于 Xcode 工程配置的简单介绍，并通过实际项目的上手来展示一些高级技巧。更多的相关技术建议翻阅文本中提供的相关链接和官方文档。</p>
+<ul>
+<li>了解 <code>multiplatform framework</code> 以及它们如何提供一种更简单的方法来管理 multiplatform 项目中的 <code>Build Settings</code> 和 <code>Build Phases</code>。</li>
+<li>了解如何通过根据依赖关系顺序并行构建目标来改进项目配置和构建性能，如何正确使用 <code>Build Rules</code> 和 <code>Build Phases</code>，以及指定依赖关系的重要性。</li>
+<li>深入研究了 <code>Build Settings</code>、如何使用 build Settings files 以及更轻松地管理它们，并深入研究了它们的语法及其提供的所有构造。</li>
+</ul>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">土土Edmond木</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2021-06-20
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/ios/">iOS&#39;</a>
+          <a href="/tags/wwdc/">WWDC&#39;</a>
+          <a href="/tags/xcode/">Xcode</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/wwdc/wwdc21/wwdc21-session-10056/">
+            <span class="next-text nav-default">WWDC21 - 让您的 iPad 与 iPhon 应用程序在 M1 的 Mac 上大放异彩</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+    <script src="https://utteranc.es/client.js"
+            repo="looseyi/looseyi.github.io"
+            issue-term="pathname"
+            theme="github-light"
+            crossorigin="anonymous"
+            async>
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/utterance">comments powered by utterances.</a></noscript>
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:chun574271939@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://twitter.com/looseyi" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="https://github.com/looseyi" class="iconfont icon-github" title="github"></a>
+      <a href="https://www.weibo.com/foreverclp" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="https://www.zhihu.com/people/tu-tu-edmondmu" class="iconfont icon-zhihu" title="zhihu"></a>
+  <a href="http://looseyi.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2019-12-11 - 
+    2021
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">土土Edmond木</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-62789092-1', 'auto');
+	ga('set', 'anonymizeIp', true);
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+</body>
+</html>

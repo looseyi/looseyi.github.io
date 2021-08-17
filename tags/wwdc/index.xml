@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>WWDC on </title>
-    <link>http://looseyi.github.io/categories/wwdc/</link>
-    <description>Recent content in WWDC on </description>
+    <title>WWDC&#39; on </title>
+    <link>http://looseyi.github.io/tags/wwdc/</link>
+    <description>Recent content in WWDC&#39; on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 20 Jun 2021 00:00:00 +0000</lastBuildDate><atom:link href="http://looseyi.github.io/categories/wwdc/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 20 Jun 2021 00:00:00 +0000</lastBuildDate><atom:link href="http://looseyi.github.io/tags/wwdc/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>WWDC21 - 探索 Xcode 项目中构建配置的高级技巧</title>
       <link>http://looseyi.github.io/post/wwdc/wwdc21/wwdc21-session-10210/</link>
