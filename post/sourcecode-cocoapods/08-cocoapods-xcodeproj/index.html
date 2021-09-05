@@ -50,7 +50,7 @@
 <meta itemprop="name" content="8. Xcode 工程文件解析">
 <meta itemprop="description" content="引子 在「Molinillo 依赖校验」通过后，CocoaPods 会根据确定的 PodSpec 下载对应的源代码和资源，并为每个 PodSpec 生成对应的 Xcode Target。本文"><meta itemprop="datePublished" content="2021-05-16T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2021-05-16T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="6689">
+<meta itemprop="wordCount" content="6857">
 <meta itemprop="keywords" content="CocoaPods,iOS,Ruby," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="8. Xcode 工程文件解析"/>
 <meta name="twitter:description" content="引子 在「Molinillo 依赖校验」通过后，CocoaPods 会根据确定的 PodSpec 下载对应的源代码和资源，并为每个 PodSpec 生成对应的 Xcode Target。本文"/>
@@ -124,7 +124,7 @@
             <a href="/categories/ios/"> iOS </a>
             <a href="/categories/cocoapods/"> CocoaPods </a>
             </div>
-          <span class="more-meta"> 约 6689 字 </span>
+          <span class="more-meta"> 约 6857 字 </span>
           <span class="more-meta"> 预计阅读 14 分钟 </span>
         
       </div>
@@ -1242,12 +1242,36 @@
     <span class="n">attribute</span> <span class="ss">:source_tree</span><span class="p">,</span> <span class="nb">String</span><span class="p">,</span> <span class="s1">&#39;&lt;group&gt;&#39;</span>
     <span class="c1"># 记录 group 在文件系统中的路径</span>
     <span class="n">attribute</span> <span class="ss">:path</span><span class="p">,</span> <span class="nb">String</span>
-	 <span class="c1"># group 名称，它和 path 不能同时存在</span>
+		<span class="c1"># 默认情况下，如果指定了路径，则此属性不存在。</span>
     <span class="n">attribute</span> <span class="ss">:name</span><span class="p">,</span> <span class="nb">String</span>
 <span class="k">end</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>举个例子：</p>
+</div><p>它提供了一个便利的初始化方法：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">new_group</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="kp">nil</span><span class="p">,</span> <span class="n">source_tree</span> <span class="o">=</span> <span class="ss">:group</span><span class="p">)</span>
+  <span class="n">group</span> <span class="o">=</span> <span class="n">project</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="no">PBXGroup</span><span class="p">)</span>
+  <span class="n">children</span> <span class="o">&lt;&lt;</span> <span class="n">group</span>
+  <span class="n">group</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="nb">name</span>
+  <span class="n">group</span><span class="o">.</span><span class="n">set_source_tree</span><span class="p">(</span><span class="n">source_tree</span><span class="p">)</span>
+  <span class="n">group</span><span class="o">.</span><span class="n">set_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+  <span class="n">group</span>
+<span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这里的 name 是必须传的，path 则可以为空。而我们在 Xcode 的导航栏中所见的各个分组名称和路径就是由这两个属性来决定的。没有 name 的情况下则是以 path 的 basename 作为 display_name 来呈现。</p>
+<p>最后来看个例子：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt">1
@@ -1272,7 +1296,7 @@
 <span class="p">};</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>项目中并不存在真实的 <code>Framework</code> 文件夹，所以无需指定 path。</p>
+</div><p>项目中并不存在真实的 <code>Framework</code> 文件夹，所以无需指定 path。另外注意，mainGroup 既没有 name 也没有 path，大家可以思考一下原因。</p>
 <h1 id="通过代码编辑-xcode-工程">通过代码编辑 Xcode 工程</h1>
 <p>最后一章，一起来实践一下简单的功能。</p>
 <h2 id="为-xcode-工程添加文件">为 Xcode 工程添加文件</h2>

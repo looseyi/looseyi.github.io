@@ -6,13 +6,31 @@
     <description>Recent content in Tags on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 20 Jun 2021 00:00:00 +0000</lastBuildDate><atom:link href="http://looseyi.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 08 Aug 2021 00:00:00 +0000</lastBuildDate><atom:link href="http://looseyi.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>CocoaPods</title>
+      <link>http://looseyi.github.io/tags/cocoapods/</link>
+      <pubDate>Sun, 08 Aug 2021 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/tags/cocoapods/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>iOS&#39;</title>
       <link>http://looseyi.github.io/tags/ios/</link>
-      <pubDate>Sun, 20 Jun 2021 00:00:00 +0000</pubDate>
+      <pubDate>Sun, 08 Aug 2021 00:00:00 +0000</pubDate>
       
       <guid>http://looseyi.github.io/tags/ios/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Ruby</title>
+      <link>http://looseyi.github.io/tags/ruby/</link>
+      <pubDate>Sun, 08 Aug 2021 00:00:00 +0000</pubDate>
+      
+      <guid>http://looseyi.github.io/tags/ruby/</guid>
       <description></description>
     </item>
     
@@ -40,24 +58,6 @@
       <pubDate>Fri, 11 Jun 2021 00:00:00 +0000</pubDate>
       
       <guid>http://looseyi.github.io/tags/swiftui/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>CocoaPods</title>
-      <link>http://looseyi.github.io/tags/cocoapods/</link>
-      <pubDate>Sun, 16 May 2021 00:00:00 +0000</pubDate>
-      
-      <guid>http://looseyi.github.io/tags/cocoapods/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Ruby</title>
-      <link>http://looseyi.github.io/tags/ruby/</link>
-      <pubDate>Sun, 16 May 2021 00:00:00 +0000</pubDate>
-      
-      <guid>http://looseyi.github.io/tags/ruby/</guid>
       <description></description>
     </item>
     
