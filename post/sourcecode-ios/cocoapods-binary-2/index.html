@@ -1,155 +1,183 @@
 <!DOCTYPE html>
-<html lang="zh-cn">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>完善 Cocoapods-Binary 支持 Server 端缓存 - </title>
-  <meta name="renderer" content="webkit" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
-
-<meta name="theme-color" content="#f8f5ec" />
-<meta name="msapplication-navbutton-color" content="#f8f5ec">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
-
-
-<meta name="author" content="土土Edmond木" /><meta name="description" content="在开始之前，还是明确一下我们的目标，希望通过对 Cocoapods-binary 的改造使其支持 server 端缓存，从而达到 一处编译，处处使用 的 pods lib dependencies。同时会简单" /><meta name="keywords" content="Hugo, theme, even" />
 
 
 
 
 
 
-<meta name="generator" content="Hugo 0.82.1 with theme even" />
 
 
-<link rel="canonical" href="http://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-2/" />
-  <link href="http://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-2/index.xml" rel="alternate" type="application/rss+xml" title="" />
-  <link href="http://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-2/index.xml" rel="feed" type="application/rss+xml" title="" />
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/manifest.json">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
 
 
-<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 
 
-<meta property="og:title" content="完善 Cocoapods-Binary 支持 Server 端缓存" />
+
+
+
+<html lang="en">
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  
+  <title>完善 Cocoapods-Binary 支持 Server 端缓存 - Aha Edmond</title>
+
+  
+  
+  <meta name="description" content="在开始之前，还是明确一下我们的目标，希望通过对 Cocoapods-binary 的改造使其支持 server 端缓存，从而达到 一处编译，处处使用 的 pods lib dependencies。同时会简单" />
+  <meta name="author" content="土土Edmond木" />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://looseyi.github.io/app.min.css" />
+
+  
+
+  
+  <link rel="preload" as="image" href="https://looseyi.github.io/theme.png" />
+
+  
+  <link rel="preload" as="image" href="https://looseyi.github.io/twitter.svg" />
+  
+  <link rel="preload" as="image" href="https://looseyi.github.io/github.svg" />
+  
+
+  
+  <link rel="icon" href="https://looseyi.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://looseyi.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.82.1" />
+
+  
+  
+  <link
+    rel="alternate"
+    type="application/rss&#43;xml"
+    href="https://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-2/index.xml"
+    title="Aha Edmond"
+  />
+  
+
+  
+  
+  
+  
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-62789092-1', 'auto');
+	ga('set', 'anonymizeIp', true);
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+  
+  
+  
+  <meta property="og:title" content="完善 Cocoapods-Binary 支持 Server 端缓存" />
 <meta property="og:description" content="在开始之前，还是明确一下我们的目标，希望通过对 Cocoapods-binary 的改造使其支持 server 端缓存，从而达到 一处编译，处处使用 的 pods lib dependencies。同时会简单" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="http://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-2/" /><meta property="article:section" content="post" />
+<meta property="og:url" content="https://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-2/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2020-01-06T11:40:06&#43;21:00" />
 <meta property="article:modified_time" content="2020-01-06T11:40:06&#43;21:00" />
 
-<meta itemprop="name" content="完善 Cocoapods-Binary 支持 Server 端缓存">
+
+  
+  <meta itemprop="name" content="完善 Cocoapods-Binary 支持 Server 端缓存">
 <meta itemprop="description" content="在开始之前，还是明确一下我们的目标，希望通过对 Cocoapods-binary 的改造使其支持 server 端缓存，从而达到 一处编译，处处使用 的 pods lib dependencies。同时会简单"><meta itemprop="datePublished" content="2020-01-06T11:40:06&#43;21:00" />
 <meta itemprop="dateModified" content="2020-01-06T11:40:06&#43;21:00" />
 <meta itemprop="wordCount" content="2409">
-<meta itemprop="keywords" content="CocoaPods,iOS,Binary,Source Code," /><meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="CocoaPods,iOS,Binary,Source Code," />
+  
+  <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="完善 Cocoapods-Binary 支持 Server 端缓存"/>
 <meta name="twitter:description" content="在开始之前，还是明确一下我们的目标，希望通过对 Cocoapods-binary 的改造使其支持 server 端缓存，从而达到 一处编译，处处使用 的 pods lib dependencies。同时会简单"/>
 
-<!--[if lte IE 9]>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
-<![endif]-->
-
-<!--[if lt IE 9]>
-  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
-<![endif]-->
-
+  
+  
 </head>
-<body>
-  <div id="mobile-navbar" class="mobile-navbar">
-  <div class="mobile-header-logo">
-    <a href="/" class="logo">Aha Moment</a>
-  </div>
-  <div class="mobile-navbar-icon">
-    <span></span>
-    <span></span>
-    <span></span>
-  </div>
-</div>
-<nav id="mobile-menu" class="mobile-menu slideout-menu">
-  <ul class="mobile-menu-list">
-    <a href="/">
-        <li class="mobile-menu-item">Home</li>
-      </a><a href="/post/">
-        <li class="mobile-menu-item">Archives</li>
-      </a><a href="/tags/">
-        <li class="mobile-menu-item">Tags</li>
-      </a><a href="/categories/">
-        <li class="mobile-menu-item">Categories</li>
-      </a>
-  </ul>
-</nav>
-  <div class="container" id="mobile-panel">
-    <header id="header" class="header">
-        <div class="logo-wrapper">
-  <a href="/" class="logo">Aha Moment</a>
-</div>
 
-<nav class="site-navbar">
-  <ul id="menu" class="menu">
-    <li class="menu-item">
-        <a class="menu-item-link" href="/">Home</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/post/">Archives</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/tags/">Tags</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/categories/">Categories</a>
-      </li>
-  </ul>
-</nav>
-    </header>
 
-    <main id="main" class="main">
-      <div class="content-wrapper">
-        <div id="content" class="content">
-          <article class="post">
+  <body class="not-ready" data-menu="true">
+    <header class="header">
+  
+  <p class="logo">
+    <a class="site-name" href="https://looseyi.github.io/">Aha Edmond</a><a class="btn-dark"></a>
+  </p>
+  
+
+  <script>
+    let bodyClx = document.body.classList;
+    let btnDark = document.querySelector('.btn-dark');
+    let sysDark = window.matchMedia('(prefers-color-scheme: dark)');
+    let darkVal = localStorage.getItem('dark');
+
+    let setDark = (isDark) => {
+      bodyClx[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark ? 'yes' : 'no');
+    };
+
+    setDark(darkVal ? darkVal === 'yes' : sysDark.matches);
+    requestAnimationFrame(() => bodyClx.remove('not-ready'));
+
+    btnDark.addEventListener('click', () => setDark(!bodyClx.contains('dark')));
+    sysDark.addEventListener('change', (event) => setDark(event.matches));
+  </script>
+
+  
+  
+  <nav class="menu">
     
-    <header class="post-header">
-      <h1 class="post-title">完善 Cocoapods-Binary 支持 Server 端缓存</h1>
+    <a class="" href="/">Home</a>
+    
+  </nav>
+  
 
-      <div class="post-meta">
-        <span class="post-time"> 2020-01-06 </span>
-        <div class="post-category">
-            <a href="/categories/ios/"> iOS </a>
-            <a href="/categories/cocoapods/"> CocoaPods </a>
-            </div>
-          <span class="more-meta"> 约 2409 字 </span>
-          <span class="more-meta"> 预计阅读 5 分钟 </span>
-        
-      </div>
-    </header>
+  
+  <nav class="social">
+    
+    <a
+      class="twitter"
+      style="--url: url(./twitter.svg)"
+      href="https://twitter.com/looseyi"
+      target="_blank"
+    ></a>
+    
+    <a
+      class="github"
+      style="--url: url(./github.svg)"
+      href="https://github.com/looseyi"
+      target="_blank"
+    ></a>
+    
+  </nav>
+  
+</header>
 
-    <div class="post-toc" id="post-toc">
-  <h2 class="post-toc-title">文章目录</h2>
-  <div class="post-toc-content always-active">
-    <nav id="TableOfContents">
-  <ul>
-    <li><a href="#业内实践">业内实践</a>
-      <ul>
-        <li><a href="#知乎-ios-基于-cocoapods-实现的二进制化方案httpsmediumcomrurlhttps3a2f2fzhuanlanzhihucom2fp2f44280283"><a href="https://medium.com/r/?url=https%3A%2F%2Fzhuanlan.zhihu.com%2Fp%2F44280283">知乎 iOS 基于 CocoaPods 实现的二进制化方案</a></a></li>
-        <li><a href="#火掌柜-ios-端基于-cocoapods-的组件二进制化实践httpsmediumcomrurlhttps3a2f2fwwwinfoqcn2farticle2fhiuoajjkns3_tvdaf0eg"><a href="https://medium.com/r/?url=https%3A%2F%2Fwww.infoq.cn%2Farticle%2FhIUoAJjKNS3_TVdaf0EG">火掌柜 iOS 端基于 CocoaPods 的组件二进制化实践</a></a></li>
-      </ul>
-    </li>
-    <li><a href="#改造-cocoapods-binary">改造 CocoaPods-Binary</a></li>
-    <li><a href="#限制">限制</a></li>
-    <li><a href="#总结">总结</a></li>
-  </ul>
-</nav>
-  </div>
-</div>
-    <div class="post-content">
-      <blockquote>
+
+    <main class="main">
+			
+
+<article class="post-single">
+  <header class="post-title">
+    <p>
+      <time>2020-01-06</time>
+      
+      <span>土土Edmond木</span>
+      
+    </p>
+    <h1>完善 Cocoapods-Binary 支持 Server 端缓存</h1>
+  </header>
+  <section class="post-content"><blockquote>
 <p>在开始之前，还是明确一下我们的目标，希望通过对 Cocoapods-binary 的改造使其支持 server 端缓存，从而达到 一处编译，处处使用 的 pods lib dependencies。同时会简单对比一下现有已经公开的大厂的实践和利弊，以及我们为何这么做。</p>
 </blockquote>
 <h2 id="业内实践">业内实践</h2>
@@ -301,47 +329,39 @@
 <p>在使用 binary 的过程中，还有一些意想不到的问题。例如，为了减少源码和 binary 切换过程中产生的大量 git change，将 Pods 目录进行了 ignore，导致工程师在过渡阶段切换分支中，多数被限制在 pod install 中一些三方库的 download 上面，非翻所不能也。还有，在 install 后发现 pod 对应的 symbol link 没有正确生成、对应的 source 没有 copy 成功、业务 framework 打包耗时超常等一系列问题。</p>
 <h2 id="总结">总结</h2>
 <p>真实项目实践中，没有一劳永逸的办法。不同的业务依赖和环境配置，包括工程代码的规范，甚至简单的头文件管理都会导致开发过程产生各种各样的问题。总之，是一个不断探索和进化的过程。</p>
+</section>
 
-    </div>
-
-    <div class="post-copyright">
-  <p class="copyright-item">
-    <span class="item-title">文章作者</span>
-    <span class="item-content">土土Edmond木</span>
-  </p>
-  <p class="copyright-item">
-    <span class="item-title">上次更新</span>
-    <span class="item-content">
-        2020-01-06
-        
-    </span>
-  </p>
   
   
-</div>
-<footer class="post-footer">
-      <div class="post-tags">
-          <a href="/tags/cocoapods/">CocoaPods</a>
-          <a href="/tags/ios/">iOS</a>
-          <a href="/tags/binary/">Binary</a>
-          <a href="/tags/source-code/">Source Code</a>
-          </div>
-      <nav class="post-nav">
-        <a class="prev" href="/post/sourcecode-ios/source-code-sdweb-1/">
-            <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">浅析 SDWebImage 5.6</span>
-            <span class="prev-text nav-mobile">上一篇</span>
-          </a>
-        <a class="next" href="/post/sourcecode-ios/cocoapods-binary-1/">
-            <span class="next-text nav-default">浅析 cocoapods-binary</span>
-            <span class="next-text nav-mobile">下一篇</span>
-            <i class="iconfont icon-right"></i>
-          </a>
-      </nav>
-    </footer>
-  </article>
-        </div>
-        
+  <footer class="post-tags">
+     
+    <a href="https://looseyi.github.io/tags/cocoapods">CocoaPods</a>
+     
+    <a href="https://looseyi.github.io/tags/ios">iOS</a>
+     
+    <a href="https://looseyi.github.io/tags/binary">Binary</a>
+     
+    <a href="https://looseyi.github.io/tags/source-code">Source Code</a>
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="post-nav">
+    
+    <a class="prev" href="https://looseyi.github.io/post/sourcecode-ios/source-code-sdweb-1/"><span>←</span><span>浅析 SDWebImage 5.6</span></a>
+     
+  </nav>
+  
+
+  
+  
+</article>
+
+
+			
 
   
 
@@ -355,70 +375,18 @@
     </script>
     <noscript>Please enable JavaScript to view the <a href="https://github.com/utterance">comments powered by utterances.</a></noscript>
 
-      </div>
-    </main>
+		</main>
 
-    <footer id="footer" class="footer">
-      <div class="social-links">
-      <a href="mailto:chun574271939@gmail.com" class="iconfont icon-email" title="email"></a>
-      <a href="https://twitter.com/looseyi" class="iconfont icon-twitter" title="twitter"></a>
-      <a href="https://github.com/looseyi" class="iconfont icon-github" title="github"></a>
-      <a href="https://www.weibo.com/foreverclp" class="iconfont icon-weibo" title="weibo"></a>
-      <a href="https://www.zhihu.com/people/tu-tu-edmondmu" class="iconfont icon-zhihu" title="zhihu"></a>
-  <a href="http://looseyi.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
-</div>
+    <footer class="footer">
+  <p>&copy; 2021 <a href="https://looseyi.github.io/">Aha Edmond</a></p>
+  <p>Powered by <a href="https://gohugo.io/" rel="noopener" target="_blank">Hugo️️</a>️</p>
+  <p>
+    <a href="https://github.com/nanxiaobei/hugo-paper" rel="noopener" target="_blank">Paper 5.1</a>
+  </p>
+</footer>
 
-<div class="copyright">
-  <span class="power-by">
-    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
-  </span>
-  <span class="division">|</span>
-  <span class="theme-info">
-    主题 - 
-    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
-  </span>
-
-  
-
-  <span class="copyright-year">
-    &copy; 
-    2019-12-11 - 
-    2021
-    <span class="heart">
-      <i class="iconfont icon-heart"></i>
-    </span>
-    <span class="author">土土Edmond木</span>
-  </span>
-</div>
-    </footer>
-
-    <div class="back-to-top" id="back-to-top">
-      <i class="iconfont icon-up"></i>
-    </div>
-  </div>
-  
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
-<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+		
 
 
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-	ga('create', 'UA-62789092-1', 'auto');
-	ga('set', 'anonymizeIp', true);
-	ga('send', 'pageview');
-}
-</script>
-<script async src='https://www.google-analytics.com/analytics.js'></script>
-
-
-
-
-
-
-
-</body>
+  </body>
 </html>

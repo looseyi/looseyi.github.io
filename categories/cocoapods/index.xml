@@ -1,118 +1,118 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>CocoaPods on </title>
-    <link>http://looseyi.github.io/categories/cocoapods/</link>
-    <description>Recent content in CocoaPods on </description>
+    <title>CocoaPods on Aha Edmond</title>
+    <link>https://looseyi.github.io/categories/cocoapods/</link>
+    <description>Recent content in CocoaPods on Aha Edmond</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 08 Aug 2021 00:00:00 +0000</lastBuildDate><atom:link href="http://looseyi.github.io/categories/cocoapods/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 08 Aug 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://looseyi.github.io/categories/cocoapods/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>9. Xcode 工程文件编辑</title>
-      <link>http://looseyi.github.io/post/sourcecode-cocoapods/09-cocoapods-xcode-object/</link>
+      <link>https://looseyi.github.io/post/sourcecode-cocoapods/09-cocoapods-xcode-object/</link>
       <pubDate>Sun, 08 Aug 2021 00:00:00 +0000</pubDate>
       
-      <guid>http://looseyi.github.io/post/sourcecode-cocoapods/09-cocoapods-xcode-object/</guid>
+      <guid>https://looseyi.github.io/post/sourcecode-cocoapods/09-cocoapods-xcode-object/</guid>
       <description>本文目录 引子 通过「Xcode 工程文件解析」一文，我们了解到 project.pbxproj 文件的重要性，Xcode 正是通过它来管理项目中的各种源代码、脚本文件、资源文件、</description>
     </item>
     
     <item>
       <title>8. Xcode 工程文件解析</title>
-      <link>http://looseyi.github.io/post/sourcecode-cocoapods/08-cocoapods-xcodeproj/</link>
+      <link>https://looseyi.github.io/post/sourcecode-cocoapods/08-cocoapods-xcodeproj/</link>
       <pubDate>Sun, 16 May 2021 00:00:00 +0000</pubDate>
       
-      <guid>http://looseyi.github.io/post/sourcecode-cocoapods/08-cocoapods-xcodeproj/</guid>
+      <guid>https://looseyi.github.io/post/sourcecode-cocoapods/08-cocoapods-xcodeproj/</guid>
       <description>引子 在「Molinillo 依赖校验」通过后，CocoaPods 会根据确定的 PodSpec 下载对应的源代码和资源，并为每个 PodSpec 生成对应的 Xcode Target。本文</description>
     </item>
     
     <item>
       <title>7. Molinillo 依赖校验</title>
-      <link>http://looseyi.github.io/post/sourcecode-cocoapods/07-cocoapods-molinillo/</link>
+      <link>https://looseyi.github.io/post/sourcecode-cocoapods/07-cocoapods-molinillo/</link>
       <pubDate>Mon, 08 Mar 2021 00:00:00 +0000</pubDate>
       
-      <guid>http://looseyi.github.io/post/sourcecode-cocoapods/07-cocoapods-molinillo/</guid>
+      <guid>https://looseyi.github.io/post/sourcecode-cocoapods/07-cocoapods-molinillo/</guid>
       <description>引子 通过「前文」对 CocaPods-Core 的分析，我们大体了解了 Pod 是如何被解析、查询与管理的。有了这些整体概念之后，我们就可以逐步深入 pod install 的各个细节。今天我们就来</description>
     </item>
     
     <item>
       <title>6. PodSpec 管理策略</title>
-      <link>http://looseyi.github.io/post/sourcecode-cocoapods/06-cocoapods-source/</link>
+      <link>https://looseyi.github.io/post/sourcecode-cocoapods/06-cocoapods-source/</link>
       <pubDate>Fri, 06 Nov 2020 00:00:00 +0000</pubDate>
       
-      <guid>http://looseyi.github.io/post/sourcecode-cocoapods/06-cocoapods-source/</guid>
+      <guid>https://looseyi.github.io/post/sourcecode-cocoapods/06-cocoapods-source/</guid>
       <description>本文目录 引子 本文是 Core 的最后一篇，它与另外两篇文章「Podfile 解析逻辑」和「PodSpec 文件分析」共同支撑起 CocoaPods 世界的骨架。CocoaPo</description>
     </item>
     
     <item>
       <title>5. PodSpec 文件分析</title>
-      <link>http://looseyi.github.io/post/sourcecode-cocoapods/05-cocoapods-podspec/</link>
+      <link>https://looseyi.github.io/post/sourcecode-cocoapods/05-cocoapods-podspec/</link>
       <pubDate>Tue, 13 Oct 2020 00:00:00 +0000</pubDate>
       
-      <guid>http://looseyi.github.io/post/sourcecode-cocoapods/05-cocoapods-podspec/</guid>
+      <guid>https://looseyi.github.io/post/sourcecode-cocoapods/05-cocoapods-podspec/</guid>
       <description>引子 在上文 Podfile 解析逻辑 中，我们以 Xcode 工程结构作为切入点介绍了 Podfile 背后对应的数据结构，剖析了 Podfile 文件是如何解析与加载，并最终 &amp;ldquo;入侵&amp;rdq</description>
     </item>
     
     <item>
+      <title>浅析 cocoapods-binary</title>
+      <link>https://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-1/</link>
+      <pubDate>Fri, 02 Oct 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-1/</guid>
+      <description>介绍 cocoapods-binary 最早是在 CocoaPods 的 Blog 中发现的：pre-compiling dependencies。虽非官方出品，但却是国内程序员的力作，medium 原版介绍</description>
+    </item>
+    
+    <item>
       <title>4. Podfile 的解析逻辑</title>
-      <link>http://looseyi.github.io/post/sourcecode-cocoapods/04-cocoapods-podfile/</link>
+      <link>https://looseyi.github.io/post/sourcecode-cocoapods/04-cocoapods-podfile/</link>
       <pubDate>Thu, 17 Sep 2020 00:00:00 +0000</pubDate>
       
-      <guid>http://looseyi.github.io/post/sourcecode-cocoapods/04-cocoapods-podfile/</guid>
+      <guid>https://looseyi.github.io/post/sourcecode-cocoapods/04-cocoapods-podfile/</guid>
       <description>引子 在上文 CocoaPods 命令解析 中，我们通过对 CLAide 的源码分析，了解了 CocoaPods 是如何处理 pod 命令，多级命令又是如何组织和嵌套的，并解释了命令行输出所代表的含义。今天</description>
     </item>
     
     <item>
       <title>3. CocoaPods 命令解析 - CLAide</title>
-      <link>http://looseyi.github.io/post/sourcecode-cocoapods/03-cocoapods-claide/</link>
+      <link>https://looseyi.github.io/post/sourcecode-cocoapods/03-cocoapods-claide/</link>
       <pubDate>Wed, 02 Sep 2020 00:00:00 +0000</pubDate>
       
-      <guid>http://looseyi.github.io/post/sourcecode-cocoapods/03-cocoapods-claide/</guid>
+      <guid>https://looseyi.github.io/post/sourcecode-cocoapods/03-cocoapods-claide/</guid>
       <description>引子 在上文 整体把握 CocoaPods 核心组件 中，我们通过对 pod install 的流程的介绍，引出 CocoaPods 的各个核心组件的角色分工和其主要作用，希望通过对这些组件的使用和介绍来帮助</description>
     </item>
     
     <item>
       <title>2. 整体把握 CocoaPods 核心组件</title>
-      <link>http://looseyi.github.io/post/sourcecode-cocoapods/02-cocoapods-corecomponents/</link>
+      <link>https://looseyi.github.io/post/sourcecode-cocoapods/02-cocoapods-corecomponents/</link>
       <pubDate>Mon, 17 Aug 2020 00:00:00 +0000</pubDate>
       
-      <guid>http://looseyi.github.io/post/sourcecode-cocoapods/02-cocoapods-corecomponents/</guid>
+      <guid>https://looseyi.github.io/post/sourcecode-cocoapods/02-cocoapods-corecomponents/</guid>
       <description>引子 在上文 版本管理工具及 Ruby 工具链环境 中，我们聊到如何统一管理团队小伙伴的 CocoaPods 生产环境及使用到的 Ruby 工具链。今天让我们将目光转到 CocoaPods 身上，一起来聊聊</description>
     </item>
     
     <item>
       <title>1. 版本管理工具及 Ruby 工具链环境</title>
-      <link>http://looseyi.github.io/post/sourcecode-cocoapods/01-cocoapods-toolchains/</link>
+      <link>https://looseyi.github.io/post/sourcecode-cocoapods/01-cocoapods-toolchains/</link>
       <pubDate>Wed, 10 Jun 2020 00:00:00 +0000</pubDate>
       
-      <guid>http://looseyi.github.io/post/sourcecode-cocoapods/01-cocoapods-toolchains/</guid>
+      <guid>https://looseyi.github.io/post/sourcecode-cocoapods/01-cocoapods-toolchains/</guid>
       <description>CocoaPods 历险记这个专题是 Edmond 和冬瓜 是对于 iOS / macOS 工程中版本管理工具 CocoaPods 的实现细节、原理、源码、实践与经验的分享记录，旨在帮助大家能够更加了解这个依赖管理</description>
     </item>
     
     <item>
       <title>浅析 Cocoapods-Packager 实现</title>
-      <link>http://looseyi.github.io/post/sourcecode-ios/cocoapods-packager/</link>
+      <link>https://looseyi.github.io/post/sourcecode-ios/cocoapods-packager/</link>
       <pubDate>Sun, 29 Mar 2020 15:10:58 +0800</pubDate>
       
-      <guid>http://looseyi.github.io/post/sourcecode-ios/cocoapods-packager/</guid>
+      <guid>https://looseyi.github.io/post/sourcecode-ios/cocoapods-packager/</guid>
       <description>介绍 CocoaPods plugin which allows you to generate a framework or static library from a podspec. This plugin is for CocoaPods developers, who need to distribute their Pods not only via CocoaPods, but also as frameworks or static libraries for people who do not use Pods. 作为 CococaPods 的官方插件之一，CocoaPods Packager 为 Pod</description>
     </item>
     
     <item>
       <title>完善 Cocoapods-Binary 支持 Server 端缓存</title>
-      <link>http://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-2/</link>
+      <link>https://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-2/</link>
       <pubDate>Mon, 06 Jan 2020 11:40:06 +2100</pubDate>
       
-      <guid>http://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-2/</guid>
+      <guid>https://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-2/</guid>
       <description>在开始之前，还是明确一下我们的目标，希望通过对 Cocoapods-binary 的改造使其支持 server 端缓存，从而达到 一处编译，处处使用 的 pods lib dependencies。同时会简单</description>
-    </item>
-    
-    <item>
-      <title>浅析 cocoapods-binary</title>
-      <link>http://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-1/</link>
-      <pubDate>Sat, 21 Dec 2019 11:37:41 +2100</pubDate>
-      
-      <guid>http://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-1/</guid>
-      <description>#介绍 cocoapods-binary 最早是在 CocoaPods 的 Blog 中发现的：pre-compiling dependencies。虽非官方出品，但却是国内程序员的力作，medium 原版介</description>
     </item>
     
   </channel>

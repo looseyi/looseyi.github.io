@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>GCD on </title>
-    <link>http://looseyi.github.io/tags/gcd/</link>
-    <description>Recent content in GCD on </description>
+    <title>GCD on Aha Edmond</title>
+    <link>https://looseyi.github.io/tags/gcd/</link>
+    <description>Recent content in GCD on Aha Edmond</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Tue, 16 Jun 2020 00:00:00 +0000</lastBuildDate><atom:link href="http://looseyi.github.io/tags/gcd/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 16 Jun 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://looseyi.github.io/tags/gcd/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>📒个人备忘 - 队列、GCD、线程基础</title>
-      <link>http://looseyi.github.io/post/notes/01-gcd/</link>
+      <link>https://looseyi.github.io/post/notes/01-gcd/</link>
       <pubDate>Tue, 16 Jun 2020 00:00:00 +0000</pubDate>
       
-      <guid>http://looseyi.github.io/post/notes/01-gcd/</guid>
+      <guid>https://looseyi.github.io/post/notes/01-gcd/</guid>
       <description>[toc] 引子 本篇内容大多来自网络上的一些文章，希望做一个 📝 和参考，如有出错的地方希望指正。 起因是公司内部的同学在开发中遇到了 FMDB 的一个 Crash，查</description>
     </item>
     

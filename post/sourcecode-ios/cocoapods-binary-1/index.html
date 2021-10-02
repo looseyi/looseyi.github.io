@@ -1,185 +1,183 @@
 <!DOCTYPE html>
-<html lang="zh-cn">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>浅析 cocoapods-binary - </title>
-  <meta name="renderer" content="webkit" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
-
-<meta name="theme-color" content="#f8f5ec" />
-<meta name="msapplication-navbutton-color" content="#f8f5ec">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
-
-
-<meta name="author" content="土土Edmond木" /><meta name="description" content="#介绍 cocoapods-binary 最早是在 CocoaPods 的 Blog 中发现的：pre-compiling dependencies。虽非官方出品，但却是国内程序员的力作，medium 原版介" /><meta name="keywords" content="Hugo, theme, even" />
 
 
 
 
 
 
-<meta name="generator" content="Hugo 0.82.1 with theme even" />
 
 
-<link rel="canonical" href="http://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-1/" />
-  <link href="http://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-1/index.xml" rel="alternate" type="application/rss+xml" title="" />
-  <link href="http://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-1/index.xml" rel="feed" type="application/rss+xml" title="" />
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/manifest.json">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
 
 
-<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 
 
-<meta property="og:title" content="浅析 cocoapods-binary" />
-<meta property="og:description" content="#介绍 cocoapods-binary 最早是在 CocoaPods 的 Blog 中发现的：pre-compiling dependencies。虽非官方出品，但却是国内程序员的力作，medium 原版介" />
+
+
+
+<html lang="en">
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  
+  <title>浅析 cocoapods-binary - Aha Edmond</title>
+
+  
+  
+  <meta name="description" content="介绍 cocoapods-binary 最早是在 CocoaPods 的 Blog 中发现的：pre-compiling dependencies。虽非官方出品，但却是国内程序员的力作，medium 原版介绍" />
+  <meta name="author" content="土土Edmond木" />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://looseyi.github.io/app.min.css" />
+
+  
+
+  
+  <link rel="preload" as="image" href="https://looseyi.github.io/theme.png" />
+
+  
+  <link rel="preload" as="image" href="https://looseyi.github.io/twitter.svg" />
+  
+  <link rel="preload" as="image" href="https://looseyi.github.io/github.svg" />
+  
+
+  
+  <link rel="icon" href="https://looseyi.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://looseyi.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.82.1" />
+
+  
+  
+  <link
+    rel="alternate"
+    type="application/rss&#43;xml"
+    href="https://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-1/index.xml"
+    title="Aha Edmond"
+  />
+  
+
+  
+  
+  
+  
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-62789092-1', 'auto');
+	ga('set', 'anonymizeIp', true);
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+  
+  
+  
+  <meta property="og:title" content="浅析 cocoapods-binary" />
+<meta property="og:description" content="介绍 cocoapods-binary 最早是在 CocoaPods 的 Blog 中发现的：pre-compiling dependencies。虽非官方出品，但却是国内程序员的力作，medium 原版介绍" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="http://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-1/" /><meta property="article:section" content="post" />
-<meta property="article:published_time" content="2019-12-21T11:37:41&#43;21:00" />
-<meta property="article:modified_time" content="2019-12-21T11:37:41&#43;21:00" />
+<meta property="og:url" content="https://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-1/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2020-10-02T00:00:00&#43;00:00" />
+<meta property="article:modified_time" content="2020-10-02T00:00:00&#43;00:00" />
 
-<meta itemprop="name" content="浅析 cocoapods-binary">
-<meta itemprop="description" content="#介绍 cocoapods-binary 最早是在 CocoaPods 的 Blog 中发现的：pre-compiling dependencies。虽非官方出品，但却是国内程序员的力作，medium 原版介"><meta itemprop="datePublished" content="2019-12-21T11:37:41&#43;21:00" />
-<meta itemprop="dateModified" content="2019-12-21T11:37:41&#43;21:00" />
-<meta itemprop="wordCount" content="4781">
-<meta itemprop="keywords" content="CocoaPods,iOS,Binary," /><meta name="twitter:card" content="summary"/>
+
+  
+  <meta itemprop="name" content="浅析 cocoapods-binary">
+<meta itemprop="description" content="介绍 cocoapods-binary 最早是在 CocoaPods 的 Blog 中发现的：pre-compiling dependencies。虽非官方出品，但却是国内程序员的力作，medium 原版介绍"><meta itemprop="datePublished" content="2020-10-02T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2020-10-02T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="4780">
+<meta itemprop="keywords" content="CocoaPods,iOS,Binary," />
+  
+  <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="浅析 cocoapods-binary"/>
-<meta name="twitter:description" content="#介绍 cocoapods-binary 最早是在 CocoaPods 的 Blog 中发现的：pre-compiling dependencies。虽非官方出品，但却是国内程序员的力作，medium 原版介"/>
+<meta name="twitter:description" content="介绍 cocoapods-binary 最早是在 CocoaPods 的 Blog 中发现的：pre-compiling dependencies。虽非官方出品，但却是国内程序员的力作，medium 原版介绍"/>
 
-<!--[if lte IE 9]>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
-<![endif]-->
-
-<!--[if lt IE 9]>
-  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
-<![endif]-->
-
+  
+  
 </head>
-<body>
-  <div id="mobile-navbar" class="mobile-navbar">
-  <div class="mobile-header-logo">
-    <a href="/" class="logo">Aha Moment</a>
-  </div>
-  <div class="mobile-navbar-icon">
-    <span></span>
-    <span></span>
-    <span></span>
-  </div>
-</div>
-<nav id="mobile-menu" class="mobile-menu slideout-menu">
-  <ul class="mobile-menu-list">
-    <a href="/">
-        <li class="mobile-menu-item">Home</li>
-      </a><a href="/post/">
-        <li class="mobile-menu-item">Archives</li>
-      </a><a href="/tags/">
-        <li class="mobile-menu-item">Tags</li>
-      </a><a href="/categories/">
-        <li class="mobile-menu-item">Categories</li>
-      </a>
-  </ul>
-</nav>
-  <div class="container" id="mobile-panel">
-    <header id="header" class="header">
-        <div class="logo-wrapper">
-  <a href="/" class="logo">Aha Moment</a>
-</div>
 
-<nav class="site-navbar">
-  <ul id="menu" class="menu">
-    <li class="menu-item">
-        <a class="menu-item-link" href="/">Home</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/post/">Archives</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/tags/">Tags</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/categories/">Categories</a>
-      </li>
-  </ul>
-</nav>
-    </header>
 
-    <main id="main" class="main">
-      <div class="content-wrapper">
-        <div id="content" class="content">
-          <article class="post">
+  <body class="not-ready" data-menu="true">
+    <header class="header">
+  
+  <p class="logo">
+    <a class="site-name" href="https://looseyi.github.io/">Aha Edmond</a><a class="btn-dark"></a>
+  </p>
+  
+
+  <script>
+    let bodyClx = document.body.classList;
+    let btnDark = document.querySelector('.btn-dark');
+    let sysDark = window.matchMedia('(prefers-color-scheme: dark)');
+    let darkVal = localStorage.getItem('dark');
+
+    let setDark = (isDark) => {
+      bodyClx[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark ? 'yes' : 'no');
+    };
+
+    setDark(darkVal ? darkVal === 'yes' : sysDark.matches);
+    requestAnimationFrame(() => bodyClx.remove('not-ready'));
+
+    btnDark.addEventListener('click', () => setDark(!bodyClx.contains('dark')));
+    sysDark.addEventListener('change', (event) => setDark(event.matches));
+  </script>
+
+  
+  
+  <nav class="menu">
     
-    <header class="post-header">
-      <h1 class="post-title">浅析 cocoapods-binary</h1>
+    <a class="" href="/">Home</a>
+    
+  </nav>
+  
 
-      <div class="post-meta">
-        <span class="post-time"> 2019-12-21 </span>
-        <div class="post-category">
-            <a href="/categories/ios/"> iOS </a>
-            <a href="/categories/cocoapods/"> CocoaPods </a>
-            </div>
-          <span class="more-meta"> 约 4781 字 </span>
-          <span class="more-meta"> 预计阅读 10 分钟 </span>
-        
-      </div>
-    </header>
+  
+  <nav class="social">
+    
+    <a
+      class="twitter"
+      style="--url: url(./twitter.svg)"
+      href="https://twitter.com/looseyi"
+      target="_blank"
+    ></a>
+    
+    <a
+      class="github"
+      style="--url: url(./github.svg)"
+      href="https://github.com/looseyi"
+      target="_blank"
+    ></a>
+    
+  </nav>
+  
+</header>
 
-    <div class="post-toc" id="post-toc">
-  <h2 class="post-toc-title">文章目录</h2>
-  <div class="post-toc-content always-active">
-    <nav id="TableOfContents">
-  <ul>
-    <li><a href="#环境检查">环境检查</a></li>
-    <li><a href="#binary-pod-的下载安装">Binary Pod 的下载安装</a>
-      <ul>
-        <li><a href="#install">install</a></li>
-      </ul>
-    </li>
-    <li><a href="#预编译环境控制">预编译环境控制</a>
-      <ul>
-        <li><a href="#is_prebuild_stag">is_prebuild_stag</a></li>
-        <li><a href="#enable_prebuild_patch">enable_prebuild_patch</a></li>
-        <li><a href="#force_disable_integration">force_disable_integration</a></li>
-        <li><a href="#disable_install_complete_message">disable_install_complete_message</a></li>
-        <li><a href="#force_disable_write_lockfile">force_disable_write_lockfile</a></li>
-      </ul>
-    </li>
-  </ul>
 
-  <ul>
-    <li><a href="#预编译的缓存查询">预编译的缓存查询</a>
-      <ul>
-        <li><a href="#预编译的-mainfest-检查">预编译的 mainfest 检查</a></li>
-        <li><a href="#预编译的-pods-变更检查">预编译的 pods 变更检查</a></li>
-        <li><a href="#预编译的-framework-缓存检查">预编译的 framework 缓存检查</a></li>
-      </ul>
-    </li>
-    <li><a href="#target-编译">Target 编译</a>
-      <ul>
-        <li><a href="#prebuild_frameworks">prebuild_frameworks!</a></li>
-      </ul>
-    </li>
-  </ul>
+    <main class="main">
+			
 
-  <ul>
-    <li><a href="#resolve-dependencies">resolve dependencies</a></li>
-    <li><a href="#download-dependencies">download dependencies</a></li>
-    <li><a href="#embedframeworksscript">EmbedFrameworksScript</a></li>
-    <li><a href="#流程图">流程图</a></li>
-    <li><a href="#结果对比">结果对比</a></li>
-    <li><a href="#总结">总结</a></li>
-  </ul>
-</nav>
-  </div>
-</div>
-    <div class="post-content">
-      <p>#介绍</p>
+<article class="post-single">
+  <header class="post-title">
+    <p>
+      <time>2020-10-02</time>
+      
+      <span>土土Edmond木</span>
+      
+    </p>
+    <h1>浅析 cocoapods-binary</h1>
+  </header>
+  <section class="post-content"><h1 id="介绍">介绍</h1>
 <p>cocoapods-binary 最早是在 CocoaPods 的 Blog 中发现的：<a href="https://guides.cocoapods.org/plugins/pre-compiling-dependencies.html">pre-compiling dependencies</a>。虽非官方出品，但却是国内程序员的力作，medium 原版介绍：<a href="https://medium.com/@gaojiji/%E5%8A%A0%E5%BF%AB-cocoapods-%E9%A1%B9%E7%9B%AE%E7%BC%96%E8%AF%91%E6%97%B6%E9%97%B4-pod-%E9%A2%84%E7%BC%96%E8%AF%91%E7%9A%84%E5%82%BB%E7%93%9C%E5%BC%8F%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88-6b791daf192d">Pod 预编译的傻瓜式解决方案</a>：</p>
 <blockquote>
 <p>A CocoaPods plugin to integrate pods in form of prebuilt frameworks, not source code, by adding <strong>just one flag</strong> in podfile. Speed up compiling dramatically.</p>
@@ -193,7 +191,7 @@
 </ul>
 <h1 id="binary-pod-的安装">Binary Pod 的安装</h1>
 <p>Binary Pod 的安装作是以 <code>pre_install</code> hook 作为入口，开始插件的运作。</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gfopbdyts7j20l10f3dh6.jpg" alt="pre_install.png"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gfopbdyts7j20l10f3dh6.jpg" alt="pre_install.png"></p>
 <p>当我们在命令行中执行 <code>pod install</code>，CocoaPods 会依次执行 👆 图的几个方法。cocoapods-binary 的 <code>pre_install</code> 就是在 prepare 阶段插入的逻辑。</p>
 <p>这里的 <code>pre_install</code> 不同于 <code>Podfile</code> 中的 <a href="https://guides.cocoapods.org/syntax/podfile.html#pre_install">pre_install</a>，其拦截方式如下：</p>
 <div class="highlight"><div class="chroma">
@@ -209,7 +207,7 @@
 </code></pre></td></tr></table>
 </div>
 </div><p>利用 CocoaPods 提供的 <a href="https://www.rubydoc.info/github/CocoaPods/CocoaPods/Pod/HooksManager">HooksManager</a> 注册 <code>pre_install</code> hook 来下载 binary pods。过程分两步：</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gflvtlvtqvj208n067aa9.jpg" alt="Main.png"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gflvtlvtqvj208n067aa9.jpg" alt="Main.png"></p>
 <h2 id="环境检查">环境检查</h2>
 <p>环境检查，首先是通过标记全局的 <code>is_prebuild_stage</code> 来防止 <code>pre_install</code> 重复的进入。</p>
 <div class="highlight"><div class="chroma">
@@ -462,7 +460,7 @@
 </li>
 </ol>
 <p>作者通过这样的配合完成了一键 <code>all_binary!</code> 和单个 <code>:binary</code> 的个性化设置。</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gfm7kp2ee5j20ln0dqabf.jpg" alt="enable_prebuild_patch.png"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gfm7kp2ee5j20ln0dqabf.jpg" alt="enable_prebuild_patch.png"></p>
 <h3 id="force_disable_integration">force_disable_integration</h3>
 <blockquote>
 <p>a force disable option for integral</p>
@@ -519,7 +517,7 @@
 <span class="k">end</span>
 </code></pre></td></tr></table>
 </div>
-</div><p><img src="http://ww1.sinaimg.cn/large/8157560cly1gfm5t282twj20xb0hqjut.jpg" alt="feature_switch.png"></p>
+</div><p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gfm5t282twj20xb0hqjut.jpg" alt="feature_switch.png"></p>
 <h1 id="binary-pod-的预编译">Binary Pod 的预编译</h1>
 <p>cocoapods-binary 在下载 binary pod 源码前会先检查是否已经有预编译好的二进制包，如果没有缓存才会开始binary pod 的下载和预编译。</p>
 <h2 id="预编译的缓存查询">预编译的缓存查询</h2>
@@ -704,7 +702,7 @@
 </div>
 </div><p>该方法虽然逻辑简单，却是比较核心的逻辑之一。</p>
 <p>它最终调用 <code>pod_name_for_target_folder</code> 来检查 <code>Pods/_Prebuild/GeneratedFrameworks</code> 目录下对应的 framework 中是否存在以 <strong>.pod_name</strong> 为结尾的文件，来标示该 framework 是否完成了预编译。它就是一个空文件而已。</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gfmci591ncj20np0g3q53.jpg" alt="exact_prebuild_cache.png"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gfmci591ncj20np0g3q53.jpg" alt="exact_prebuild_cache.png"></p>
 <h2 id="target-编译">Target 编译</h2>
 <p>通过 <code>pre_install</code> 下载完 pods 后就要开始编译啦，入口如下：</p>
 <div class="highlight"><div class="chroma">
@@ -729,7 +727,7 @@
 </div>
 </div><p>为了保证 <code>prebuild_frameworks!</code> 是在最后一步执行，作者并未通过 <code>HooksManager</code> 来添加 plugins 的 <code>post_install</code> 而是直接 <strong>Override</strong> 了它的调用方法。</p>
 <p>关于 install hooks，CocoaPods 提供了两种类型：Podfile hook 和 plugin hook。</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gfnfd0b99ij210r0hqtbm.jpg" alt="hooks.png"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gfnfd0b99ij210r0hqtbm.jpg" alt="hooks.png"></p>
 <p>插件的 hooks 操作都是通过 <code>HooksManager</code> 来完成调用的，podfile 中提供的 hooks 则是单独的方法执行时机也是各有不同。</p>
 <h3 id="prebuild_frameworks">prebuild_frameworks!</h3>
 <p>方法比较长就不贴完整的代码了，概括如下：</p>
@@ -1050,12 +1048,12 @@
 <p>重写其实就是在把相对路径改为绝对路径。</p>
 <h2 id="流程图">流程图</h2>
 <p>最后贴一下，梳理的流程图：</p>
-<p><img src="https://user-gold-cdn.xitu.io/2019/12/21/16f28fe79cec4bae?w=3891&amp;h=2218&amp;f=png&amp;s=435060" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/cocoapods-binary-10-flow.png" alt=""></p>
 <h2 id="结果对比">结果对比</h2>
 <p>基本的模块介绍完，我们来看看，引入 cocoapods-binary 插件后 Pods 的文件构成：</p>
-<p><img src="https://user-gold-cdn.xitu.io/2019/12/21/16f28fe274deb12a?w=1218&amp;h=113&amp;f=png&amp;s=42173" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/cocoapods-binary-08-prebuild-product.png" alt=""></p>
 <p>_Prebuild 目录下则完整保存了一份 Pods 源代码，同时多出来的 GeneratedFrameworks 则缓存了预编译后的 binary 文件以及 dSYM 符号表。在最后的 integration 阶段 symbol link 替换完后源码则会被删除同时指向binary。</p>
-<p><img src="https://user-gold-cdn.xitu.io/2019/12/21/16f28fe4bebba8af?w=805&amp;h=102&amp;f=png&amp;s=26338" alt=""></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/cocoapods-binary-09-linkproduct.png" alt=""></p>
 <h2 id="总结">总结</h2>
 <p>使用过程中这个方案还是有很多限制的：</p>
 <ul>
@@ -1068,43 +1066,40 @@
 </ul>
 <p>整体感觉是很不错的思路，适用于人数不多的中小型项目。一旦项目依赖库较多，可能就不太适用了，限制太多，同时对开发的要求和环境的一致性要求比较高。</p>
 <p>前期准备基本介绍完了，下一节就是核心的 prebuild 逻辑。先上一张脑图补一补：</p>
-<p><img src="https://user-gold-cdn.xitu.io/2019/12/21/16f28fd6d97d3ea7?w=2850&amp;h=1490&amp;f=png&amp;s=370440" alt="structure"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/cocoapods-binary-07-class-diagram.png" alt="structure"></p>
+</section>
 
-    </div>
-
-    <div class="post-copyright">
-  <p class="copyright-item">
-    <span class="item-title">文章作者</span>
-    <span class="item-content">土土Edmond木</span>
-  </p>
-  <p class="copyright-item">
-    <span class="item-title">上次更新</span>
-    <span class="item-content">
-        2019-12-21
-        
-    </span>
-  </p>
   
   
-</div>
-<footer class="post-footer">
-      <div class="post-tags">
-          <a href="/tags/cocoapods/">CocoaPods</a>
-          <a href="/tags/ios/">iOS</a>
-          <a href="/tags/binary/">Binary</a>
-          </div>
-      <nav class="post-nav">
-        <a class="prev" href="/post/sourcecode-ios/cocoapods-binary-2/">
-            <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">完善 Cocoapods-Binary 支持 Server 端缓存</span>
-            <span class="prev-text nav-mobile">上一篇</span>
-          </a>
-        
-      </nav>
-    </footer>
-  </article>
-        </div>
-        
+  <footer class="post-tags">
+     
+    <a href="https://looseyi.github.io/tags/cocoapods">CocoaPods</a>
+     
+    <a href="https://looseyi.github.io/tags/ios">iOS</a>
+     
+    <a href="https://looseyi.github.io/tags/binary">Binary</a>
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="post-nav">
+    
+    <a class="prev" href="https://looseyi.github.io/post/sourcecode-cocoapods/05-cocoapods-podspec/"><span>←</span><span>5. PodSpec 文件分析</span></a>
+     
+    <a class="next" href="https://looseyi.github.io/post/sourcecode-cocoapods/04-cocoapods-podfile/"><span>4. Podfile 的解析逻辑</span><span>→</span></a>
+    
+  </nav>
+  
+
+  
+  
+</article>
+
+
+			
 
   
 
@@ -1118,70 +1113,18 @@
     </script>
     <noscript>Please enable JavaScript to view the <a href="https://github.com/utterance">comments powered by utterances.</a></noscript>
 
-      </div>
-    </main>
+		</main>
 
-    <footer id="footer" class="footer">
-      <div class="social-links">
-      <a href="mailto:chun574271939@gmail.com" class="iconfont icon-email" title="email"></a>
-      <a href="https://twitter.com/looseyi" class="iconfont icon-twitter" title="twitter"></a>
-      <a href="https://github.com/looseyi" class="iconfont icon-github" title="github"></a>
-      <a href="https://www.weibo.com/foreverclp" class="iconfont icon-weibo" title="weibo"></a>
-      <a href="https://www.zhihu.com/people/tu-tu-edmondmu" class="iconfont icon-zhihu" title="zhihu"></a>
-  <a href="http://looseyi.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
-</div>
+    <footer class="footer">
+  <p>&copy; 2021 <a href="https://looseyi.github.io/">Aha Edmond</a></p>
+  <p>Powered by <a href="https://gohugo.io/" rel="noopener" target="_blank">Hugo️️</a>️</p>
+  <p>
+    <a href="https://github.com/nanxiaobei/hugo-paper" rel="noopener" target="_blank">Paper 5.1</a>
+  </p>
+</footer>
 
-<div class="copyright">
-  <span class="power-by">
-    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
-  </span>
-  <span class="division">|</span>
-  <span class="theme-info">
-    主题 - 
-    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
-  </span>
-
-  
-
-  <span class="copyright-year">
-    &copy; 
-    2019-12-11 - 
-    2021
-    <span class="heart">
-      <i class="iconfont icon-heart"></i>
-    </span>
-    <span class="author">土土Edmond木</span>
-  </span>
-</div>
-    </footer>
-
-    <div class="back-to-top" id="back-to-top">
-      <i class="iconfont icon-up"></i>
-    </div>
-  </div>
-  
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
-<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+		
 
 
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-	ga('create', 'UA-62789092-1', 'auto');
-	ga('set', 'anonymizeIp', true);
-	ga('send', 'pageview');
-}
-</script>
-<script async src='https://www.google-analytics.com/analytics.js'></script>
-
-
-
-
-
-
-
-</body>
+  </body>
 </html>

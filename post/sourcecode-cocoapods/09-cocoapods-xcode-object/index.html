@@ -1,174 +1,188 @@
 <!DOCTYPE html>
-<html lang="zh-cn">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>9. Xcode 工程文件编辑 - </title>
-  <meta name="renderer" content="webkit" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
-
-<meta name="theme-color" content="#f8f5ec" />
-<meta name="msapplication-navbutton-color" content="#f8f5ec">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
-
-
-<meta name="author" content="土土Edmond木" /><meta name="description" content="本文目录 引子 通过「Xcode 工程文件解析」一文，我们了解到 project.pbxproj 文件的重要性，Xcode 正是通过它来管理项目中的各种源代码、脚本文件、资源文件、" /><meta name="keywords" content="Hugo, theme, even" />
 
 
 
 
 
 
-<meta name="generator" content="Hugo 0.82.1 with theme even" />
 
 
-<link rel="canonical" href="http://looseyi.github.io/post/sourcecode-cocoapods/09-cocoapods-xcode-object/" />
-  <link href="http://looseyi.github.io/post/sourcecode-cocoapods/09-cocoapods-xcode-object/index.xml" rel="alternate" type="application/rss+xml" title="" />
-  <link href="http://looseyi.github.io/post/sourcecode-cocoapods/09-cocoapods-xcode-object/index.xml" rel="feed" type="application/rss+xml" title="" />
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/manifest.json">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
 
 
-<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 
 
-<meta property="og:title" content="9. Xcode 工程文件编辑" />
+
+
+
+<html lang="en">
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  
+  <title>9. Xcode 工程文件编辑 - Aha Edmond</title>
+
+  
+  
+  <meta name="description" content="本文目录 引子 通过「Xcode 工程文件解析」一文，我们了解到 project.pbxproj 文件的重要性，Xcode 正是通过它来管理项目中的各种源代码、脚本文件、资源文件、" />
+  <meta name="author" content="土土Edmond木" />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://looseyi.github.io/app.min.css" />
+
+  
+
+  
+  <link rel="preload" as="image" href="https://looseyi.github.io/theme.png" />
+
+  
+  <link rel="preload" as="image" href="https://looseyi.github.io/twitter.svg" />
+  
+  <link rel="preload" as="image" href="https://looseyi.github.io/github.svg" />
+  
+
+  
+  <link rel="icon" href="https://looseyi.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://looseyi.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.82.1" />
+
+  
+  
+  <link
+    rel="alternate"
+    type="application/rss&#43;xml"
+    href="https://looseyi.github.io/post/sourcecode-cocoapods/09-cocoapods-xcode-object/index.xml"
+    title="Aha Edmond"
+  />
+  
+
+  
+  
+  
+  
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-62789092-1', 'auto');
+	ga('set', 'anonymizeIp', true);
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+  
+  
+  
+  <meta property="og:title" content="9. Xcode 工程文件编辑" />
 <meta property="og:description" content="本文目录 引子 通过「Xcode 工程文件解析」一文，我们了解到 project.pbxproj 文件的重要性，Xcode 正是通过它来管理项目中的各种源代码、脚本文件、资源文件、" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="http://looseyi.github.io/post/sourcecode-cocoapods/09-cocoapods-xcode-object/" /><meta property="article:section" content="post" />
+<meta property="og:url" content="https://looseyi.github.io/post/sourcecode-cocoapods/09-cocoapods-xcode-object/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2021-08-08T00:00:00&#43;00:00" />
 <meta property="article:modified_time" content="2021-08-08T00:00:00&#43;00:00" />
 
-<meta itemprop="name" content="9. Xcode 工程文件编辑">
+
+  
+  <meta itemprop="name" content="9. Xcode 工程文件编辑">
 <meta itemprop="description" content="本文目录 引子 通过「Xcode 工程文件解析」一文，我们了解到 project.pbxproj 文件的重要性，Xcode 正是通过它来管理项目中的各种源代码、脚本文件、资源文件、"><meta itemprop="datePublished" content="2021-08-08T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2021-08-08T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="5132">
-<meta itemprop="keywords" content="CocoaPods,iOS,Ruby," /><meta name="twitter:card" content="summary"/>
+<meta itemprop="wordCount" content="5156">
+<meta itemprop="keywords" content="CocoaPods,iOS,Ruby," />
+  
+  <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="9. Xcode 工程文件编辑"/>
 <meta name="twitter:description" content="本文目录 引子 通过「Xcode 工程文件解析」一文，我们了解到 project.pbxproj 文件的重要性，Xcode 正是通过它来管理项目中的各种源代码、脚本文件、资源文件、"/>
 
-<!--[if lte IE 9]>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
-<![endif]-->
-
-<!--[if lt IE 9]>
-  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
-<![endif]-->
-
+  
+  
 </head>
-<body>
-  <div id="mobile-navbar" class="mobile-navbar">
-  <div class="mobile-header-logo">
-    <a href="/" class="logo">Aha Moment</a>
-  </div>
-  <div class="mobile-navbar-icon">
-    <span></span>
-    <span></span>
-    <span></span>
-  </div>
-</div>
-<nav id="mobile-menu" class="mobile-menu slideout-menu">
-  <ul class="mobile-menu-list">
-    <a href="/">
-        <li class="mobile-menu-item">Home</li>
-      </a><a href="/post/">
-        <li class="mobile-menu-item">Archives</li>
-      </a><a href="/tags/">
-        <li class="mobile-menu-item">Tags</li>
-      </a><a href="/categories/">
-        <li class="mobile-menu-item">Categories</li>
-      </a>
-  </ul>
-</nav>
-  <div class="container" id="mobile-panel">
-    <header id="header" class="header">
-        <div class="logo-wrapper">
-  <a href="/" class="logo">Aha Moment</a>
-</div>
 
-<nav class="site-navbar">
-  <ul id="menu" class="menu">
-    <li class="menu-item">
-        <a class="menu-item-link" href="/">Home</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/post/">Archives</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/tags/">Tags</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/categories/">Categories</a>
-      </li>
-  </ul>
-</nav>
-    </header>
 
-    <main id="main" class="main">
-      <div class="content-wrapper">
-        <div id="content" class="content">
-          <article class="post">
+  <body class="not-ready" data-menu="true">
+    <header class="header">
+  
+  <p class="logo">
+    <a class="site-name" href="https://looseyi.github.io/">Aha Edmond</a><a class="btn-dark"></a>
+  </p>
+  
+
+  <script>
+    let bodyClx = document.body.classList;
+    let btnDark = document.querySelector('.btn-dark');
+    let sysDark = window.matchMedia('(prefers-color-scheme: dark)');
+    let darkVal = localStorage.getItem('dark');
+
+    let setDark = (isDark) => {
+      bodyClx[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark ? 'yes' : 'no');
+    };
+
+    setDark(darkVal ? darkVal === 'yes' : sysDark.matches);
+    requestAnimationFrame(() => bodyClx.remove('not-ready'));
+
+    btnDark.addEventListener('click', () => setDark(!bodyClx.contains('dark')));
+    sysDark.addEventListener('change', (event) => setDark(event.matches));
+  </script>
+
+  
+  
+  <nav class="menu">
     
-    <header class="post-header">
-      <h1 class="post-title">9. Xcode 工程文件编辑</h1>
+    <a class="" href="/">Home</a>
+    
+  </nav>
+  
 
-      <div class="post-meta">
-        <span class="post-time"> 2021-08-08 </span>
-        <div class="post-category">
-            <a href="/categories/ios/"> iOS </a>
-            <a href="/categories/cocoapods/"> CocoaPods </a>
-            </div>
-          <span class="more-meta"> 约 5132 字 </span>
-          <span class="more-meta"> 预计阅读 11 分钟 </span>
-        
-      </div>
-    </header>
+  
+  <nav class="social">
+    
+    <a
+      class="twitter"
+      style="--url: url(./twitter.svg)"
+      href="https://twitter.com/looseyi"
+      target="_blank"
+    ></a>
+    
+    <a
+      class="github"
+      style="--url: url(./github.svg)"
+      href="https://github.com/looseyi"
+      target="_blank"
+    ></a>
+    
+  </nav>
+  
+</header>
 
-    <div class="post-toc" id="post-toc">
-  <h2 class="post-toc-title">文章目录</h2>
-  <div class="post-toc-content always-active">
-    <nav id="TableOfContents">
-  <ul>
-    <li><a href="#reference-attributes">Reference Attributes</a>
-      <ul>
-        <li><a href="#直接引用">直接引用</a></li>
-        <li><a href="#容器类引用">容器类引用</a></li>
-      </ul>
-    </li>
-    <li><a href="#object-configuration">Object Configuration</a>
-      <ul>
-        <li><a href="#configure_with_plist">configure_with_plist</a></li>
-        <li><a href="#object_with_uuid">object_with_uuid</a></li>
-      </ul>
-    </li>
-    <li><a href="#全局-objects-索引">全局 Objects 索引</a>
-      <ul>
-        <li><a href="#add_referrer">add_referrer</a></li>
-      </ul>
-    </li>
-  </ul>
 
-  <ul>
-    <li><a href="#0x01-新建子工程文件引用">0x01 新建子工程文件引用</a></li>
-    <li><a href="#0x02-新建子工程-product-引用">0x02 新建子工程 Product 引用</a></li>
-    <li><a href="#0x03-写入-project_references">0x03 写入 project_references</a></li>
-  </ul>
-</nav>
-  </div>
-</div>
-    <div class="post-content">
-      <h1 id="本文目录">本文目录</h1>
+    <main class="main">
+			
+
+<article class="post-single">
+  <header class="post-title">
+    <p>
+      <time>2021-08-08</time>
+      
+      <span>土土Edmond木</span>
+      
+    </p>
+    <h1>9. Xcode 工程文件编辑</h1>
+  </header>
+  <section class="post-content"><h1 id="本文目录">本文目录</h1>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/Xcode-project-edite.png" alt="Xcode-project-edite"></p>
 <h1 id="引子">引子</h1>
 <p>通过「<strong><a href="https://zhuanlan.zhihu.com/p/378474944">Xcode 工程文件解析</a></strong>」一文，我们了解到 <code>project.pbxproj</code> 文件的重要性，Xcode 正是通过它来管理项目中的各种源代码、脚本文件、资源文件、依赖库等。也深入的分析了 <code>project.pbxproj</code> 文件的组成部分，而 <a href="https://github.com/CocoaPods/Xcodeproj"><code>xcodeproj</code></a> 正是通过 Ruby 脚本来编辑该文件，从而将 Pod 依赖库添加进 Xcode 项目中。本文将会继续深入对 <code>xcodeproj</code> 的剖析。</p>
 <h1 id="object-attributes">Object Attributes</h1>
-<p>前文中我们提过 <code>xcodeproj</code> 通过 Ruby 的 <strong>Attribute</strong> 特性，实现了一套对 <code>project.pbxproj</code> 文件结构的映射，将 Sections Object 中的 <strong>isa</strong> 字段作为类名，映射为对应的 Object 类。</p>
+<p>前文中我们提过 <code>xcodeproj</code> 通过 Ruby 的 <strong><a href="https://medium.com/@amliving/diving-into-rubys-attr-accessor-d34e2ccc5477">attr_accessor</a></strong> 特性，实现了一套对 <code>project.pbxproj</code> 文件结构的映射，将 Sections Object 中的 <strong>isa</strong> 字段作为类名，映射为对应的 Object 类。</p>
 <p>在 <code>xcodeproj</code> 中 Object 类的完整关系如下：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/09-xcode-object-01-classes.png" alt="09-xcode-object-01-classes"></p>
 <blockquote>
@@ -176,18 +190,18 @@
 </blockquote>
 <h2 id="reference-attributes">Reference Attributes</h2>
 <p>前文已经介绍了基类 <code>AbstractObject</code> 和常规属性的修饰器 <code>attribute</code>, 它将常规属性的内容封装在 <code>AbstractObjectAttribute</code> 中，最终存入 <code>@attributes</code> 数组用于后续查询。</p>
-<p>而 Xcode 项目文件中除了常规属性之外，还有 Object 的引用关系和 objects 字典需要进行保存，如 <code>PBXProject</code> 对象就同时保存了对 <code>mainGroup</code> 和 <code>targets</code> 的引用，另外它们都需要在 objects 字典中有记录。在 <code>Xcodeproj</code> 中这些引用关系是通过特殊的属性修饰器来实现的。</p>
-<p>如果按引用数量来分类，存在有两种引用关系：</p>
+<p>而 Xcode 项目文件中除了常规属性之外，还有 Object 的引用关系和 objects 字典需要进行保存，如 <code>PBXProject</code> 对象就同时保存了对 <code>mainGroup</code> 和 <code>targets</code> 的引用，另外它们都需要在 objects 字典中有记录。在 <code>Xcodeproj</code> 中这些引用关系是通过特殊的对象来记录的。</p>
+<p>如果按引用是否存在多份不同对象来分类，可分喂为：</p>
 <ul>
-<li>**直接引用：**如项目 <code>PBXProject</code> 只会有一个 <code>mainGroup</code> 作为其主文件夹，另外每个 <code>PBXBuildFile</code> 也只会有一份 <code>PBXFileReference</code> 引用。</li>
-<li>**容器类引用：**如 <code>PBXNativeTarget</code> 可以存在多个构建规则和依赖等：<code>PBXBuildRule</code>、<code>AbstractBuildPhase</code>, <code>PBXTargetDependency</code> 等。</li>
+<li><strong>单一引用关系</strong>: 如项目 <code>PBXProject</code> 只会有一个 <code>mainGroup</code> 作为其主文件夹，另外每个 <code>PBXBuildFile</code> 也只会有一份 <code>PBXFileReference</code> 引用，它们之间是单一直接引用关系。</li>
+<li><strong>多引用</strong>: 如 <code>PBXNativeTarget</code> 可以存在多个构建规则和依赖：<code>PBXBuildRule</code>、<code>AbstractBuildPhase</code>, <code>PBXTargetDependency</code> 等。</li>
 </ul>
-<h3 id="直接引用">直接引用</h3>
+<h3 id="单一引用关系">单一引用关系</h3>
 <p><strong>has_one 修饰器</strong></p>
 <blockquote>
 <p>Defines a new relationship to a single and synthesises the corresponding methods.</p>
 </blockquote>
-<p><code>has_one</code> 用于定义 Objects 间的直接引用，即一对一的关系，它会生成对应的 Access 方法来维护引用关系。</p>
+<p><code>has_one</code> 用于定义 Objects 间唯一引用关系，它会生成对应的 Access 方法来维护引用关系。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -250,7 +264,7 @@
 <li>通过 <code>attr_reader</code> 定义了名称为 <code>attrb.name</code> 的 getter 方法；</li>
 <li>通过 <code>define_method</code> 定义了名称为 <code>attrb.name=</code> 的 setter 方法；</li>
 </ol>
-<p>has_one 本质是通过 <code>attr_reader</code> 来获取属性的值，而 setter 则通过 <code>define_method</code> 动态添加。借用 Ruby runtime 能力，通过 <code>instance_variable_set</code> 将引用对象保存到对应的实例变量中。自定义 setter 主要为了处理新旧对象的引用关系，通过基类 <code>AbstractObject</code> 对象提供的 <code>add_referrer</code> 与 <code>remove_referrer</code> 来更新全局的 objects 引用表。</p>
+<p>has_one 本质是通过 <code>attr_reader</code> 来获取属性的值，而 setter 则通过 <code>define_method</code> 动态添加。借用 Ruby runtime 能力，通过 <code>instance_variable_set</code> 将引用对象保存到对应的实例变量中。自定义 setter 主要为了处理新旧对象的引用关系，通过基类 <code>AbstractObject</code> 对象提供的 <code>add_referrer</code> 与 <code>remove_referrer</code> 来更新全局的 objects 表。</p>
 <p>再补充一点关于参数 <strong>isas</strong>，他会检查参数类型，保证类型 isas 为数组。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -290,10 +304,10 @@
 <pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">has_one</span> <span class="ss">:build_configuration_list</span><span class="p">,</span> <span class="no">XCConfigurationList</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>像这样声明的 <code>build_configuration_list</code> 属性其实是个数组：<code>[XCConfigurationList]</code>。</p>
-<h3 id="容器类引用">容器类引用</h3>
+</div><p>像这样声明的 <code>build_configuration_list</code> 属性，背后也是通过数组：<code>[XCConfigurationList]</code> 来保存引用对象的。</p>
+<h3 id="多引用关系">多引用关系</h3>
 <h4 id="has_many">has_many</h4>
-<p>has_many 用于定义一组有序的引用关系。它仅生成了 reader 方法，这里不提供 setter 方法是由于关联属性是记录在数组中，而声明创建 ObjectList 对象仅是作为容器，因此无需提供 setter。</p>
+<p>has_many 用于定义一组有序的引用关系。它仅提供了 reader 方法。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -338,7 +352,9 @@
 <span class="k">end</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>第一步也是创建并保存 <code>AbstractObjectAttribute</code>。getter 则比较简单，以惰性初始化的方式返回 <code>ObjectList</code> 数组。为了管理对象的引用计数，作为 Array 的子类 <code>ObjectList</code> 也提供了 <code>add_referrer</code> 与 <code>remove_referrer</code> 来更新引用计数，后续会展开。</p>
+</div><p>这里未提供 setter 方法，由于 <code>has_many</code> 声明创建的 ObjectList 对象作为容器，来记录关联对象。因此引用对象的变更是对容器元素的操作。</p>
+<p>接着来看实现：</p>
+<p>第一步也是创建并保存 <code>AbstractObjectAttribute</code>。getter 则比较简单，以惰性初始化的方式返回 <code>ObjectList</code> 数组。作为 Array 的子类 <code>ObjectList</code> 也提供了 <code>add_referrer</code> 与 <code>remove_referrer</code> 来更新关联对象的全局引用关系，后续会展开。</p>
 <p>has_many 使用如下：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -365,10 +381,10 @@
 </code></pre></td></tr></table>
 </div>
 </div><h4 id="has_many_references_by_keys">has_many_references_by_keys</h4>
-<p><code>has_many_references_by_keys</code> 同样为容器类引用，也是通过 ObjectList 来存储关联对象。不过它用于记录 project 之间的引用关系，我们知道在 Xcode 中 Project 是可以存在依赖关系。</p>
+<p><code>has_many_references_by_keys</code> 同样为容器类引用，也是通过 ObjectList 来存储关联对象。不过<strong>它用于记录 project 之间的引用关系</strong>，我们知道在 Xcode 中 Project 是可以存在依赖关系。</p>
 <p>举个例子：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/09-xcode-object-02-nest-project.png" alt="09-xcode-object-02-nest-project"></p>
-<p>Example.xcodeproj 通过 <code>Add Files to Example</code> 方式直接将 A.xcodeproj 添加至该项目中，以方便我们同事管理多个项目。针对这种情况，<code>project.pbxproj</code> 文件则会增加一个字典 <strong>projectReferences</strong> 来记录该引用关系：</p>
+<p>Example.xcodeproj 通过 <code>Add Files to Example</code> 方式直接将 A.xcodeproj 添加至该项目中，以方便我们同事管理多个项目。此时 <code>project.pbxproj</code> 文件则会增加一个字典 <strong>projectReferences</strong> 来记录该引用关系：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -401,7 +417,7 @@
 <span class="sr">/* End PBXProject section */</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>另外需要注意的是，由于引用的是一个完整的 Project，这里的 <code>ProjectRef</code> 指向的是一个 <code>PBXFileReference</code>：</p>
+</div><p>另外需要注意的是，由于引用的是一个完整的 Project，这里的 <code>ProjectRef</code> 指向的是一个 <strong>PBXFileReference</strong>：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt">1
@@ -422,10 +438,11 @@
 <span class="p">};</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>这也给我们一个示例，<em><strong>大型工程的功能代码该如何高效组织</strong></em>。而 CocoaPods 在 <a href="https://blog.cocoapods.org/CocoaPods-1.7.0-beta/">1.7 版本</a>中提供的 install feature：<strong>generate_multiple_pod_projects</strong> 则是他们提供的解决方案。</p>
+</div><p>这也给我们一个提示，<em><strong>大型工程的功能代码该如何高效组织</strong></em>。恰好 CocoaPods 在 <a href="https://blog.cocoapods.org/CocoaPods-1.7.0-beta/">1.7 版本</a>中提供的 install feature：<strong>generate_multiple_pod_projects</strong>，为 Pods 库生成多 Project 工程，则是他们提供的解决方案。</p>
+<p>这里简单介绍一下背景：</p>
 <blockquote>
 <p>从历史上看，CocoaPods 总是生成一个 Pods.xcodeproj，其中包含项目编译所需的所有目标和构建设置。对于较小的项目，仅使用一个包含整个 Podfile 的项目就可以了；但是，随着项目的增长，Pods.xcodeproj 文件的大小也会增加。</p>
-<p>Pods.xcodeproj 文件越大，Xcode 解析其内容所需的时间就越长，这会导致 Xcode 体验下降。通过将每个 pod 集成为自己独立的 Xcode 项目并嵌套在顶级 Pods.xcodeproj 下，从而为更大的 CocoaPods 项目带来了一些显着的性能改进。</p>
+<p>Pods.xcodeproj 文件越大，Xcode 解析其内容所需的时间就越长，这会导致 Xcode 体验下降。通过将每个 pod 集成为自己独立的 Xcode project 并嵌套在顶级 Pods.xcodeproj 下，从而为更大的 CocoaPods 项目带来了一些显着的性能改进。</p>
 <p>此外，在大型代码库中，此功能可能特别有用，因为开发人员可以选择仅打开他们需要处理的特定 .xcodeproj（位于 Pods/ 目录下），而不是打开整个工作区，这会减慢他们的开发过程。</p>
 </blockquote>
 <p>回到本文中，<code>has_many_references_by_key</code> 就是用于记录 <code>projectReferences</code>，其实现如下：</p>
@@ -453,7 +470,7 @@
 <span class="k">end</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>它是作为 <code>PBXProject</code> 属性来关联其他项目文件，声明如下：</p>
+</div><p>该方法用于修饰 <code>PBXProject</code> 属性来关联其他项目文件，声明如下：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt">1
@@ -472,7 +489,7 @@
 <span class="k">end</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>可以注意到，这里的存储的元素为 <code>ObjectDictionary</code>，所记录的键值对为：</p>
+</div><p>而存储的元素为 <code>ObjectDictionary</code>，所记录的键值对为：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt">1
@@ -489,12 +506,14 @@
 </div>
 </div><p>同 <code>ObjectList</code> 类似，<code>ObjectDictionary</code> 作为 Hash 的子类也提供了 <code>add_referrer</code> 与 <code>remove_referrer</code> 来更新引用计数。具体我们在下一节展开。</p>
 <h2 id="object-configuration">Object Configuration</h2>
-<p>前文整体介绍了项目文件 <code>project.pbxproj</code> 的解析。而对于核心方法 <strong>Object::configure_with_plist</strong> 并未展开，因为它涉及到本文的两个重要类型 <code>ObjectList</code> 与 <code>ObjectDictionary</code>，为了方便理解，我们在这里来详细分析。</p>
+<p>前文整体介绍了项目文件 <code>project.pbxproj</code> 的解析，而对于 Object 的解析方法 <strong>Object::configure_with_plist</strong> 并未展开。因为它涉及到本文的两个重要类型 <code>ObjectList</code> 与 <code>ObjectDictionary</code>，为了方便理解，我们在这里来详细分析。</p>
 <p>首先，回顾一下 <code>project.pbxproj</code> 解析 flow：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/02-parse-project.png" alt="02-parse-project"></p>
-<p>可以看到方法 <code>Object::objects_by_uuid</code> 会调用 <code>Project::new_from_plist</code> 形成递归，直至 objects 解析完成。</p>
+<p>可以看到方法 <code>Object::objects_by_uuid</code> 会调用 <code>Project::new_from_plist</code> 完成 object 的遍历，直至 objects 解析完成。</p>
 <h3 id="configure_with_plist">configure_with_plist</h3>
-<p>让我们将 <code>Object::configure_with_plist</code> 展开，内容主要分 5 个部分：</p>
+<p>让我们将 <code>Object::configure_with_plist</code> 展开。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/09-xcode-object-05-configure_with_plist.png.png" alt="09-xcode-object-05-configure_with_plist"></p>
+<p>内容主要分 5 个部分：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -568,7 +587,7 @@
 		<span class="n">attrb</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span> <span class="n">object_plist</span><span class="o">[</span><span class="n">attrb</span><span class="o">.</span><span class="n">plist_name</span><span class="o">]</span><span class="p">)</span>
 		<span class="n">object_plist</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">attrb</span><span class="o">.</span><span class="n">plist_name</span><span class="p">)</span>
 	<span class="k">end</span>
-   <span class="c1">#3. 直接引用 Object 属性解析</span>
+   <span class="c1">#3. 单一引用关系的属性解析</span>
 	<span class="n">to_one_attributes</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">attrb</span><span class="o">|</span>
 		<span class="n">ref_uuid</span> <span class="o">=</span> <span class="n">object_plist</span><span class="o">[</span><span class="n">attrb</span><span class="o">.</span><span class="n">plist_name</span><span class="o">]</span>
 		<span class="k">if</span> <span class="n">ref_uuid</span>
@@ -577,7 +596,7 @@
 		<span class="k">end</span>
 		<span class="n">object_plist</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">attrb</span><span class="o">.</span><span class="n">plist_name</span><span class="p">)</span>
 	<span class="k">end</span>
-   <span class="c1">#4. 数组容器引用 Object 属性解析</span>
+   <span class="c1">#4. 多引用关系的 Object 解析</span>
 	<span class="n">to_many_attributes</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">attrb</span><span class="o">|</span>
 		<span class="n">ref_uuids</span> <span class="o">=</span> <span class="n">object_plist</span><span class="o">[</span><span class="n">attrb</span><span class="o">.</span><span class="n">plist_name</span><span class="o">]</span> <span class="o">||</span> <span class="o">[]</span>
 		<span class="n">list</span> <span class="o">=</span> <span class="n">attrb</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span>
@@ -587,7 +606,7 @@
 		<span class="k">end</span>
 		<span class="n">object_plist</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">attrb</span><span class="o">.</span><span class="n">plist_name</span><span class="p">)</span>
 	<span class="k">end</span>
-   <span class="c1">#5. 数组容器引用 Project 属性解析</span>
+   <span class="c1">#5. 多引用关系的 Project 解析</span>
 	<span class="n">references_by_keys_attributes</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">attrb</span><span class="o">|</span>
 		<span class="n">hashes</span> <span class="o">=</span> <span class="n">object_plist</span><span class="o">[</span><span class="n">attrb</span><span class="o">.</span><span class="n">plist_name</span><span class="o">]</span> <span class="o">||</span> <span class="p">{}</span>
 		<span class="n">list</span> <span class="o">=</span> <span class="n">attrb</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span>
@@ -614,9 +633,9 @@
 </div><ol>
 <li>根据 uuid 获取 <code>project.pbxproj</code> object 对应的 plist 字典 object_plist；</li>
 <li>遍历 <code>simple_attributes</code>，将 object_plist 中与常规属性名一致的值存入对应的 attribute 中，并对 object_plist 中的值清除，避免无限赋值；</li>
-<li>直接引用 Object 解析，遍历 <code>to_one_attributes</code>，从 object_plist 中取出对应的字典 ref_uuid 以生成 object 并绑定到当前对象。</li>
-<li>数组引用 Object 解析，遍历 <code>to_many_attributes</code>，从 object_plist 中取出对应的数组 ref_uuids，再遍历生成 Objects 存入 attrbute 的 list 中。</li>
-<li>数组引用 Project 属性解析，遍历 <code>references_by_keys_attributes</code>，从 object_plist 中取出对应的字典 hash，再遍历 hash 键值对生成项目引用对象，存入 attrbute 的 list 中。</li>
+<li>单一引用的 Object 解析，遍历 <code>to_one_attributes</code>，从 object_plist 中取出对应的字典 ref_uuid 以生成 object 并绑定到当前对象。</li>
+<li>多引用关系的 Object 解析，遍历 <code>to_many_attributes</code>，从 object_plist 中取出对应的数组 ref_uuids，再遍历生成 Objects 存入 attrbute 的 list 中。</li>
+<li>多引用关系的 Project 解析，遍历 <code>references_by_keys_attributes</code>，从 object_plist 中取出对应的字典 hash，再遍历 hash 键值对生成项目引用对象，存入 attrbute 的 list 中。</li>
 </ol>
 <h3 id="object_with_uuid">object_with_uuid</h3>
 <p>上一节中，我们看到所有的引用属性的解析，都会调用 object_with_uuid，而该方法本身是缓存方法，最终记录了 rootObject 的 objects 表，key 为 uuid。该方法实现如下：</p>
@@ -685,12 +704,13 @@
 </div>
 </div><ol>
 <li>以 isa 字符串获取 Xcodeproj 中对应的 Xcode Object 类型 klass，以初始化 object；</li>
-<li>更新 rootObject 的 objects 表 objects_by_uuid，另外仅当 root_object 为 true 时，才会通过 <code>add_referrer</code> 将 project 与 root_object 关联。</li>
-<li>遍历 objects 字典以递归方式完成 objects 对象的初始化，并将 ISA 数据到 Xcode Object 的映射</li>
+<li>更新 rootObject 的 objects 表 objects_by_uuid，另外仅当 root_object 为 true 时，才会通过 <code>add_referrer</code> 将 project 与 root_object 关联；</li>
+<li>遍历 objects 字典以递归方式完成 objects 对象的初始化，并将 ISA 数据到 Xcode Object 的映射；</li>
 </ol>
-<p>我们知道 xcodeproj 提供的是对 <code>project.pbxproj</code> 的编辑能力，因此，对于 objects_by_uuid 的更新不能仅停留在对 <code>project.pbxproj</code> 的解析。当用户编辑引用对象时也需要保证 <code>objects_by_uuid</code> 的一致性。那么如何保证呢 ？答案就是通过 <code>add_referrer</code>。</p>
+<p>我们知道 xcodeproj 提供的是对 <code>project.pbxproj</code> 的编辑能力，因此，对于 <code>objects_by_uuid</code> 的更新不能仅停留在对 <code>project.pbxproj</code> 的解析。当用户编辑引用对象时也需要保证 <code>objects_by_uuid</code> 的一致性。</p>
+<p>那么如何保证呢 ？答案就是通过 <code>add_referrer</code>。</p>
 <h2 id="全局-objects-索引">全局 Objects 索引</h2>
-<p>本节我们就来看看全局 objects 索引 <code>objects_by_uuid</code> 都是如何更新的。除了 <code>new_from_plist</code> 初始化 object 时主动更新 objects_by_uuid 之外，剩下的就是通过 <code>add_referrer</code> + <code>remove_referrer</code>。而该方法除了 <code>has_one</code> 属性会修改之外，<code>ObjectList</code> 和 <code>ObjectDictionary</code> 容器均提供了对应的接口。</p>
+<p>本节我们就来看看核心的 objects 表 <code>objects_by_uuid</code> 如何更新的。除了 <code>new_from_plist</code> 初始化 object 时主动更新 objects_by_uuid 之外，剩下的就是通过 <code>add_referrer</code> 与 <code>remove_referrer</code> 来完成。而该方法除了 <code>has_one</code> 属性会修改之外，<code>ObjectList</code> 和 <code>ObjectDictionary</code> 容器均提供了对应的接口。</p>
 <h3 id="add_referrer">add_referrer</h3>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -730,14 +750,15 @@
 <span class="k">end</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>下面我们重点聊 <code>add_referrer</code>，删除引用的逻辑同添加类似就不展开了。<code>add_referrer</code> 实现就两行，比较简单。首先会通知 object 另一个对象正在引用它，并将其记录到 <code>referrers</code> 中。如果 object 之前没有引用，则将其添加到 objects_by_uuid 表中。</p>
-<p>前面提到 <code>Xcodeproj</code> 支持编辑 <code>project.pbxproj</code>，而对 <code>project.pbxproj</code> 的编辑本质上是修改 object 属性与 <code>objects_by_uuid</code>。因此，我们要做的事情就是保证引用属性被修改时，对应的 referres 和 objects_by_uuid 的同步。同步逻辑就封装在 <code>Xcodeproj</code> 的引用修饰器中：<code>has_one</code>、<code>has_many</code>、 <code>has_many_references_by_keys</code>。</p>
+</div><p>下面我们重点聊 <code>add_referrer</code>，删除引用的逻辑同 <code>add_referrer</code> 类似就不展开了。</p>
+<p><code>add_referrer</code> 实现就两行，用于记录  会通知 object 另一个对象正在引用它，并将其记录到 <code>referrers</code> 中。如果 object 之前没有引用，则将其添加到 <code>objects_by_uuid</code> 表中。</p>
+<p>前面提到 <code>Xcodeproj</code> 支持编辑 <code>project.pbxproj</code>，而<strong>对 <code>project.pbxproj</code> 的编辑本质上是修改 objects 属性与维护 <code>objects_by_uuid</code></strong>。因此，我们要做的事情就是保证引用属性被修改时，对应的 <code>referres</code> 和 <code>objects_by_uuid</code> 的同步。同步逻辑就封装在 <code>has_one</code>、<code>has_many</code>、 <code>has_many_references_by_keys </code> 这些引用修饰器中。</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/09-xcode-object-05-add_referrer.png" alt="09-xcode-object-05-add_referrer"></p>
 <h4 id="has_one"><code>has_one</code></h4>
 <p><code>has_one</code> 直接通过在定义的 attribute setter 方法中调用 <code>value.add_referrer(self) if value</code> 来完成引用更新。注意，它更新前会先调用 <code>remove_referrer</code> 清除前值的引用关系。</p>
 <h4 id="has_many-1"><code>has_many</code></h4>
 <p>对于数组引用类型，通过重载了 Array 的增加和删除方法来更新引用。</p>
-<p>我们在前文示例代码中提到过，如果想要将新增的文件添加在 Xcode 项目中，需要通过 <code>new_file_reference</code> 将文件所对应的 <code>PBXFileReference</code> 添加至 <code>PBXGroup</code> 下，即保存在 <code>children</code> 中。</p>
+<p>我们在前文示例代码中提到过，如果想要将新增的文件添加在 Xcode 项目中，需要通过 <code>new_file_reference</code> 将文件所对应的 <code>PBXFileReference</code> 添加至 <code>PBXGroup</code> 下，即保存在 <code>children</code> 属性中。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt">1
@@ -799,7 +820,7 @@
 </code></pre></td></tr></table>
 </div>
 </div><h4 id="has_many_references_by_keys-1"><code>has_many_references_by_keys</code></h4>
-<p>has_many_references_by_keys 不同于 <code>has_many</code> 的是其储存的元素为 ObjectDictionary，它通过重载 Hash 的更新方法来更新引用：</p>
+<p><code>has_many_references_by_keys</code> 不同于 <code>has_many</code> 的是其储存的元素为 <code>ObjectDictionary</code>，<code>ObjectDictionary</code> 通过重载 Hash 的更新方法来更新引用：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -836,10 +857,10 @@
 <span class="k">end</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>在 <code>perform_additions_operations</code> 中，同样调用 object 的 <code>add_referrer</code> 完成引用更新。</p>
+</div><p>在 <code>perform_additions_operations</code> 中，同样调用 object 的 <code>add_referrer</code> 完成引用对象都更新。</p>
 <h1 id="通过-cli-添加-xcode-子项目依赖">通过 CLI 添加 Xcode 子项目依赖</h1>
 <p>最后一节，我们通过命令行添加 Xcode 子项目，来实践一下前面提到的知识点。</p>
-<p>在前文提到的 <code>new_reference</code> 方法中，当新建引用文件类型为 <code>.xcodeproj</code> 时，会调用 <code>new_subproject</code>，该方法就是用于添加 Xcode 子项目的引用。</p>
+<p>要添加 Xcode 子项目依赖，本质也是添加文件引用，因此需要先调用 <code>new_reference</code>。当新建引用文件类型为 <code>.xcodeproj</code> 时，会调用 <code>new_subproject</code>。正如前文提到，在 Xcode 工程中添加普通文件也是通过 <code>new_reference</code> 来分发。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code><span class="lnt"> 1
@@ -944,20 +965,20 @@
 <span class="k">end</span>
 </code></pre></td></tr></table>
 </div>
-</div><p>通过前面介绍的 Xcode 子项目依赖可知，添加子项目后 Xcode 工程文件中多出了字典 <code>projectReferences</code>，它包含两个 key <code>project_ref</code> 与 <code>product_group</code>。想要以 CLI 的方式添加 Xcode 子项目依赖，就需要构造出 <code>projectReferences</code> 字典。</p>
+</div><p>我们知道当 Xcode 项目中存在子项目时，Xcode 工程文件中将多出字典 <code>projectReferences</code>，它包含两个 key <code>project_ref</code> 与 <code>product_group</code>。想要以 CLI 的方式添加 Xcode 子项目依赖，就需要构造出 <code>projectReferences</code> 字典。</p>
 <p>具体步骤说明如下：</p>
 <h2 id="0x01-新建子工程文件引用">0x01 新建子工程文件引用</h2>
-<p>通过 new_file_reference 创建 <code>PBXReference</code> 以指向子项目的工程文件地址。</p>
+<p>通过 <code>new_file_reference</code> 创建 <code>PBXReference</code> 以指向子项目的工程文件地址。</p>
 <h2 id="0x02-新建子工程-product-引用">0x02 新建子工程 Product 引用</h2>
-<p>当我们添加 Xcode 子项目作为依赖时，本质上是将子项目的产物，以 framework 形式作为依赖添加进主工程。为此我们需要一个 Proxy 来指向该产物的 Xcode Object Identify，即 GUID。</p>
+<p>通过 <code>projectReferences</code> 属性名可知，当我们添加 Xcode 子项目作为依赖时，本质上是将子项目的产物，以 framework 形式加进主工程。为此我们需要一个 Proxy 来指向该产物的 <strong>Xcode Object Identify</strong>，即 GUID。</p>
 <p>完整引用关系如下：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/09-xcode-object-06-product-group-ref.png" alt="09-xcode-object-06-product-group-ref"></p>
 <ol>
-<li>首先我们需要新建一个 <code>PBXGroup</code> 作为 product group reference。</li>
+<li>首先需要新建一个 <code>PBXGroup</code> 作为 product group reference。</li>
 <li>新建 <code>PBXReferenceProxy</code> 和 <code>PBXContainerItemProxy</code> 代理来桥接子项目的 GUID，对应为 container 代理的 <code>remote_global_id_string</code> 字段。同时还需要记录 container_portal，其值为子项目 Product Group 的 GUID。</li>
 </ol>
 <h2 id="0x03-写入-project_references">0x03 写入 project_references</h2>
-<p>新建 Object Dictionary 将前两步生成的 ref 分别记录在 <code>project_ref</code> 和 <code>product_group</code>，最后写入 rootObject 的 project_references 中。</p>
+<p>新建 Object Dictionary 将前两步生成的 ref 分别记录在 <code>project_ref</code> 和 <code>product_group</code>，最后写入 rootObject 的 <code>project_references</code> 中。</p>
 <h1 id="总结">总结</h1>
 <p><code>xcodeproj</code> 利用属性修饰器不仅完成了对 Xcode 项目文件的映射，同时也支持了对 Xcode 项目文件的编辑。并且作者利用 AbstractObjectAttribute 和 ObjectList 抹除了不同类型的 Xcode Object 差异，为批量解析提供了便利。最后为了支持嵌套的 Xcode 工程，引入 ObjectDictionary 的同时仍旧保证了现有结构的完整性。另外从嵌套的 Xcode 工程，我们也能理解为何 Xcode 项目文件需要提供 GUID，毕竟，避免键值的冲突对于大型项目而言尤其重要。</p>
 <h1 id="知识点问题梳理">知识点问题梳理</h1>
@@ -969,42 +990,37 @@
 <li>说说 <code>PBXReferenceProxy</code> 与 <code>PBXContainerItemProxy</code> 的作用？</li>
 <li>描述一下如何通过 CLI 添加 Xcode 子项目？</li>
 </ol>
+</section>
 
-    </div>
-
-    <div class="post-copyright">
-  <p class="copyright-item">
-    <span class="item-title">文章作者</span>
-    <span class="item-content">土土Edmond木</span>
-  </p>
-  <p class="copyright-item">
-    <span class="item-title">上次更新</span>
-    <span class="item-content">
-        2021-08-08
-        
-    </span>
-  </p>
   
   
-</div>
-<footer class="post-footer">
-      <div class="post-tags">
-          <a href="/tags/cocoapods/">CocoaPods</a>
-          <a href="/tags/ios/">iOS</a>
-          <a href="/tags/ruby/">Ruby</a>
-          </div>
-      <nav class="post-nav">
-        
-        <a class="next" href="/post/wwdc/wwdc21/wwdc21-session-10210/">
-            <span class="next-text nav-default">WWDC21 - 探索 Xcode 项目中构建配置的高级技巧</span>
-            <span class="next-text nav-mobile">下一篇</span>
-            <i class="iconfont icon-right"></i>
-          </a>
-      </nav>
-    </footer>
-  </article>
-        </div>
-        
+  <footer class="post-tags">
+     
+    <a href="https://looseyi.github.io/tags/cocoapods">CocoaPods</a>
+     
+    <a href="https://looseyi.github.io/tags/ios">iOS</a>
+     
+    <a href="https://looseyi.github.io/tags/ruby">Ruby</a>
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="post-nav">
+     
+    <a class="next" href="https://looseyi.github.io/post/wwdc/wwdc21/wwdc21-session-10210/"><span>WWDC21 - 探索 Xcode 项目中构建配置的高级技巧</span><span>→</span></a>
+    
+  </nav>
+  
+
+  
+  
+</article>
+
+
+			
 
   
 
@@ -1018,70 +1034,18 @@
     </script>
     <noscript>Please enable JavaScript to view the <a href="https://github.com/utterance">comments powered by utterances.</a></noscript>
 
-      </div>
-    </main>
+		</main>
 
-    <footer id="footer" class="footer">
-      <div class="social-links">
-      <a href="mailto:chun574271939@gmail.com" class="iconfont icon-email" title="email"></a>
-      <a href="https://twitter.com/looseyi" class="iconfont icon-twitter" title="twitter"></a>
-      <a href="https://github.com/looseyi" class="iconfont icon-github" title="github"></a>
-      <a href="https://www.weibo.com/foreverclp" class="iconfont icon-weibo" title="weibo"></a>
-      <a href="https://www.zhihu.com/people/tu-tu-edmondmu" class="iconfont icon-zhihu" title="zhihu"></a>
-  <a href="http://looseyi.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
-</div>
+    <footer class="footer">
+  <p>&copy; 2021 <a href="https://looseyi.github.io/">Aha Edmond</a></p>
+  <p>Powered by <a href="https://gohugo.io/" rel="noopener" target="_blank">Hugo️️</a>️</p>
+  <p>
+    <a href="https://github.com/nanxiaobei/hugo-paper" rel="noopener" target="_blank">Paper 5.1</a>
+  </p>
+</footer>
 
-<div class="copyright">
-  <span class="power-by">
-    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
-  </span>
-  <span class="division">|</span>
-  <span class="theme-info">
-    主题 - 
-    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
-  </span>
-
-  
-
-  <span class="copyright-year">
-    &copy; 
-    2019-12-11 - 
-    2021
-    <span class="heart">
-      <i class="iconfont icon-heart"></i>
-    </span>
-    <span class="author">土土Edmond木</span>
-  </span>
-</div>
-    </footer>
-
-    <div class="back-to-top" id="back-to-top">
-      <i class="iconfont icon-up"></i>
-    </div>
-  </div>
-  
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
-<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+		
 
 
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-	ga('create', 'UA-62789092-1', 'auto');
-	ga('set', 'anonymizeIp', true);
-	ga('send', 'pageview');
-}
-</script>
-<script async src='https://www.google-analytics.com/analytics.js'></script>
-
-
-
-
-
-
-
-</body>
+  </body>
 </html>

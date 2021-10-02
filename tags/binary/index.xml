@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Binary on </title>
-    <link>http://looseyi.github.io/tags/binary/</link>
-    <description>Recent content in Binary on </description>
+    <title>Binary on Aha Edmond</title>
+    <link>https://looseyi.github.io/tags/binary/</link>
+    <description>Recent content in Binary on Aha Edmond</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Mon, 06 Jan 2020 11:40:06 +2100</lastBuildDate><atom:link href="http://looseyi.github.io/tags/binary/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 02 Oct 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://looseyi.github.io/tags/binary/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>完善 Cocoapods-Binary 支持 Server 端缓存</title>
-      <link>http://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-2/</link>
-      <pubDate>Mon, 06 Jan 2020 11:40:06 +2100</pubDate>
+      <title>浅析 cocoapods-binary</title>
+      <link>https://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-1/</link>
+      <pubDate>Fri, 02 Oct 2020 00:00:00 +0000</pubDate>
       
-      <guid>http://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-2/</guid>
-      <description>在开始之前，还是明确一下我们的目标，希望通过对 Cocoapods-binary 的改造使其支持 server 端缓存，从而达到 一处编译，处处使用 的 pods lib dependencies。同时会简单</description>
+      <guid>https://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-1/</guid>
+      <description>介绍 cocoapods-binary 最早是在 CocoaPods 的 Blog 中发现的：pre-compiling dependencies。虽非官方出品，但却是国内程序员的力作，medium 原版介绍</description>
     </item>
     
     <item>
-      <title>浅析 cocoapods-binary</title>
-      <link>http://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-1/</link>
-      <pubDate>Sat, 21 Dec 2019 11:37:41 +2100</pubDate>
+      <title>完善 Cocoapods-Binary 支持 Server 端缓存</title>
+      <link>https://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-2/</link>
+      <pubDate>Mon, 06 Jan 2020 11:40:06 +2100</pubDate>
       
-      <guid>http://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-1/</guid>
-      <description>#介绍 cocoapods-binary 最早是在 CocoaPods 的 Blog 中发现的：pre-compiling dependencies。虽非官方出品，但却是国内程序员的力作，medium 原版介</description>
+      <guid>https://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-2/</guid>
+      <description>在开始之前，还是明确一下我们的目标，希望通过对 Cocoapods-binary 的改造使其支持 server 端缓存，从而达到 一处编译，处处使用 的 pods lib dependencies。同时会简单</description>
     </item>
     
   </channel>

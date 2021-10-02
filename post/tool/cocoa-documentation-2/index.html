@@ -1,186 +1,187 @@
 <!DOCTYPE html>
-<html lang="zh-cn">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>Cocoa 文档注释与生成工具使用 - Jazzy &#43; SourceKitten - </title>
-  <meta name="renderer" content="webkit" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
-
-<meta name="theme-color" content="#f8f5ec" />
-<meta name="msapplication-navbutton-color" content="#f8f5ec">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
-
-
-<meta name="author" content="土土Edmond木" /><meta name="description" content="我们在前文 《Cocoa 代码注释与文档生成》 中详细介绍了如何为 Swift &amp;amp; ObjC 的代码编写符合规范的注释，以及使用 Jazzy 来生成项目文档。 今天我们来尝试一下，如" /><meta name="keywords" content="Hugo, theme, even" />
 
 
 
 
 
 
-<meta name="generator" content="Hugo 0.82.1 with theme even" />
 
 
-<link rel="canonical" href="http://looseyi.github.io/post/tool/cocoa-documentation-2/" />
-  <link href="http://looseyi.github.io/post/tool/cocoa-documentation-2/index.xml" rel="alternate" type="application/rss+xml" title="" />
-  <link href="http://looseyi.github.io/post/tool/cocoa-documentation-2/index.xml" rel="feed" type="application/rss+xml" title="" />
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/manifest.json">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
 
 
-<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 
 
-<meta property="og:title" content="Cocoa 文档注释与生成工具使用 - Jazzy &#43; SourceKitten" />
+
+
+
+<html lang="en">
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  
+  <title>Cocoa 文档注释与生成工具使用 - Jazzy &#43; SourceKitten - Aha Edmond</title>
+
+  
+  
+  <meta name="description" content="我们在前文 《Cocoa 代码注释与文档生成》 中详细介绍了如何为 Swift &amp; ObjC 的代码编写符合规范的注释，以及使用 Jazzy 来生成项目文档。 今天我们来尝试一下，如" />
+  <meta name="author" content="土土Edmond木" />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://looseyi.github.io/app.min.css" />
+
+  
+
+  
+  <link rel="preload" as="image" href="https://looseyi.github.io/theme.png" />
+
+  
+  <link rel="preload" as="image" href="https://looseyi.github.io/twitter.svg" />
+  
+  <link rel="preload" as="image" href="https://looseyi.github.io/github.svg" />
+  
+
+  
+  <link rel="icon" href="https://looseyi.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://looseyi.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.82.1" />
+
+  
+  
+  <link
+    rel="alternate"
+    type="application/rss&#43;xml"
+    href="https://looseyi.github.io/post/tool/cocoa-documentation-2/index.xml"
+    title="Aha Edmond"
+  />
+  
+
+  
+  
+  
+  
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-62789092-1', 'auto');
+	ga('set', 'anonymizeIp', true);
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+  
+  
+  
+  <meta property="og:title" content="Cocoa 文档注释与生成工具使用 - Jazzy &#43; SourceKitten" />
 <meta property="og:description" content="我们在前文 《Cocoa 代码注释与文档生成》 中详细介绍了如何为 Swift &amp; ObjC 的代码编写符合规范的注释，以及使用 Jazzy 来生成项目文档。 今天我们来尝试一下，如" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="http://looseyi.github.io/post/tool/cocoa-documentation-2/" /><meta property="article:section" content="post" />
+<meta property="og:url" content="https://looseyi.github.io/post/tool/cocoa-documentation-2/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2020-06-18T00:00:00&#43;00:00" />
 <meta property="article:modified_time" content="2020-06-18T00:00:00&#43;00:00" />
 
-<meta itemprop="name" content="Cocoa 文档注释与生成工具使用 - Jazzy &#43; SourceKitten">
+
+  
+  <meta itemprop="name" content="Cocoa 文档注释与生成工具使用 - Jazzy &#43; SourceKitten">
 <meta itemprop="description" content="我们在前文 《Cocoa 代码注释与文档生成》 中详细介绍了如何为 Swift &amp; ObjC 的代码编写符合规范的注释，以及使用 Jazzy 来生成项目文档。 今天我们来尝试一下，如"><meta itemprop="datePublished" content="2020-06-18T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2020-06-18T00:00:00&#43;00:00" />
 <meta itemprop="wordCount" content="4168">
-<meta itemprop="keywords" content="iOS&#39;,Document,SourceKit,Jazzy,gitpage," /><meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="iOS&#39;,Document,SourceKit,Jazzy,gitpage," />
+  
+  <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Cocoa 文档注释与生成工具使用 - Jazzy &#43; SourceKitten"/>
 <meta name="twitter:description" content="我们在前文 《Cocoa 代码注释与文档生成》 中详细介绍了如何为 Swift &amp; ObjC 的代码编写符合规范的注释，以及使用 Jazzy 来生成项目文档。 今天我们来尝试一下，如"/>
 
-<!--[if lte IE 9]>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
-<![endif]-->
-
-<!--[if lt IE 9]>
-  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
-<![endif]-->
-
+  
+  
 </head>
-<body>
-  <div id="mobile-navbar" class="mobile-navbar">
-  <div class="mobile-header-logo">
-    <a href="/" class="logo">Aha Moment</a>
-  </div>
-  <div class="mobile-navbar-icon">
-    <span></span>
-    <span></span>
-    <span></span>
-  </div>
-</div>
-<nav id="mobile-menu" class="mobile-menu slideout-menu">
-  <ul class="mobile-menu-list">
-    <a href="/">
-        <li class="mobile-menu-item">Home</li>
-      </a><a href="/post/">
-        <li class="mobile-menu-item">Archives</li>
-      </a><a href="/tags/">
-        <li class="mobile-menu-item">Tags</li>
-      </a><a href="/categories/">
-        <li class="mobile-menu-item">Categories</li>
-      </a>
-  </ul>
-</nav>
-  <div class="container" id="mobile-panel">
-    <header id="header" class="header">
-        <div class="logo-wrapper">
-  <a href="/" class="logo">Aha Moment</a>
-</div>
 
-<nav class="site-navbar">
-  <ul id="menu" class="menu">
-    <li class="menu-item">
-        <a class="menu-item-link" href="/">Home</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/post/">Archives</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/tags/">Tags</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/categories/">Categories</a>
-      </li>
-  </ul>
-</nav>
-    </header>
 
-    <main id="main" class="main">
-      <div class="content-wrapper">
-        <div id="content" class="content">
-          <article class="post">
+  <body class="not-ready" data-menu="true">
+    <header class="header">
+  
+  <p class="logo">
+    <a class="site-name" href="https://looseyi.github.io/">Aha Edmond</a><a class="btn-dark"></a>
+  </p>
+  
+
+  <script>
+    let bodyClx = document.body.classList;
+    let btnDark = document.querySelector('.btn-dark');
+    let sysDark = window.matchMedia('(prefers-color-scheme: dark)');
+    let darkVal = localStorage.getItem('dark');
+
+    let setDark = (isDark) => {
+      bodyClx[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark ? 'yes' : 'no');
+    };
+
+    setDark(darkVal ? darkVal === 'yes' : sysDark.matches);
+    requestAnimationFrame(() => bodyClx.remove('not-ready'));
+
+    btnDark.addEventListener('click', () => setDark(!bodyClx.contains('dark')));
+    sysDark.addEventListener('change', (event) => setDark(event.matches));
+  </script>
+
+  
+  
+  <nav class="menu">
     
-    <header class="post-header">
-      <h1 class="post-title">Cocoa 文档注释与生成工具使用 - Jazzy &#43; SourceKitten</h1>
+    <a class="" href="/">Home</a>
+    
+  </nav>
+  
 
-      <div class="post-meta">
-        <span class="post-time"> 2020-06-18 </span>
-        <div class="post-category">
-            <a href="/categories/ios/"> iOS </a>
-            <a href="/categories/tool/"> Tool </a>
-            </div>
-          <span class="more-meta"> 约 4168 字 </span>
-          <span class="more-meta"> 预计阅读 9 分钟 </span>
-        
-      </div>
-    </header>
+  
+  <nav class="social">
+    
+    <a
+      class="twitter"
+      style="--url: url(./twitter.svg)"
+      href="https://twitter.com/looseyi"
+      target="_blank"
+    ></a>
+    
+    <a
+      class="github"
+      style="--url: url(./github.svg)"
+      href="https://github.com/looseyi"
+      target="_blank"
+    ></a>
+    
+  </nav>
+  
+</header>
 
-    <div class="post-toc" id="post-toc">
-  <h2 class="post-toc-title">文章目录</h2>
-  <div class="post-toc-content always-active">
-    <nav id="TableOfContents">
-  <ul>
-    <li>
-      <ul>
-        <li><a href="#生成工具">生成工具</a></li>
-      </ul>
-    </li>
-  </ul>
 
-  <ul>
-    <li><a href="#索引页">索引页</a>
-      <ul>
-        <li><a href="#业务库">业务库</a></li>
-        <li><a href="#基础库">基础库</a></li>
-      </ul>
-    </li>
-    <li><a href="#文档结构">文档结构</a></li>
-  </ul>
+    <main class="main">
+			
 
-  <ul>
-    <li><a href="#swift-依赖库的文档生成">Swift 依赖库的文档生成</a>
-      <ul>
-        <li><a href="#指定文档的范围">指定文档的范围</a></li>
-      </ul>
-    </li>
-    <li><a href="#objc-依赖库的文档生成">ObjC 依赖库的文档生成</a>
-      <ul>
-        <li><a href="#获取-umbrella-header">获取 umbrella header</a></li>
-        <li><a href="#复制-umbrella-header">复制 umbrella header</a></li>
-      </ul>
-    </li>
-    <li><a href="#swift--objc-混编依赖库的文档生成">Swift &amp; ObjC 混编依赖库的文档生成</a>
-      <ul>
-        <li><a href="#mixinswift">MixinSwift</a></li>
-        <li><a href="#mixinobjc">MixinObjC</a></li>
-      </ul>
-    </li>
-    <li><a href="#依赖库类型判断">依赖库类型判断</a></li>
-  </ul>
-</nav>
-  </div>
-</div>
-    <div class="post-content">
-      <p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg1evv2z3wj20ow0bin5l.jpg" alt="Cocoa Documentation By Jazzy & SourceKitten.png"></p>
+<article class="post-single">
+  <header class="post-title">
+    <p>
+      <time>2020-06-18</time>
+      
+      <span>土土Edmond木</span>
+      
+    </p>
+    <h1>Cocoa 文档注释与生成工具使用 - Jazzy &#43; SourceKitten</h1>
+  </header>
+  <section class="post-content"><p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gg1evv2z3wj20ow0bin5l.jpg" alt="Cocoa Documentation By Jazzy & SourceKitten.png"></p>
 <p>我们在前文 <a href="https://juejin.im/post/5ee70d7ff265da76d66c3c60">《Cocoa 代码注释与文档生成》</a> 中详细介绍了如何为 Swift &amp; ObjC 的代码编写符合规范的注释，以及使用 Jazzy 来生成项目文档。
 今天我们来尝试一下，如何一键生成多个私有库的文档，并将其部署到 Github page 或者 Gitlab page 上。</p>
 <h1 id="本文知识目录">本文知识目录</h1>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg1erzhbraj21me1jaguc.jpg" alt="利用 Jazzy + SourceKitten 生成多依赖库的在线文档.png"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gg1erzhbraj21me1jaguc.jpg" alt="利用 Jazzy + SourceKitten 生成多依赖库的在线文档.png"></p>
 <h1 id="背景">背景</h1>
 <p>随着公司项目的迭代，一般都会沉淀出多个私有库。如果这些私有库可以够提供统一的文档查询和预览服务，那将有助于团队中的新成员快速了解业务。</p>
 <p>作者所在的公司就维护者 20 多个的私有库，同时这些项目的代码注释完整度不一，注释的内容也参差不齐。如果我们可以通过这个在线文档，不仅可以提供快速的 API 查阅能力，也可以更好的监督和规范项目。</p>
@@ -287,11 +288,11 @@
 <p><!-- raw HTML omitted --></p>
 <h2 id="文档结构">文档结构</h2>
 <p>我们先来看一下以 Alamofire 项目生成的 <code>docs</code> 文档目录结构：</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gfv1lw2qhuj20gv0a1abv.jpg" alt="WechatIMG13.png"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gfv1lw2qhuj20gv0a1abv.jpg" alt="WechatIMG13.png"></p>
 <p>第一层包含了 <code>Classes</code>、<code>Enums</code>、<code>Extensions</code>、<code>Protocols</code>、<code>Structs</code> 等分类和对应的 <code>index.html</code> 索引文件。</p>
 <p>第二层为具体到的每个 Class、Enum 或其他数据结构的 HTML 页面。如果该结构还存在嵌套的内部数据类型，会以递归的方式呈现。</p>
 <p>整个 <code>docs</code> 的基础结构特别简单：</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gfv3161khoj209l0c1t90.jpg" alt="jazzy document.png"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gfv3161khoj209l0c1t90.jpg" alt="jazzy document.png"></p>
 <p>我们要做的就是复制上面的文件，以及修改的 index.html 就可以。</p>
 <h1 id="多依赖库的文档生成">多依赖库的文档生成</h1>
 <p>对于 iOS 项目的依赖库管理标配为 CocoaPods (后面简称 <strong>Pod</strong>) ，它将所有的依赖库源码统一存放在项目的 <code>/Pods</code> 目录下。我们要做的就是遍历 <code>/Pods</code> 目录，逐一生成文档并将其输出到一个指定目录就可以了。</p>
@@ -459,7 +460,7 @@ bundle <span class="nb">exec</span> jazzy -o docs/<span class="nv">$lib_name</sp
 </div>
 </div><p>将子目录下文件全部移到 framework 源码目录下，再通过 Jazzy 来生成文档，算是暂时解决问题了。</p>
 <p>然而 AFNetworking 的文档依旧不是完整的，不过属于另外一种情况。目录如下，大家可以 🤔 一下：</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gfyzo504r8j212s0h0gql.jpg" alt="WechatIMG12.png"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gfyzo504r8j212s0h0gql.jpg" alt="WechatIMG12.png"></p>
 <h2 id="swift--objc-混编依赖库的文档生成">Swift &amp; ObjC 混编依赖库的文档生成</h2>
 <p>对 Swift &amp; ObjC 混编的依赖库本身是不提倡的，虽然在实际开发过程中无法避免。</p>
 <p>为了测试混编库的文档生成，这里新建一个 Pod 库：<a href="https://github.com/looseyi/Mixin">Mixin</a>，添加了 MixinSwift 和 MixinObjC 两个类：</p>
@@ -573,7 +574,7 @@ jazzy -o <span class="nv">$output</span> --sourcekitten-sourcefile <span class="
 </code></pre></td></tr></table>
 </div>
 </div><p>文档如下：</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gfzy7mk9nrj20km0a1js4.jpg" alt="WechatIMG13.png"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gfzy7mk9nrj20km0a1js4.jpg" alt="WechatIMG13.png"></p>
 <h2 id="依赖库类型判断">依赖库类型判断</h2>
 <p>由于不同类型的依赖库，其生成文档的脚本有所不同，我们还需要判断每个依赖库类型，是纯 ObjC、纯 Swift 还是混编类型。解决方式就是对 Source 目录下的文件类型进行 count 以判断依赖库类型：</p>
 <div class="highlight"><div class="chroma">
@@ -608,11 +609,11 @@ jazzy -o <span class="nv">$output</span> --sourcekitten-sourcefile <span class="
 </div>
 </div><h1 id="静态文档的部署">静态文档的部署</h1>
 <p>我们使用是 Github Page 来进行文档部署，特别简单仅需在 repo 的设置页指定文档类型就可以了。剩下的就是提交代码，Git 会自动触发编译。</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg09xcwxccj20jd0cawfr.jpg" alt="WechatIMG14.png"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gg09xcwxccj20jd0cawfr.jpg" alt="WechatIMG14.png"></p>
 <p>更多介绍请查看 <a href="https://help.github.com/en/github/working-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site">Github Page 说明</a>。</p>
 <p>最后，完整 Demo 的托管地址为：<a href="https://github.com/looseyi/Cocoa-Documentation-Example">Cocoa-Documentation-Example</a>。</p>
 <p>Git page 文档地址：https://looseyi.github.io/Cocoa-Documentation-Example，这个地址是 Github 自动生成的。效果如下：</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg1e0gy1slj20ib0dg3z1.jpg" alt="WechatIMG15.png"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gg1e0gy1slj20ib0dg3z1.jpg" alt="WechatIMG15.png"></p>
 <h1 id="one-more-thing-">One More Thing &hellip;</h1>
 <p>尽管我们当前的方案可以正确的生成文档，但是其实还可以更进一步。</p>
 <p>当前的文档生成是基于 <code>project</code> 的方式，而我们完全可以针对每一个文件生成一份 json 数据，最后在把它们全部粘一起。命令的话 SourceKitten 都准备好了：</p>
@@ -658,48 +659,43 @@ jazzy -o <span class="nv">$output</span> --sourcekitten-sourcefile <span class="
 <li>ObjC 的 <code>umbrella header</code> 是从哪里获取的？</li>
 <li>扩展： <code>SourceKitten</code> 所生成的 JSON 结构包括哪些字段？</li>
 </ol>
+</section>
 
-    </div>
-
-    <div class="post-copyright">
-  <p class="copyright-item">
-    <span class="item-title">文章作者</span>
-    <span class="item-content">土土Edmond木</span>
-  </p>
-  <p class="copyright-item">
-    <span class="item-title">上次更新</span>
-    <span class="item-content">
-        2020-06-18
-        
-    </span>
-  </p>
   
   
-</div>
-<footer class="post-footer">
-      <div class="post-tags">
-          <a href="/tags/ios/">iOS&#39;</a>
-          <a href="/tags/document/">Document</a>
-          <a href="/tags/sourcekit/">SourceKit</a>
-          <a href="/tags/jazzy/">Jazzy</a>
-          <a href="/tags/gitpage/">gitpage</a>
-          </div>
-      <nav class="post-nav">
-        <a class="prev" href="/post/wwdc/wwdc20/wwdc20-session-10041/">
-            <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">WWDC20 - What&#39;s new in SwiftUI</span>
-            <span class="prev-text nav-mobile">上一篇</span>
-          </a>
-        <a class="next" href="/post/notes/01-gcd/">
-            <span class="next-text nav-default">📒个人备忘 - 队列、GCD、线程基础</span>
-            <span class="next-text nav-mobile">下一篇</span>
-            <i class="iconfont icon-right"></i>
-          </a>
-      </nav>
-    </footer>
-  </article>
-        </div>
-        
+  <footer class="post-tags">
+     
+    <a href="https://looseyi.github.io/tags/ios">iOS&#39;</a>
+     
+    <a href="https://looseyi.github.io/tags/document">Document</a>
+     
+    <a href="https://looseyi.github.io/tags/sourcekit">SourceKit</a>
+     
+    <a href="https://looseyi.github.io/tags/jazzy">Jazzy</a>
+     
+    <a href="https://looseyi.github.io/tags/gitpage">gitpage</a>
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="post-nav">
+    
+    <a class="prev" href="https://looseyi.github.io/post/wwdc/wwdc20/wwdc20-session-10041/"><span>←</span><span>WWDC20 - What&#39;s new in SwiftUI</span></a>
+     
+    <a class="next" href="https://looseyi.github.io/post/notes/01-gcd/"><span>📒个人备忘 - 队列、GCD、线程基础</span><span>→</span></a>
+    
+  </nav>
+  
+
+  
+  
+</article>
+
+
+			
 
   
 
@@ -713,70 +709,18 @@ jazzy -o <span class="nv">$output</span> --sourcekitten-sourcefile <span class="
     </script>
     <noscript>Please enable JavaScript to view the <a href="https://github.com/utterance">comments powered by utterances.</a></noscript>
 
-      </div>
-    </main>
+		</main>
 
-    <footer id="footer" class="footer">
-      <div class="social-links">
-      <a href="mailto:chun574271939@gmail.com" class="iconfont icon-email" title="email"></a>
-      <a href="https://twitter.com/looseyi" class="iconfont icon-twitter" title="twitter"></a>
-      <a href="https://github.com/looseyi" class="iconfont icon-github" title="github"></a>
-      <a href="https://www.weibo.com/foreverclp" class="iconfont icon-weibo" title="weibo"></a>
-      <a href="https://www.zhihu.com/people/tu-tu-edmondmu" class="iconfont icon-zhihu" title="zhihu"></a>
-  <a href="http://looseyi.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
-</div>
+    <footer class="footer">
+  <p>&copy; 2021 <a href="https://looseyi.github.io/">Aha Edmond</a></p>
+  <p>Powered by <a href="https://gohugo.io/" rel="noopener" target="_blank">Hugo️️</a>️</p>
+  <p>
+    <a href="https://github.com/nanxiaobei/hugo-paper" rel="noopener" target="_blank">Paper 5.1</a>
+  </p>
+</footer>
 
-<div class="copyright">
-  <span class="power-by">
-    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
-  </span>
-  <span class="division">|</span>
-  <span class="theme-info">
-    主题 - 
-    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
-  </span>
-
-  
-
-  <span class="copyright-year">
-    &copy; 
-    2019-12-11 - 
-    2021
-    <span class="heart">
-      <i class="iconfont icon-heart"></i>
-    </span>
-    <span class="author">土土Edmond木</span>
-  </span>
-</div>
-    </footer>
-
-    <div class="back-to-top" id="back-to-top">
-      <i class="iconfont icon-up"></i>
-    </div>
-  </div>
-  
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
-<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+		
 
 
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-	ga('create', 'UA-62789092-1', 'auto');
-	ga('set', 'anonymizeIp', true);
-	ga('send', 'pageview');
-}
-</script>
-<script async src='https://www.google-analytics.com/analytics.js'></script>
-
-
-
-
-
-
-
-</body>
+  </body>
 </html>

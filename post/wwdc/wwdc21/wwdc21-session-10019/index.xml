@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>WWDC21 - Discover concurrency in SwiftUI on </title>
-    <link>http://looseyi.github.io/post/wwdc/wwdc21/wwdc21-session-10019/</link>
-    <description>Recent content in WWDC21 - Discover concurrency in SwiftUI on </description>
+    <title>WWDC21 - Discover concurrency in SwiftUI on Aha Edmond</title>
+    <link>https://looseyi.github.io/post/wwdc/wwdc21/wwdc21-session-10019/</link>
+    <description>Recent content in WWDC21 - Discover concurrency in SwiftUI on Aha Edmond</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Fri, 11 Jun 2021 00:00:00 +0000</lastBuildDate><atom:link href="http://looseyi.github.io/post/wwdc/wwdc21/wwdc21-session-10019/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 11 Jun 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://looseyi.github.io/post/wwdc/wwdc21/wwdc21-session-10019/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>

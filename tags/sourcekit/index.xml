@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>SourceKit on </title>
-    <link>http://looseyi.github.io/tags/sourcekit/</link>
-    <description>Recent content in SourceKit on </description>
+    <title>SourceKit on Aha Edmond</title>
+    <link>https://looseyi.github.io/tags/sourcekit/</link>
+    <description>Recent content in SourceKit on Aha Edmond</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Thu, 18 Jun 2020 00:00:00 +0000</lastBuildDate><atom:link href="http://looseyi.github.io/tags/sourcekit/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 18 Jun 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://looseyi.github.io/tags/sourcekit/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Cocoa 文档注释与生成工具使用 - Jazzy &#43; SourceKitten</title>
-      <link>http://looseyi.github.io/post/tool/cocoa-documentation-2/</link>
+      <link>https://looseyi.github.io/post/tool/cocoa-documentation-2/</link>
       <pubDate>Thu, 18 Jun 2020 00:00:00 +0000</pubDate>
       
-      <guid>http://looseyi.github.io/post/tool/cocoa-documentation-2/</guid>
+      <guid>https://looseyi.github.io/post/tool/cocoa-documentation-2/</guid>
       <description>我们在前文 《Cocoa 代码注释与文档生成》 中详细介绍了如何为 Swift &amp;amp; ObjC 的代码编写符合规范的注释，以及使用 Jazzy 来生成项目文档。 今天我们来尝试一下，如</description>
     </item>
     
     <item>
       <title>Cocoa 文档注释与生成</title>
-      <link>http://looseyi.github.io/post/tool/cocoa-documentation-1/</link>
+      <link>https://looseyi.github.io/post/tool/cocoa-documentation-1/</link>
       <pubDate>Sun, 14 Jun 2020 00:00:00 +0000</pubDate>
       
-      <guid>http://looseyi.github.io/post/tool/cocoa-documentation-1/</guid>
+      <guid>https://looseyi.github.io/post/tool/cocoa-documentation-1/</guid>
       <description>Cocoa 代码注释与文档生成 本文的文档规范部分的内容参考自：NSHipster 的 Swift Documentation 作者 &amp;amp; Nate Cook 本文知识目录 背景 曾经以为好的代码是可以自我解释不需要注</description>
     </item>
     

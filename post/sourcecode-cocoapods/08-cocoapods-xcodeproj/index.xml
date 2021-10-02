@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>8. Xcode 工程文件解析 on </title>
-    <link>http://looseyi.github.io/post/sourcecode-cocoapods/08-cocoapods-xcodeproj/</link>
-    <description>Recent content in 8. Xcode 工程文件解析 on </description>
+    <title>8. Xcode 工程文件解析 on Aha Edmond</title>
+    <link>https://looseyi.github.io/post/sourcecode-cocoapods/08-cocoapods-xcodeproj/</link>
+    <description>Recent content in 8. Xcode 工程文件解析 on Aha Edmond</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 16 May 2021 00:00:00 +0000</lastBuildDate><atom:link href="http://looseyi.github.io/post/sourcecode-cocoapods/08-cocoapods-xcodeproj/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 16 May 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://looseyi.github.io/post/sourcecode-cocoapods/08-cocoapods-xcodeproj/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>

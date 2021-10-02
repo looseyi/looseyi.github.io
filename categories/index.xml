@@ -1,101 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Categories on </title>
-    <link>http://looseyi.github.io/categories/</link>
-    <description>Recent content in Categories on </description>
+    <title>Categories on Aha Edmond</title>
+    <link>https://looseyi.github.io/categories/</link>
+    <description>Recent content in Categories on Aha Edmond</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 08 Aug 2021 00:00:00 +0000</lastBuildDate><atom:link href="http://looseyi.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>CocoaPods</title>
-      <link>http://looseyi.github.io/categories/cocoapods/</link>
-      <pubDate>Sun, 08 Aug 2021 00:00:00 +0000</pubDate>
-      
-      <guid>http://looseyi.github.io/categories/cocoapods/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>iOS</title>
-      <link>http://looseyi.github.io/categories/ios/</link>
-      <pubDate>Sun, 08 Aug 2021 00:00:00 +0000</pubDate>
-      
-      <guid>http://looseyi.github.io/categories/ios/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>WWDC</title>
-      <link>http://looseyi.github.io/categories/wwdc/</link>
-      <pubDate>Sun, 20 Jun 2021 00:00:00 +0000</pubDate>
-      
-      <guid>http://looseyi.github.io/categories/wwdc/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Xcodeproj</title>
-      <link>http://looseyi.github.io/categories/xcodeproj/</link>
-      <pubDate>Sun, 20 Jun 2021 00:00:00 +0000</pubDate>
-      
-      <guid>http://looseyi.github.io/categories/xcodeproj/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>SwiftUI</title>
-      <link>http://looseyi.github.io/categories/swiftui/</link>
-      <pubDate>Fri, 11 Jun 2021 00:00:00 +0000</pubDate>
-      
-      <guid>http://looseyi.github.io/categories/swiftui/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Widgets</title>
-      <link>http://looseyi.github.io/categories/widgets/</link>
-      <pubDate>Wed, 13 Jan 2021 00:00:00 +0000</pubDate>
-      
-      <guid>http://looseyi.github.io/categories/widgets/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Tool</title>
-      <link>http://looseyi.github.io/categories/tool/</link>
-      <pubDate>Thu, 18 Jun 2020 00:00:00 +0000</pubDate>
-      
-      <guid>http://looseyi.github.io/categories/tool/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>En</title>
-      <link>http://looseyi.github.io/categories/en/</link>
-      <pubDate>Sun, 12 Apr 2020 23:08:12 +1700</pubDate>
-      
-      <guid>http://looseyi.github.io/categories/en/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Objc</title>
-      <link>http://looseyi.github.io/categories/objc/</link>
-      <pubDate>Sun, 12 Apr 2020 23:08:12 +1700</pubDate>
-      
-      <guid>http://looseyi.github.io/categories/objc/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Swift</title>
-      <link>http://looseyi.github.io/categories/swift/</link>
-      <pubDate>Mon, 16 Mar 2020 23:10:58 +0800</pubDate>
-      
-      <guid>http://looseyi.github.io/categories/swift/</guid>
-      <description></description>
-    </item>
-    
+    <lastBuildDate>Sun, 08 Aug 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://looseyi.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>

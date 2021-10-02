@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Xcodeproj on </title>
-    <link>http://looseyi.github.io/categories/xcodeproj/</link>
-    <description>Recent content in Xcodeproj on </description>
+    <title>Xcodeproj on Aha Edmond</title>
+    <link>https://looseyi.github.io/categories/xcodeproj/</link>
+    <description>Recent content in Xcodeproj on Aha Edmond</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 20 Jun 2021 00:00:00 +0000</lastBuildDate><atom:link href="http://looseyi.github.io/categories/xcodeproj/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 20 Jun 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://looseyi.github.io/categories/xcodeproj/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>WWDC21 - 探索 Xcode 项目中构建配置的高级技巧</title>
-      <link>http://looseyi.github.io/post/wwdc/wwdc21/wwdc21-session-10210/</link>
+      <link>https://looseyi.github.io/post/wwdc/wwdc21/wwdc21-session-10210/</link>
       <pubDate>Sun, 20 Jun 2021 00:00:00 +0000</pubDate>
       
-      <guid>http://looseyi.github.io/post/wwdc/wwdc21/wwdc21-session-10210/</guid>
+      <guid>https://looseyi.github.io/post/wwdc/wwdc21/wwdc21-session-10210/</guid>
       <description>WWDC21 Session 10210 - Explore advanced project configuration in Xcode。由于官方视频资源有问题，可访问 Youtube 链接。 本文知识目录 引言 大多时候我们都关注如何进行高效、高质量的完成任务或技术需</description>
     </item>
     

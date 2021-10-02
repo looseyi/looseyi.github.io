@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Logger on </title>
-    <link>http://looseyi.github.io/tags/logger/</link>
-    <description>Recent content in Logger on </description>
+    <title>Logger on Aha Edmond</title>
+    <link>https://looseyi.github.io/tags/logger/</link>
+    <description>Recent content in Logger on Aha Edmond</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 16 May 2020 00:00:00 +0800</lastBuildDate><atom:link href="http://looseyi.github.io/tags/logger/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 16 May 2020 00:00:00 +0800</lastBuildDate><atom:link href="https://looseyi.github.io/tags/logger/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>浅析 - CocoaLumberjack 3.6 之 DatabaseLogger</title>
-      <link>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-3/</link>
+      <link>https://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-3/</link>
       <pubDate>Sat, 16 May 2020 00:00:00 +0800</pubDate>
       
-      <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-3/</guid>
+      <guid>https://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-3/</guid>
       <description>前言 这是 DDLog 源码阅读的最后一篇。本篇重点介绍 DDLogger 对数据库存储的支持，原理应该和 FileLogger 一样，log 磁盘存储的频率，过期 log 的淘汰策略，以及 log 存储的缓存策</description>
     </item>
     
     <item>
       <title>浅析 - CocoaLumberjack 3.6 之 FileLogger</title>
-      <link>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-2/</link>
+      <link>https://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-2/</link>
       <pubDate>Fri, 08 May 2020 23:20:00 +0800</pubDate>
       
-      <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-2/</guid>
+      <guid>https://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-2/</guid>
       <description>DDFileLogger 继续上一篇：CocoaLumberjack 之 DDLog，重点介绍了 lumberjack 的核心管理类 DDLog 以及两个核心协议 DDLogger 和 DDLogFormatter。还涉及</description>
     </item>
     
     <item>
       <title>浅析 - CocoaLumberjack 3.6 之 DDLog</title>
-      <link>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-1/</link>
+      <link>https://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-1/</link>
       <pubDate>Mon, 04 May 2020 18:20:00 +0800</pubDate>
       
-      <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-1/</guid>
+      <guid>https://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-1/</guid>
       <description>介绍 CocoaLumberjack is a fast &amp;amp; simple, yet powerful &amp;amp; flexible logging framework for Mac and iOS. 先扯一下 lumberjack 这个单词，对应的就是它的 logo，一位伐木工。 一直不太理解为什么是用这个单词，其他语音中也有日</description>
     </item>
     

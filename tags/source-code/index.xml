@@ -1,99 +1,99 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Source Code on </title>
-    <link>http://looseyi.github.io/tags/source-code/</link>
-    <description>Recent content in Source Code on </description>
+    <title>Source Code on Aha Edmond</title>
+    <link>https://looseyi.github.io/tags/source-code/</link>
+    <description>Recent content in Source Code on Aha Edmond</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Thu, 21 May 2020 00:00:00 +0800</lastBuildDate><atom:link href="http://looseyi.github.io/tags/source-code/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 21 May 2020 00:00:00 +0800</lastBuildDate><atom:link href="https://looseyi.github.io/tags/source-code/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>浅析 - 微信 MMKV 1.1.1</title>
-      <link>http://looseyi.github.io/post/sourcecode-ios/source-code-mmkv/</link>
+      <link>https://looseyi.github.io/post/sourcecode-ios/source-code-mmkv/</link>
       <pubDate>Thu, 21 May 2020 00:00:00 +0800</pubDate>
       
-      <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-mmkv/</guid>
+      <guid>https://looseyi.github.io/post/sourcecode-ios/source-code-mmkv/</guid>
       <description>介绍 MMKV is an efficient, small, easy-to-use mobile key-value storage framework used in the WeChat application. It&amp;rsquo;s currently available on Android, iOS/macOS, Win32 and POSIX. 作为一个精简易用且性能强悍的全平台 K-V 存储框架，MMKV 有如下特点： 高效： 利用 mmap 直接将文件</description>
     </item>
     
     <item>
       <title>浅析 - CocoaLumberjack 3.6 之 DatabaseLogger</title>
-      <link>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-3/</link>
+      <link>https://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-3/</link>
       <pubDate>Sat, 16 May 2020 00:00:00 +0800</pubDate>
       
-      <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-3/</guid>
+      <guid>https://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-3/</guid>
       <description>前言 这是 DDLog 源码阅读的最后一篇。本篇重点介绍 DDLogger 对数据库存储的支持，原理应该和 FileLogger 一样，log 磁盘存储的频率，过期 log 的淘汰策略，以及 log 存储的缓存策</description>
     </item>
     
     <item>
       <title>浅析 - CocoaLumberjack 3.6 之 FileLogger</title>
-      <link>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-2/</link>
+      <link>https://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-2/</link>
       <pubDate>Fri, 08 May 2020 23:20:00 +0800</pubDate>
       
-      <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-2/</guid>
+      <guid>https://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-2/</guid>
       <description>DDFileLogger 继续上一篇：CocoaLumberjack 之 DDLog，重点介绍了 lumberjack 的核心管理类 DDLog 以及两个核心协议 DDLogger 和 DDLogFormatter。还涉及</description>
     </item>
     
     <item>
       <title>浅析 - CocoaLumberjack 3.6 之 DDLog</title>
-      <link>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-1/</link>
+      <link>https://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-1/</link>
       <pubDate>Mon, 04 May 2020 18:20:00 +0800</pubDate>
       
-      <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-1/</guid>
+      <guid>https://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-1/</guid>
       <description>介绍 CocoaLumberjack is a fast &amp;amp; simple, yet powerful &amp;amp; flexible logging framework for Mac and iOS. 先扯一下 lumberjack 这个单词，对应的就是它的 logo，一位伐木工。 一直不太理解为什么是用这个单词，其他语音中也有日</description>
     </item>
     
     <item>
       <title>The Architecture of SDWebImage v5.6</title>
-      <link>http://looseyi.github.io/post/sourcecode-ios/source-code-sdweb-en1/</link>
+      <link>https://looseyi.github.io/post/sourcecode-ios/source-code-sdweb-en1/</link>
       <pubDate>Sun, 12 Apr 2020 23:08:12 +1700</pubDate>
       
-      <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-sdweb-en1/</guid>
+      <guid>https://looseyi.github.io/post/sourcecode-ios/source-code-sdweb-en1/</guid>
       <description>This article is based on SDWebImage 5.6. Why i write this article, cause i found that SD&amp;rsquo;s API is constantly iterating, and many of the structures are different from earlier versions. Here is to make a record. We will start from the top of the API&amp;rsquo;s level list below, force on the entire framework&amp;rsquo;s data flow. 5.0 Migration Guid It is highly recommended to watch the official migration document, which</description>
     </item>
     
     <item>
       <title>浅析 Cocoapods-Packager 实现</title>
-      <link>http://looseyi.github.io/post/sourcecode-ios/cocoapods-packager/</link>
+      <link>https://looseyi.github.io/post/sourcecode-ios/cocoapods-packager/</link>
       <pubDate>Sun, 29 Mar 2020 15:10:58 +0800</pubDate>
       
-      <guid>http://looseyi.github.io/post/sourcecode-ios/cocoapods-packager/</guid>
+      <guid>https://looseyi.github.io/post/sourcecode-ios/cocoapods-packager/</guid>
       <description>介绍 CocoaPods plugin which allows you to generate a framework or static library from a podspec. This plugin is for CocoaPods developers, who need to distribute their Pods not only via CocoaPods, but also as frameworks or static libraries for people who do not use Pods. 作为 CococaPods 的官方插件之一，CocoaPods Packager 为 Pod</description>
     </item>
     
     <item>
       <title>浅析 RxSwift 5.0 - Subscription</title>
-      <link>http://looseyi.github.io/post/sourcecode-ios/source-code-rxswift/</link>
+      <link>https://looseyi.github.io/post/sourcecode-ios/source-code-rxswift/</link>
       <pubDate>Mon, 16 Mar 2020 23:10:58 +0800</pubDate>
       
-      <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-rxswift/</guid>
+      <guid>https://looseyi.github.io/post/sourcecode-ios/source-code-rxswift/</guid>
       <description>前言 ReactiveX 它是一个与语言无关的编程思想。作为成员框架之一 RxSwift 落地了大部分 ReactiveX 中关于流的操作。官方描述： An API for asynchronous programming with observable streams ReactiveX is a combination of the best ideas from the Observer pattern, the Iterator pattern,</description>
     </item>
     
     <item>
       <title>浅析 SDWebImage 5.5.2 - WebP Plugin</title>
-      <link>http://looseyi.github.io/post/sourcecode-ios/source-code-sdweb-2/</link>
+      <link>https://looseyi.github.io/post/sourcecode-ios/source-code-sdweb-2/</link>
       <pubDate>Wed, 11 Mar 2020 23:08:12 +0800</pubDate>
       
-      <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-sdweb-2/</guid>
+      <guid>https://looseyi.github.io/post/sourcecode-ios/source-code-sdweb-2/</guid>
       <description>本文基于 SDWebImage 5.5.2。重读的原因也是由于发现它的 API 在不断迭代，许多结构已经不同与早期版本，同时也是为了做一个记录。整体分析可以查看上一篇文章</description>
     </item>
     
     <item>
       <title>浅析 SDWebImage 5.6</title>
-      <link>http://looseyi.github.io/post/sourcecode-ios/source-code-sdweb-1/</link>
+      <link>https://looseyi.github.io/post/sourcecode-ios/source-code-sdweb-1/</link>
       <pubDate>Sat, 22 Feb 2020 23:08:12 +0800</pubDate>
       
-      <guid>http://looseyi.github.io/post/sourcecode-ios/source-code-sdweb-1/</guid>
+      <guid>https://looseyi.github.io/post/sourcecode-ios/source-code-sdweb-1/</guid>
       <description>本文基于 SDWebImage 5.6。重读的原因也是由于发现它的 API 在不断迭代，许多结构已经不同与早期版本，同时也是为了做一个记录。阅读顺序也会依据 API 执行顺序进行</description>
     </item>
     
     <item>
       <title>完善 Cocoapods-Binary 支持 Server 端缓存</title>
-      <link>http://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-2/</link>
+      <link>https://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-2/</link>
       <pubDate>Mon, 06 Jan 2020 11:40:06 +2100</pubDate>
       
-      <guid>http://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-2/</guid>
+      <guid>https://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-2/</guid>
       <description>在开始之前，还是明确一下我们的目标，希望通过对 Cocoapods-binary 的改造使其支持 server 端缓存，从而达到 一处编译，处处使用 的 pods lib dependencies。同时会简单</description>
     </item>
     

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>浅析 - CocoaLumberjack 3.6 之 DDLog on </title>
-    <link>http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-1/</link>
-    <description>Recent content in 浅析 - CocoaLumberjack 3.6 之 DDLog on </description>
+    <title>浅析 - CocoaLumberjack 3.6 之 DDLog on Aha Edmond</title>
+    <link>https://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-1/</link>
+    <description>Recent content in 浅析 - CocoaLumberjack 3.6 之 DDLog on Aha Edmond</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Mon, 04 May 2020 18:20:00 +0800</lastBuildDate><atom:link href="http://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-1/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 04 May 2020 18:20:00 +0800</lastBuildDate><atom:link href="https://looseyi.github.io/post/sourcecode-ios/source-code-lumberjack-1/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>
