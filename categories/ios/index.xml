@@ -6,7 +6,16 @@
     <description>Recent content in iOS on Aha Edmond</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 08 Aug 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://looseyi.github.io/categories/ios/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 02 Oct 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://looseyi.github.io/categories/ios/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>浅析 cocoapods-binary</title>
+      <link>https://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-1/</link>
+      <pubDate>Sat, 02 Oct 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-1/</guid>
+      <description>介绍 cocoapods-binary 最早是在 CocoaPods 的 Blog 中发现的：pre-compiling dependencies。虽非官方出品，但却是国内程序员的力作，medium 原版介绍</description>
+    </item>
+    
     <item>
       <title>9. Xcode 工程文件编辑</title>
       <link>https://looseyi.github.io/post/sourcecode-cocoapods/09-cocoapods-xcode-object/</link>
@@ -59,15 +68,6 @@
       
       <guid>https://looseyi.github.io/post/snowball/snowball-widgets/</guid>
       <description>本文知识目录 引言 在 2020 的 WWDC 上苹果发布了 WidgetKit 小组件，重新设计后的 Widgets，其展示不再局限于负一屏，而且支持在 macOS 和 iOS 的主屏幕上提供动态信息和个</description>
-    </item>
-    
-    <item>
-      <title>浅析 cocoapods-binary</title>
-      <link>https://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-1/</link>
-      <pubDate>Fri, 02 Oct 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-1/</guid>
-      <description>介绍 cocoapods-binary 最早是在 CocoaPods 的 Blog 中发现的：pre-compiling dependencies。虽非官方出品，但却是国内程序员的力作，medium 原版介绍</description>
     </item>
     
     <item>
