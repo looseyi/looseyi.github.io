@@ -95,7 +95,7 @@ if (!doNotTrack) {
   <meta itemprop="name" content="WWDC21 - 探索 Xcode 项目中构建配置的高级技巧">
 <meta itemprop="description" content="WWDC21 Session 10210 - Explore advanced project configuration in Xcode。由于官方视频资源有问题，可访问 Youtube 链接。 本文知识目录 引言 大多时候我们都关注如何进行高效、高质量的完成任务或技术需"><meta itemprop="datePublished" content="2021-06-20T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2021-06-20T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="6929">
+<meta itemprop="wordCount" content="6899">
 <meta itemprop="keywords" content="iOS&#39;,WWDC&#39;,Xcode," />
   
   <meta name="twitter:card" content="summary"/>
@@ -281,32 +281,16 @@ if (!doNotTrack) {
 <p>让我们看看如何将这项工作提取到 <code>Build Rules</code> 中：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-15-buildRules.png" alt="wwdc21-10210-15-buildRules"></p>
 <p>切到 framework 项目编辑器的 <code>Build Rules</code> 选项卡，然后单击 <strong>+</strong> 以添加新的构建规则。然后输入文件通配符 <code>*.recipe</code>，对应我们希望处理的的文件类型的扩展名。接着添加依赖项，<strong>注意：这里不需要向 <code>Build Rules</code> 添加任何额外的输入</strong>，因为它会自动获取它处理的每个输入文件作为输入。但是，我们确实需要告诉构建系统所产生的输出文件的路径规则，在 <code>Output Files</code> 下新建一个输出路径：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell">// Output Files
-<span class="k">$(</span>DERIVED_FILE_DIR<span class="k">)</span>/<span class="k">$(</span>INPUT_FILE_BASE<span class="k">)</span>.compiledrecipe
-</code></pre></td></tr></table>
-</div>
-</div><blockquote>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>// Output Files
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span><span style="color:#719e07">$(</span>DERIVED_FILE_DIR<span style="color:#719e07">)</span>/<span style="color:#719e07">$(</span>INPUT_FILE_BASE<span style="color:#719e07">)</span>.compiledrecipe
+</code></pre></div><blockquote>
 <p>Tips：这里将生成文件写入 <code>DERIVED_FILE_DIR</code> 交由构建系统来管理适当的存储路径。我们应该避免在源根目录下生成输出文件，因为这会干扰源代码控制并在同时运行多个构建时导致冲突。</p>
 </blockquote>
 <p>接着将 <code>Build Phase</code> 的 <code>Process Recipes</code> 阶段的脚本复制到 <code>Build Rules</code> 中。</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-18-buildPhase-recipes.png" alt="wwdc21-10210-18-buildPhase-recipes"></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell">// BuildRules 
-<span class="s2">&#34;</span><span class="nv">$SRCROOT</span><span class="s2">/Scripts/gen-code.sh&#34;</span> <span class="s2">&#34;</span><span class="nv">$SCRIPT_INPUT_FILE</span><span class="s2">&#34;</span> <span class="s2">&#34;</span><span class="nv">$SCRIPT_OUTPUT_FILE_0</span><span class="s2">&#34;</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>可以看到这里的 Script 有些不同：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>// BuildRules 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span><span style="color:#2aa198">&#34;</span><span style="color:#268bd2">$SRCROOT</span><span style="color:#2aa198">/Scripts/gen-code.sh&#34;</span> <span style="color:#2aa198">&#34;</span><span style="color:#268bd2">$SCRIPT_INPUT_FILE</span><span style="color:#2aa198">&#34;</span> <span style="color:#2aa198">&#34;</span><span style="color:#268bd2">$SCRIPT_OUTPUT_FILE_0</span><span style="color:#2aa198">&#34;</span>
+</code></pre></div><p>可以看到这里的 Script 有些不同：</p>
 <ol>
 <li>删除了 for 循环，因为 Build Rule 会为它们处理的每个输入运行一次；</li>
 <li><code>$RECIPE</code> 替换为 <code>$SCRIPT_INPUT_FILE</code>;</li>
@@ -324,133 +308,63 @@ if (!doNotTrack) {
 <p>对于这个需要大量输入的特定脚本，我们可以使用 XCFilelist 通过外部文件管理这个输入列表，而不是一个一个地在项目文件中输入。</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-22-fileLists.gif" alt="wwdc21-10210-22-fileLists"></p>
 <p>完整的操作路径如上图，我们将 xcfilelist 作为指定的 <strong>Input File List</strong>。另外还需要指定 Output File List：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell">// Output File list
-<span class="k">$(</span>PROJECT_TEMP_DIR<span class="k">)</span>/instructions.mdarchive
-</code></pre></td></tr></table>
-</div>
-</div><h4 id="environment-variables">Environment Variables</h4>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>// Output File list
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span><span style="color:#719e07">$(</span>PROJECT_TEMP_DIR<span style="color:#719e07">)</span>/instructions.mdarchive
+</code></pre></div><h4 id="environment-variables">Environment Variables</h4>
 <p>与 <code>Build Rules</code> 类似，<code>Script Phases</code> 为您提供了一些关键的环境变量。来看一下 package.sh 的内容：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># Package up the recipes.</span>
-
-<span class="nb">echo</span> <span class="s2">&#34;packaging...&#34;</span>
-
-<span class="k">for</span> i in <span class="k">$(</span>seq <span class="m">0</span> <span class="k">$(</span>expr <span class="si">${</span><span class="nv">SCRIPT_INPUT_FILE_LIST_COUNT</span><span class="si">}</span> - 1<span class="k">))</span> <span class="p">;</span> <span class="k">do</span>
-    <span class="nv">infile_</span><span class="o">=</span><span class="s2">&#34;SCRIPT_INPUT_FILE_LIST_</span><span class="nv">$i</span><span class="s2">&#34;</span>
-    <span class="nb">eval</span> <span class="nv">infile</span><span class="o">=</span><span class="se">\$</span><span class="nv">$infile_</span>
-
-    <span class="k">while</span> <span class="nv">IFS</span><span class="o">=</span> <span class="nb">read</span> -r file<span class="p">;</span> <span class="k">do</span>
-        cat <span class="s2">&#34;</span><span class="nv">$file</span><span class="s2">&#34;</span> &gt;&gt; <span class="s2">&#34;</span><span class="nv">$SCRIPT_OUTPUT_FILE_0</span><span class="s2">&#34;</span>
-    <span class="k">done</span> &lt; <span class="s2">&#34;</span><span class="nv">$infile</span><span class="s2">&#34;</span>
-<span class="k">done</span>
-</code></pre></td></tr></table>
-</div>
-</div><ul>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#586e75"># Package up the recipes.</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span><span style="color:#b58900">echo</span> <span style="color:#2aa198">&#34;packaging...&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span><span style="color:#719e07">for</span> i in <span style="color:#719e07">$(</span>seq <span style="color:#2aa198">0</span> <span style="color:#719e07">$(</span>expr <span style="color:#2aa198">${</span><span style="color:#268bd2">SCRIPT_INPUT_FILE_LIST_COUNT</span><span style="color:#2aa198">}</span> - 1<span style="color:#719e07">))</span> ; <span style="color:#719e07">do</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>    <span style="color:#268bd2">infile_</span><span style="color:#719e07">=</span><span style="color:#2aa198">&#34;SCRIPT_INPUT_FILE_LIST_</span><span style="color:#268bd2">$i</span><span style="color:#2aa198">&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>    <span style="color:#b58900">eval</span> <span style="color:#268bd2">infile</span><span style="color:#719e07">=</span><span style="color:#cb4b16">\$</span><span style="color:#268bd2">$infile_</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>    <span style="color:#719e07">while</span> <span style="color:#268bd2">IFS</span><span style="color:#719e07">=</span> <span style="color:#b58900">read</span> -r file; <span style="color:#719e07">do</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>        cat <span style="color:#2aa198">&#34;</span><span style="color:#268bd2">$file</span><span style="color:#2aa198">&#34;</span> &gt;&gt; <span style="color:#2aa198">&#34;</span><span style="color:#268bd2">$SCRIPT_OUTPUT_FILE_0</span><span style="color:#2aa198">&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>    <span style="color:#719e07">done</span> &lt; <span style="color:#2aa198">&#34;</span><span style="color:#268bd2">$infile</span><span style="color:#2aa198">&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span><span style="color:#719e07">done</span>
+</code></pre></div><ul>
 <li><code>SCRIPT_INPUT_FILE_LIST_COUNT</code>：指传递给我们的 <code>Script Phases</code> 的输入文件列表的总数；</li>
 <li><code>SCRIPT_INPUT_FILE_LIST_n</code>：指解析出的输入文件列表在第 n 个索引处的绝对文件路径;</li>
 <li><code>SCRIPT_OUTPUT_FILE_0</code>：指第一个解析的绝对文件路径，在这种情况下只有输出文件；</li>
 </ul>
 <p><strong>0x01</strong>：以下是提供给 <code>Script Phases</code> 的一些关键环境变量的概述：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell">// These environment variables are available in script phases:
-
-SCRIPT_INPUT_FILE_COUNT // This specifies the number of paths from the Input Files table.
-SCRIPT_INPUT_FILE_n // This specifies the absolute path of the nth file from the Input Files table, with build settings expanded.
-
-SCRIPT_INPUT_FILE_LIST_COUNT // This specifies the number of input file lists.
-SCRIPT_INPUT_FILE_LIST_n // This specifies the absolute path of the nth <span class="s2">&#34;resolved&#34;</span> input file list with contained paths made absolute, build settings expanded, and comments removed.
-
-SCRIPT_OUTPUT_FILE_COUNT // This specifies the number of paths from the Output Files table.
-SCRIPT_OUTPUT_FILE_n // This specifies the absolute path of the nth file from the Output Files table, with build settings expanded.
-
-SCRIPT_OUTPUT_FILE_LIST_COUNT // This specifies the number of output file lists.
-SCRIPT_OUTPUT_FILE_LIST_n // This specifies the absolute path of the nth <span class="s2">&#34;resolved&#34;</span> output file list with contained paths made absolute, build settings expanded, and comments removed.
-
-* n in the above examples refers to a 0-based index.
-</code></pre></td></tr></table>
-</div>
-</div><p>target 的 <code>Build Settings</code> 可用于 <code>Script Phases</code> 环境。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span>// These environment variables are available in script phases:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>SCRIPT_INPUT_FILE_COUNT // This specifies the number of paths from the Input Files table.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>SCRIPT_INPUT_FILE_n // This specifies the absolute path of the nth file from the Input Files table, with build settings expanded.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>SCRIPT_INPUT_FILE_LIST_COUNT // This specifies the number of input file lists.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>SCRIPT_INPUT_FILE_LIST_n // This specifies the absolute path of the nth <span style="color:#2aa198">&#34;resolved&#34;</span> input file list with contained paths made absolute, build settings expanded, and comments removed.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>SCRIPT_OUTPUT_FILE_COUNT // This specifies the number of paths from the Output Files table.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>SCRIPT_OUTPUT_FILE_n // This specifies the absolute path of the nth file from the Output Files table, with build settings expanded.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>SCRIPT_OUTPUT_FILE_LIST_COUNT // This specifies the number of output file lists.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>SCRIPT_OUTPUT_FILE_LIST_n // This specifies the absolute path of the nth <span style="color:#2aa198">&#34;resolved&#34;</span> output file list with contained paths made absolute, build settings expanded, and comments removed.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>* n in the above examples refers to a 0-based index.
+</code></pre></div><p>target 的 <code>Build Settings</code> 可用于 <code>Script Phases</code> 环境。</p>
 <p><strong>0x02</strong>：以下是提供给 <code>Build Rules</code> 的一些关键环境变量的概述：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell">// These environment variables are available in build rules:
-
-SCRIPT_INPUT_FILE // This specifies the absolute path of the main input file being processed by the rule.
-
-OTHER_INPUT_FILE_FLAGS // This specifies custom <span class="nb">command</span> line flags defined <span class="k">for</span> the input file in the Compile Sources build phase.
-
-SCRIPT_INPUT_FILE_COUNT // This specifies the number of paths from the Input Files table.
-SCRIPT_INPUT_FILE_n // This specifies the absolute path of the nth file from the Input Files table, with build settings expanded.
-
-SCRIPT_OUTPUT_FILE_COUNT // This specifies the number of paths from the Output Files table.
-SCRIPT_OUTPUT_FILE_n // This specifies the absolute path of the nth file from the Output Files table, with build settings expanded.
-
-SCRIPT_HEADER_VISIBILITY // This is <span class="nb">set</span> to <span class="s2">&#34;public&#34;</span> or <span class="s2">&#34;private&#34;</span> <span class="k">if</span> the input file being processed is a header file in a Headers build phase, and its Header Visibility is <span class="nb">set</span> to one of those values.
-
-HEADER_OUTPUT_DIR // This specifies the output directory to which the input file should be copied, <span class="k">if</span> the input file being processed is a header file in a Headers build phase.
-
-* n in the above examples refers to a 0-based index.
-</code></pre></td></tr></table>
-</div>
-</div><p>这里概述了一些 Build Rules 特有的及一些不太常见的环境变量。另外 <code>Build Settings</code> 设置也可用于 <code>Build Rules</code> 环境。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span>// These environment variables are available in build rules:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>SCRIPT_INPUT_FILE // This specifies the absolute path of the main input file being processed by the rule.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>OTHER_INPUT_FILE_FLAGS // This specifies custom <span style="color:#b58900">command</span> line flags defined <span style="color:#719e07">for</span> the input file in the Compile Sources build phase.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>SCRIPT_INPUT_FILE_COUNT // This specifies the number of paths from the Input Files table.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>SCRIPT_INPUT_FILE_n // This specifies the absolute path of the nth file from the Input Files table, with build settings expanded.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>SCRIPT_OUTPUT_FILE_COUNT // This specifies the number of paths from the Output Files table.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>SCRIPT_OUTPUT_FILE_n // This specifies the absolute path of the nth file from the Output Files table, with build settings expanded.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>SCRIPT_HEADER_VISIBILITY // This is <span style="color:#b58900">set</span> to <span style="color:#2aa198">&#34;public&#34;</span> or <span style="color:#2aa198">&#34;private&#34;</span> <span style="color:#719e07">if</span> the input file being processed is a header file in a Headers build phase, and its Header Visibility is <span style="color:#b58900">set</span> to one of those values.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>HEADER_OUTPUT_DIR // This specifies the output directory to which the input file should be copied, <span style="color:#719e07">if</span> the input file being processed is a header file in a Headers build phase.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>* n in the above examples refers to a 0-based index.
+</code></pre></div><p>这里概述了一些 Build Rules 特有的及一些不太常见的环境变量。另外 <code>Build Settings</code> 设置也可用于 <code>Build Rules</code> 环境。</p>
 <h4 id="aggregate-target">Aggregate target</h4>
 <p>现在，如果尝试构建项目，则会遇到问题。让我们去构建日志仔细看看。</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10210-23-prebuild.png" alt="wwdc21-10210-23-prebuild"></p>
@@ -587,7 +501,7 @@ HEADER_OUTPUT_DIR // This specifies the output directory to which the input file
   
   <nav class="post-nav">
     
-    <a class="prev" href="https://looseyi.github.io/post/sourcecode-cocoapods/09-cocoapods-xcode-object/"><span>←</span><span>9. Xcode 工程文件编辑</span></a>
+    <a class="prev" href="https://looseyi.github.io/post/sourcecode-cocoapods/09-cocoapods-xcodeproj-edit/"><span>←</span><span>9. Xcode 工程文件编辑</span></a>
      
     <a class="next" href="https://looseyi.github.io/post/wwdc/wwdc21/wwdc21-session-10056/"><span>WWDC21 - 让您的 iPad 与 iPhon 应用程序在 M1 的 Mac 上大放异彩</span><span>→</span></a>
     

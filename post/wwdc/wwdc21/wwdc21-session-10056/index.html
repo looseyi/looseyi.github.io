@@ -95,7 +95,7 @@ if (!doNotTrack) {
   <meta itemprop="name" content="WWDC21 - 让您的 iPad 与 iPhon 应用程序在 M1 的 Mac 上大放异彩">
 <meta itemprop="description" content="让您的 iPad 与 iPhon 应用程序在 M1 的 Mac 上大放异彩 WWDC21 Session 10056 - Qualities of great iPad and iPhone apps on Macs with M1 主讲人：Nils Beck 本文知识目录 引言 在 2020 年 11 月的发布会上，苹果正式发布了搭"><meta itemprop="datePublished" content="2021-06-20T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2021-06-20T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="6458">
+<meta itemprop="wordCount" content="6454">
 <meta itemprop="keywords" content="iOS&#39;,WWDC&#39;,Xcode," />
   
   <meta name="twitter:card" content="summary"/>
@@ -233,32 +233,14 @@ if (!doNotTrack) {
 <li>但无论何时应用，<code>UIResponders.keyCommands</code> 都优先于菜单项的快捷键。</li>
 </ul>
 <h4 id="uimenubuilder"><code>UIMenuBuilder</code></h4>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="p">@</span><span class="n">MainActor</span> <span class="kd">protocol</span> <span class="nc">UIMenuBuilder</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>您可能已经在使用我们在 <code>iOS 13</code> 中更新的 <code>UIMenuBuilder</code> API。**<code>UIMenuBuilder</code> 为您的 <code>UIKeyCommands</code> 添加了语义结构。**仅需在 <code>App Delegate</code> 或 <code>ViewController</code> 中覆盖  <code>buildMenu(with:)</code> 方法以修改 builder 对象。覆盖后的菜单结构决定了系统如何展示菜单的内容。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kr">override</span> <span class="kd">func</span> <span class="nf">buildMenu</span><span class="p">(</span><span class="n">with</span> <span class="n">builder</span><span class="p">:</span> <span class="n">UIMenuBuilder</span><span class="p">)</span> <span class="p">{</span>
-	<span class="k">if</span> <span class="n">builder</span><span class="p">.</span><span class="n">system</span> <span class="p">==</span> <span class="p">.</span><span class="n">main</span> <span class="p">{</span>
-		<span class="n">menuController</span> <span class="p">=</span> <span class="n">MenuController</span><span class="p">(</span><span class="n">with</span><span class="p">:</span> <span class="n">builder</span><span class="p">)</span>
-	<span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>要查看如何使用 <code>UIMenuBuilder</code> 对象的示例，请参阅 <a href="https://developer.apple.com/documentation/uikit/uicommand/adding_menus_and_shortcuts_to_the_menu_bar_and_user_interface?language=objc">Adding Menus and Shortcuts to the Menu Bar and User Interface</a>。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>@MainActor <span style="color:#268bd2">protocol</span> <span style="color:#268bd2">UIMenuBuilder</span>
+</code></pre></div><p>您可能已经在使用我们在 <code>iOS 13</code> 中更新的 <code>UIMenuBuilder</code> API。**<code>UIMenuBuilder</code> 为您的 <code>UIKeyCommands</code> 添加了语义结构。**仅需在 <code>App Delegate</code> 或 <code>ViewController</code> 中覆盖  <code>buildMenu(with:)</code> 方法以修改 builder 对象。覆盖后的菜单结构决定了系统如何展示菜单的内容。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#268bd2">override</span> <span style="color:#268bd2">func</span> <span style="color:#268bd2">buildMenu</span>(with builder: UIMenuBuilder) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>	<span style="color:#719e07">if</span> builder.system == .main {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>		menuController = MenuController(with: builder)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>	}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>}
+</code></pre></div><p>要查看如何使用 <code>UIMenuBuilder</code> 对象的示例，请参阅 <a href="https://developer.apple.com/documentation/uikit/uicommand/adding_menus_and_shortcuts_to_the_menu_bar_and_user_interface?language=objc">Adding Menus and Shortcuts to the Menu Bar and User Interface</a>。</p>
 <p>前面提到，带有键盘的 iPad 上按住 Command 键时，会展示叠加层用于显示当前应用程序可用的键盘命令。在 Mac 上，传递到构建器的默认结构会有所不同，但您对结构的自定义将反映在主菜单中。<code>UIKeyCommands</code> 依赖响应者链来为其操作找到适用的目标，这决定了是否启用菜单项。</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10056-4-menu-bar-tipics.png" alt="wwdc21-10056-4-menu-bar-tipics"></p>
 <p>有关更多信息，请参阅 &ldquo;<a href="https://developer.apple.com/videos/play/wwdc2021/10057/">Take your iPad apps to the next level</a>&rdquo; 和 &ldquo;<a href="https://developer.apple.com/videos/play/wwdc2021/10260/">Focus on iPad keyboard navigation,&rdquo; and &ldquo;Qualities of a great Mac Catalyst app</a>&rdquo; 。</p>
@@ -349,15 +331,8 @@ if (!doNotTrack) {
 <h4 id="support-for-apple-pay">Support for Apple Pay</h4>
 <p>Apple Pay 现在可用于 M1 Mac 上的 iPad 和 iPhone 应用程序，它使用我们为 <code>macOS Big Sur</code> 中的 <code>Mac Catalyst</code> 应用程序引入的相同增强型跨平台 API。这意味着您现在可以一处实现，就能支持 Apple Pay 在不同平台上接受付款。</p>
 <p>只要确保您已经实现了如下代理。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">protocol</span> <span class="nc">PKPaymentAuthorizationControllerDelegate</span>
-</code></pre></td></tr></table>
-</div>
-</div><p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10056-14-motery-authorizet.png" alt="wwdc21-10056-14-motery-authorizet">
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#268bd2">protocol</span> <span style="color:#268bd2">PKPaymentAuthorizationControllerDelegate</span>
+</code></pre></div><p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/wwdc21-10056-14-motery-authorizet.png" alt="wwdc21-10056-14-motery-authorizet">
 有关更多详细信息，请查看视频 <a href="https://developer.apple.com/videos/play/wwdc2021/10092/">What&rsquo;s new in Wallet and Apple Pay</a>。</p>
 <h4 id="better-avkit">Better AVKit</h4>
 <p>我们还使用 AVKit 制作了更好的全屏视频。</p>

@@ -9,10 +9,10 @@
     <lastBuildDate>Sun, 08 Aug 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://looseyi.github.io/tags/ruby/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>9. Xcode 工程文件编辑</title>
-      <link>https://looseyi.github.io/post/sourcecode-cocoapods/09-cocoapods-xcode-object/</link>
+      <link>https://looseyi.github.io/post/sourcecode-cocoapods/09-cocoapods-xcodeproj-edit/</link>
       <pubDate>Sun, 08 Aug 2021 00:00:00 +0000</pubDate>
       
-      <guid>https://looseyi.github.io/post/sourcecode-cocoapods/09-cocoapods-xcode-object/</guid>
+      <guid>https://looseyi.github.io/post/sourcecode-cocoapods/09-cocoapods-xcodeproj-edit/</guid>
       <description>本文目录 引子 通过「Xcode 工程文件解析」一文，我们了解到 project.pbxproj 文件的重要性，Xcode 正是通过它来管理项目中的各种源代码、脚本文件、资源文件、</description>
     </item>
     

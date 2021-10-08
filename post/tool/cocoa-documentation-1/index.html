@@ -95,7 +95,7 @@ if (!doNotTrack) {
   <meta itemprop="name" content="Cocoa 文档注释与生成">
 <meta itemprop="description" content="Cocoa 代码注释与文档生成 本文的文档规范部分的内容参考自：NSHipster 的 Swift Documentation 作者 &amp; Nate Cook 本文知识目录 背景 曾经以为好的代码是可以自我解释不需要注"><meta itemprop="datePublished" content="2020-06-14T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2020-06-14T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="3520">
+<meta itemprop="wordCount" content="3458">
 <meta itemprop="keywords" content="iOS&#39;,Document,SourceKit,Jazzy," />
   
   <meta name="twitter:card" content="summary"/>
@@ -212,42 +212,19 @@ if (!doNotTrack) {
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gfrz872it4j20d00g77hi.jpg" alt="Xcode 添加注释的快捷方式"></p>
 <p>下面为最基本的 Cocoa 注释。</p>
 <p>Objective-C 风格的注释：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="c1">/// Let&#39;s say something
-</span><span class="c1">///
-</span><span class="c1">/// @param bar I&#39;m paramter
-</span><span class="c1">/// @return I&#39;m return value
-</span><span class="c1"></span><span class="p">-</span> <span class="p">(</span><span class="kt">id</span><span class="p">)</span><span class="nf">fooBar:</span><span class="p">(</span><span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">bar</span><span class="p">;</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>Swift 风格的代码注释：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="c1">///</span>
-<span class="c1">/// Let&#39;s say something</span>
-<span class="c1">///</span>
-<span class="c1">/// - Parameter bar: I&#39;m paramter</span>
-<span class="c1">/// - Returns: I&#39;m return value</span>
-<span class="kd">func</span> <span class="nf">foo</span><span class="p">(</span><span class="n">bar</span><span class="p">:</span> <span class="nb">String</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">AnyObject</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gfs1q96waej20em07w0vz.jpg" alt="Swift 注释的提示效果"></p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objc" data-lang="objc"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#586e75">/// Let&#39;s say something
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span><span style="color:#586e75">///
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span><span style="color:#586e75">/// @param bar I&#39;m paramter
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span><span style="color:#586e75">/// @return I&#39;m return value
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span><span style="color:#586e75"></span>- (<span style="color:#dc322f">id</span>)<span style="color:#268bd2">fooBar:</span>(NSString <span style="color:#719e07">*</span>)<span style="color:#268bd2">bar</span>;
+</code></pre></div><p>Swift 风格的代码注释：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#586e75">///</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span><span style="color:#586e75">/// Let&#39;s say something</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span><span style="color:#586e75">///</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span><span style="color:#586e75">/// - Parameter bar: I&#39;m paramter</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span><span style="color:#586e75">/// - Returns: I&#39;m return value</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span><span style="color:#268bd2">func</span> <span style="color:#268bd2">foo</span>(bar: <span style="color:#b58900">String</span>) -&gt; <span style="color:#b58900">AnyObject</span> { ... }
+</code></pre></div><p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gfs1q96waej20em07w0vz.jpg" alt="Swift 注释的提示效果"></p>
 <h2 id="基本标记规则">基本标记规则</h2>
 <p>文档注释通过使用 <code>/** ... */</code> 的多行注释或 <code>///...</code> 的单行注释来进行区分。在注释块里面的内容支持标准的 Markdown 语法，规则如下：</p>
 <ul>
@@ -257,61 +234,31 @@ if (!doNotTrack) {
 <li>标题使用 <code>#</code> 作为前缀，内容的分割线使用 <code>---</code></li>
 <li>支持 <a href="https://daringfireball.net/projects/markdown/syntax#link">链接</a> 和 <a href="https://daringfireball.net/projects/markdown/syntax#img">图片</a>，会将基于Web的图像下载并直接在 Xcode 中显示</li>
 </ul>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-markdown" data-lang="markdown">/**
- Hello, documentation
-
- [<span class="nt">土土Edmond木</span>](<span class="na">https://looseyi.github.io/</span>)
-
- # Lists
-
- You can apply <span class="ge">*italic*</span>, <span class="gs">**bold**</span>, or <span class="sb">`code`</span> inline styles.
-
- ---
-
- # Unordered Lists
- <span class="k">-</span> Lists are great,
- <span class="k">-</span> but perhaps don&#39;t nest;
- <span class="k">-</span> Sub-list formatting...
- <span class="k">-</span> ...isn&#39;t the best.
- ---
-
- ## Ordered Lists
- <span class="k">1.</span> Ordered lists, too,
- <span class="k">2.</span> for things that are sorted;
- <span class="k">3.</span> Arabic numerals
- <span class="k">4.</span> are the only kind supported.
- */
-</code></pre></td></tr></table>
-</div>
-</div><p>预览效果</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-markdown" data-lang="markdown"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span>/**
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span> Hello, documentation
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span> [<span style="color:#268bd2">土土Edmond木</span>](https://looseyi.github.io/)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span> # Lists
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span> You can apply <span style="font-style:italic">*italic*</span>, <span style="font-weight:bold">**bold**</span>, or <span style="color:#586e75">`code`</span> inline styles.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span> ---
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span> # Unordered Lists
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span> <span style="color:#719e07">-</span> Lists are great,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span> <span style="color:#719e07">-</span> but perhaps don&#39;t nest;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span> <span style="color:#719e07">-</span> Sub-list formatting...
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span> <span style="color:#719e07">-</span> ...isn&#39;t the best.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span> ---
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span> ## Ordered Lists
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span> <span style="color:#719e07">1.</span> Ordered lists, too,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span> <span style="color:#719e07">2.</span> for things that are sorted;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">22</span> <span style="color:#719e07">3.</span> Arabic numerals
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">23</span> <span style="color:#719e07">4.</span> are the only kind supported.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">24</span> */
+</code></pre></div><p>预览效果</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gfs7fph5hxj20em0dkgui.jpg" alt="Markdown 注释的样式效果.png"></p>
 <h2 id="摘要和说明">摘要和说明</h2>
 <p>文档注释的开头部分将成为 “摘要“ <code>Summary</code>，余下的其他内容将一起归入 “讨论” <code>Discussion</code>。</p>
@@ -327,76 +274,36 @@ if (!doNotTrack) {
 </ul>
 <p>本文我们基本以 Swift 代码作为示例。如果代码是 Objective-C，格式稍微有一些区别。</p>
 <p>以返回值的关键字为例。在 Swift 中，我们编写 <code>-return :</code>，但在 Objective-C 中，您将编写 <code>@return</code>。 有关更多详细信息，请参见 Apple 的 <a href="https://developer.apple.com/library/archive/documentation/DeveloperTools/Conceptual/HeaderDoc/tags/tags.html">HeaderDoc 用户指南</a>。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-markdown" data-lang="markdown">/**
- Creates a personalized greeting for a recipient.
-
- <span class="k">-</span> Parameter recipient: The person being greeted.
-
- <span class="k">-</span> Throws: <span class="sb">`MyError.invalidRecipient`</span>
-           if <span class="sb">`recipient`</span> is &#34;Derek&#34;
-           (he knows what he did).
-
- <span class="k">-</span> Returns: A new string saying hello to <span class="sb">`recipient`</span>.
- */
-func greeting(to recipient: String) throws -&gt; String {
-    guard recipient != &#34;Derek&#34; else {
-        throw MyError.invalidRecipient
-    }
-
-    return &#34;Greetings, \(recipient)!&#34;
-}
-</code></pre></td></tr></table>
-</div>
-</div><p>如果你的方法有多个参数的话，可以通过 <code>Parameters:</code> 字段加上无序列表符来注释：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-markdown" data-lang="markdown">/// Returns the magnitude of a vector in three dimensions
-/// from the given components.
-///
-/// - Parameters:
-///     - x: The <span class="ge">*x*</span> component of the vector.
-///     - y: The <span class="ge">*y*</span> component of the vector.
-///     - z: The <span class="ge">*z*</span> component of the vector.
-func magnitude3D(x: Double, y: Double, z: Double) -&gt; Double {
-    return sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2))
-}
-</code></pre></td></tr></table>
-</div>
-</div><h2 id="其他字段">其他字段</h2>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-markdown" data-lang="markdown"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span>/**
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span> Creates a personalized greeting for a recipient.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span> <span style="color:#719e07">-</span> Parameter recipient: The person being greeted.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span> <span style="color:#719e07">-</span> Throws: <span style="color:#586e75">`MyError.invalidRecipient`</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>           if <span style="color:#586e75">`recipient`</span> is &#34;Derek&#34;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>           (he knows what he did).
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span> <span style="color:#719e07">-</span> Returns: A new string saying hello to <span style="color:#586e75">`recipient`</span>.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span> */
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>func greeting(to recipient: String) throws -&gt; String {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>    guard recipient != &#34;Derek&#34; else {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>        throw MyError.invalidRecipient
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>    return &#34;Greetings, \(recipient)!&#34;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>}
+</code></pre></div><p>如果你的方法有多个参数的话，可以通过 <code>Parameters:</code> 字段加上无序列表符来注释：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-markdown" data-lang="markdown"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span>/// Returns the magnitude of a vector in three dimensions
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>/// from the given components.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>///
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>/// - Parameters:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>///     - x: The <span style="font-style:italic">*x*</span> component of the vector.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>///     - y: The <span style="font-style:italic">*y*</span> component of the vector.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>///     - z: The <span style="font-style:italic">*z*</span> component of the vector.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>func magnitude3D(x: Double, y: Double, z: Double) -&gt; Double {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>    return sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2))
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>}
+</code></pre></div><h2 id="其他字段">其他字段</h2>
 <p>除了上面的常用字段，Swift 风格的 Markdown 还定义了其他几个字段：</p>
 <table>
 <thead>
@@ -427,72 +334,32 @@ func magnitude3D(x: Double, y: Double, z: Double) -&gt; Double {
 </blockquote>
 <h2 id="代码块">代码块</h2>
 <p>文档注释也支持嵌入 Code 来演示功能的正确用法或实现细节。插入代码可以通过添加三个反引号 <code>(```)</code> :</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-markdown" data-lang="markdown">/**
- The area of the <span class="sb">`Shape`</span> instance.
-
- Computation depends on the shape of the instance.
- For a triangle, <span class="sb">`area`</span> is equivalent to:
-</code></pre></td></tr></table>
-</div>
-</div><p>let height = triangle.calculateHeight()
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-markdown" data-lang="markdown"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>/**
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span> The area of the <span style="color:#586e75">`Shape`</span> instance.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span> Computation depends on the shape of the instance.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span> For a triangle, <span style="color:#586e75">`area`</span> is equivalent to:
+</code></pre></div><p>let height = triangle.calculateHeight()
 let area = triangle.base * height / 2</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">*/
-var area: CGFloat { get }
-</code></pre></td></tr></table>
-</div>
-</div><p>或者三个反波浪号 <code>(~~~)</code>:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-markdown" data-lang="markdown">/**
- The perimeter of the <span class="sb">`Shape`</span> instance.
-
- Computation depends on the shape of the instance, and is
- equivalent to:
-
- ~~~
- // Circles:
- let perimeter = circle.radius <span class="ge">* 2 *</span> Float.pi
- // Other shapes:
- let perimeter = shape.sides.map { $0.length }
- .reduce(0, +)
- ~~~
- */
-var perimeter: CGFloat { get }
-</code></pre></td></tr></table>
-</div>
-</div><h2 id="mark--todo--fixme">MARK / TODO / FIXME</h2>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>*/
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>var area: CGFloat { get }
+</code></pre></div><p>或者三个反波浪号 <code>(~~~)</code>:</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-markdown" data-lang="markdown"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span>/**
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span> The perimeter of the <span style="color:#586e75">`Shape`</span> instance.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span> Computation depends on the shape of the instance, and is
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span> equivalent to:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span> ~~~
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span> // Circles:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span> let perimeter = circle.radius <span style="font-style:italic">* 2 *</span> Float.pi
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span> // Other shapes:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span> let perimeter = shape.sides.map { $0.length }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span> .reduce(0, +)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span> ~~~
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span> */
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>var perimeter: CGFloat { get }
+</code></pre></div><h2 id="mark--todo--fixme">MARK / TODO / FIXME</h2>
 <p>在 Objective-C 中，我们通过预处理器指令 <a href="https://nshipster.com/pragma/">#pragma mark</a> 将功能划分为有意义的，易于导航的部分。 在 Swift中，可以通过注释 <code>// MARK：</code> 实现相同的功能。以及我们常用的其他 tag：</p>
 <ul>
 <li><code>// MARK:</code></li>
@@ -502,227 +369,105 @@ var perimeter: CGFloat { get }
 </ul>
 <p>为了展示这些新标签的实际作用，下面介绍了如何扩展 Bicycle 类以采用 CustomStringConvertible 协议并实现 description属性。</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gfs9j3pvf6j20cy0eggta.jpg" alt="Mark 分割效果"></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="c1">// </span><span class="cs">MARK:</span><span class="c1"> - CustomStringConvertible</span>
-
-<span class="kd">extension</span> <span class="nc">Bicycle</span><span class="p">:</span> <span class="n">CustomStringConvertible</span> <span class="p">{</span>
-    <span class="kd">public</span> <span class="kd">var</span> <span class="nv">description</span><span class="p">:</span> <span class="nb">String</span> <span class="p">{</span>
-        <span class="kd">var</span> <span class="nv">descriptors</span><span class="p">:</span> <span class="p">[</span><span class="nb">String</span><span class="p">]</span> <span class="p">=</span> <span class="p">[]</span>
-        <span class="p">...</span>
-       
-        <span class="c1">// </span><span class="cs">FIXME:</span><span class="c1"> Use a distance formatter</span>
-        <span class="n">descriptors</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#34;...&#34;</span><span class="p">)</span>
-
-        <span class="c1">// </span><span class="cs">TODO:</span><span class="c1"> Allow bikes to be named?</span>
-        <span class="k">return</span> <span class="n">descriptors</span><span class="p">.</span><span class="n">joined</span><span class="p">(</span><span class="n">separator</span><span class="p">:</span> <span class="s">&#34;, &#34;</span><span class="p">)</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><h2 id="给一个类添加完整的注释">给一个类添加完整的注释</h2>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span><span class="lnt">33
-</span><span class="lnt">34
-</span><span class="lnt">35
-</span><span class="lnt">36
-</span><span class="lnt">37
-</span><span class="lnt">38
-</span><span class="lnt">39
-</span><span class="lnt">40
-</span><span class="lnt">41
-</span><span class="lnt">42
-</span><span class="lnt">43
-</span><span class="lnt">44
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="c1">/// 🚲 A two-wheeled, human-powered mode of transportation.</span>
-<span class="kd">class</span> <span class="nc">Bicycle</span> <span class="p">{</span>
-    <span class="c1">/// Frame and construction style.</span>
-    <span class="kd">enum</span> <span class="nc">Style</span> <span class="p">{</span>
-        <span class="c1">/// A style for streets or trails.</span>
-        <span class="k">case</span> <span class="n">road</span>
-
-        <span class="c1">/// A style for long journeys.</span>
-        <span class="k">case</span> <span class="n">touring</span>
-
-        <span class="c1">/// A style for casual trips around town.</span>
-        <span class="k">case</span> <span class="n">cruiser</span>
-
-        <span class="c1">/// A style for general-purpose transportation.</span>
-        <span class="k">case</span> <span class="n">hybrid</span>
-    <span class="p">}</span>
-
-    <span class="c1">/// The style of the bicycle.</span>
-    <span class="kd">let</span> <span class="nv">style</span><span class="p">:</span> <span class="n">Style</span>
-
-    <span class="c1">/// The size of the frame, in centimeters.</span>
-    <span class="kd">let</span> <span class="nv">frameSize</span><span class="p">:</span> <span class="nb">Int</span>
-
-    <span class="c1">/// The number of trips traveled by the bicycle.</span>
-    <span class="kd">private</span><span class="p">(</span><span class="kr">set</span><span class="p">)</span> <span class="kd">var</span> <span class="nv">numberOfTrips</span><span class="p">:</span> <span class="nb">Int</span>
-
-    <span class="c1">/// The total distance traveled by the bicycle, in meters.</span>
-    <span class="kd">private</span><span class="p">(</span><span class="kr">set</span><span class="p">)</span> <span class="kd">var</span> <span class="nv">distanceTraveled</span><span class="p">:</span> <span class="nb">Double</span>
-
-    <span class="cm">/**
-</span><span class="cm">     Take a bike out for a spin.
-</span><span class="cm">
-</span><span class="cm">     Calling this method increments the `numberOfTrips`
-</span><span class="cm">     and increases `distanceTraveled` by the value of `meters`.
-</span><span class="cm">
-</span><span class="cm">     - Parameter meters: The distance to travel in meters.
-</span><span class="cm">     - Precondition: `meters` must be greater than 0.
-</span><span class="cm">     */</span>
-    <span class="kd">func</span> <span class="nf">travel</span><span class="p">(</span><span class="bp">distance</span> <span class="n">meters</span><span class="p">:</span> <span class="nb">Double</span><span class="p">)</span> <span class="p">{</span>
-        <span class="bp">precondition</span><span class="p">(</span><span class="n">meters</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="n">distanceTraveled</span> <span class="o">+=</span> <span class="n">meters</span>
-        <span class="n">numberOfTrips</span> <span class="o">+=</span> <span class="mi">1</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>完整的 🚴‍♀️ 文档，<a href="https://swift-documentation-example.nshipster.com/classes/bicycle">戳这里</a>。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#586e75">// </span><span style="color:#719e07">MARK:</span><span style="color:#586e75"> - CustomStringConvertible</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span><span style="color:#268bd2">extension</span> <span style="color:#268bd2">Bicycle</span>: CustomStringConvertible {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>    <span style="color:#268bd2">public</span> <span style="color:#268bd2">var</span> <span style="color:#268bd2">description</span>: <span style="color:#b58900">String</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>        <span style="color:#268bd2">var</span> <span style="color:#268bd2">descriptors</span>: [<span style="color:#b58900">String</span>] = []
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>        ...
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>       
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>        <span style="color:#586e75">// </span><span style="color:#719e07">FIXME:</span><span style="color:#586e75"> Use a distance formatter</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>        descriptors.append(<span style="color:#2aa198">&#34;...&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>        <span style="color:#586e75">// </span><span style="color:#719e07">TODO:</span><span style="color:#586e75"> Allow bikes to be named?</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>        <span style="color:#719e07">return</span> descriptors.joined(separator: <span style="color:#2aa198">&#34;, &#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>}
+</code></pre></div><h2 id="给一个类添加完整的注释">给一个类添加完整的注释</h2>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#586e75">/// 🚲 A two-wheeled, human-powered mode of transportation.</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span><span style="color:#268bd2">class</span> <span style="color:#268bd2">Bicycle</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>    <span style="color:#586e75">/// Frame and construction style.</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>    <span style="color:#268bd2">enum</span> <span style="color:#268bd2">Style</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>        <span style="color:#586e75">/// A style for streets or trails.</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>        <span style="color:#719e07">case</span> road
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>        <span style="color:#586e75">/// A style for long journeys.</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>        <span style="color:#719e07">case</span> touring
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>        <span style="color:#586e75">/// A style for casual trips around town.</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>        <span style="color:#719e07">case</span> cruiser
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>        <span style="color:#586e75">/// A style for general-purpose transportation.</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>        <span style="color:#719e07">case</span> hybrid
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>    <span style="color:#586e75">/// The style of the bicycle.</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>    <span style="color:#268bd2">let</span> <span style="color:#268bd2">style</span>: Style
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span>    <span style="color:#586e75">/// The size of the frame, in centimeters.</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">22</span>    <span style="color:#268bd2">let</span> <span style="color:#268bd2">frameSize</span>: <span style="color:#b58900">Int</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">23</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">24</span>    <span style="color:#586e75">/// The number of trips traveled by the bicycle.</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">25</span>    <span style="color:#268bd2">private</span>(<span style="color:#268bd2">set</span>) <span style="color:#268bd2">var</span> <span style="color:#268bd2">numberOfTrips</span>: <span style="color:#b58900">Int</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">26</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">27</span>    <span style="color:#586e75">/// The total distance traveled by the bicycle, in meters.</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">28</span>    <span style="color:#268bd2">private</span>(<span style="color:#268bd2">set</span>) <span style="color:#268bd2">var</span> <span style="color:#268bd2">distanceTraveled</span>: <span style="color:#b58900">Double</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">29</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">30</span>    <span style="color:#586e75">/**
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">31</span><span style="color:#586e75">     Take a bike out for a spin.
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">32</span><span style="color:#586e75">
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">33</span><span style="color:#586e75">     Calling this method increments the `numberOfTrips`
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">34</span><span style="color:#586e75">     and increases `distanceTraveled` by the value of `meters`.
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">35</span><span style="color:#586e75">
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">36</span><span style="color:#586e75">     - Parameter meters: The distance to travel in meters.
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">37</span><span style="color:#586e75">     - Precondition: `meters` must be greater than 0.
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">38</span><span style="color:#586e75">     */</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">39</span>    <span style="color:#268bd2">func</span> <span style="color:#268bd2">travel</span>(<span style="color:#268bd2">distance</span> meters: <span style="color:#b58900">Double</span>) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">40</span>        <span style="color:#268bd2">precondition</span>(meters <span style="color:#719e07">&gt;</span> <span style="color:#2aa198">0</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">41</span>        distanceTraveled <span style="color:#719e07">+=</span> meters
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">42</span>        numberOfTrips <span style="color:#719e07">+=</span> <span style="color:#2aa198">1</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">43</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">44</span>}
+</code></pre></div><p>完整的 🚴‍♀️ 文档，<a href="https://swift-documentation-example.nshipster.com/classes/bicycle">戳这里</a>。</p>
 <h1 id="library-项目文档的生成">Library 项目文档的生成</h1>
 <p>接下来我们一起来实践一下，如何使用 Jazzy 来生成项目的 API 文档。</p>
 <p>首先，Jazzy 支持对 Swift 和 Objective-C 的 Xcode project 项目生成文档，对于 SwiftPM 也是近期刚支持的。我们会逐步进阶，从一个独立的 Swift 和 ObjC 项目，再到混编项目，最后是基于 CocoaPods 来生成私有库文档。</p>
 <h2 id="为-swift-项目生成文档">为 Swift 项目生成文档</h2>
 <p>Jazzy 默认是解析 Swift 代码注释来生成文档。我们先尝试为 <a href="https://github.com/Alamofire/Alamofire">Alamofire</a> 生成 HTML 文档。</p>
 <p>首先需要安装 Jazzy，Jazzy 是一个 Gem 依赖库，更多了解 Gem 请看 <a href="https://juejin.im/post/5ee1a589518825431e03f758#heading-18">《版本管理工具及 Ruby 工具链环境》</a>。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="o">[</span><span class="n">sudo</span><span class="o">]</span> <span class="n">gem</span> <span class="n">install</span> <span class="n">jazzy</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>不过由于 Alamofire 在项目的 Gemfile 中已经添加了 Jazzy 的依赖，所以我们这里使用 <code>bundle install</code> 来安装。最后通过 <code>-o Docs</code> 将文档输出到项目的根目录，完整命令如下：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell">$ git clone https://github.com/Alamofire/Alamofire
-$ <span class="nb">cd</span> Alamofire
-$ bundle install
-$ bundle <span class="nb">exec</span> jazzy -o Docs
-</code></pre></td></tr></table>
-</div>
-</div><p>生成文档的效果：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#719e07">[</span>sudo<span style="color:#719e07">]</span> gem install jazzy
+</code></pre></div><p>不过由于 Alamofire 在项目的 Gemfile 中已经添加了 Jazzy 的依赖，所以我们这里使用 <code>bundle install</code> 来安装。最后通过 <code>-o Docs</code> 将文档输出到项目的根目录，完整命令如下：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>$ git clone https://github.com/Alamofire/Alamofire
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>$ <span style="color:#b58900">cd</span> Alamofire
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>$ bundle install
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>$ bundle <span style="color:#b58900">exec</span> jazzy -o Docs
+</code></pre></div><p>生成文档的效果：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gfssabvz0pj20zw0fiwi2.jpg" alt="Jazzy 生成文档效果.png"></p>
 <p>Jazzy 默认会读取项目中的 <code>README.md</code>、<code>README.markdown</code>  、<code>README.mdown</code>  、<code>README</code> 文档内容作为 index page 的内容。</p>
 <p>对于 Swift module 项目，Jazzy 在生成文档时会自动寻找项目根目录下的 project，然后执行 <code>xcodebuild</code>  或 <code>swift build</code> 来生成 <a href="https://clang.llvm.org/docs/IntroductionToTheClangAST.html">Clang AST</a>，再通过 <a href="https://www.jpsim.com/uncovering-sourcekit">SourceKit</a> 来生成注释文档。</p>
 <p>对于支持 SwiftPM 的项目，我们也可以通过指定 <code>--wift-build-tool</code> 来生成文档：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell">$ bundle <span class="nb">exec</span> jazzy <span class="se">\
-</span><span class="se"></span>  -o Docs <span class="se">\
-</span><span class="se"></span>  --module Alamofire <span class="se">\
-</span><span class="se"></span>  --swift-build-tool spm <span class="se">\
-</span><span class="se"></span>  --build-tool-arguments -Xswiftc,-swift-version,-Xswiftc,5
-</code></pre></td></tr></table>
-</div>
-</div><h2 id="为-objective-c-项目生成文档">为 Objective-C 项目生成文档</h2>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>$ bundle <span style="color:#b58900">exec</span> jazzy <span style="color:#cb4b16">\
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span><span style="color:#cb4b16"></span>  -o Docs <span style="color:#cb4b16">\
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span><span style="color:#cb4b16"></span>  --module Alamofire <span style="color:#cb4b16">\
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span><span style="color:#cb4b16"></span>  --swift-build-tool spm <span style="color:#cb4b16">\
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span><span style="color:#cb4b16"></span>  --build-tool-arguments -Xswiftc,-swift-version,-Xswiftc,5
+</code></pre></div><h2 id="为-objective-c-项目生成文档">为 Objective-C 项目生成文档</h2>
 <p>Objective-C 项目文档的生成需要多几个参数，这里我们以 AFNetworking 为例。</p>
 <p>clone 代码到本地后需要修改 AFNetworking 目录下的 Gemfile 添加 Jazzy 依赖：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">source</span> <span class="s2">&#34;https://rubygems.org&#34;</span>
-
-<span class="n">gem</span> <span class="s2">&#34;fastlane&#34;</span>
-<span class="n">gem</span> <span class="s2">&#34;cocoapods&#34;</span>
-<span class="n">gem</span> <span class="s2">&#34;jazzy&#34;</span>
-<span class="n">gem</span> <span class="s2">&#34;xcode-install&#34;</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>接着安装 jazzy 生成 docs 文档：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell">$ bundle install
-$ bundle <span class="nb">exec</span> jazzy <span class="se">\
-</span><span class="se"></span>  -o Docs <span class="se">\
-</span><span class="se"></span>  --objc <span class="se">\
-</span><span class="se"></span>  --umbrella-header AFNetworking/AFNetworking.h <span class="se">\
-</span><span class="se"></span>  --framework-root AFNetworking
-</code></pre></td></tr></table>
-</div>
-</div><ul>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>source <span style="color:#2aa198">&#34;https://rubygems.org&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>gem <span style="color:#2aa198">&#34;fastlane&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>gem <span style="color:#2aa198">&#34;cocoapods&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>gem <span style="color:#2aa198">&#34;jazzy&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>gem <span style="color:#2aa198">&#34;xcode-install&#34;</span>
+</code></pre></div><p>接着安装 jazzy 生成 docs 文档：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>$ bundle install
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>$ bundle <span style="color:#b58900">exec</span> jazzy <span style="color:#cb4b16">\
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span><span style="color:#cb4b16"></span>  -o Docs <span style="color:#cb4b16">\
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span><span style="color:#cb4b16"></span>  --objc <span style="color:#cb4b16">\
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span><span style="color:#cb4b16"></span>  --umbrella-header AFNetworking/AFNetworking.h <span style="color:#cb4b16">\
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span><span style="color:#cb4b16"></span>  --framework-root AFNetworking
+</code></pre></div><ul>
 <li>&ndash;objc：指定为 Objective-C 生成文档</li>
 <li>&ndash;umbrella-header：指定 Objective-C framework 的 <code>Umbrella header</code> 路径</li>
 <li>&ndash;framework-root: 指定 Objective-C framework 路径</li>
@@ -730,33 +475,17 @@ $ bundle <span class="nb">exec</span> jazzy <span class="se">\
 <h2 id="为-swift--objective-c-混编项目生成文档">为 Swift &amp; Objective-C 混编项目生成文档</h2>
 <p>Jazzy 对于混编项目的支持目前还不是很友好。想要生成混编代码注释的文档，我们需要事先生成 <code>json</code> 格式的中间产物，再传递给 Jazzy 来生成完整的文档。这里需要用到工具 <strong><a href="https://github.com/jpsim/SourceKitten">sourcekitten</a></strong>。</p>
 <p>先看基于混编项目生成文档的方式：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># 输出 SourceKitter 的 Swift 文档数据到 json</span>
-sourcekitten doc -- -workspace MyProject.xcworkspace -scheme MyScheme &gt; swiftDoc.json
-
-<span class="c1"># 输出 SourceKitter 的 Objective-C 文档数据到 json</span>
-sourcekitten doc --objc <span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/MyProject/MyProject.h <span class="se">\
-</span><span class="se"></span>      -- -x objective-c  -isysroot <span class="k">$(</span>xcrun --show-sdk-path --sdk iphonesimulator<span class="k">)</span> <span class="se">\
-</span><span class="se"></span>      -I <span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span> -fmodules &gt; objcDoc.json
-
-<span class="c1"># 合并 swift 和 Objective-C json 并输出文档</span>
-jazzy --sourcekitten-sourcefile swiftDoc.json,objcDoc.json
-</code></pre></td></tr></table>
-</div>
-</div><p>当然 Jazzy 还有其他很多使用参数这里就不一一介绍了，大家感兴趣的可以查看官方文档或者使用 <code>jazzy --help &lt;command&gt;</code> 。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#586e75"># 输出 SourceKitter 的 Swift 文档数据到 json</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>sourcekitten doc -- -workspace MyProject.xcworkspace -scheme MyScheme &gt; swiftDoc.json
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span><span style="color:#586e75"># 输出 SourceKitter 的 Objective-C 文档数据到 json</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>sourcekitten doc --objc <span style="color:#719e07">$(</span><span style="color:#b58900">pwd</span><span style="color:#719e07">)</span>/MyProject/MyProject.h <span style="color:#cb4b16">\
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span><span style="color:#cb4b16"></span>      -- -x objective-c  -isysroot <span style="color:#719e07">$(</span>xcrun --show-sdk-path --sdk iphonesimulator<span style="color:#719e07">)</span> <span style="color:#cb4b16">\
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span><span style="color:#cb4b16"></span>      -I <span style="color:#719e07">$(</span><span style="color:#b58900">pwd</span><span style="color:#719e07">)</span> -fmodules &gt; objcDoc.json
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span><span style="color:#586e75"># 合并 swift 和 Objective-C json 并输出文档</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>jazzy --sourcekitten-sourcefile swiftDoc.json,objcDoc.json
+</code></pre></div><p>当然 Jazzy 还有其他很多使用参数这里就不一一介绍了，大家感兴趣的可以查看官方文档或者使用 <code>jazzy --help &lt;command&gt;</code> 。</p>
 <h1 id="总结">总结</h1>
 <ul>
 <li>本文介绍了如何按照 Apple 的标准写出 Swift 风格的代码注释，以及基于 Jazzy 来生成简单的 HTML 文档。</li>

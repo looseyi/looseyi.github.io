@@ -95,7 +95,7 @@ if (!doNotTrack) {
   <meta itemprop="name" content="浅析 - CocoaLumberjack 3.6 之 DDLog">
 <meta itemprop="description" content="介绍 CocoaLumberjack is a fast &amp; simple, yet powerful &amp; flexible logging framework for Mac and iOS. 先扯一下 lumberjack 这个单词，对应的就是它的 logo，一位伐木工。 一直不太理解为什么是用这个单词，其他语音中也有日"><meta itemprop="datePublished" content="2020-05-04T18:20:00&#43;08:00" />
 <meta itemprop="dateModified" content="2020-05-04T18:20:00&#43;08:00" />
-<meta itemprop="wordCount" content="8097">
+<meta itemprop="wordCount" content="7919">
 <meta itemprop="keywords" content="Source Code,iOS,Logger," />
   
   <meta name="twitter:card" content="summary"/>
@@ -210,230 +210,106 @@ if (!doNotTrack) {
 </blockquote>
 <p>log message 用于记录日志原语，它是通过宏来实现的。logging primitives 是什么意思呢？可以理解为 log message 保存了 log 被调用时的一系列相关环境的上下文。单词 primitive 一开始没看明白，不过计算机中倒是有一个<a href="https://baike.baidu.com/item/%E5%8E%9F%E8%AF%AD">原语</a>的概念（不一定对），可以帮助大家理解这个单词。</p>
 <p>具体存了哪些东西呢？</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">@interface</span> <span class="nc">DDLogMessage</span> : <span class="nc">NSObject</span> <span class="o">&lt;</span><span class="n">NSCopying</span><span class="o">&gt;</span>
-<span class="p">{</span>
-    <span class="c1">// Direct accessors to be used only for performance
-</span><span class="c1"></span>    <span class="k">@public</span>
-    <span class="n">NSString</span> <span class="o">*</span><span class="n">_message</span><span class="p">;</span>
-    <span class="n">DDLogLevel</span> <span class="n">_level</span><span class="p">;</span>
-    <span class="n">DDLogFlag</span> <span class="n">_flag</span><span class="p">;</span>
-    <span class="n">NSInteger</span> <span class="n">_context</span><span class="p">;</span>
-    <span class="n">NSString</span> <span class="o">*</span><span class="n">_file</span><span class="p">;</span>
-    <span class="n">NSString</span> <span class="o">*</span><span class="n">_fileName</span><span class="p">;</span>
-    <span class="n">NSString</span> <span class="o">*</span><span class="n">_function</span><span class="p">;</span>
-    <span class="n">NSUInteger</span> <span class="n">_line</span><span class="p">;</span>
-    <span class="kt">id</span> <span class="n">_tag</span><span class="p">;</span>
-    <span class="n">DDLogMessageOptions</span> <span class="n">_options</span><span class="p">;</span>
-    <span class="n">NSDate</span> <span class="o">*</span> <span class="n">_timestamp</span><span class="p">;</span>
-    <span class="n">NSString</span> <span class="o">*</span><span class="n">_threadID</span><span class="p">;</span>
-    <span class="n">NSString</span> <span class="o">*</span><span class="n">_threadName</span><span class="p">;</span>
-    <span class="n">NSString</span> <span class="o">*</span><span class="n">_queueLabel</span><span class="p">;</span>
-    <span class="n">NSUInteger</span> <span class="n">_qos</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>这里通过前置声明实例变量，这样调用方可以避开 getter 直接访问变量，来提高访问效率。当然作者也提供了 readonly 的 @property method。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objc" data-lang="objc"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">@interface</span> <span style="color:#268bd2">DDLogMessage</span> : <span style="color:#268bd2">NSObject</span> <span style="color:#719e07">&lt;</span>NSCopying<span style="color:#719e07">&gt;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>{
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>    <span style="color:#586e75">// Direct accessors to be used only for performance
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span><span style="color:#586e75"></span>    <span style="color:#719e07">@public</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>    NSString <span style="color:#719e07">*</span>_message;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>    DDLogLevel _level;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>    DDLogFlag _flag;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>    NSInteger _context;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>    NSString <span style="color:#719e07">*</span>_file;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>    NSString <span style="color:#719e07">*</span>_fileName;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>    NSString <span style="color:#719e07">*</span>_function;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>    NSUInteger _line;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>    <span style="color:#dc322f">id</span> _tag;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>    DDLogMessageOptions _options;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>    NSDate <span style="color:#719e07">*</span> _timestamp;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>    NSString <span style="color:#719e07">*</span>_threadID;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>    NSString <span style="color:#719e07">*</span>_threadName;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>    NSString <span style="color:#719e07">*</span>_queueLabel;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>    NSUInteger _qos;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>}
+</code></pre></div><p>这里通过前置声明实例变量，这样调用方可以避开 getter 直接访问变量，来提高访问效率。当然作者也提供了 readonly 的 @property method。</p>
 <p>首先，message、file、function <strong>默认不会执行 copy 操作</strong>，如果需要可以通过 DDLogMessageOptions 来控制：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">typedef</span> <span class="nf">NS_OPTIONS</span><span class="p">(</span><span class="n">NSInteger</span><span class="p">,</span> <span class="n">DDLogMessageOptions</span><span class="p">){</span>
-	 <span class="c1">/// Use this to use a copy of the file path
-</span><span class="c1"></span>    <span class="n">DDLogMessageCopyFile</span>        <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">0</span><span class="p">,</span>
- 	 <span class="c1">/// Use this to use a copy of the function name
-</span><span class="c1"></span>    <span class="n">DDLogMessageCopyFunction</span>    <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">,</span>
-	 <span class="c1">/// Use this to use avoid a copy of the message
-</span><span class="c1"></span>    <span class="n">DDLogMessageDontCopyMessage</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">2</span>
-<span class="p">};</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>我们知道，对于 NSString 的操作需要使用 copy ，以保证我们对它操作时是安全及不可变的。这里针对 message、file、function 却不采用 copy，是为了避免不必要的 allocations 开销。因为 file 和 function 是通过 __FILE__ and __FUNCTION__ 这两个宏来获取的，它们本质上就是一个字符常量，所以可以这么操作。而 message 正常由 DDlog 内部生成的，Lumberjack 来保证 mesage 不可修改。So 官方提示如下：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objc" data-lang="objc"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#719e07">typedef</span> <span style="color:#268bd2">NS_OPTIONS</span>(NSInteger, DDLogMessageOptions){
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>	 <span style="color:#586e75">/// Use this to use a copy of the file path
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span><span style="color:#586e75"></span>    DDLogMessageCopyFile        <span style="color:#719e07">=</span> <span style="color:#2aa198">1</span> <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">0</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span> 	 <span style="color:#586e75">/// Use this to use a copy of the function name
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span><span style="color:#586e75"></span>    DDLogMessageCopyFunction    <span style="color:#719e07">=</span> <span style="color:#2aa198">1</span> <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">1</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>	 <span style="color:#586e75">/// Use this to use avoid a copy of the message
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span><span style="color:#586e75"></span>    DDLogMessageDontCopyMessage <span style="color:#719e07">=</span> <span style="color:#2aa198">1</span> <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">8</span>};
+</code></pre></div><p>我们知道，对于 NSString 的操作需要使用 copy ，以保证我们对它操作时是安全及不可变的。这里针对 message、file、function 却不采用 copy，是为了避免不必要的 allocations 开销。因为 file 和 function 是通过 __FILE__ and __FUNCTION__ 这两个宏来获取的，它们本质上就是一个字符常量，所以可以这么操作。而 message 正常由 DDlog 内部生成的，Lumberjack 来保证 mesage 不可修改。So 官方提示如下：</p>
 <blockquote>
 <p>If you find need to manually create logMessage objects, there is one thing you should be aware of.</p>
 </blockquote>
 <p>说的就是，当你需要手动生成 log message 的时候需要注意，这三个参数的内存修饰操作。</p>
 <p>log message 内部实现就比较简单了，以 message 字段为例：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="kt">BOOL</span> <span class="n">copyMessage</span> <span class="o">=</span> <span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">DDLogMessageDontCopyMessage</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">;</span>
-<span class="n">_message</span> <span class="o">=</span> <span class="n">copyMessage</span> <span class="o">?</span> <span class="p">[</span><span class="n">message</span> <span class="k">copy</span><span class="p">]</span> <span class="o">:</span> <span class="n">message</span><span class="p">;</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>另外，就是每个 logMessage 会记录当前调用的 thread &amp; queue 信息，分别如下:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="n">__uint64_t</span> <span class="n">tid</span><span class="p">;</span>
-<span class="k">if</span> <span class="p">(</span><span class="n">pthread_threadid_np</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">tid</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">_threadID</span> <span class="o">=</span> <span class="p">[[</span><span class="n">NSString</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithFormat</span><span class="p">:</span><span class="s">@&#34;%llu&#34;</span><span class="p">,</span> <span class="n">tid</span><span class="p">];</span>
-<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-    <span class="n">_threadID</span> <span class="o">=</span> <span class="s">@&#34;missing threadId&#34;</span><span class="p">;</span>
-<span class="p">}</span>
-<span class="n">_threadName</span>   <span class="o">=</span> <span class="n">NSThread</span><span class="p">.</span><span class="n">currentThread</span><span class="p">.</span><span class="n">name</span><span class="p">;</span>
-<span class="c1">// Try to get the current queue&#39;s label
-</span><span class="c1"></span><span class="n">_queueLabel</span> <span class="o">=</span> <span class="p">[[</span><span class="n">NSString</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithFormat</span><span class="p">:</span><span class="s">@&#34;%s&#34;</span><span class="p">,</span> <span class="n">dispatch_queue_get_label</span><span class="p">(</span><span class="n">DISPATCH_CURRENT_QUEUE_LABEL</span><span class="p">)];</span>
-<span class="k">if</span> <span class="p">(@</span><span class="n">available</span><span class="p">(</span><span class="n">macOS</span> <span class="mf">10.10</span><span class="p">,</span> <span class="n">iOS</span> <span class="mf">8.0</span><span class="p">,</span> <span class="o">*</span><span class="p">))</span>
-    <span class="n">_qos</span> <span class="o">=</span> <span class="p">(</span><span class="n">NSUInteger</span><span class="p">)</span> <span class="n">qos_class_self</span><span class="p">();</span>
-</code></pre></td></tr></table>
-</div>
-</div><h3 id="ddloglevel">DDLogLevel</h3>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objc" data-lang="objc"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#dc322f">BOOL</span> copyMessage <span style="color:#719e07">=</span> (options <span style="color:#719e07">&amp;</span> DDLogMessageDontCopyMessage) <span style="color:#719e07">==</span> <span style="color:#2aa198">0</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>_message <span style="color:#719e07">=</span> copyMessage <span style="color:#719e07">?</span> [message <span style="color:#719e07">copy</span>] <span style="color:#719e07">:</span> message;
+</code></pre></div><p>另外，就是每个 logMessage 会记录当前调用的 thread &amp; queue 信息，分别如下:</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objc" data-lang="objc"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span>__uint64_t tid;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span><span style="color:#719e07">if</span> (pthread_threadid_np(<span style="color:#b58900">NULL</span>, <span style="color:#719e07">&amp;</span>tid) <span style="color:#719e07">==</span> <span style="color:#2aa198">0</span>) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>    _threadID <span style="color:#719e07">=</span> [[NSString alloc] initWithFormat:<span style="color:#2aa198">@&#34;%llu&#34;</span>, tid];
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>} <span style="color:#719e07">else</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>    _threadID <span style="color:#719e07">=</span> <span style="color:#2aa198">@&#34;missing threadId&#34;</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>_threadName   <span style="color:#719e07">=</span> NSThread.currentThread.name;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span><span style="color:#586e75">// Try to get the current queue&#39;s label
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span><span style="color:#586e75"></span>_queueLabel <span style="color:#719e07">=</span> [[NSString alloc] initWithFormat:<span style="color:#2aa198">@&#34;%s&#34;</span>, dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL)];
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span><span style="color:#719e07">if</span> (@available(macOS <span style="color:#2aa198">10.10</span>, iOS <span style="color:#2aa198">8.0</span>, <span style="color:#719e07">*</span>))
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>    _qos <span style="color:#719e07">=</span> (NSUInteger) qos_class_self();
+</code></pre></div><h3 id="ddloglevel">DDLogLevel</h3>
 <blockquote>
 <p>Log levels are used to filter out logs. Used together with flags.</p>
 </blockquote>
 <p>每一条 log mesage 都设置了对应的日志级别，用于过滤 logs 的。其定义是一个枚举：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">typedef</span> <span class="nf">NS_ENUM</span><span class="p">(</span><span class="n">NSUInteger</span><span class="p">,</span> <span class="n">DDLogLevel</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">// No logs
-</span><span class="c1"></span>    <span class="n">DDLogLevelOff</span>       <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> 
-    <span class="c1">// Error logs only
-</span><span class="c1"></span>    <span class="n">DDLogLevelError</span>     <span class="o">=</span> <span class="p">(</span><span class="n">DDLogFlagError</span><span class="p">),</span> 
-    <span class="c1">// Error and warning logs
-</span><span class="c1"></span>    <span class="n">DDLogLevelWarning</span>   <span class="o">=</span> <span class="p">(</span><span class="n">DDLogLevelError</span>   <span class="o">|</span> <span class="n">DDLogFlagWarning</span><span class="p">),</span>
-    <span class="c1">// Error, warning and info logs
-</span><span class="c1"></span>    <span class="n">DDLogLevelInfo</span>      <span class="o">=</span> <span class="p">(</span><span class="n">DDLogLevelWarning</span> <span class="o">|</span> <span class="n">DDLogFlagInfo</span><span class="p">),</span> 
-    <span class="c1">// Error, warning, info and debug logs
-</span><span class="c1"></span>    <span class="n">DDLogLevelDebug</span>     <span class="o">=</span> <span class="p">(</span><span class="n">DDLogLevelInfo</span>    <span class="o">|</span> <span class="n">DDLogFlagDebug</span><span class="p">),</span> 
-    <span class="c1">// Error, warning, info, debug and verbose logs
-</span><span class="c1"></span>    <span class="n">DDLogLevelVerbose</span>   <span class="o">=</span> <span class="p">(</span><span class="n">DDLogLevelDebug</span>   <span class="o">|</span> <span class="n">DDLogFlagVerbose</span><span class="p">),</span> 
-    <span class="c1">// All logs (1...11111)
-</span><span class="c1"></span>    <span class="n">DDLogLevelAll</span>       <span class="o">=</span> <span class="n">NSUIntegerMax</span> 
-<span class="p">};</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>而 loglevel 是由 DDLogFlag 控制，其声明如下：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">typedef</span> <span class="nf">NS_OPTIONS</span><span class="p">(</span><span class="n">NSUInteger</span><span class="p">,</span> <span class="n">DDLogFlag</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">// 0...00001 DDLogFlagError
-</span><span class="c1"></span>    <span class="n">DDLogFlagError</span>      <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">0</span><span class="p">),</span>
-    <span class="c1">// 0...00010 DDLogFlagWarning
-</span><span class="c1"></span>    <span class="n">DDLogFlagWarning</span>    <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">),</span>
-    <span class="c1">// 0...00100 DDLogFlagInfo
-</span><span class="c1"></span>    <span class="n">DDLogFlagInfo</span>       <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">2</span><span class="p">),</span>
-    <span class="c1">// 0...01000 DDLogFlagDebug
-</span><span class="c1"></span>    <span class="n">DDLogFlagDebug</span>      <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">3</span><span class="p">),</span>
-    <span class="c1">// 0...10000 DDLogFlagVerbose
-</span><span class="c1"></span>    <span class="n">DDLogFlagVerbose</span>    <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">4</span><span class="p">)</span>
-<span class="p">};</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>这些就是 DDLog 所预设的 5 种 level，对于新手来说基本够用了。同时，对于有自定义 level 需求的用户来说，可以通过结构化的宏，就能轻松实现。详见 <a href="https://github.com/CocoaLumberjack/CocoaLumberjack/blob/master/Documentation/CustomLogLevels.md">CustomLogLevels.md</a>。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objc" data-lang="objc"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">typedef</span> <span style="color:#268bd2">NS_ENUM</span>(NSUInteger, DDLogLevel) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>    <span style="color:#586e75">// No logs
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span><span style="color:#586e75"></span>    DDLogLevelOff       <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>, 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>    <span style="color:#586e75">// Error logs only
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span><span style="color:#586e75"></span>    DDLogLevelError     <span style="color:#719e07">=</span> (DDLogFlagError), 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>    <span style="color:#586e75">// Error and warning logs
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span><span style="color:#586e75"></span>    DDLogLevelWarning   <span style="color:#719e07">=</span> (DDLogLevelError   <span style="color:#719e07">|</span> DDLogFlagWarning),
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>    <span style="color:#586e75">// Error, warning and info logs
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span><span style="color:#586e75"></span>    DDLogLevelInfo      <span style="color:#719e07">=</span> (DDLogLevelWarning <span style="color:#719e07">|</span> DDLogFlagInfo), 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>    <span style="color:#586e75">// Error, warning, info and debug logs
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span><span style="color:#586e75"></span>    DDLogLevelDebug     <span style="color:#719e07">=</span> (DDLogLevelInfo    <span style="color:#719e07">|</span> DDLogFlagDebug), 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>    <span style="color:#586e75">// Error, warning, info, debug and verbose logs
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span><span style="color:#586e75"></span>    DDLogLevelVerbose   <span style="color:#719e07">=</span> (DDLogLevelDebug   <span style="color:#719e07">|</span> DDLogFlagVerbose), 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>    <span style="color:#586e75">// All logs (1...11111)
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span><span style="color:#586e75"></span>    DDLogLevelAll       <span style="color:#719e07">=</span> NSUIntegerMax 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>};
+</code></pre></div><p>而 loglevel 是由 DDLogFlag 控制，其声明如下：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objc" data-lang="objc"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">typedef</span> <span style="color:#268bd2">NS_OPTIONS</span>(NSUInteger, DDLogFlag) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>    <span style="color:#586e75">// 0...00001 DDLogFlagError
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span><span style="color:#586e75"></span>    DDLogFlagError      <span style="color:#719e07">=</span> (<span style="color:#2aa198">1</span> <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">0</span>),
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>    <span style="color:#586e75">// 0...00010 DDLogFlagWarning
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span><span style="color:#586e75"></span>    DDLogFlagWarning    <span style="color:#719e07">=</span> (<span style="color:#2aa198">1</span> <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">1</span>),
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>    <span style="color:#586e75">// 0...00100 DDLogFlagInfo
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span><span style="color:#586e75"></span>    DDLogFlagInfo       <span style="color:#719e07">=</span> (<span style="color:#2aa198">1</span> <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">2</span>),
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>    <span style="color:#586e75">// 0...01000 DDLogFlagDebug
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span><span style="color:#586e75"></span>    DDLogFlagDebug      <span style="color:#719e07">=</span> (<span style="color:#2aa198">1</span> <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">3</span>),
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>    <span style="color:#586e75">// 0...10000 DDLogFlagVerbose
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span><span style="color:#586e75"></span>    DDLogFlagVerbose    <span style="color:#719e07">=</span> (<span style="color:#2aa198">1</span> <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">4</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>};
+</code></pre></div><p>这些就是 DDLog 所预设的 5 种 level，对于新手来说基本够用了。同时，对于有自定义 level 需求的用户来说，可以通过结构化的宏，就能轻松实现。详见 <a href="https://github.com/CocoaLumberjack/CocoaLumberjack/blob/master/Documentation/CustomLogLevels.md">CustomLogLevels.md</a>。</p>
 <p>其核心是先将预设的 level 清除，然后在进行重新定义：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="c1">// First undefine the default stuff we don&#39;t want to use.
-</span><span class="c1"></span><span class="cp">#undef DDLogError
-</span><span class="cp">#undef DDLogWarn
-</span><span class="cp">#undef DDLogInfo
-</span><span class="cp">#undef DDLogDebug
-</span><span class="cp">#undef DDLogVerbose
-</span><span class="cp"></span><span class="p">...</span>
-<span class="c1">// Now define everything how we want it
-</span><span class="c1"></span><span class="cp">#define LOG_FLAG_FATAL   (1 &lt;&lt; 0)  </span><span class="c1">// 0...000001
-</span><span class="c1"></span><span class="cp">#define LOG_LEVEL_FATAL   (LOG_FLAG_FATAL)  </span><span class="c1">// 0...000001
-</span><span class="c1"></span><span class="cp">#define LOG_FATAL   (ddLogLevel &amp; LOG_FLAG_FATAL )
-</span><span class="cp">#define DDLogFatal(frmt, ...)    SYNC_LOG_OBJC_MAYBE(ddLogLevel, LOG_FLAG_FATAL,  0, frmt, ##__VA_ARGS__)
-</span><span class="cp"></span><span class="p">...</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>除了对 level 的重定义之外，我们也可以通过对 level 进行扩展来满足我们对需求。由于 lumberjack 使用的是 bitmask 且只预设了 5 个 bit，对应 5 种 log flag。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objc" data-lang="objc"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#586e75">// First undefine the default stuff we don&#39;t want to use.
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span><span style="color:#586e75"></span><span style="color:#719e07">#undef DDLogError
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span><span style="color:#719e07">#undef DDLogWarn
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span><span style="color:#719e07">#undef DDLogInfo
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span><span style="color:#719e07">#undef DDLogDebug
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span><span style="color:#719e07">#undef DDLogVerbose
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span><span style="color:#719e07"></span>...
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span><span style="color:#586e75">// Now define everything how we want it
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span><span style="color:#586e75"></span><span style="color:#719e07">#define LOG_FLAG_FATAL   (1 &lt;&lt; 0)  </span><span style="color:#586e75">// 0...000001
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span><span style="color:#586e75"></span><span style="color:#719e07">#define LOG_LEVEL_FATAL   (LOG_FLAG_FATAL)  </span><span style="color:#586e75">// 0...000001
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span><span style="color:#586e75"></span><span style="color:#719e07">#define LOG_FATAL   (ddLogLevel &amp; LOG_FLAG_FATAL )
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span><span style="color:#719e07">#define DDLogFatal(frmt, ...)    SYNC_LOG_OBJC_MAYBE(ddLogLevel, LOG_FLAG_FATAL,  0, frmt, ##__VA_ARGS__)
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span><span style="color:#719e07"></span>...
+</code></pre></div><p>除了对 level 的重定义之外，我们也可以通过对 level 进行扩展来满足我们对需求。由于 lumberjack 使用的是 bitmask 且只预设了 5 个 bit，对应 5 种 log flag。</p>
 <p>而 logLevel 作为 Int 类型，意味着对于 32 位的系统而言，预留给我们的 levels 还有 28 bits，因为默认的 level 仅仅占用了 4 bits。扩展空间可以说是绰绰有余的。官方提供了两个需要进行扩展的场景，详见：<a href="https://github.com/CocoaLumberjack/CocoaLumberjack/blob/master/Documentation/FineGrainedLogging.md">FineGrainedLogging.md</a>。</p>
 <h3 id="ddloger">DDLoger</h3>
 <blockquote>
@@ -443,43 +319,22 @@ if (!doNotTrack) {
 <li>(i.e. flush, get its loggerQueue, get its name, &hellip;</li>
 </ul>
 </blockquote>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">@protocol</span> <span class="nc">DDLogger</span> <span class="o">&lt;</span><span class="n">NSObject</span><span class="o">&gt;</span>
-
-<span class="o">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nl">logMessage</span><span class="p">:(</span><span class="n">DDLogMessage</span> <span class="o">*</span><span class="p">)</span><span class="n">logMessage</span> <span class="n">NS_SWIFT_NAME</span><span class="p">(</span><span class="n">log</span><span class="p">(</span><span class="nl">message</span><span class="p">:));</span>
-<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">strong</span><span class="p">,</span> <span class="n">nullable</span><span class="p">)</span> <span class="kt">id</span> <span class="o">&lt;</span><span class="n">DDLogFormatter</span><span class="o">&gt;</span> <span class="n">logFormatter</span><span class="p">;</span>
-
-<span class="k">@optional</span>
-<span class="o">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">didAddLogger</span><span class="p">;</span>
-<span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">didAddLoggerInQueue:</span><span class="p">(</span><span class="n">dispatch_queue_t</span><span class="p">)</span><span class="nv">queue</span><span class="p">;</span>
-<span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">willRemoveLogger</span><span class="p">;</span>
-<span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">flush</span><span class="p">;</span>
-
-<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="n">DISPATCH_QUEUE_REFERENCE_TYPE</span><span class="p">,</span> <span class="k">readonly</span><span class="p">)</span> <span class="n">dispatch_queue_t</span> <span class="n">loggerQueue</span><span class="p">;</span>
-<span class="k">@property</span> <span class="p">(</span><span class="k">copy</span><span class="p">,</span> <span class="k">nonatomic</span><span class="p">,</span> <span class="k">readonly</span><span class="p">)</span> <span class="n">DDLoggerName</span> <span class="n">loggerName</span><span class="p">;</span>
-
-<span class="k">@end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>logMessage 没啥好说的，logFormatter 会在后面介绍。重点看上面的几个 optional 方法和参数。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">@protocol</span> <span style="color:#268bd2">DDLogger</span> <span style="color:#719e07">&lt;</span>NSObject<span style="color:#719e07">&gt;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span><span style="color:#719e07">-</span> (<span style="color:#dc322f">void</span>)logMessage:(DDLogMessage <span style="color:#719e07">*</span>)logMessage NS_SWIFT_NAME(log(message:));
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span><span style="color:#719e07">@property</span> (<span style="color:#719e07">nonatomic</span>, <span style="color:#719e07">strong</span>, nullable) <span style="color:#dc322f">id</span> <span style="color:#719e07">&lt;</span>DDLogFormatter<span style="color:#719e07">&gt;</span> logFormatter;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span><span style="color:#719e07">@optional</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span><span style="color:#719e07">-</span> (<span style="color:#dc322f">void</span>)didAddLogger;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>- (<span style="color:#dc322f">void</span>)<span style="color:#268bd2">didAddLoggerInQueue:</span>(dispatch_queue_t)<span style="color:#268bd2">queue</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>- (<span style="color:#dc322f">void</span>)<span style="color:#268bd2">willRemoveLogger</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>- (<span style="color:#dc322f">void</span>)<span style="color:#268bd2">flush</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span><span style="color:#719e07">@property</span> (<span style="color:#719e07">nonatomic</span>, DISPATCH_QUEUE_REFERENCE_TYPE, <span style="color:#719e07">readonly</span>) dispatch_queue_t loggerQueue;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span><span style="color:#719e07">@property</span> (<span style="color:#719e07">copy</span>, <span style="color:#719e07">nonatomic</span>, <span style="color:#719e07">readonly</span>) DDLoggerName loggerName;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span><span style="color:#719e07">@end</span>
+</code></pre></div><p>logMessage 没啥好说的，logFormatter 会在后面介绍。重点看上面的几个 optional 方法和参数。</p>
 <p><strong>loggerQueue</strong></p>
 <p>先看 loggerQueue，由于日志打印均为异步操作，所以会为每个 looger 分配一个 dispatch_queue_t。如果 logger 未提供 loggerQueue，那么 DDLog 为根据你所指定的 loggerName 主动为你生成。</p>
 <p><strong>didAddLogger</strong></p>
@@ -492,35 +347,18 @@ if (!doNotTrack) {
 <blockquote>
 <p>Formatter allow you to format a log message before the logger logs it.</p>
 </blockquote>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">@protocol</span> <span class="nc">DDLogFormatter</span> <span class="o">&lt;</span><span class="n">NSObject</span><span class="o">&gt;</span>
-
-<span class="k">@required</span>
-<span class="o">-</span> <span class="p">(</span><span class="n">nullable</span> <span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nl">formatLogMessage</span><span class="p">:(</span><span class="n">DDLogMessage</span> <span class="o">*</span><span class="p">)</span><span class="n">logMessage</span> <span class="n">NS_SWIFT_NAME</span><span class="p">(</span><span class="n">format</span><span class="p">(</span><span class="nl">message</span><span class="p">:));</span>
-
-<span class="k">@optional</span>
-<span class="o">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nl">didAddToLogger</span><span class="p">:(</span><span class="kt">id</span> <span class="o">&lt;</span><span class="n">DDLogger</span><span class="o">&gt;</span><span class="p">)</span><span class="n">logger</span><span class="p">;</span>
-<span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">didAddToLogger:</span><span class="p">(</span><span class="kt">id</span> <span class="o">&lt;</span><span class="n">DDLogger</span><span class="o">&gt;</span><span class="p">)</span><span class="nv">logger</span> <span class="nf">inQueue:</span><span class="p">(</span><span class="n">dispatch_queue_t</span><span class="p">)</span><span class="nv">queue</span><span class="p">;</span>
-<span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">willRemoveFromLogger:</span><span class="p">(</span><span class="kt">id</span> <span class="o">&lt;</span><span class="n">DDLogger</span><span class="o">&gt;</span><span class="p">)</span><span class="nv">logger</span><span class="p">;</span>
-
-<span class="k">@end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p><strong>formatLogMessage:</strong></p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">@protocol</span> <span style="color:#268bd2">DDLogFormatter</span> <span style="color:#719e07">&lt;</span>NSObject<span style="color:#719e07">&gt;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span><span style="color:#719e07">@required</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span><span style="color:#719e07">-</span> (nullable NSString <span style="color:#719e07">*</span>)formatLogMessage:(DDLogMessage <span style="color:#719e07">*</span>)logMessage NS_SWIFT_NAME(format(message:));
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span><span style="color:#719e07">@optional</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span><span style="color:#719e07">-</span> (<span style="color:#dc322f">void</span>)didAddToLogger:(<span style="color:#dc322f">id</span> <span style="color:#719e07">&lt;</span>DDLogger<span style="color:#719e07">&gt;</span>)logger;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>- (<span style="color:#dc322f">void</span>)<span style="color:#268bd2">didAddToLogger:</span>(<span style="color:#dc322f">id</span> <span style="color:#719e07">&lt;</span>DDLogger<span style="color:#719e07">&gt;</span>)<span style="color:#268bd2">logger</span> <span style="color:#268bd2">inQueue:</span>(dispatch_queue_t)<span style="color:#268bd2">queue</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>- (<span style="color:#dc322f">void</span>)<span style="color:#268bd2">willRemoveFromLogger:</span>(<span style="color:#dc322f">id</span> <span style="color:#719e07">&lt;</span>DDLogger<span style="color:#719e07">&gt;</span>)<span style="color:#268bd2">logger</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span><span style="color:#719e07">@end</span>
+</code></pre></div><p><strong>formatLogMessage:</strong></p>
 <p>formatter 是可以添加到任何 logger 上的，通过 <code>formatLogMessage:</code> 极大提高了 logging 的自由度。怎么理解呢？我们可以通过 <code>formatLogMessage:</code> 给 file logger 和 console 返回不同的结果。例如 console 一般系统会自动在 log 前添加时间戳，而当我们写入 log file 时就需要自行来添加时间。我们还可以通过返回 nil 将其作为 filter 来过滤对应的 log。</p>
 <p><strong>didAddToLogger</strong></p>
 <p>一个 formatter 可以被添加到多个 logger 上。当 formatter 被添加时，通过这个方法来通知它。该方法是需要保证线程安全的，否则可能会出现线程安全异常。</p>
@@ -533,39 +371,20 @@ if (!doNotTrack) {
 </blockquote>
 <p>DDLog 作为 lumberjack 的管理类，负责将用户的 log 信息收集后集中调度至不同的 logger 已达到不同的功能，比如 console log 和 file log。因此，作为单例是必须的。我们先来看看它初始化都准备了什么东西。</p>
 <h3 id="initialize">Initialize</h3>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">@interface</span> <span class="nc">DDLog</span> <span class="p">()</span>
-
-<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">strong</span><span class="p">)</span> <span class="n">NSMutableArray</span> <span class="o">*</span><span class="n">_loggers</span><span class="p">;</span>
-
-<span class="k">@end</span>
-
-<span class="k">@implementation</span> <span class="nc">DDLog</span>
-
-<span class="k">static</span> <span class="n">dispatch_queue_t</span> <span class="n">_loggingQueue</span><span class="p">;</span>
-<span class="k">static</span> <span class="n">dispatch_group_t</span> <span class="n">_loggingGroup</span><span class="p">;</span>
-<span class="k">static</span> <span class="n">dispatch_semaphore_t</span> <span class="n">_queueSemaphore</span><span class="p">;</span>
-<span class="k">static</span> <span class="n">NSUInteger</span> <span class="n">_numProcessors</span><span class="p">;</span>
-<span class="p">...</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>上面几个均为私有变量，_loggers 自不必说，任何 logger 的添加/删除都需要在 loggingQueue/loggingThread 中进行的。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">@interface</span> <span style="color:#268bd2">DDLog</span> ()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span><span style="color:#719e07">@property</span> (<span style="color:#719e07">nonatomic</span>, <span style="color:#719e07">strong</span>) NSMutableArray <span style="color:#719e07">*</span>_loggers;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span><span style="color:#719e07">@end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span><span style="color:#719e07">@implementation</span> <span style="color:#268bd2">DDLog</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span><span style="color:#719e07">static</span> dispatch_queue_t _loggingQueue;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span><span style="color:#719e07">static</span> dispatch_group_t _loggingGroup;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span><span style="color:#719e07">static</span> dispatch_semaphore_t _queueSemaphore;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span><span style="color:#719e07">static</span> NSUInteger _numProcessors;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>...
+</code></pre></div><p>上面几个均为私有变量，_loggers 自不必说，任何 logger 的添加/删除都需要在 loggingQueue/loggingThread 中进行的。</p>
 <p><strong>_loggingQueue</strong></p>
 <p>全局的 log queue 用于保证 FIFO 的操作顺序，所有 logger 会通过它来顺序执行各 logger 的 <code>logMessage:</code> 。</p>
 <p><strong>_loggingGroup</strong></p>
@@ -576,594 +395,263 @@ if (!doNotTrack) {
 <p><strong>_numProcessors</strong></p>
 <p>记录处理器内核数量，以针对单核情况时进行相应的优化。</p>
 <p>作为静态变量，其初始化则放在 <code>initialize</code>，如下：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="p">+</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">initialize</span> <span class="p">{</span>
-    <span class="k">static</span> <span class="n">dispatch_once_t</span> <span class="n">DDLogOnceToken</span><span class="p">;</span>
-
-    <span class="n">dispatch_once</span><span class="p">(</span><span class="o">&amp;</span><span class="n">DDLogOnceToken</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span>
-        <span class="n">NSLogDebug</span><span class="p">(</span><span class="s">@&#34;DDLog: Using grand central dispatch&#34;</span><span class="p">);</span>
-
-        <span class="n">_loggingQueue</span> <span class="o">=</span> <span class="n">dispatch_queue_create</span><span class="p">(</span><span class="s">&#34;cocoa.lumberjack&#34;</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
-        <span class="n">_loggingGroup</span> <span class="o">=</span> <span class="n">dispatch_group_create</span><span class="p">();</span>
-
-        <span class="kt">void</span> <span class="o">*</span><span class="n">nonNullValue</span> <span class="o">=</span> <span class="n">GlobalLoggingQueueIdentityKey</span><span class="p">;</span> <span class="c1">// Whatever, just not null
-</span><span class="c1"></span>        <span class="n">dispatch_queue_set_specific</span><span class="p">(</span><span class="n">_loggingQueue</span><span class="p">,</span> <span class="n">GlobalLoggingQueueIdentityKey</span><span class="p">,</span> <span class="n">nonNullValue</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
-
-        <span class="n">_queueSemaphore</span> <span class="o">=</span> <span class="n">dispatch_semaphore_create</span><span class="p">(</span><span class="n">DDLOG_MAX_QUEUE_SIZE</span><span class="p">);</span>
-
-        <span class="c1">// Figure out how many processors are available.
-</span><span class="c1"></span>        <span class="c1">// This may be used later for an optimization on uniprocessor machines.
-</span><span class="c1"></span>
-        <span class="n">_numProcessors</span> <span class="o">=</span> <span class="n">MAX</span><span class="p">([</span><span class="n">NSProcessInfo</span> <span class="n">processInfo</span><span class="p">].</span><span class="n">processorCount</span><span class="p">,</span> <span class="p">(</span><span class="n">NSUInteger</span><span class="p">)</span> <span class="mi">1</span><span class="p">);</span>
-
-        <span class="n">NSLogDebug</span><span class="p">(</span><span class="s">@&#34;DDLog: numProcessors = %@&#34;</span><span class="p">,</span> <span class="l">@(</span><span class="n">_numProcessors</span><span class="l">)</span><span class="p">);</span>
-    <span class="p">});</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>上述代码中，通过 <code>dispatch_queue_set_specific</code> 为 _loggingQueue 添加了 key：<strong>GlobalLoggingQueueIdentityKey</strong> 作为标记。之后会在所有的内部方法执行前通过 <code>dispatch_get_specific</code> 获取 flag 来进行断言，确保内部方法都是在全局的 _loggingQueue 中调度的。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span>+ (<span style="color:#dc322f">void</span>)<span style="color:#268bd2">initialize</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>    <span style="color:#719e07">static</span> dispatch_once_t DDLogOnceToken;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>    dispatch_once(<span style="color:#719e07">&amp;</span>DDLogOnceToken, <span style="color:#719e07">^</span>{
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>        NSLogDebug(<span style="color:#2aa198">@&#34;DDLog: Using grand central dispatch&#34;</span>);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>        _loggingQueue <span style="color:#719e07">=</span> dispatch_queue_create(<span style="color:#2aa198">&#34;cocoa.lumberjack&#34;</span>, <span style="color:#b58900">NULL</span>);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>        _loggingGroup <span style="color:#719e07">=</span> dispatch_group_create();
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>        <span style="color:#dc322f">void</span> <span style="color:#719e07">*</span>nonNullValue <span style="color:#719e07">=</span> GlobalLoggingQueueIdentityKey; <span style="color:#586e75">// Whatever, just not null
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span><span style="color:#586e75"></span>        dispatch_queue_set_specific(_loggingQueue, GlobalLoggingQueueIdentityKey, nonNullValue, <span style="color:#b58900">NULL</span>);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>        _queueSemaphore <span style="color:#719e07">=</span> dispatch_semaphore_create(DDLOG_MAX_QUEUE_SIZE);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>        <span style="color:#586e75">// Figure out how many processors are available.
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span><span style="color:#586e75"></span>        <span style="color:#586e75">// This may be used later for an optimization on uniprocessor machines.
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span><span style="color:#586e75"></span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>        _numProcessors <span style="color:#719e07">=</span> MAX([NSProcessInfo processInfo].processorCount, (NSUInteger) <span style="color:#2aa198">1</span>);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>        NSLogDebug(<span style="color:#2aa198">@&#34;DDLog: numProcessors = %@&#34;</span>, @(_numProcessors));
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span>    });
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">22</span>}
+</code></pre></div><p>上述代码中，通过 <code>dispatch_queue_set_specific</code> 为 _loggingQueue 添加了 key：<strong>GlobalLoggingQueueIdentityKey</strong> 作为标记。之后会在所有的内部方法执行前通过 <code>dispatch_get_specific</code> 获取 flag 来进行断言，确保内部方法都是在全局的 _loggingQueue 中调度的。</p>
 <p>接着，我们来看看 DDLog 实例的初始化，仅做了两件事：</p>
 <ul>
 <li>_loggers 初始化；</li>
 <li>尝试注册通知，确保 APP 进程结束前能够及时将 Logger 中的 message 处理完毕；</li>
 </ul>
 <p>由于 lumberjack 支持全平台以及命令行，这里的 notificationName 判断条件相对多一些：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="cp">#if TARGET_OS_IOS
-</span><span class="cp"></span>    <span class="n">NSString</span> <span class="o">*</span><span class="n">notificationName</span> <span class="o">=</span> <span class="n">UIApplicationWillTerminateNotification</span><span class="p">;</span>
-<span class="cp">#else
-</span><span class="cp"></span>    <span class="n">NSString</span> <span class="o">*</span><span class="n">notificationName</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
-    <span class="c1">// On Command Line Tool apps AppKit may not be available
-</span><span class="c1"></span><span class="cp">#if !defined(DD_CLI) &amp;&amp; __has_include(&lt;AppKit/NSApplication.h&gt;)
-</span><span class="cp"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">NSApp</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">notificationName</span> <span class="o">=</span> <span class="n">NSApplicationWillTerminateNotification</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="cp">#endif
-</span><span class="cp"></span>    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">notificationName</span><span class="p">)</span> <span class="p">{</span>
-        <span class="c1">// If there is no NSApp -&gt; we are running Command Line Tool app.
-</span><span class="c1"></span>        <span class="c1">// In this case terminate notification wouldn&#39;t be fired, so we use workaround.
-</span><span class="c1"></span>        <span class="k">__weak</span> <span class="n">__auto_type</span> <span class="n">weakSelf</span> <span class="o">=</span> <span class="nb">self</span><span class="p">;</span>
-        <span class="n">atexit_b</span> <span class="p">(</span><span class="o">^</span><span class="p">{</span>
-            <span class="p">[</span><span class="n">weakSelf</span> <span class="nl">applicationWillTerminate</span><span class="p">:</span><span class="nb">nil</span><span class="p">];</span>
-        <span class="p">});</span>
-    <span class="p">}</span>
-<span class="cp">#endif </span><span class="cm">/* if TARGET_OS_IOS */</span><span class="cp">
-</span></code></pre></td></tr></table>
-</div>
-</div><p>稍微提一点，命令行中是如何来监听程序退出？这里用到了 <code>atexit</code></p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">#if TARGET_OS_IOS
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span><span style="color:#719e07"></span>    NSString <span style="color:#719e07">*</span>notificationName <span style="color:#719e07">=</span> UIApplicationWillTerminateNotification;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span><span style="color:#719e07">#else
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span><span style="color:#719e07"></span>    NSString <span style="color:#719e07">*</span>notificationName <span style="color:#719e07">=</span> <span style="color:#b58900">nil</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>    <span style="color:#586e75">// On Command Line Tool apps AppKit may not be available
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span><span style="color:#586e75"></span><span style="color:#719e07">#if !defined(DD_CLI) &amp;&amp; __has_include(&lt;AppKit/NSApplication.h&gt;)
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span><span style="color:#719e07"></span>    <span style="color:#719e07">if</span> (NSApp) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>        notificationName <span style="color:#719e07">=</span> NSApplicationWillTerminateNotification;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span><span style="color:#719e07">#endif
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span><span style="color:#719e07"></span>    <span style="color:#719e07">if</span> (<span style="color:#719e07">!</span>notificationName) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>        <span style="color:#586e75">// If there is no NSApp -&gt; we are running Command Line Tool app.
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span><span style="color:#586e75"></span>        <span style="color:#586e75">// In this case terminate notification wouldn&#39;t be fired, so we use workaround.
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span><span style="color:#586e75"></span>        <span style="color:#719e07">__weak</span> __auto_type weakSelf <span style="color:#719e07">=</span> <span style="color:#b58900">self</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>        atexit_b (<span style="color:#719e07">^</span>{
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>            [weakSelf applicationWillTerminate:<span style="color:#b58900">nil</span>];
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>        });
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span><span style="color:#719e07">#endif </span><span style="color:#586e75">/* if TARGET_OS_IOS */</span><span style="color:#719e07">
+</span></code></pre></div><p>稍微提一点，命令行中是如何来监听程序退出？这里用到了 <code>atexit</code></p>
 <blockquote>
 <p>The atexit() function registers the given function to be called at program exit, whether via exit(3) or via return from the program&rsquo;s main().  Functions so registered are called in reverse order; no arguments are passed.</p>
 </blockquote>
 <p>就是说，程序在退出时，系统会主动调用通过 atexit 注册的 callbacks，可以注册多个回调，按照顺序执行。</p>
 <p>DDLog 在收到通知后会触发 <code>flush</code>，这个我们晚一点展开。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">if</span> <span class="p">(</span><span class="n">notificationName</span><span class="p">)</span> <span class="p">{</span>
-    <span class="p">[[</span><span class="n">NSNotificationCenter</span> <span class="n">defaultCenter</span><span class="p">]</span> <span class="nl">addObserver</span><span class="p">:</span><span class="nb">self</span>
-                                             <span class="nl">selector</span><span class="p">:</span><span class="k">@selector</span><span class="p">(</span><span class="nl">applicationWillTerminate</span><span class="p">:)</span>
-                                                 <span class="nl">name</span><span class="p">:</span><span class="n">notificationName</span>
-                                               <span class="nl">object</span><span class="p">:</span><span class="nb">nil</span><span class="p">];</span>
-<span class="p">}</span>
-
-<span class="o">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nl">applicationWillTerminate</span><span class="p">:(</span><span class="n">NSNotification</span> <span class="o">*</span> <span class="n">__attribute__</span><span class="p">((</span><span class="n">unused</span><span class="p">)))</span><span class="n">notification</span> <span class="p">{</span>
-    <span class="p">[</span><span class="nb">self</span> <span class="n">flushLog</span><span class="p">];</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><h3 id="logger-management">Logger Management</h3>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">if</span> (notificationName) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>    [[NSNotificationCenter defaultCenter] addObserver:<span style="color:#b58900">self</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>                                             selector:<span style="color:#719e07">@selector</span>(applicationWillTerminate:)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>                                                 name:notificationName
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>                                               object:<span style="color:#b58900">nil</span>];
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span><span style="color:#719e07">-</span> (<span style="color:#dc322f">void</span>)applicationWillTerminate:(NSNotification <span style="color:#719e07">*</span> __attribute__((unused)))notification {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>    [<span style="color:#b58900">self</span> flushLog];
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>}
+</code></pre></div><h3 id="logger-management">Logger Management</h3>
 <p>对 logger 的操作主要是添加和删除。</p>
 <p><strong>AddLogger</strong></p>
 <p>DDLog 提供了多个添加 logger 的 convince 方法：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="p">+</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">addLogger:</span><span class="p">(</span><span class="kt">id</span> <span class="o">&lt;</span><span class="n">DDLogger</span><span class="o">&gt;</span><span class="p">)</span><span class="nv">logger</span><span class="p">;</span>
-<span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">addLogger:</span><span class="p">(</span><span class="kt">id</span> <span class="o">&lt;</span><span class="n">DDLogger</span><span class="o">&gt;</span><span class="p">)</span><span class="nv">logger</span><span class="p">;</span>
-<span class="p">+</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">addLogger:</span><span class="p">(</span><span class="kt">id</span> <span class="o">&lt;</span><span class="n">DDLogger</span><span class="o">&gt;</span><span class="p">)</span><span class="nv">logger</span> <span class="nf">withLevel:</span><span class="p">(</span><span class="n">DDLogLevel</span><span class="p">)</span><span class="nv">level</span><span class="p">;</span>
-<span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">addLogger:</span><span class="p">(</span><span class="kt">id</span> <span class="o">&lt;</span><span class="n">DDLogger</span><span class="o">&gt;</span><span class="p">)</span><span class="nv">logger</span> <span class="nf">withLevel:</span><span class="p">(</span><span class="n">DDLogLevel</span><span class="p">)</span><span class="nv">level</span><span class="err">；</span>
-
-<span class="o">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nl">addLogger</span><span class="p">:(</span><span class="kt">id</span> <span class="o">&lt;</span><span class="n">DDLogger</span><span class="o">&gt;</span><span class="p">)</span><span class="n">logger</span> <span class="nl">withLevel</span><span class="p">:(</span><span class="n">DDLogLevel</span><span class="p">)</span><span class="n">level</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">logger</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">return</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="n">dispatch_async</span><span class="p">(</span><span class="n">_loggingQueue</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span> <span class="k">@autoreleasepool</span> <span class="p">{</span>
-        <span class="p">[</span><span class="nb">self</span> <span class="nl">lt_addLogger</span><span class="p">:</span><span class="n">logger</span> <span class="nl">level</span><span class="p">:</span><span class="n">level</span><span class="p">];</span>
-    <span class="p">}</span> <span class="p">});</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>在放入 _loggingQueue 后，最终走到了 <code>lt_addLogger: level:</code> 方法。这里的前缀 <code>lt</code> 是 lgging thread 的缩写。在 logger 添加前会检查去重：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">for</span> <span class="p">(</span><span class="n">DDLoggerNode</span> <span class="o">*</span><span class="n">node</span> <span class="k">in</span> <span class="nb">self</span><span class="p">.</span><span class="n">_loggers</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">_logger</span> <span class="o">==</span> <span class="n">logger</span> <span class="o">&amp;&amp;</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">_level</span> <span class="o">==</span> <span class="n">level</span><span class="p">)</span> <span class="p">{</span>
-        <span class="c1">// Exactly same logger already added, exit
-</span><span class="c1"></span>        <span class="k">return</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p><strong>DDLoggerNode</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">@interface</span> <span class="nc">DDLoggerNode</span> : <span class="nc">NSObject</span>
-<span class="p">{</span>
-    <span class="c1">// Direct accessors to be used only for performance
-</span><span class="c1"></span>    <span class="k">@public</span>
-    <span class="kt">id</span> <span class="o">&lt;</span><span class="n">DDLogger</span><span class="o">&gt;</span> <span class="n">_logger</span><span class="p">;</span>
-    <span class="n">DDLogLevel</span> <span class="n">_level</span><span class="p">;</span>
-    <span class="n">dispatch_queue_t</span> <span class="n">_loggerQueue</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="p">+</span> <span class="p">(</span><span class="kt">instancetype</span><span class="p">)</span><span class="nf">nodeWithLogger:</span><span class="p">(</span><span class="kt">id</span> <span class="o">&lt;</span><span class="n">DDLogger</span><span class="o">&gt;</span><span class="p">)</span><span class="nv">logger</span>
-                   <span class="nf">loggerQueue:</span><span class="p">(</span><span class="n">dispatch_queue_t</span><span class="p">)</span><span class="nv">loggerQueue</span>
-                         <span class="nf">level:</span><span class="p">(</span><span class="n">DDLogLevel</span><span class="p">)</span><span class="nv">level</span><span class="p">;</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>私有类，用于关联 logger、level 和 loggerQueue。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span>+ (<span style="color:#dc322f">void</span>)<span style="color:#268bd2">addLogger:</span>(<span style="color:#dc322f">id</span> <span style="color:#719e07">&lt;</span>DDLogger<span style="color:#719e07">&gt;</span>)<span style="color:#268bd2">logger</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>- (<span style="color:#dc322f">void</span>)<span style="color:#268bd2">addLogger:</span>(<span style="color:#dc322f">id</span> <span style="color:#719e07">&lt;</span>DDLogger<span style="color:#719e07">&gt;</span>)<span style="color:#268bd2">logger</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>+ (<span style="color:#dc322f">void</span>)<span style="color:#268bd2">addLogger:</span>(<span style="color:#dc322f">id</span> <span style="color:#719e07">&lt;</span>DDLogger<span style="color:#719e07">&gt;</span>)<span style="color:#268bd2">logger</span> <span style="color:#268bd2">withLevel:</span>(DDLogLevel)<span style="color:#268bd2">level</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>- (<span style="color:#dc322f">void</span>)<span style="color:#268bd2">addLogger:</span>(<span style="color:#dc322f">id</span> <span style="color:#719e07">&lt;</span>DDLogger<span style="color:#719e07">&gt;</span>)<span style="color:#268bd2">logger</span> <span style="color:#268bd2">withLevel:</span>(DDLogLevel)<span style="color:#268bd2">level</span>；
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span><span style="color:#719e07">-</span> (<span style="color:#dc322f">void</span>)addLogger:(<span style="color:#dc322f">id</span> <span style="color:#719e07">&lt;</span>DDLogger<span style="color:#719e07">&gt;</span>)logger withLevel:(DDLogLevel)level {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>    <span style="color:#719e07">if</span> (<span style="color:#719e07">!</span>logger) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>        <span style="color:#719e07">return</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>    dispatch_async(_loggingQueue, <span style="color:#719e07">^</span>{ <span style="color:#719e07">@autoreleasepool</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>        [<span style="color:#b58900">self</span> lt_addLogger:logger level:level];
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>    } });
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>}
+</code></pre></div><p>在放入 _loggingQueue 后，最终走到了 <code>lt_addLogger: level:</code> 方法。这里的前缀 <code>lt</code> 是 lgging thread 的缩写。在 logger 添加前会检查去重：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#719e07">for</span> (DDLoggerNode <span style="color:#719e07">*</span>node <span style="color:#719e07">in</span> <span style="color:#b58900">self</span>._loggers) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>    <span style="color:#719e07">if</span> (node<span style="color:#719e07">-&gt;</span>_logger <span style="color:#719e07">==</span> logger <span style="color:#719e07">&amp;&amp;</span> node<span style="color:#719e07">-&gt;</span>_level <span style="color:#719e07">==</span> level) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>        <span style="color:#586e75">// Exactly same logger already added, exit
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span><span style="color:#586e75"></span>        <span style="color:#719e07">return</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>}
+</code></pre></div><p><strong>DDLoggerNode</strong></p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objc" data-lang="objc"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">@interface</span> <span style="color:#268bd2">DDLoggerNode</span> : <span style="color:#268bd2">NSObject</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>{
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>    <span style="color:#586e75">// Direct accessors to be used only for performance
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span><span style="color:#586e75"></span>    <span style="color:#719e07">@public</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>    <span style="color:#dc322f">id</span> <span style="color:#719e07">&lt;</span>DDLogger<span style="color:#719e07">&gt;</span> _logger;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>    DDLogLevel _level;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>    dispatch_queue_t _loggerQueue;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>+ (<span style="color:#dc322f">instancetype</span>)<span style="color:#268bd2">nodeWithLogger:</span>(<span style="color:#dc322f">id</span> <span style="color:#719e07">&lt;</span>DDLogger<span style="color:#719e07">&gt;</span>)<span style="color:#268bd2">logger</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>                   <span style="color:#268bd2">loggerQueue:</span>(dispatch_queue_t)<span style="color:#268bd2">loggerQueue</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>                         <span style="color:#268bd2">level:</span>(DDLogLevel)<span style="color:#268bd2">level</span>;
+</code></pre></div><p>私有类，用于关联 logger、level 和 loggerQueue。</p>
 <p>稍微提一下，在 DDLoggerNode 的初始化方法中的，兼容了 MRC 的使用。内部使用了一个宏 <code>OS_OBJECT_USE_OBJC</code> 来区分 GCD 是否支持 ARC。在6.0 之前 GCD 中的对象是不支持 ARC，因此在 6.0 之前 <code>OS_OBJECT_USE_OBJC</code> 是没有的。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">if</span> <span class="p">(</span><span class="n">loggerQueue</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">_loggerQueue</span> <span class="o">=</span> <span class="n">loggerQueue</span><span class="p">;</span>
-    <span class="cp">#if !OS_OBJECT_USE_OBJC
-</span><span class="cp"></span>    <span class="n">dispatch_retain</span><span class="p">(</span><span class="n">loggerQueue</span><span class="p">);</span>
-    <span class="cp">#endif
-</span><span class="cp"></span><span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>接着就是前面所提到的 QueueIdentity 的断言：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">NSAssert</span><span class="p">(</span><span class="n">dispatch_get_specific</span><span class="p">(</span><span class="n">GlobalLoggingQueueIdentityKey</span><span class="p">),</span>
-         <span class="s">@&#34;This method should only be run on the logging thread/queue&#34;</span><span class="p">);</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>准备 loggerQueue：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">dispatch_queue_t</span> <span class="n">loggerQueue</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-<span class="k">if</span> <span class="p">([</span><span class="n">logger</span> <span class="nl">respondsToSelector</span><span class="p">:</span><span class="k">@selector</span><span class="p">(</span><span class="n">loggerQueue</span><span class="p">)])</span> <span class="p">{</span>
-    <span class="n">loggerQueue</span> <span class="o">=</span> <span class="n">logger</span><span class="p">.</span><span class="n">loggerQueue</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="k">if</span> <span class="p">(</span><span class="n">loggerQueue</span> <span class="o">==</span> <span class="nb">nil</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">loggerQueueName</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">([</span><span class="n">logger</span> <span class="nl">respondsToSelector</span><span class="p">:</span><span class="k">@selector</span><span class="p">(</span><span class="n">loggerName</span><span class="p">)])</span> <span class="p">{</span>
-        <span class="n">loggerQueueName</span> <span class="o">=</span> <span class="n">logger</span><span class="p">.</span><span class="n">loggerName</span><span class="p">.</span><span class="n">UTF8String</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="n">loggerQueue</span> <span class="o">=</span> <span class="n">dispatch_queue_create</span><span class="p">(</span><span class="n">loggerQueueName</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>这段代码，有没有似曾相识的干？这是在 <code>DDLogger Protocol</code> 声明时提到的逻辑。如果 logger 提供了 loggerQueue 则直接使用。否则，通过 loggerName 来创建。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#719e07">if</span> (loggerQueue) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>    _loggerQueue <span style="color:#719e07">=</span> loggerQueue;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>    <span style="color:#719e07">#if !OS_OBJECT_USE_OBJC
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span><span style="color:#719e07"></span>    dispatch_retain(loggerQueue);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>    <span style="color:#719e07">#endif
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span><span style="color:#719e07"></span>}
+</code></pre></div><p>接着就是前面所提到的 QueueIdentity 的断言：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>NSAssert(dispatch_get_specific(GlobalLoggingQueueIdentityKey),
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>         <span style="color:#2aa198">@&#34;This method should only be run on the logging thread/queue&#34;</span>);
+</code></pre></div><p>准备 loggerQueue：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span>dispatch_queue_t loggerQueue <span style="color:#719e07">=</span> <span style="color:#b58900">NULL</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span><span style="color:#719e07">if</span> ([logger respondsToSelector:<span style="color:#719e07">@selector</span>(loggerQueue)]) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>    loggerQueue <span style="color:#719e07">=</span> logger.loggerQueue;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span><span style="color:#719e07">if</span> (loggerQueue <span style="color:#719e07">==</span> <span style="color:#b58900">nil</span>) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>    <span style="color:#719e07">const</span> <span style="color:#dc322f">char</span> <span style="color:#719e07">*</span>loggerQueueName <span style="color:#719e07">=</span> <span style="color:#b58900">NULL</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>    <span style="color:#719e07">if</span> ([logger respondsToSelector:<span style="color:#719e07">@selector</span>(loggerName)]) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>        loggerQueueName <span style="color:#719e07">=</span> logger.loggerName.UTF8String;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>    loggerQueue <span style="color:#719e07">=</span> dispatch_queue_create(loggerQueueName, <span style="color:#b58900">NULL</span>);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>}
+</code></pre></div><p>这段代码，有没有似曾相识的干？这是在 <code>DDLogger Protocol</code> 声明时提到的逻辑。如果 logger 提供了 loggerQueue 则直接使用。否则，通过 loggerName 来创建。</p>
 <p>最后就是创建 DDLoggerNode，添加 logger，发送 <code>didAddLogger</code> 通知。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">DDLoggerNode</span> <span class="o">*</span><span class="n">loggerNode</span> <span class="o">=</span> <span class="p">[</span><span class="n">DDLoggerNode</span> <span class="nl">nodeWithLogger</span><span class="p">:</span><span class="n">logger</span> <span class="nl">loggerQueue</span><span class="p">:</span><span class="n">loggerQueue</span> <span class="nl">level</span><span class="p">:</span><span class="n">level</span><span class="p">];</span>
-<span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">_loggers</span> <span class="nl">addObject</span><span class="p">:</span><span class="n">loggerNode</span><span class="p">];</span>
-
-<span class="k">if</span> <span class="p">([</span><span class="n">logger</span> <span class="nl">respondsToSelector</span><span class="p">:</span><span class="k">@selector</span><span class="p">(</span><span class="nl">didAddLoggerInQueue</span><span class="p">:)])</span> <span class="p">{</span>
-    <span class="n">dispatch_async</span><span class="p">(</span><span class="n">loggerNode</span><span class="o">-&gt;</span><span class="n">_loggerQueue</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span> <span class="k">@autoreleasepool</span> <span class="p">{</span>
-        <span class="p">[</span><span class="n">logger</span> <span class="nl">didAddLoggerInQueue</span><span class="p">:</span><span class="n">loggerNode</span><span class="o">-&gt;</span><span class="n">_loggerQueue</span><span class="p">];</span>
-    <span class="p">}</span> <span class="p">});</span>
-<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">([</span><span class="n">logger</span> <span class="nl">respondsToSelector</span><span class="p">:</span><span class="k">@selector</span><span class="p">(</span><span class="n">didAddLogger</span><span class="p">)])</span> <span class="p">{</span>
-    <span class="n">dispatch_async</span><span class="p">(</span><span class="n">loggerNode</span><span class="o">-&gt;</span><span class="n">_loggerQueue</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span> <span class="k">@autoreleasepool</span> <span class="p">{</span>
-        <span class="p">[</span><span class="n">logger</span> <span class="n">didAddLogger</span><span class="p">];</span>
-    <span class="p">}</span> <span class="p">});</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p><strong>RemoveLogger</strong></p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span>DDLoggerNode <span style="color:#719e07">*</span>loggerNode <span style="color:#719e07">=</span> [DDLoggerNode nodeWithLogger:logger loggerQueue:loggerQueue level:level];
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>[<span style="color:#b58900">self</span>._loggers addObject:loggerNode];
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span><span style="color:#719e07">if</span> ([logger respondsToSelector:<span style="color:#719e07">@selector</span>(didAddLoggerInQueue:)]) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>    dispatch_async(loggerNode<span style="color:#719e07">-&gt;</span>_loggerQueue, <span style="color:#719e07">^</span>{ <span style="color:#719e07">@autoreleasepool</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>        [logger didAddLoggerInQueue:loggerNode<span style="color:#719e07">-&gt;</span>_loggerQueue];
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>    } });
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>} <span style="color:#719e07">else</span> <span style="color:#719e07">if</span> ([logger respondsToSelector:<span style="color:#719e07">@selector</span>(didAddLogger)]) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>    dispatch_async(loggerNode<span style="color:#719e07">-&gt;</span>_loggerQueue, <span style="color:#719e07">^</span>{ <span style="color:#719e07">@autoreleasepool</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>        [logger didAddLogger];
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>    } });
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>}
+</code></pre></div><p><strong>RemoveLogger</strong></p>
 <p>同 addLogger 类似，removeLogger 也提供了实例方法和类方法。类方法通过 sharedInstance 最终收口到实例方法：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">removeLogger:</span><span class="p">(</span><span class="kt">id</span> <span class="o">&lt;</span><span class="n">DDLogger</span><span class="o">&gt;</span><span class="p">)</span><span class="nv">logger</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">logger</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">return</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="n">dispatch_async</span><span class="p">(</span><span class="n">_loggingQueue</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span> <span class="k">@autoreleasepool</span> <span class="p">{</span>
-        <span class="p">[</span><span class="nb">self</span> <span class="nl">lt_removeLogger</span><span class="p">:</span><span class="n">logger</span><span class="p">];</span>
-    <span class="p">}</span> <span class="p">});</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p><strong>-[DDLog lt_removeLogger:]</strong></p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>- (<span style="color:#dc322f">void</span>)<span style="color:#268bd2">removeLogger:</span>(<span style="color:#dc322f">id</span> <span style="color:#719e07">&lt;</span>DDLogger<span style="color:#719e07">&gt;</span>)<span style="color:#268bd2">logger</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>    <span style="color:#719e07">if</span> (<span style="color:#719e07">!</span>logger) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>        <span style="color:#719e07">return</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>    dispatch_async(_loggingQueue, <span style="color:#719e07">^</span>{ <span style="color:#719e07">@autoreleasepool</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>        [<span style="color:#b58900">self</span> lt_removeLogger:logger];
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span>    } });
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">8</span>}
+</code></pre></div><p><strong>-[DDLog lt_removeLogger:]</strong></p>
 <p>删除前，照例是 loggingQueue 检查，然后遍历获取 loggerNode：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">DDLoggerNode</span> <span class="o">*</span><span class="n">loggerNode</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
-<span class="k">for</span> <span class="p">(</span><span class="n">DDLoggerNode</span> <span class="o">*</span><span class="n">node</span> <span class="k">in</span> <span class="nb">self</span><span class="p">.</span><span class="n">_loggers</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">_logger</span> <span class="o">==</span> <span class="n">logger</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">loggerNode</span> <span class="o">=</span> <span class="n">node</span><span class="p">;</span>
-        <span class="k">break</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>如果 loggerNode 不存在，则提前结束。存在，则会先向 loggerNode 发送 <code>willRemoveLogger</code> 通知，再移除。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">if</span> <span class="p">([</span><span class="n">logger</span> <span class="nl">respondsToSelector</span><span class="p">:</span><span class="k">@selector</span><span class="p">(</span><span class="n">willRemoveLogger</span><span class="p">)])</span> <span class="p">{</span>
-    <span class="n">dispatch_async</span><span class="p">(</span><span class="n">loggerNode</span><span class="o">-&gt;</span><span class="n">_loggerQueue</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span> <span class="k">@autoreleasepool</span> <span class="p">{</span>
-        <span class="p">[</span><span class="n">logger</span> <span class="n">willRemoveLogger</span><span class="p">];</span>
-    <span class="p">}</span> <span class="p">});</span>
-<span class="p">}</span>
-<span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">_loggers</span> <span class="nl">removeObject</span><span class="p">:</span><span class="n">loggerNode</span><span class="p">];</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>DDLog 还提供了 removeAllLoggers 的方法，以一次性清零 loggers，实现同 <code>lt_removeLogger:</code> 类似，这里不展开了。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>DDLoggerNode <span style="color:#719e07">*</span>loggerNode <span style="color:#719e07">=</span> <span style="color:#b58900">nil</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span><span style="color:#719e07">for</span> (DDLoggerNode <span style="color:#719e07">*</span>node <span style="color:#719e07">in</span> <span style="color:#b58900">self</span>._loggers) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>    <span style="color:#719e07">if</span> (node<span style="color:#719e07">-&gt;</span>_logger <span style="color:#719e07">==</span> logger) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>        loggerNode <span style="color:#719e07">=</span> node;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>        <span style="color:#719e07">break</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span>}
+</code></pre></div><p>如果 loggerNode 不存在，则提前结束。存在，则会先向 loggerNode 发送 <code>willRemoveLogger</code> 通知，再移除。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#719e07">if</span> ([logger respondsToSelector:<span style="color:#719e07">@selector</span>(willRemoveLogger)]) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>    dispatch_async(loggerNode<span style="color:#719e07">-&gt;</span>_loggerQueue, <span style="color:#719e07">^</span>{ <span style="color:#719e07">@autoreleasepool</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>        [logger willRemoveLogger];
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>    } });
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>[<span style="color:#b58900">self</span>._loggers removeObject:loggerNode];
+</code></pre></div><p>DDLog 还提供了 removeAllLoggers 的方法，以一次性清零 loggers，实现同 <code>lt_removeLogger:</code> 类似，这里不展开了。</p>
 <h3 id="logging">Logging</h3>
 <p>logging 相关方法是 DDLog 的核心，提供三种类型的实例方法，以及分别对应的类方法。我们来看第一个：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span><span class="lnt">9
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="p">+</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">log:</span><span class="p">(</span><span class="kt">BOOL</span><span class="p">)</span><span class="nv">asynchronous</span>
-      <span class="nf">level:</span><span class="p">(</span><span class="n">DDLogLevel</span><span class="p">)</span><span class="nv">level</span>
-       <span class="nf">flag:</span><span class="p">(</span><span class="n">DDLogFlag</span><span class="p">)</span><span class="nv">flag</span>
-    <span class="nf">context:</span><span class="p">(</span><span class="n">NSInteger</span><span class="p">)</span><span class="nv">context</span>
-       <span class="nf">file:</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="p">)</span><span class="nv">file</span>
-   <span class="nf">function:</span><span class="p">(</span><span class="n">nullable</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="p">)</span><span class="nv">function</span>
-       <span class="nf">line:</span><span class="p">(</span><span class="n">NSUInteger</span><span class="p">)</span><span class="nv">line</span>
-        <span class="nf">tag:</span><span class="p">(</span><span class="n">nullable</span> <span class="kt">id</span><span class="p">)</span><span class="nv">tag</span>
-     <span class="nf">format:</span><span class="p">(</span><span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">format</span><span class="p">,</span> <span class="p">...</span> <span class="n">NS_FORMAT_FUNCTION</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="mi">10</span><span class="p">);</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>熟悉吧，这些参数前面都介绍过了，是构造 log message 所需的关参数。最后一个 C 写法的可变参数 <code>...</code> 用于生成 log message string，同样 DDLog 也提供了它的变种 <code>args:(va_list)argList</code> ，这就是第二种 log 方法。最后一种则是由用户直接提供 logMessage。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>+ (<span style="color:#dc322f">void</span>)<span style="color:#268bd2">log:</span>(<span style="color:#dc322f">BOOL</span>)<span style="color:#268bd2">asynchronous</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>      <span style="color:#268bd2">level:</span>(DDLogLevel)<span style="color:#268bd2">level</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>       <span style="color:#268bd2">flag:</span>(DDLogFlag)<span style="color:#268bd2">flag</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>    <span style="color:#268bd2">context:</span>(NSInteger)<span style="color:#268bd2">context</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>       <span style="color:#268bd2">file:</span>(<span style="color:#719e07">const</span> <span style="color:#dc322f">char</span> <span style="color:#719e07">*</span>)<span style="color:#268bd2">file</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>   <span style="color:#268bd2">function:</span>(nullable <span style="color:#719e07">const</span> <span style="color:#dc322f">char</span> <span style="color:#719e07">*</span>)<span style="color:#268bd2">function</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span>       <span style="color:#268bd2">line:</span>(NSUInteger)<span style="color:#268bd2">line</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">8</span>        <span style="color:#268bd2">tag:</span>(nullable <span style="color:#dc322f">id</span>)<span style="color:#268bd2">tag</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">9</span>     <span style="color:#268bd2">format:</span>(NSString <span style="color:#719e07">*</span>)<span style="color:#268bd2">format</span>, ... NS_FORMAT_FUNCTION(<span style="color:#2aa198">9</span>,<span style="color:#2aa198">10</span>);
+</code></pre></div><p>熟悉吧，这些参数前面都介绍过了，是构造 log message 所需的关参数。最后一个 C 写法的可变参数 <code>...</code> 用于生成 log message string，同样 DDLog 也提供了它的变种 <code>args:(va_list)argList</code> ，这就是第二种 log 方法。最后一种则是由用户直接提供 logMessage。</p>
 <p>对于 <code>...</code> 的可变参数的获取，是通过 c 提供的宏，代码如下：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">va_list</span> <span class="n">args</span><span class="p">;</span>
-<span class="n">va_start</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">format</span><span class="p">);</span>
-<span class="n">NSString</span> <span class="o">*</span><span class="n">message</span> <span class="o">=</span> <span class="p">[[</span><span class="n">NSString</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithFormat</span><span class="p">:</span><span class="n">format</span> <span class="nl">arguments</span><span class="p">:</span><span class="n">args</span><span class="p">];</span>
-<span class="n">va_end</span><span class="p">(</span><span class="n">args</span><span class="p">);</span>
-</code></pre></td></tr></table>
-</div>
-</div><p><strong>-[DDLog queueLogMessage: asynchronously:]</strong></p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>va_list args;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>va_start(args, format);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>NSString <span style="color:#719e07">*</span>message <span style="color:#719e07">=</span> [[NSString alloc] initWithFormat:format arguments:args];
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>va_end(args);
+</code></pre></div><p><strong>-[DDLog queueLogMessage: asynchronously:]</strong></p>
 <p>准备好 log message 则开始分发，进行异步调用：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">queueLogMessage:</span><span class="p">(</span><span class="n">DDLogMessage</span> <span class="o">*</span><span class="p">)</span><span class="nv">logMessage</span> <span class="nf">asynchronously:</span><span class="p">(</span><span class="kt">BOOL</span><span class="p">)</span><span class="nv">asyncFlag</span> <span class="p">{</span>
-   <span class="n">dispatch_block_t</span> <span class="n">logBlock</span> <span class="o">=</span> <span class="o">^</span><span class="p">{</span>
-        <span class="n">dispatch_semaphore_wait</span><span class="p">(</span><span class="n">_queueSemaphore</span><span class="p">,</span> <span class="n">DISPATCH_TIME_FOREVER</span><span class="p">);</span>
-        <span class="k">@autoreleasepool</span> <span class="p">{</span>
-            <span class="p">[</span><span class="nb">self</span> <span class="nl">lt_log</span><span class="p">:</span><span class="n">logMessage</span><span class="p">];</span>
-        <span class="p">}</span>
-    <span class="p">};</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="n">asyncFlag</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">dispatch_async</span><span class="p">(</span><span class="n">_loggingQueue</span><span class="p">,</span> <span class="n">logBlock</span><span class="p">);</span>
-    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">dispatch_get_specific</span><span class="p">(</span><span class="n">GlobalLoggingQueueIdentityKey</span><span class="p">))</span> <span class="p">{</span>
-        <span class="n">logBlock</span><span class="p">();</span>
-    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-        <span class="n">dispatch_sync</span><span class="p">(</span><span class="n">_loggingQueue</span><span class="p">,</span> <span class="n">logBlock</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>先忽略 logBlock，看 DDLog 如果处理 loggingQueue 调度，以及如何来避免线程死锁问题。这里的解决方式绝对需要<strong>划重点</strong>。大家经常遇到的主线程死锁，很常见的情况如下：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">viewDidLoad</span> <span class="p">{</span>
-    <span class="p">[</span><span class="nb">super</span> <span class="n">viewDidLoad</span><span class="p">];</span>
-    <span class="n">NSLog</span><span class="p">(</span><span class="s">@&#34;1&#34;</span><span class="p">);</span>
-    <span class="n">dispatch_sync</span><span class="p">(</span><span class="n">dispatch_get_main_queue</span><span class="p">(),</span> <span class="o">^</span><span class="p">{</span>
-        <span class="n">NSLog</span><span class="p">(</span><span class="s">@&#34;2&#34;</span><span class="p">);</span>
-    <span class="p">});</span>
-    <span class="n">NSLog</span><span class="p">(</span><span class="s">@&#34;3&#34;</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>这个也是面试会被常常问到的 case。核心点在于，上述代码在 main thread 执行了 dispatch_sync 开启了 main queue 的同步等待。解决方案就有很多种，比如 SDWebImage 中就提供了 <a href="https://looseyi.github.io/post/sourcecode-ios/source-code-sdweb-1/">dispatch_main_async_safe</a> 来避免该问题。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objc" data-lang="objc"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span>- (<span style="color:#dc322f">void</span>)<span style="color:#268bd2">queueLogMessage:</span>(DDLogMessage <span style="color:#719e07">*</span>)<span style="color:#268bd2">logMessage</span> <span style="color:#268bd2">asynchronously:</span>(<span style="color:#dc322f">BOOL</span>)<span style="color:#268bd2">asyncFlag</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>   dispatch_block_t logBlock <span style="color:#719e07">=</span> <span style="color:#719e07">^</span>{
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>        dispatch_semaphore_wait(_queueSemaphore, DISPATCH_TIME_FOREVER);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>        <span style="color:#719e07">@autoreleasepool</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>            [<span style="color:#b58900">self</span> lt_log:logMessage];
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>        }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>    };
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>    <span style="color:#719e07">if</span> (asyncFlag) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>        dispatch_async(_loggingQueue, logBlock);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>    } <span style="color:#719e07">else</span> <span style="color:#719e07">if</span> (dispatch_get_specific(GlobalLoggingQueueIdentityKey)) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>        logBlock();
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>    } <span style="color:#719e07">else</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>        dispatch_sync(_loggingQueue, logBlock);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>}
+</code></pre></div><p>先忽略 logBlock，看 DDLog 如果处理 loggingQueue 调度，以及如何来避免线程死锁问题。这里的解决方式绝对需要<strong>划重点</strong>。大家经常遇到的主线程死锁，很常见的情况如下：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objc" data-lang="objc"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>- (<span style="color:#dc322f">void</span>)<span style="color:#268bd2">viewDidLoad</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>    [<span style="color:#b58900">super</span> viewDidLoad];
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>    NSLog(<span style="color:#2aa198">@&#34;1&#34;</span>);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>    dispatch_sync(dispatch_get_main_queue(), <span style="color:#719e07">^</span>{
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>        NSLog(<span style="color:#2aa198">@&#34;2&#34;</span>);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>    });
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span>    NSLog(<span style="color:#2aa198">@&#34;3&#34;</span>);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">8</span>}
+</code></pre></div><p>这个也是面试会被常常问到的 case。核心点在于，上述代码在 main thread 执行了 dispatch_sync 开启了 main queue 的同步等待。解决方案就有很多种，比如 SDWebImage 中就提供了 <a href="https://looseyi.github.io/post/sourcecode-ios/source-code-sdweb-1/">dispatch_main_async_safe</a> 来避免该问题。</p>
 <p>回到 DDLog，现在大家可以明白在 dispatch_sync 前为何需要多一步 queue identity 的判断了吧。另外，关于这个问题，<a href="https://github.com/CocoaLumberjack/CocoaLumberjack/issues/812#issuecomment-298853313">github issuse #812</a> 中有比较详细的论述。</p>
 <p>接着看 logBlock，它在执行第一行代码时，就开启了 semaphore_wait 直到可用队列数小于 maximumQueueSize。通常来说，我们会通过给 queueSize 加锁的方式来确保可用队列数的准确性和线程安全。但是这里作者希望，能够更快速的来获取添加 log mesage 入队列的时机，毕竟锁的开销比较大。</p>
 <p>这种实践在很多优秀开源库中都用到了，比如 SDWebImage。</p>
 <p><strong>- [DDLog lt_log:]</strong></p>
 <p>该方法是将 log message 分配到所以满足的 logger 手中。开始前照例进行 QueueIdentity 的断言。接着依据 CPU 内核数是单核或者多核区别对待：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">if</span> <span class="p">(</span><span class="n">_numProcessors</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>  <span class="p">...</span> <span class="p">}</span> <span class="k">else</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><ol>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#719e07">if</span> (_numProcessors <span style="color:#719e07">&gt;</span> <span style="color:#2aa198">1</span>) {  ... } <span style="color:#719e07">else</span> { ... }
+</code></pre></div><ol>
 <li>多核处理器，代码如下：</li>
 </ol>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span><span class="lnt">9
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">for</span> <span class="p">(</span><span class="n">DDLoggerNode</span> <span class="o">*</span><span class="n">loggerNode</span> <span class="k">in</span> <span class="nb">self</span><span class="p">.</span><span class="n">_loggers</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">logMessage</span><span class="o">-&gt;</span><span class="n">_flag</span> <span class="o">&amp;</span> <span class="n">loggerNode</span><span class="o">-&gt;</span><span class="n">_level</span><span class="p">))</span> <span class="p">{</span>
-        <span class="k">continue</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="n">dispatch_group_async</span><span class="p">(</span><span class="n">_loggingGroup</span><span class="p">,</span> <span class="n">loggerNode</span><span class="o">-&gt;</span><span class="n">_loggerQueue</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span> <span class="k">@autoreleasepool</span> <span class="p">{</span>
-        <span class="p">[</span><span class="n">loggerNode</span><span class="o">-&gt;</span><span class="n">_logger</span> <span class="nl">logMessage</span><span class="p">:</span><span class="n">logMessage</span><span class="p">];</span>
-    <span class="p">}</span> <span class="p">});</span>
-<span class="p">}</span>
-<span class="n">dispatch_group_wait</span><span class="p">(</span><span class="n">_loggingGroup</span><span class="p">,</span> <span class="n">DISPATCH_TIME_FOREVER</span><span class="p">);</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>稍微提一下 DDLog 的设计思路，由于一条 log message 可能会提供给多个不同类型的 logger 处理。例如，一条 log 可能同时需要输出到终端、写入到 log file 中、通过 websocket 输出到浏览器方便测试等操作。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#719e07">for</span> (DDLoggerNode <span style="color:#719e07">*</span>loggerNode <span style="color:#719e07">in</span> <span style="color:#b58900">self</span>._loggers) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>    <span style="color:#719e07">if</span> (<span style="color:#719e07">!</span>(logMessage<span style="color:#719e07">-&gt;</span>_flag <span style="color:#719e07">&amp;</span> loggerNode<span style="color:#719e07">-&gt;</span>_level)) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>        <span style="color:#719e07">continue</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>    dispatch_group_async(_loggingGroup, loggerNode<span style="color:#719e07">-&gt;</span>_loggerQueue, <span style="color:#719e07">^</span>{ <span style="color:#719e07">@autoreleasepool</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>        [loggerNode<span style="color:#719e07">-&gt;</span>_logger logMessage:logMessage];
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span>    } });
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">8</span>}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">9</span>dispatch_group_wait(_loggingGroup, DISPATCH_TIME_FOREVER);
+</code></pre></div><p>稍微提一下 DDLog 的设计思路，由于一条 log message 可能会提供给多个不同类型的 logger 处理。例如，一条 log 可能同时需要输出到终端、写入到 log file 中、通过 websocket 输出到浏览器方便测试等操作。</p>
 <p>首先，通过 logMessage-&gt;_flag 过滤掉 level 不匹配的 loggerNode。然后从匹配到的 loggerNode 中取出 loggerQueue 和 logger 调用 <code>logMessage:</code> 。</p>
 <p>重点来了，这里利用 _loggingGroup 将本次的 <code>logMessage:</code> 关联到 group 中，打包成一个 &ldquo;事务&rdquo;，以保证每次的 <code>lt_log:</code> 都是顺序执行的。而每个 logger 本身都分配了独立的 loggerQueue，通过这种组合，即保证了 logger 的并发调用，又能满足 queueSize 的限制。</p>
 <p>使用 dispatch_group_wait 还有一个目的，就是确保那些执行效果慢的 logger 也能按顺序完成调用，避免队列任务过多时，这些 logger 没能及时完成导致大量的 padding log message 没有被及时处理。</p>
 <ol start="2">
 <li>对单核处理就比较简单了，就是第二步不同。不存在 gropu 操作：</li>
 </ol>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">dispatch_sync</span><span class="p">(</span><span class="n">loggerNode</span><span class="o">-&gt;</span><span class="n">_loggerQueue</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span> <span class="k">@autoreleasepool</span> <span class="p">{</span>
-    <span class="p">[</span><span class="n">loggerNode</span><span class="o">-&gt;</span><span class="n">_logger</span> <span class="nl">logMessage</span><span class="p">:</span><span class="n">logMessage</span><span class="p">];</span>
-<span class="p">}</span> <span class="p">});</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>最后，分配完 logger message 后，需要将 _queueSemaphore 加 1:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">dispatch_semaphore_signal</span><span class="p">(</span><span class="n">_queueSemaphore</span><span class="p">);</span>
-</code></pre></td></tr></table>
-</div>
-</div><p><strong>lt_flush</strong></p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>dispatch_sync(loggerNode<span style="color:#719e07">-&gt;</span>_loggerQueue, <span style="color:#719e07">^</span>{ <span style="color:#719e07">@autoreleasepool</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>    [loggerNode<span style="color:#719e07">-&gt;</span>_logger logMessage:logMessage];
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>} });
+</code></pre></div><p>最后，分配完 logger message 后，需要将 _queueSemaphore 加 1:</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>dispatch_semaphore_signal(_queueSemaphore);
+</code></pre></div><p><strong>lt_flush</strong></p>
 <p>DDLog 的最后一个方法，会在程序结束前由通知来触发执行，其实现同 <code>lt_log:</code> 类似：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">lt_flush</span> <span class="p">{</span>
-    <span class="n">NSAssert</span><span class="p">(</span><span class="n">dispatch_get_specific</span><span class="p">(</span><span class="n">GlobalLoggingQueueIdentityKey</span><span class="p">),</span>
-             <span class="s">@&#34;This method should only be run on the logging thread/queue&#34;</span><span class="p">);</span>
-
-    <span class="k">for</span> <span class="p">(</span><span class="n">DDLoggerNode</span> <span class="o">*</span><span class="n">loggerNode</span> <span class="k">in</span> <span class="nb">self</span><span class="p">.</span><span class="n">_loggers</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">([</span><span class="n">loggerNode</span><span class="o">-&gt;</span><span class="n">_logger</span> <span class="nl">respondsToSelector</span><span class="p">:</span><span class="k">@selector</span><span class="p">(</span><span class="n">flush</span><span class="p">)])</span> <span class="p">{</span>
-            <span class="n">dispatch_group_async</span><span class="p">(</span><span class="n">_loggingGroup</span><span class="p">,</span> <span class="n">loggerNode</span><span class="o">-&gt;</span><span class="n">_loggerQueue</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span> <span class="k">@autoreleasepool</span> <span class="p">{</span>
-                <span class="p">[</span><span class="n">loggerNode</span><span class="o">-&gt;</span><span class="n">_logger</span> <span class="n">flush</span><span class="p">];</span>
-            <span class="p">}</span> <span class="p">});</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-    <span class="n">dispatch_group_wait</span><span class="p">(</span><span class="n">_loggingGroup</span><span class="p">,</span> <span class="n">DISPATCH_TIME_FOREVER</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><h3 id="小结">小结</h3>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span>- (<span style="color:#dc322f">void</span>)<span style="color:#268bd2">lt_flush</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>    NSAssert(dispatch_get_specific(GlobalLoggingQueueIdentityKey),
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>             <span style="color:#2aa198">@&#34;This method should only be run on the logging thread/queue&#34;</span>);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>    <span style="color:#719e07">for</span> (DDLoggerNode <span style="color:#719e07">*</span>loggerNode <span style="color:#719e07">in</span> <span style="color:#b58900">self</span>._loggers) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>        <span style="color:#719e07">if</span> ([loggerNode<span style="color:#719e07">-&gt;</span>_logger respondsToSelector:<span style="color:#719e07">@selector</span>(flush)]) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>            dispatch_group_async(_loggingGroup, loggerNode<span style="color:#719e07">-&gt;</span>_loggerQueue, <span style="color:#719e07">^</span>{ <span style="color:#719e07">@autoreleasepool</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>                [loggerNode<span style="color:#719e07">-&gt;</span>_logger flush];
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>            } });
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>        }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>    dispatch_group_wait(_loggingGroup, DISPATCH_TIME_FOREVER);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>}
+</code></pre></div><h3 id="小结">小结</h3>
 <p>DDLog 名副其实的 manager，利用了信号量和 group 高效的完成对 message 的调度，主要做了以下工作：</p>
 <ol>
 <li>管理 logger 的生命周期，并对其添加、删除操作进行相应通知；</li>
@@ -1174,126 +662,57 @@ if (!doNotTrack) {
 <p>现在我们来聊聊 logger。DDLog 给我们提供了一个 logger 基类 DDAbstractLogger 以及几个默认实现。一一来过一下；</p>
 <h2 id="ddabstractlogger">DDAbstractLogger</h2>
 <p>AbstractLogger 声明如下：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">@interface</span> <span class="nc">DDAbstractLogger</span> : <span class="nc">NSObject</span> <span class="o">&lt;</span><span class="n">DDLogger</span><span class="o">&gt;</span>
-<span class="p">{</span>
-    <span class="k">@public</span>
-    <span class="kt">id</span> <span class="o">&lt;</span><span class="n">DDLogFormatter</span><span class="o">&gt;</span> <span class="n">_logFormatter</span><span class="p">;</span>
-    <span class="n">dispatch_queue_t</span> <span class="n">_loggerQueue</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">strong</span><span class="p">,</span> <span class="n">nullable</span><span class="p">)</span> <span class="kt">id</span> <span class="o">&lt;</span><span class="n">DDLogFormatter</span><span class="o">&gt;</span> <span class="n">logFormatter</span><span class="p">;</span>
-<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="n">DISPATCH_QUEUE_REFERENCE_TYPE</span><span class="p">)</span> <span class="n">dispatch_queue_t</span> <span class="n">loggerQueue</span><span class="p">;</span>
-<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">readonly</span><span class="p">,</span> <span class="k">getter</span><span class="o">=</span><span class="n">isOnGlobalLoggingQueue</span><span class="p">)</span>  <span class="kt">BOOL</span> <span class="n">onGlobalLoggingQueue</span><span class="p">;</span>
-<span class="k">@property</span> <span class="p">(</span><span class="k">nonatomic</span><span class="p">,</span> <span class="k">readonly</span><span class="p">,</span> <span class="k">getter</span><span class="o">=</span><span class="n">isOnInternalLoggerQueue</span><span class="p">)</span> <span class="kt">BOOL</span> <span class="n">onInternalLoggerQueue</span><span class="p">;</span>
-
-<span class="k">@end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>先看初始化方法 <code>init</code> ：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">@interface</span> <span style="color:#268bd2">DDAbstractLogger</span> : <span style="color:#268bd2">NSObject</span> <span style="color:#719e07">&lt;</span>DDLogger<span style="color:#719e07">&gt;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>{
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>    <span style="color:#719e07">@public</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>    <span style="color:#dc322f">id</span> <span style="color:#719e07">&lt;</span>DDLogFormatter<span style="color:#719e07">&gt;</span> _logFormatter;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>    dispatch_queue_t _loggerQueue;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span><span style="color:#719e07">@property</span> (<span style="color:#719e07">nonatomic</span>, <span style="color:#719e07">strong</span>, nullable) <span style="color:#dc322f">id</span> <span style="color:#719e07">&lt;</span>DDLogFormatter<span style="color:#719e07">&gt;</span> logFormatter;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span><span style="color:#719e07">@property</span> (<span style="color:#719e07">nonatomic</span>, DISPATCH_QUEUE_REFERENCE_TYPE) dispatch_queue_t loggerQueue;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span><span style="color:#719e07">@property</span> (<span style="color:#719e07">nonatomic</span>, <span style="color:#719e07">readonly</span>, <span style="color:#719e07">getter</span><span style="color:#719e07">=</span>isOnGlobalLoggingQueue)  <span style="color:#dc322f">BOOL</span> onGlobalLoggingQueue;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span><span style="color:#719e07">@property</span> (<span style="color:#719e07">nonatomic</span>, <span style="color:#719e07">readonly</span>, <span style="color:#719e07">getter</span><span style="color:#719e07">=</span>isOnInternalLoggerQueue) <span style="color:#dc322f">BOOL</span> onInternalLoggerQueue;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span><span style="color:#719e07">@end</span>
+</code></pre></div><p>先看初始化方法 <code>init</code> ：</p>
 <h3 id="init">Init</h3>
 <p>AdstractLogger 默认提供了 loggerQueue 以及当前是否为 loggerQueue 和 全局 loggingQueue 的 convene 方法。loggerQueue 的初始化是在 <code>init</code> 中完成的，整个 <code>init</code> 也就做了这一件事。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">loggerQueueName</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-
-<span class="k">if</span> <span class="p">([</span><span class="nb">self</span> <span class="nl">respondsToSelector</span><span class="p">:</span><span class="k">@selector</span><span class="p">(</span><span class="n">loggerName</span><span class="p">)])</span> <span class="p">{</span>
-    <span class="n">loggerQueueName</span> <span class="o">=</span> <span class="nb">self</span><span class="p">.</span><span class="n">loggerName</span><span class="p">.</span><span class="n">UTF8String</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="n">_loggerQueue</span> <span class="o">=</span> <span class="n">dispatch_queue_create</span><span class="p">(</span><span class="n">loggerQueueName</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
-<span class="kt">void</span> <span class="o">*</span><span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="k">__bridge</span> <span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="nb">self</span><span class="p">;</span>
-<span class="kt">void</span> <span class="o">*</span><span class="n">nonNullValue</span> <span class="o">=</span> <span class="p">(</span><span class="k">__bridge</span> <span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="nb">self</span><span class="p">;</span>
-<span class="n">dispatch_queue_set_specific</span><span class="p">(</span><span class="n">_loggerQueue</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">nonNullValue</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>同样先获取 queueName，这里默认返回的 <code>loggerName</code> 是 <code>NSStringFromClass([self class]);</code> 。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">const</span> <span style="color:#dc322f">char</span> <span style="color:#719e07">*</span>loggerQueueName <span style="color:#719e07">=</span> <span style="color:#b58900">NULL</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span><span style="color:#719e07">if</span> ([<span style="color:#b58900">self</span> respondsToSelector:<span style="color:#719e07">@selector</span>(loggerName)]) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>    loggerQueueName <span style="color:#719e07">=</span> <span style="color:#b58900">self</span>.loggerName.UTF8String;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>_loggerQueue <span style="color:#719e07">=</span> dispatch_queue_create(loggerQueueName, <span style="color:#b58900">NULL</span>);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span><span style="color:#dc322f">void</span> <span style="color:#719e07">*</span>key <span style="color:#719e07">=</span> (<span style="color:#719e07">__bridge</span> <span style="color:#dc322f">void</span> <span style="color:#719e07">*</span>)<span style="color:#b58900">self</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span><span style="color:#dc322f">void</span> <span style="color:#719e07">*</span>nonNullValue <span style="color:#719e07">=</span> (<span style="color:#719e07">__bridge</span> <span style="color:#dc322f">void</span> <span style="color:#719e07">*</span>)<span style="color:#b58900">self</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>dispatch_queue_set_specific(_loggerQueue, key, nonNullValue, <span style="color:#b58900">NULL</span>);
+</code></pre></div><p>同样先获取 queueName，这里默认返回的 <code>loggerName</code> 是 <code>NSStringFromClass([self class]);</code> 。</p>
 <p>同时，以 self 的地址作为 flag 关联到 loggerQueue，并用于判断 <code>onInternalLoggerQueue</code> 。</p>
 <h3 id="logformatter">LogFormatter</h3>
 <p>AdstractLogger 最主要的是实现了 logFormatter 的 getter/setter 方法。同时代码中赋予了十分详细的说明，先看看 getter 实现。</p>
 <p><strong>Getter</strong></p>
 <p>首先是线程相关的断言，确保当前不在 global queue 和 loggerQueue：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">NSAssert</span><span class="p">(</span><span class="o">!</span><span class="p">[</span><span class="nb">self</span> <span class="n">isOnGlobalLoggingQueue</span><span class="p">],</span> <span class="s">@&#34;Core architecture requirement failure&#34;</span><span class="p">);</span>
-<span class="n">NSAssert</span><span class="p">(</span><span class="o">!</span><span class="p">[</span><span class="nb">self</span> <span class="n">isOnInternalLoggerQueue</span><span class="p">],</span> <span class="s">@&#34;MUST access ivar directly, NOT via self.* syntax.&#34;</span><span class="p">);</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>接着在 loggingQueue 和 loggerQueue 中获取 logFormatter：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="n">dispatch_queue_t</span> <span class="n">globalLoggingQueue</span> <span class="o">=</span> <span class="p">[</span><span class="n">DDLog</span> <span class="n">loggingQueue</span><span class="p">];</span>
-
-<span class="k">__block</span> <span class="kt">id</span> <span class="o">&lt;</span><span class="n">DDLogFormatter</span><span class="o">&gt;</span> <span class="n">result</span><span class="p">;</span>
-
-<span class="n">dispatch_sync</span><span class="p">(</span><span class="n">globalLoggingQueue</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span>
-    <span class="n">dispatch_sync</span><span class="p">(</span><span class="nb">self</span><span class="o">-&gt;</span><span class="n">_loggerQueue</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="nb">self</span><span class="o">-&gt;</span><span class="n">_logFormatter</span><span class="p">;</span>
-    <span class="p">});</span>
-<span class="p">});</span>
-<span class="k">return</span> <span class="n">result</span><span class="p">;</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>看去一个普通的 formatter 为何需要如此大动干戈，需要层层深入来呢？我们来看一段代码：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">DDLogVerbose</span><span class="p">(</span><span class="s">@&#34;log msg 1&#34;</span><span class="p">);</span>
-<span class="n">DDLogVerbose</span><span class="p">(</span><span class="s">@&#34;log msg 2&#34;</span><span class="p">);</span>
-<span class="p">[</span><span class="n">logger</span> <span class="nl">setFormatter</span><span class="p">:</span><span class="n">myFormatter</span><span class="p">];</span>
-<span class="n">DDLogVerbose</span><span class="p">(</span><span class="s">@&#34;log msg 3&#34;</span><span class="p">);</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>从直觉上，我们希望看到的结果是新设置的 formatter 仅应用在第 3 条 log message 上。然而 DDLog 在整个 logging 过程中却都是异步调用的。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>NSAssert(<span style="color:#719e07">!</span>[<span style="color:#b58900">self</span> isOnGlobalLoggingQueue], <span style="color:#2aa198">@&#34;Core architecture requirement failure&#34;</span>);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>NSAssert(<span style="color:#719e07">!</span>[<span style="color:#b58900">self</span> isOnInternalLoggerQueue], <span style="color:#2aa198">@&#34;MUST access ivar directly, NOT via self.* syntax.&#34;</span>);
+</code></pre></div><p>接着在 loggingQueue 和 loggerQueue 中获取 logFormatter：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objc" data-lang="objc"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span>dispatch_queue_t globalLoggingQueue <span style="color:#719e07">=</span> [DDLog loggingQueue];
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span><span style="color:#719e07">__block</span> <span style="color:#dc322f">id</span> <span style="color:#719e07">&lt;</span>DDLogFormatter<span style="color:#719e07">&gt;</span> result;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>dispatch_sync(globalLoggingQueue, <span style="color:#719e07">^</span>{
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>    dispatch_sync(<span style="color:#b58900">self</span><span style="color:#719e07">-&gt;</span>_loggerQueue, <span style="color:#719e07">^</span>{
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>        result <span style="color:#719e07">=</span> <span style="color:#b58900">self</span><span style="color:#719e07">-&gt;</span>_logFormatter;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>    });
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>});
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span><span style="color:#719e07">return</span> result;
+</code></pre></div><p>看去一个普通的 formatter 为何需要如此大动干戈，需要层层深入来呢？我们来看一段代码：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>DDLogVerbose(<span style="color:#2aa198">@&#34;log msg 1&#34;</span>);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>DDLogVerbose(<span style="color:#2aa198">@&#34;log msg 2&#34;</span>);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>[logger setFormatter:myFormatter];
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>DDLogVerbose(<span style="color:#2aa198">@&#34;log msg 3&#34;</span>);
+</code></pre></div><p>从直觉上，我们希望看到的结果是新设置的 formatter 仅应用在第 3 条 log message 上。然而 DDLog 在整个 logging 过程中却都是异步调用的。</p>
 <ol>
 <li>log message 最终是在单独的 loggerQueue 中执行的，是由 logger 各自持有的 queue；</li>
 <li>在进入每个 loggerQueue 之前，又要经过一道全局的 loggingQueue。</li>
@@ -1302,146 +721,70 @@ if (!doNotTrack) {
 <p>需要强调一点，logger在内部<strong>最好直接访问 FORMATTER VARIABLE</strong> ，如果需要的话。一旦使用 <code>self.</code>  可能会导致线程死锁。</p>
 <p><strong>Setter</strong></p>
 <p>同 getter 一致，先断言，然后依次进入队列 <code>DDLog.loggingQueue -&gt; self-&gt;_loggerQueue</code> 执行 block 开始真正的赋值：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="k">@autoreleasepool</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nb">self</span><span class="o">-&gt;</span><span class="n">_logFormatter</span> <span class="o">!=</span> <span class="n">logFormatter</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">([</span><span class="nb">self</span><span class="o">-&gt;</span><span class="n">_logFormatter</span> <span class="nl">respondsToSelector</span><span class="p">:</span><span class="k">@selector</span><span class="p">(</span><span class="nl">willRemoveFromLogger</span><span class="p">:)])</span> <span class="p">{</span>
-            <span class="p">[</span><span class="nb">self</span><span class="o">-&gt;</span><span class="n">_logFormatter</span> <span class="nl">willRemoveFromLogger</span><span class="p">:</span><span class="nb">self</span><span class="p">];</span>
-        <span class="p">}</span>
-
-        <span class="nb">self</span><span class="o">-&gt;</span><span class="n">_logFormatter</span> <span class="o">=</span> <span class="n">logFormatter</span><span class="p">;</span>
-
-        <span class="k">if</span> <span class="p">([</span><span class="nb">self</span><span class="o">-&gt;</span><span class="n">_logFormatter</span> <span class="nl">respondsToSelector</span><span class="p">:</span><span class="k">@selector</span><span class="p">(</span><span class="nl">didAddToLogger</span><span class="p">:</span><span class="nl">inQueue</span><span class="p">:)])</span> <span class="p">{</span>
-            <span class="p">[</span><span class="nb">self</span><span class="o">-&gt;</span><span class="n">_logFormatter</span> <span class="nl">didAddToLogger</span><span class="p">:</span><span class="nb">self</span> <span class="nl">inQueue</span><span class="p">:</span><span class="nb">self</span><span class="o">-&gt;</span><span class="n">_loggerQueue</span><span class="p">];</span>
-        <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">([</span><span class="nb">self</span><span class="o">-&gt;</span><span class="n">_logFormatter</span> <span class="nl">respondsToSelector</span><span class="p">:</span><span class="k">@selector</span><span class="p">(</span><span class="nl">didAddToLogger</span><span class="p">:)])</span> <span class="p">{</span>
-            <span class="p">[</span><span class="nb">self</span><span class="o">-&gt;</span><span class="n">_logFormatter</span> <span class="nl">didAddToLogger</span><span class="p">:</span><span class="nb">self</span><span class="p">];</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><h2 id="ddasllogger">DDASLLogger</h2>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objc" data-lang="objc"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">@autoreleasepool</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>    <span style="color:#719e07">if</span> (<span style="color:#b58900">self</span><span style="color:#719e07">-&gt;</span>_logFormatter <span style="color:#719e07">!=</span> logFormatter) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>        <span style="color:#719e07">if</span> ([<span style="color:#b58900">self</span><span style="color:#719e07">-&gt;</span>_logFormatter respondsToSelector:<span style="color:#719e07">@selector</span>(willRemoveFromLogger:)]) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>            [<span style="color:#b58900">self</span><span style="color:#719e07">-&gt;</span>_logFormatter willRemoveFromLogger:<span style="color:#b58900">self</span>];
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>        }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>        <span style="color:#b58900">self</span><span style="color:#719e07">-&gt;</span>_logFormatter <span style="color:#719e07">=</span> logFormatter;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>        <span style="color:#719e07">if</span> ([<span style="color:#b58900">self</span><span style="color:#719e07">-&gt;</span>_logFormatter respondsToSelector:<span style="color:#719e07">@selector</span>(didAddToLogger:inQueue:)]) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>            [<span style="color:#b58900">self</span><span style="color:#719e07">-&gt;</span>_logFormatter didAddToLogger:<span style="color:#b58900">self</span> inQueue:<span style="color:#b58900">self</span><span style="color:#719e07">-&gt;</span>_loggerQueue];
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>        } <span style="color:#719e07">else</span> <span style="color:#719e07">if</span> ([<span style="color:#b58900">self</span><span style="color:#719e07">-&gt;</span>_logFormatter respondsToSelector:<span style="color:#719e07">@selector</span>(didAddToLogger:)]) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>            [<span style="color:#b58900">self</span><span style="color:#719e07">-&gt;</span>_logFormatter didAddToLogger:<span style="color:#b58900">self</span>];
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>        }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>}
+</code></pre></div><h2 id="ddasllogger">DDASLLogger</h2>
 <p>ASLLogger 是对 <strong>Apple System Log</strong> API 的封装，我们经常使用的 <code>NSLog</code> 会将其输出定向到两个地方：</p>
 <ul>
 <li><a href="https://support.apple.com/zh-cn/guide/console/cnsl1012/mac">Apple System Log</a></li>
 <li><a href="https://www.wikiwand.com/en/Standard_streams">Standard error</a> （telemetry）</li>
 </ul>
 <p>不过 ASLLogger 在 macosx 10.12 iOS 10.0 已经被废弃了，取而代之的是 DDOSLoger。ASLLogger 背后使用的 API 是 <a href="https://opensource.apple.com/source/Libc/Libc-583/include/asl.h.auto.html"><strong>&lt;asl.h&gt;</strong></a> ，它也提供了几种 message level</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span><span class="lnt">9
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="cm">/*! @defineblock Log Message Priority Levels Log levels of the message. */</span>
-<span class="cp">#define ASL_LEVEL_EMERG   0
-</span><span class="cp">#define ASL_LEVEL_ALERT   1
-</span><span class="cp">#define ASL_LEVEL_CRIT    2 </span><span class="c1">// DDLogFlagError
-</span><span class="c1"></span><span class="cp">#define ASL_LEVEL_ERR     3 </span><span class="c1">// DDLogFlagWarning
-</span><span class="c1"></span><span class="cp">#define ASL_LEVEL_WARNING 4 </span><span class="c1">// DDLogFlagInfo, Regular NSLog&#39;s level
-</span><span class="c1"></span><span class="cp">#define ASL_LEVEL_NOTICE  5 </span><span class="c1">// default
-</span><span class="c1"></span><span class="cp">#define ASL_LEVEL_INFO    6
-</span><span class="cp">#define ASL_LEVEL_DEBUG   7
-</span></code></pre></td></tr></table>
-</div>
-</div><p>默认情况下 ASL 会过滤 NOTICE 之上的信息，这也是为何 DDLog 基本也就设置了 5 种日志级别。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#586e75">/*! @defineblock Log Message Priority Levels Log levels of the message. */</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span><span style="color:#719e07">#define ASL_LEVEL_EMERG   0
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span><span style="color:#719e07">#define ASL_LEVEL_ALERT   1
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span><span style="color:#719e07">#define ASL_LEVEL_CRIT    2 </span><span style="color:#586e75">// DDLogFlagError
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span><span style="color:#586e75"></span><span style="color:#719e07">#define ASL_LEVEL_ERR     3 </span><span style="color:#586e75">// DDLogFlagWarning
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span><span style="color:#586e75"></span><span style="color:#719e07">#define ASL_LEVEL_WARNING 4 </span><span style="color:#586e75">// DDLogFlagInfo, Regular NSLog&#39;s level
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span><span style="color:#586e75"></span><span style="color:#719e07">#define ASL_LEVEL_NOTICE  5 </span><span style="color:#586e75">// default
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">8</span><span style="color:#586e75"></span><span style="color:#719e07">#define ASL_LEVEL_INFO    6
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">9</span><span style="color:#719e07">#define ASL_LEVEL_DEBUG   7
+</span></code></pre></div><p>默认情况下 ASL 会过滤 NOTICE 之上的信息，这也是为何 DDLog 基本也就设置了 5 种日志级别。</p>
 <h3 id="logmessage">logMessage</h3>
 <p>logMessage 是每个 logger 处理 log message 的方法。ASLLogger 首先会过滤 filename 为 <code>DDASLLogCapture</code> (主动监听的系统 log)。然后对 message 进行 formate：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objc" data-lang="objc"><span class="n">NSString</span> <span class="o">*</span> <span class="n">message</span> <span class="o">=</span> <span class="n">_logFormatter</span> <span class="o">?</span> <span class="p">[</span><span class="n">_logFormatter</span> <span class="nl">formatLogMessage</span><span class="p">:</span><span class="n">logMessage</span><span class="p">]</span> <span class="o">:</span> <span class="n">logMessage</span><span class="o">-&gt;</span><span class="n">_message</span><span class="p">;</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>如果 message 存在，生成 <code>aslmsg</code>  通过 <code>asl_send</code> 发送至 ASL。实现如下：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">msg</span> <span class="o">=</span> <span class="p">[</span><span class="n">message</span> <span class="n">UTF8String</span><span class="p">];</span>
-<span class="n">size_t</span> <span class="n">aslLogLevel</span><span class="p">;</span> <span class="c1">// logMessage-&gt;_flag 获取 ASL_LEVEL_XXX
-</span><span class="c1"></span>
-<span class="k">static</span> <span class="kt">char</span> <span class="k">const</span> <span class="o">*</span><span class="k">const</span> <span class="n">level_strings</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#34;0&#34;</span><span class="p">,</span> <span class="s">&#34;1&#34;</span><span class="p">,</span> <span class="s">&#34;2&#34;</span><span class="p">,</span> <span class="s">&#34;3&#34;</span><span class="p">,</span> <span class="s">&#34;4&#34;</span><span class="p">,</span> <span class="s">&#34;5&#34;</span><span class="p">,</span> <span class="s">&#34;6&#34;</span><span class="p">,</span> <span class="s">&#34;7&#34;</span> <span class="p">};</span>
-
-<span class="n">uid_t</span> <span class="k">const</span> <span class="n">readUID</span> <span class="o">=</span> <span class="n">geteuid</span><span class="p">();</span> <span class="c1">/// the effective user ID of the calling process
-</span><span class="c1"></span>
-<span class="kt">char</span> <span class="n">readUIDString</span><span class="p">[</span><span class="mi">16</span><span class="p">];</span> <span class="c1">/// formatted output conversion
-</span><span class="c1"></span><span class="cp">#ifndef NS_BLOCK_ASSERTIONS
-</span><span class="cp"></span><span class="n">size_t</span> <span class="n">l</span> <span class="o">=</span> <span class="p">(</span><span class="n">size_t</span><span class="p">)</span><span class="n">snprintf</span><span class="p">(</span><span class="n">readUIDString</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">readUIDString</span><span class="p">),</span> <span class="s">&#34;%d&#34;</span><span class="p">,</span> <span class="n">readUID</span><span class="p">);</span>
-<span class="cp">#else
-</span><span class="cp"></span><span class="n">snprintf</span><span class="p">(</span><span class="n">readUIDString</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">readUIDString</span><span class="p">),</span> <span class="s">&#34;%d&#34;</span><span class="p">,</span> <span class="n">readUID</span><span class="p">);</span>
-<span class="cp">#endif
-</span><span class="cp"></span>
-<span class="n">NSAssert</span><span class="p">(</span><span class="n">l</span> <span class="o">&lt;</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">readUIDString</span><span class="p">),</span> <span class="s">@&#34;Formatted euid is too long.&#34;</span><span class="p">);</span>
-<span class="n">NSAssert</span><span class="p">(</span><span class="n">aslLogLevel</span> <span class="o">&lt;</span> <span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">level_strings</span><span class="p">)</span> <span class="o">/</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">level_strings</span><span class="p">[</span><span class="mi">0</span><span class="p">])),</span> <span class="s">@&#34;Unhandled ASL log level.&#34;</span><span class="p">);</span>
-
-<span class="n">aslmsg</span> <span class="n">m</span> <span class="o">=</span> <span class="n">asl_new</span><span class="p">(</span><span class="n">ASL_TYPE_MSG</span><span class="p">);</span>
-<span class="k">if</span> <span class="p">(</span><span class="n">m</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">asl_set</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">ASL_KEY_LEVEL</span><span class="p">,</span> <span class="n">level_strings</span><span class="p">[</span><span class="n">aslLogLevel</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span>
-        <span class="n">asl_set</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">ASL_KEY_MSG</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span>
-        <span class="n">asl_set</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">ASL_KEY_READ_UID</span><span class="p">,</span> <span class="n">readUIDString</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span>
-        <span class="n">asl_set</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">kDDASLKeyDDLog</span><span class="p">,</span> <span class="n">kDDASLDDLogValue</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">asl_send</span><span class="p">(</span><span class="n">_client</span><span class="p">,</span> <span class="n">m</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="n">asl_free</span><span class="p">(</span><span class="n">m</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><h2 id="ddoslogger">DDOSLogger</h2>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objc" data-lang="objc"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>NSString <span style="color:#719e07">*</span> message <span style="color:#719e07">=</span> _logFormatter <span style="color:#719e07">?</span> [_logFormatter formatLogMessage:logMessage] <span style="color:#719e07">:</span> logMessage<span style="color:#719e07">-&gt;</span>_message;
+</code></pre></div><p>如果 message 存在，生成 <code>aslmsg</code>  通过 <code>asl_send</code> 发送至 ASL。实现如下：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">const</span> <span style="color:#dc322f">char</span> <span style="color:#719e07">*</span>msg <span style="color:#719e07">=</span> [message UTF8String];
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>size_t aslLogLevel; <span style="color:#586e75">// logMessage-&gt;_flag 获取 ASL_LEVEL_XXX
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span><span style="color:#586e75"></span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span><span style="color:#719e07">static</span> <span style="color:#dc322f">char</span> <span style="color:#719e07">const</span> <span style="color:#719e07">*</span><span style="color:#719e07">const</span> level_strings[] <span style="color:#719e07">=</span> { <span style="color:#2aa198">&#34;0&#34;</span>, <span style="color:#2aa198">&#34;1&#34;</span>, <span style="color:#2aa198">&#34;2&#34;</span>, <span style="color:#2aa198">&#34;3&#34;</span>, <span style="color:#2aa198">&#34;4&#34;</span>, <span style="color:#2aa198">&#34;5&#34;</span>, <span style="color:#2aa198">&#34;6&#34;</span>, <span style="color:#2aa198">&#34;7&#34;</span> };
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>uid_t <span style="color:#719e07">const</span> readUID <span style="color:#719e07">=</span> geteuid(); <span style="color:#586e75">/// the effective user ID of the calling process
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span><span style="color:#586e75"></span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span><span style="color:#dc322f">char</span> readUIDString[<span style="color:#2aa198">16</span>]; <span style="color:#586e75">/// formatted output conversion
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span><span style="color:#586e75"></span><span style="color:#719e07">#ifndef NS_BLOCK_ASSERTIONS
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span><span style="color:#719e07"></span>size_t l <span style="color:#719e07">=</span> (size_t)snprintf(readUIDString, <span style="color:#719e07">sizeof</span>(readUIDString), <span style="color:#2aa198">&#34;%d&#34;</span>, readUID);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span><span style="color:#719e07">#else
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span><span style="color:#719e07"></span>snprintf(readUIDString, <span style="color:#719e07">sizeof</span>(readUIDString), <span style="color:#2aa198">&#34;%d&#34;</span>, readUID);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span><span style="color:#719e07">#endif
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span><span style="color:#719e07"></span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>NSAssert(l <span style="color:#719e07">&lt;</span> <span style="color:#719e07">sizeof</span>(readUIDString), <span style="color:#2aa198">@&#34;Formatted euid is too long.&#34;</span>);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>NSAssert(aslLogLevel <span style="color:#719e07">&lt;</span> (<span style="color:#719e07">sizeof</span>(level_strings) <span style="color:#719e07">/</span> <span style="color:#719e07">sizeof</span>(level_strings[<span style="color:#2aa198">0</span>])), <span style="color:#2aa198">@&#34;Unhandled ASL log level.&#34;</span>);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>aslmsg m <span style="color:#719e07">=</span> asl_new(ASL_TYPE_MSG);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span><span style="color:#719e07">if</span> (m <span style="color:#719e07">!=</span> <span style="color:#b58900">NULL</span>) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>    <span style="color:#719e07">if</span> (asl_set(m, ASL_KEY_LEVEL, level_strings[aslLogLevel]) <span style="color:#719e07">==</span> <span style="color:#2aa198">0</span> <span style="color:#719e07">&amp;&amp;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span>        asl_set(m, ASL_KEY_MSG, msg) <span style="color:#719e07">==</span> <span style="color:#2aa198">0</span> <span style="color:#719e07">&amp;&amp;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">22</span>        asl_set(m, ASL_KEY_READ_UID, readUIDString) <span style="color:#719e07">==</span> <span style="color:#2aa198">0</span> <span style="color:#719e07">&amp;&amp;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">23</span>        asl_set(m, kDDASLKeyDDLog, kDDASLDDLogValue) <span style="color:#719e07">==</span> <span style="color:#2aa198">0</span>) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">24</span>        asl_send(_client, m);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">25</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">26</span>    asl_free(m);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">27</span>}
+</code></pre></div><h2 id="ddoslogger">DDOSLogger</h2>
 <p>苹果的新一代 logging system <a href="https://developer.apple.com/documentation/os/logging">os_log</a>，官方提供了比较完整的概述和说明。正是它取代了 ASL，manual 如下：</p>
 <blockquote>
 <p>The unified logging system provides a single, efficient, high performance set of APIs for capturing log messages across all levels of the system.  This unified system centralizes the storage of log data in memory and in a data store on disk.</p>
@@ -1449,15 +792,8 @@ if (!doNotTrack) {
 <p>它提供了日志记录的中心化存储。同时 API 也十分简洁，关于 os_log 有机会在展开。</p>
 <h3 id="init-1">Init</h3>
 <p>首先，OSLogger 需要持有一个 log object：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">os_log_t</span> <span class="nf">os_log_create</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">subsystem</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">category</span><span class="p">);</span>
-</code></pre></td></tr></table>
-</div>
-</div><p><strong>subsystem</strong></p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>os_log_t <span style="color:#268bd2">os_log_create</span>(<span style="color:#719e07">const</span> <span style="color:#dc322f">char</span> <span style="color:#719e07">*</span>subsystem, <span style="color:#719e07">const</span> <span style="color:#dc322f">char</span> <span style="color:#719e07">*</span>category);
+</code></pre></div><p><strong>subsystem</strong></p>
 <blockquote>
 <p>An identifier string, in reverse DNS notation, that represents the subsystem that’s performing logging, for example, <code>com.your_company.your_subsystem_name</code>. The subsystem is used for categorization and filtering of related log messages, as well as for grouping related logging settings.</p>
 </blockquote>
@@ -1468,43 +804,22 @@ if (!doNotTrack) {
 <p>顺便说一下，os_log 的官方文档是只提供了 Swift 说明，OSLog.Category <a href="https://developer.apple.com/documentation/os/oslog/category">详细点此</a>。</p>
 <h3 id="logmessage-1">LogMessage</h3>
 <p>同样是过滤 filename 为 <code>DDASLLogCapture</code> 的 log message 和对 log message 的 formatter。os_log 所提供的 API 则十分友好简洁，每种 <a href="https://developer.apple.com/documentation/kernel/os_log_type_t?language=objc">os_log_type_t</a> 都提供了对应的方法，使用如下：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="n">__auto_type</span> <span class="n">logger</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="n">logger</span><span class="p">];</span>
-<span class="k">switch</span> <span class="p">(</span><span class="n">logMessage</span><span class="o">-&gt;</span><span class="n">_flag</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">case</span> <span class="nl">DDLogFlagError</span>  <span class="p">:</span>
-        <span class="n">os_log_error</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="s">&#34;%{public}s&#34;</span><span class="p">,</span> <span class="n">msg</span><span class="p">);</span>
-        <span class="k">break</span><span class="p">;</span>
-    <span class="k">case</span> <span class="nl">DDLogFlagWarning</span><span class="p">:</span>
-    <span class="k">case</span> <span class="nl">DDLogFlagInfo</span>   <span class="p">:</span>
-        <span class="n">os_log_info</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="s">&#34;%{public}s&#34;</span><span class="p">,</span> <span class="n">msg</span><span class="p">);</span>
-        <span class="k">break</span><span class="p">;</span>
-    <span class="k">case</span> <span class="nl">DDLogFlagDebug</span>  <span class="p">:</span>
-    <span class="k">case</span> <span class="nl">DDLogFlagVerbose</span><span class="p">:</span>
-    <span class="k">default</span>              <span class="o">:</span>
-        <span class="n">os_log_debug</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="s">&#34;%{public}s&#34;</span><span class="p">,</span> <span class="n">msg</span><span class="p">);</span>
-        <span class="k">break</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><h2 id="ddttylogger">DDTTYLogger</h2>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span>__auto_type logger <span style="color:#719e07">=</span> [<span style="color:#b58900">self</span> logger];
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span><span style="color:#719e07">switch</span> (logMessage<span style="color:#719e07">-&gt;</span>_flag) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>    <span style="color:#719e07">case</span> DDLogFlagError  :
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>        os_log_error(logger, <span style="color:#2aa198">&#34;%{public}s&#34;</span>, msg);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>        <span style="color:#719e07">break</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>    <span style="color:#719e07">case</span> DDLogFlagWarning:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>    <span style="color:#719e07">case</span> DDLogFlagInfo   :
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>        os_log_info(logger, <span style="color:#2aa198">&#34;%{public}s&#34;</span>, msg);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>        <span style="color:#719e07">break</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>    <span style="color:#719e07">case</span> DDLogFlagDebug  :
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>    <span style="color:#719e07">case</span> DDLogFlagVerbose:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>    <span style="color:#719e07">default</span>              <span style="color:#719e07">:</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>        os_log_debug(logger, <span style="color:#2aa198">&#34;%{public}s&#34;</span>, msg);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>        <span style="color:#719e07">break</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>}
+</code></pre></div><h2 id="ddttylogger">DDTTYLogger</h2>
 <blockquote>
 <p>This class provides a logger for Terminal output or Xcode console output, depending on where you are running your code.</p>
 </blockquote>

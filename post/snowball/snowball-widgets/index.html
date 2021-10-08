@@ -95,7 +95,7 @@ if (!doNotTrack) {
   <meta itemprop="name" content="雪球 iOS Widget 从零到壹">
 <meta itemprop="description" content="本文知识目录 引言 在 2020 的 WWDC 上苹果发布了 WidgetKit 小组件，重新设计后的 Widgets，其展示不再局限于负一屏，而且支持在 macOS 和 iOS 的主屏幕上提供动态信息和个"><meta itemprop="datePublished" content="2021-01-13T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2021-01-13T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="4273">
+<meta itemprop="wordCount" content="4255">
 <meta itemprop="keywords" content="iOS&#39;,Widgets&#39;,SwiftUI," />
   
   <meta name="twitter:card" content="summary"/>
@@ -245,82 +245,39 @@ if (!doNotTrack) {
 <h3 id="网络通信">网络通信</h3>
 <p>小组件中可以使用 <code>URLSession</code>，而雪球在 Swift 2.0 已接入 Swift，且基于 <code>Alamofire + SwiftyJSON</code> 封装了一层内部网络库。仅需简单抽离即完成了小组件网络库的封装。</p>
 <p>作为独立于主工程的小组件，我们需要在 <code>Podfile</code> 中为小组件的 target 引入所需的依赖框架。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">target</span> <span class="s1">&#39;Snowball&#39;</span> <span class="k">do</span>
-  <span class="o">...</span>
-
-  <span class="n">target</span> <span class="s1">&#39;SnowballWidgets&#39;</span> <span class="k">do</span>
-    <span class="n">inherit!</span> <span class="ss">:search_paths</span>
-
-    <span class="n">pod</span> <span class="s1">&#39;Alamofire&#39;</span><span class="p">,</span> <span class="s1">&#39;~&gt; 5.0.2&#39;</span>
-    <span class="n">pod</span> <span class="s1">&#39;SwiftyJSON&#39;</span><span class="p">,</span> <span class="s1">&#39;~&gt; 5.0.0&#39;</span>
-    <span class="o">...</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>具体网络实封装本文不做展开。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span>target <span style="color:#2aa198">&#39;Snowball&#39;</span> <span style="color:#719e07">do</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>  <span style="color:#719e07">...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>  target <span style="color:#2aa198">&#39;SnowballWidgets&#39;</span> <span style="color:#719e07">do</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>    inherit! <span style="color:#2aa198">:search_paths</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>    pod <span style="color:#2aa198">&#39;Alamofire&#39;</span>, <span style="color:#2aa198">&#39;~&gt; 5.0.2&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>    pod <span style="color:#2aa198">&#39;SwiftyJSON&#39;</span>, <span style="color:#2aa198">&#39;~&gt; 5.0.0&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>    <span style="color:#719e07">...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span><span style="color:#719e07">end</span>
+</code></pre></div><p>具体网络实封装本文不做展开。</p>
 <h3 id="数据共享">数据共享</h3>
 <p>由于 App Extension 不能直接同主程序直接通讯，不过苹果提供了 <code>App Groups</code> 的方式来进行通讯。<code>App Groups</code> 有两种共享数据的方式：<code>UserDefaults</code> 和 <code>FileManager</code>。</p>
 <p>对于将要展示的用户自选数据，必须要先获取登录授权信息。同时雪球的认证机制比较复杂，其完整功能存在于内部独立的 OAuth SDK 中，无法直接在 extension 中使用。因此，我们决定通过 <code>UserDefaults</code> 来共享 access_token 及用户偏好设置，如涨跌颜色等。</p>
 <p><strong>UserDefaults 共享数据</strong></p>
 <p>共享 UserDefaults 数据要设置 <code>suitename</code> 对为应项目的 App GroupID，有两种设置方式：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">init</span><span class="p">?(</span><span class="n">suiteName</span> <span class="n">suitename</span><span class="p">:</span> <span class="nb">String</span><span class="p">?)</span>
-<span class="c1">// or</span>
-<span class="kd">func</span> <span class="nf">addSuite</span><span class="p">(</span><span class="n">named</span> <span class="n">suiteName</span><span class="p">:</span> <span class="nb">String</span><span class="p">)</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>设置之后即可使用该实例来储存和获取共享数据了。我们以 access_token 为例：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">public</span> <span class="kd">extension</span> <span class="nc">UserDefaults</span> <span class="p">{</span>
-
-    <span class="kr">@objc</span>
-    <span class="kd">static</span> <span class="kd">var</span> <span class="nv">shared</span><span class="p">:</span> <span class="n">UserDefaults</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="kd">let</span> <span class="nv">value</span> <span class="p">=</span> <span class="n">Bundle</span><span class="p">.</span><span class="n">main</span><span class="p">.</span><span class="n">object</span><span class="p">(</span><span class="n">forInfoDictionaryKey</span><span class="p">:</span> <span class="s">&#34;GroupIdentifier&#34;</span><span class="p">)</span> <span class="k">as</span><span class="p">?</span> <span class="nb">String</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="n">UserDefaults</span><span class="p">(</span><span class="n">suiteName</span><span class="p">:</span> <span class="n">value</span><span class="p">)</span> <span class="p">??</span> <span class="p">.</span><span class="n">stander</span>
-        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="n">UserDefaults</span><span class="p">(</span><span class="n">suiteName</span><span class="p">:</span> <span class="s">&#34;group.xxx&#34;</span><span class="p">)</span> <span class="p">??</span> <span class="p">.</span><span class="n">stander</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>这里我们通过读取 <code>Info.plist</code> 中预设的 <code>GroupIdentifier</code> 作为 App GroupID。用来解决内网发布所用的企业证书和 App Store 的个人证书不同，导致 App GroupID 不同的问题。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#268bd2">init</span>?(suiteName suitename: <span style="color:#b58900">String</span>?)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span><span style="color:#586e75">// or</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span><span style="color:#268bd2">func</span> <span style="color:#268bd2">addSuite</span>(named suiteName: <span style="color:#b58900">String</span>)
+</code></pre></div><p>设置之后即可使用该实例来储存和获取共享数据了。我们以 access_token 为例：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#268bd2">public</span> <span style="color:#268bd2">extension</span> <span style="color:#268bd2">UserDefaults</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>    <span style="color:#268bd2">@objc</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>    <span style="color:#268bd2">static</span> <span style="color:#268bd2">var</span> <span style="color:#268bd2">shared</span>: UserDefaults {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>        <span style="color:#719e07">if</span> <span style="color:#268bd2">let</span> <span style="color:#268bd2">value</span> = Bundle.main.object(forInfoDictionaryKey: <span style="color:#2aa198">&#34;GroupIdentifier&#34;</span>) <span style="color:#719e07">as</span>? <span style="color:#b58900">String</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>            <span style="color:#719e07">return</span> UserDefaults(suiteName: value) ?? .stander
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>        } <span style="color:#719e07">else</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>            <span style="color:#719e07">return</span> UserDefaults(suiteName: <span style="color:#2aa198">&#34;group.xxx&#34;</span>) ?? .stander
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>        }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>}
+</code></pre></div><p>这里我们通过读取 <code>Info.plist</code> 中预设的 <code>GroupIdentifier</code> 作为 App GroupID。用来解决内网发布所用的企业证书和 App Store 的个人证书不同，导致 App GroupID 不同的问题。</p>
 <p>完整的 Widget token 获取流程如下：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gl7a89pl2cj20ow0dijsa.jpg" alt="04-Widget-token"></p>
 <ol>
@@ -333,81 +290,41 @@ if (!doNotTrack) {
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gml9umivlnj23sn24pkjp.jpg" alt="05-Widget-logout"></p>
 <p>最后，对于数据量较大的文件共享，可以通过 <code>FileManager</code> 的 <code>containerURL(forSecurityApplicationGroupIdentifier:)</code> 获取 App Group 共享的储存空间地址，进行文件的存取操作。</p>
 <p>由于我们在 Userdefaults 中所使用到 key 都需要在主工程中赋值，在 Widget 中读取。为了避免 key 的多处重复定义，以及方便 API 的统一调用，将公共逻辑抽离到单独文件中，通过 <code>Comple Source</code> 分别在主工程和 Widget 中引用，来实现逻辑共用。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span><span class="lnt">33
-</span><span class="lnt">34
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="p">@</span><span class="n">propertyWrapper</span>
-<span class="kd">public</span> <span class="kd">struct</span> <span class="nc">UserDefaultsWrapper</span><span class="p">&lt;</span><span class="n">Value</span><span class="p">&gt;</span> <span class="p">{</span>
-
-    <span class="kd">let</span> <span class="nv">key</span><span class="p">:</span> <span class="nb">String</span>
-    <span class="kd">let</span> <span class="nv">defaultValue</span><span class="p">:</span> <span class="n">Value</span>
-    <span class="kd">var</span> <span class="nv">storage</span><span class="p">:</span> <span class="n">UserDefaults</span> <span class="p">=</span> <span class="p">.</span><span class="n">shared</span>
-
-    <span class="kd">public</span> <span class="kd">var</span> <span class="nv">wrappedValue</span><span class="p">:</span> <span class="n">Value</span> <span class="p">{</span>
-        <span class="kr">get</span> <span class="p">{</span>
-            <span class="kd">let</span> <span class="nv">value</span> <span class="p">=</span> <span class="n">storage</span><span class="p">.</span><span class="n">value</span><span class="p">(</span><span class="n">forKey</span><span class="p">:</span> <span class="n">key</span><span class="p">)</span> <span class="k">as</span><span class="p">?</span> <span class="n">Value</span>
-            <span class="k">return</span> <span class="n">value</span> <span class="p">??</span> <span class="n">defaultValue</span>
-        <span class="p">}</span>
-        <span class="kr">set</span> <span class="p">{</span>
-            <span class="n">storage</span><span class="p">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">newValue</span><span class="p">,</span> <span class="n">forKey</span><span class="p">:</span> <span class="n">key</span><span class="p">)</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="kd">public</span> <span class="kd">extension</span> <span class="nc">UserDefaultsWrapper</span> <span class="k">where</span> <span class="n">Value</span><span class="p">:</span> <span class="n">ExpressibleByNilLiteral</span> <span class="p">{</span>
-    <span class="kd">init</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="nb">String</span><span class="p">,</span> <span class="n">storage</span><span class="p">:</span> <span class="n">UserDefaults</span> <span class="p">=</span> <span class="p">.</span><span class="n">shared</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kc">self</span><span class="p">.</span><span class="kd">init</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="n">key</span><span class="p">,</span> <span class="n">defaultValue</span><span class="p">:</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">storage</span><span class="p">:</span> <span class="n">storage</span><span class="p">)</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="kd">public</span> <span class="kd">extension</span> <span class="nc">UserDefaults</span> <span class="p">{</span>
-
-    <span class="p">@</span><span class="n">UserDefaultsWrapper</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="s">&#34;xxx.Widgets.token&#34;</span><span class="p">)</span>
-    <span class="kr">@objc</span> <span class="kd">static</span> <span class="kd">var</span> <span class="nv">WidgetToken</span><span class="p">:</span> <span class="nb">String</span><span class="p">?</span>
-
-    <span class="p">@</span><span class="n">UserDefaultsWrapper</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="s">&#34;xxx.Widgets.stockColor&#34;</span><span class="p">,</span> <span class="n">defaultValue</span><span class="p">:</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="kr">@objc</span> <span class="kd">static</span> <span class="kd">var</span> <span class="nv">WidgetStockColor</span><span class="p">:</span> <span class="nb">Bool</span>
-
-    <span class="p">...</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>这里还利用了 @propertyWrapper 特性，将 key 收口，使用者仅需关心对应的属性即可。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span>@propertyWrapper
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span><span style="color:#268bd2">public</span> <span style="color:#268bd2">struct</span> <span style="color:#268bd2">UserDefaultsWrapper</span>&lt;Value&gt; {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>    <span style="color:#268bd2">let</span> <span style="color:#268bd2">key</span>: <span style="color:#b58900">String</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>    <span style="color:#268bd2">let</span> <span style="color:#268bd2">defaultValue</span>: Value
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>    <span style="color:#268bd2">var</span> <span style="color:#268bd2">storage</span>: UserDefaults = .shared
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>    <span style="color:#268bd2">public</span> <span style="color:#268bd2">var</span> <span style="color:#268bd2">wrappedValue</span>: Value {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>        <span style="color:#268bd2">get</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>            <span style="color:#268bd2">let</span> <span style="color:#268bd2">value</span> = storage.value(forKey: key) <span style="color:#719e07">as</span>? Value
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>            <span style="color:#719e07">return</span> value ?? defaultValue
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>        }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>        <span style="color:#268bd2">set</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>            storage.setValue(newValue, forKey: key)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>        }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span><span style="color:#268bd2">public</span> <span style="color:#268bd2">extension</span> <span style="color:#268bd2">UserDefaultsWrapper</span> <span style="color:#719e07">where</span> Value: ExpressibleByNilLiteral {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>    <span style="color:#268bd2">init</span>(key: <span style="color:#b58900">String</span>, storage: UserDefaults = .shared) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span>        <span style="color:#cb4b16">self</span>.<span style="color:#268bd2">init</span>(key: key, defaultValue: <span style="color:#cb4b16">nil</span>, storage: storage)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">22</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">23</span>}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">24</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">25</span><span style="color:#268bd2">public</span> <span style="color:#268bd2">extension</span> <span style="color:#268bd2">UserDefaults</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">26</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">27</span>    @UserDefaultsWrapper(key: <span style="color:#2aa198">&#34;xxx.Widgets.token&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">28</span>    <span style="color:#268bd2">@objc</span> <span style="color:#268bd2">static</span> <span style="color:#268bd2">var</span> <span style="color:#268bd2">WidgetToken</span>: <span style="color:#b58900">String</span>?
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">29</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">30</span>    @UserDefaultsWrapper(key: <span style="color:#2aa198">&#34;xxx.Widgets.stockColor&#34;</span>, defaultValue: <span style="color:#2aa198">0</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">31</span>    <span style="color:#268bd2">@objc</span> <span style="color:#268bd2">static</span> <span style="color:#268bd2">var</span> <span style="color:#268bd2">WidgetStockColor</span>: <span style="color:#b58900">Bool</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">32</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">33</span>    ...
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">34</span>}
+</code></pre></div><p>这里还利用了 @propertyWrapper 特性，将 key 收口，使用者仅需关心对应的属性即可。</p>
 <h2 id="0x02-swiftui--custom-view">0x02 SwiftUI &amp; Custom View</h2>
 <p>本节我们简单谈谈使用 SwiftUI 来开发 Widget 的一些小细节和注意事项。</p>
 <p>由于雪球工程历史包袱较大，在上面进行 Widget 的开发调试效率较低，且无法充分利用 SwiftUI 的 preview 特性进行 UI 调试。基于这个考虑，笔者直接在新建的 Xcode 工程中进行 SwiftUI 构建，完成后再同步回主工程。</p>
@@ -428,68 +345,32 @@ if (!doNotTrack) {
 <h3 id="自选背景实现">自选背景实现</h3>
 <p>在 Widget 设计一节中，可以看到在自选、热门话题及雪球日历均有一个浅色渐变的 logo 背景，只是颜色不同。</p>
 <p>由于背景是撑满整个 Widget 且 logo 位于顶点的相对位置，即顶部或底部。因此，这里采用了手动布局 <code>frame + position</code> 的方式。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">func</span> <span class="nf">logoPosition</span><span class="p">(</span><span class="kc">_</span> <span class="n">contentSize</span><span class="p">:</span> <span class="n">CGSize</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">CGPoint</span> <span class="p">{</span>
-
-     <span class="kd">let</span> <span class="nv">offset</span><span class="p">:</span> <span class="n">CGFloat</span> <span class="p">=</span> <span class="n">logoSize</span> <span class="o">/</span> <span class="mi">3</span>
-
-     <span class="k">if</span> <span class="n">edge</span> <span class="p">==</span> <span class="p">.</span><span class="n">top</span> <span class="p">{</span>
-         <span class="k">return</span> <span class="n">CGPoint</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">contentSize</span><span class="p">.</span><span class="n">width</span> <span class="o">-</span> <span class="n">offset</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">offset</span><span class="p">)</span>
-     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-         <span class="k">return</span> <span class="n">CGPoint</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">contentSize</span><span class="p">.</span><span class="n">width</span> <span class="o">-</span> <span class="n">offset</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">contentSize</span><span class="p">.</span><span class="n">height</span> <span class="o">-</span> <span class="n">offset</span><span class="p">)</span>
-     <span class="p">}</span>
- <span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>另外为了方便对比调试，直接添加了多种状态的预览视图：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">struct</span> <span class="nc">LogoView_Previews</span><span class="p">:</span> <span class="n">PreviewProvider</span> <span class="p">{</span>
-
-    <span class="kd">static</span> <span class="kd">var</span> <span class="nv">previews</span><span class="p">:</span> <span class="n">some</span> <span class="n">View</span> <span class="p">{</span>
-        <span class="n">Group</span> <span class="p">{</span>
-            <span class="n">LogoBackgroundView</span><span class="p">(</span><span class="n">edge</span><span class="p">:</span> <span class="p">.</span><span class="n">top</span><span class="p">,</span> <span class="n">style</span><span class="p">:</span> <span class="p">.</span><span class="n">custom</span><span class="p">(.</span><span class="n">blue99</span><span class="p">))</span>
-
-            <span class="n">LogoBackgroundView</span><span class="p">(</span><span class="n">edge</span><span class="p">:</span> <span class="p">.</span><span class="n">top</span><span class="p">,</span> <span class="n">style</span><span class="p">:</span> <span class="p">.</span><span class="n">custom</span><span class="p">(.</span><span class="n">gold</span><span class="p">))</span>
-
-            <span class="n">LogoBackgroundView</span><span class="p">(</span><span class="n">edge</span><span class="p">:</span> <span class="p">.</span><span class="n">bottom</span><span class="p">,</span> <span class="n">style</span><span class="p">:</span> <span class="p">.</span><span class="n">custom</span><span class="p">(.</span><span class="n">gold</span><span class="p">))</span>
-                <span class="p">.</span><span class="n">environment</span><span class="p">(</span><span class="err">\</span><span class="p">.</span><span class="n">colorScheme</span><span class="p">,</span> <span class="p">.</span><span class="n">dark</span><span class="p">)</span>
-        <span class="p">}</span>
-        <span class="p">.</span><span class="n">previewContext</span><span class="p">(</span><span class="n">WidgetPreviewContext</span><span class="p">(</span><span class="n">family</span><span class="p">:</span> <span class="p">.</span><span class="n">systemMedium</span><span class="p">))</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>完整代码和预览效果如下：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#268bd2">func</span> <span style="color:#268bd2">logoPosition</span>(<span style="color:#cb4b16">_</span> contentSize: CGSize) -&gt; CGPoint {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>     <span style="color:#268bd2">let</span> <span style="color:#268bd2">offset</span>: CGFloat = logoSize <span style="color:#719e07">/</span> <span style="color:#2aa198">3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>     <span style="color:#719e07">if</span> edge == .top {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>         <span style="color:#719e07">return</span> CGPoint(x: contentSize.width <span style="color:#719e07">-</span> offset, y: offset)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>     } <span style="color:#719e07">else</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>         <span style="color:#719e07">return</span> CGPoint(x: contentSize.width <span style="color:#719e07">-</span> offset, y: contentSize.height <span style="color:#719e07">-</span> offset)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>     }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span> }
+</code></pre></div><p>另外为了方便对比调试，直接添加了多种状态的预览视图：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#268bd2">struct</span> <span style="color:#268bd2">LogoView_Previews</span>: PreviewProvider {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>    <span style="color:#268bd2">static</span> <span style="color:#268bd2">var</span> <span style="color:#268bd2">previews</span>: some View {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>        Group {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>            LogoBackgroundView(edge: .top, style: .custom(.blue99))
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>            LogoBackgroundView(edge: .top, style: .custom(.gold))
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>            LogoBackgroundView(edge: .bottom, style: .custom(.gold))
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>                .environment(\.colorScheme, .dark)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>        }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>        .previewContext(WidgetPreviewContext(family: .systemMedium))
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>}
+</code></pre></div><p>完整代码和预览效果如下：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gmlc9dbv45j225s1r6b29.jpg" alt="06-Widget-bg"></p>
 <h3 id="自选列表项实现">自选列表项实现</h3>
 <p>自选列表项在整个小组件中算是相对复杂的布局了，需要支持用户的不同登录状态、自选展示内容和数量的可编辑、不同的画布尺寸以及用户涨跌幅颜色配置等。不过相比 UIKit 而言简，SwiftUI 进行页面编写直不要太爽，以自选列表项 <code>PortfolioItemView</code> 为例，仅需 50 行不到的代码就能完成 UI 与数据逻辑。</p>
@@ -523,15 +404,8 @@ if (!doNotTrack) {
 <p>编译后系统自动生成的 <code>PortfolioSelectionIntent</code> 类：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gmlvci9cvuj21jv0qe42y.jpg" alt="13-Widget-portfolioSelection"></p>
 <p>最终我们在 Widget 的 <strong>IntentTimelineProvider</strong> 入口关联 Intent：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">typealias</span> <span class="n">Intent</span> <span class="p">=</span> <span class="n">PortfolioSelectionIntent</span>
-</code></pre></td></tr></table>
-</div>
-</div><p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gmlvcdd35tj21hq0zin2u.jpg" alt="14-Widgets"></p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#268bd2">typealias</span> Intent = PortfolioSelectionIntent
+</code></pre></div><p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gmlvcdd35tj21hq0zin2u.jpg" alt="14-Widgets"></p>
 <h3 id="处理-intenthandler">处理 IntentHandler</h3>
 <p>完成绑定后，还需要新建一个 <code>PortfolioSelectionIntentHandler</code> 的 Target 用来处理和响应用户输入。</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gmlvale6qkj228418c47r.jpg" alt="15-intenthandler"></p>

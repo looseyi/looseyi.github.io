@@ -95,7 +95,7 @@ if (!doNotTrack) {
   <meta itemprop="name" content="完善 Cocoapods-Binary 支持 Server 端缓存">
 <meta itemprop="description" content="在开始之前，还是明确一下我们的目标，希望通过对 Cocoapods-binary 的改造使其支持 server 端缓存，从而达到 一处编译，处处使用 的 pods lib dependencies。同时会简单"><meta itemprop="datePublished" content="2020-01-06T11:40:06&#43;21:00" />
 <meta itemprop="dateModified" content="2020-01-06T11:40:06&#43;21:00" />
-<meta itemprop="wordCount" content="2409">
+<meta itemprop="wordCount" content="2405">
 <meta itemprop="keywords" content="CocoaPods,iOS,Binary,Source Code," />
   
   <meta name="twitter:card" content="summary"/>
@@ -214,109 +214,53 @@ if (!doNotTrack) {
 在 Prebuild framework 之前检查当前 pod_target 是否有对应的 server cache，存在则 download 至本地同时 unarchive 至 GenerateFramework 文件目录下，然后跳过当前 pod_target 的编译。</li>
 </ul>
 <p><a href="https://gist.github.com/looseyi/97820689ff80aa58c9791ece45d22a96">exist_remote_framewo = sandbox.fetch_remote_framework_for_target(target)</a></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">fetch_remote_framework_for_target</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-    <span class="n">existed_remote_framework</span> <span class="o">=</span> <span class="nb">self</span><span class="o">.</span><span class="n">remote_framework_names</span><span class="o">.</span><span class="n">include?</span><span class="p">(</span><span class="n">zip_framework_name</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
-
-    <span class="k">return</span> <span class="kp">false</span> <span class="k">unless</span> <span class="n">existed_remote_framework</span>
-
-    <span class="k">begin</span>
-        <span class="n">zip_framework_path</span> <span class="o">=</span> <span class="nb">self</span><span class="o">.</span><span class="n">ftp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">remote_framework_dir</span> <span class="o">+</span> <span class="n">zip_framework_name</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
-    <span class="k">rescue</span>
-        <span class="no">Pod</span><span class="o">::</span><span class="no">UI</span><span class="o">.</span><span class="n">puts</span> <span class="s2">&#34;Retry fetch remote fameworks&#34;</span>
-        <span class="nb">self</span><span class="o">.</span><span class="n">reset_ftp</span>
-        <span class="n">zip_framework_path</span> <span class="o">=</span> <span class="nb">self</span><span class="o">.</span><span class="n">ftp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">remote_framework_dir</span> <span class="o">+</span> <span class="n">zip_framework_name</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
-    <span class="k">end</span>
-
-    <span class="k">return</span> <span class="kp">false</span> <span class="k">unless</span> <span class="no">File</span><span class="o">.</span><span class="n">exist?</span><span class="p">(</span><span class="n">zip_framework_path</span><span class="p">)</span>
-
-    <span class="n">target_framework_path</span> <span class="o">=</span> <span class="n">generate_framework_path</span> <span class="o">+</span> <span class="n">target</span><span class="o">.</span><span class="n">name</span>
-    <span class="k">return</span> <span class="kp">true</span> <span class="k">unless</span> <span class="no">Dir</span><span class="o">.</span><span class="n">empty?</span><span class="p">(</span><span class="n">target_framework_path</span><span class="p">)</span>
-
-    <span class="n">extract_framework_path</span> <span class="o">=</span> <span class="n">generate_framework_path</span> <span class="o">+</span> <span class="n">target</span><span class="o">.</span><span class="n">name</span>
-    <span class="n">zf</span> <span class="o">=</span> <span class="no">Zipper</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">zip_framework_path</span><span class="p">,</span> <span class="n">extract_framework_path</span><span class="p">)</span>
-    <span class="n">zf</span><span class="o">.</span><span class="n">extract</span><span class="p">()</span>
-    <span class="kp">true</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>在 Prebuild 结束后会进行文件清理和 binary 的替换链接，在此时进行批量 binary 文件的同步。将GenerateFramework 目录中所匹配的 pod_target 且资源服务器所不存在的 binary 文件进行上传，统一至 static_frameworks 目录下，文件名则是 pod_name + tag, 例如 pod &lsquo;AFNetworking&rsquo;, &lsquo;3.0&rsquo;对应的 zip framework 名字为 AFNeworkings-3.0.0.zip 。
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">def</span> <span style="color:#268bd2">fetch_remote_framework_for_target</span>(target)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>    existed_remote_framework <span style="color:#719e07">=</span> <span style="color:#b58900">self</span><span style="color:#719e07">.</span>remote_framework_names<span style="color:#719e07">.</span>include?(zip_framework_name(target))
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>    <span style="color:#719e07">return</span> <span style="color:#719e07">false</span> <span style="color:#719e07">unless</span> existed_remote_framework
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>    <span style="color:#719e07">begin</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>        zip_framework_path <span style="color:#719e07">=</span> <span style="color:#b58900">self</span><span style="color:#719e07">.</span>ftp<span style="color:#719e07">.</span>get(remote_framework_dir <span style="color:#719e07">+</span> zip_framework_name(target))
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>    <span style="color:#719e07">rescue</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>        <span style="color:#cb4b16">Pod</span><span style="color:#719e07">::</span><span style="color:#cb4b16">UI</span><span style="color:#719e07">.</span>puts <span style="color:#2aa198">&#34;Retry fetch remote fameworks&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>        <span style="color:#b58900">self</span><span style="color:#719e07">.</span>reset_ftp
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>        zip_framework_path <span style="color:#719e07">=</span> <span style="color:#b58900">self</span><span style="color:#719e07">.</span>ftp<span style="color:#719e07">.</span>get(remote_framework_dir <span style="color:#719e07">+</span> zip_framework_name(target))
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>    <span style="color:#719e07">return</span> <span style="color:#719e07">false</span> <span style="color:#719e07">unless</span> <span style="color:#cb4b16">File</span><span style="color:#719e07">.</span>exist?(zip_framework_path)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>    target_framework_path <span style="color:#719e07">=</span> generate_framework_path <span style="color:#719e07">+</span> target<span style="color:#719e07">.</span>name
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>    <span style="color:#719e07">return</span> <span style="color:#719e07">true</span> <span style="color:#719e07">unless</span> <span style="color:#cb4b16">Dir</span><span style="color:#719e07">.</span>empty?(target_framework_path)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>    extract_framework_path <span style="color:#719e07">=</span> generate_framework_path <span style="color:#719e07">+</span> target<span style="color:#719e07">.</span>name
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>    zf <span style="color:#719e07">=</span> <span style="color:#cb4b16">Zipper</span><span style="color:#719e07">.</span>new(zip_framework_path, extract_framework_path)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span>    zf<span style="color:#719e07">.</span>extract()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">22</span>    <span style="color:#719e07">true</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">23</span><span style="color:#719e07">end</span>
+</code></pre></div><p>在 Prebuild 结束后会进行文件清理和 binary 的替换链接，在此时进行批量 binary 文件的同步。将GenerateFramework 目录中所匹配的 pod_target 且资源服务器所不存在的 binary 文件进行上传，统一至 static_frameworks 目录下，文件名则是 pod_name + tag, 例如 pod &lsquo;AFNetworking&rsquo;, &lsquo;3.0&rsquo;对应的 zip framework 名字为 AFNeworkings-3.0.0.zip 。
 <a href="https://gist.github.com/looseyi/f5674ad527c1a7e6d5cf896cfb4f0237">sync_prebuild_framework_to_server(target)</a></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">sync_prebuild_framework_to_server</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-    <span class="n">zip_framework</span> <span class="o">=</span> <span class="n">zip_framework_name</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-    <span class="n">target_framework_path</span> <span class="o">=</span> <span class="n">framework_folder_path_for_target_name</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-    <span class="n">zip_framework_path</span> <span class="o">=</span> <span class="n">framework_folder_path_for_target_name</span><span class="p">(</span><span class="n">zip_framework</span><span class="p">)</span>
-
-    <span class="c1"># ftp server 已有相同 Tag 的包</span>
-    <span class="k">return</span> <span class="k">if</span> <span class="nb">self</span><span class="o">.</span><span class="n">remote_framework_names</span><span class="o">.</span><span class="n">include?</span> <span class="n">zip_framework</span>
-    <span class="c1"># 本地 archive 失败</span>
-    <span class="k">return</span> <span class="k">if</span> <span class="o">!</span><span class="no">File</span><span class="o">.</span><span class="n">exist?</span><span class="p">(</span><span class="n">target_framework_path</span><span class="p">)</span> <span class="o">||</span> <span class="no">Dir</span><span class="o">.</span><span class="n">empty?</span><span class="p">(</span><span class="n">target_framework_path</span><span class="p">)</span>
-
-    <span class="k">begin</span>
-        <span class="no">Zipper</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">target_framework_path</span><span class="p">,</span> <span class="n">zip_framework_path</span><span class="p">)</span><span class="o">.</span><span class="n">write</span> <span class="k">unless</span> <span class="no">File</span><span class="o">.</span><span class="n">exist?</span><span class="p">(</span><span class="n">zip_framework_path</span><span class="p">)</span>
-        <span class="nb">self</span><span class="o">.</span><span class="n">ftp</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">zip_framework_path</span><span class="p">,</span> <span class="n">remote_framework_dir</span><span class="p">)</span>
-        <span class="n">remote_zip_framework_path</span> <span class="o">=</span> <span class="nb">self</span><span class="o">.</span><span class="n">ftp</span><span class="o">.</span><span class="n">local_file</span><span class="p">(</span><span class="n">remote_framework_dir</span> <span class="o">+</span> <span class="n">zip_framework</span><span class="p">)</span>
-        <span class="no">FileUtils</span><span class="o">.</span><span class="n">mv</span> <span class="n">zip_framework_path</span><span class="p">,</span> <span class="n">remote_zip_framework_path</span><span class="p">,</span> <span class="ss">:force</span> <span class="o">=&gt;</span> <span class="kp">true</span>    
-    <span class="k">rescue</span>
-        <span class="no">Pod</span><span class="o">::</span><span class="no">UI</span><span class="o">.</span><span class="n">puts</span> <span class="s2">&#34;ReTry To Sync Once&#34;</span>
-        <span class="nb">self</span><span class="o">.</span><span class="n">reset_ftp</span>
-        <span class="n">sync_prebuild_framework_to_server</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-    <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>实践过程中，为了方便直接是利用了公司现有的 ftp 文件服务器，单独开了一个进行目录维护。相比 CocoaPods-binary 仅增加了 ftp_tools.rb 和 zip_tools.rb 两个文件，实现比较简单这里就不贴出来了。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">def</span> <span style="color:#268bd2">sync_prebuild_framework_to_server</span>(target)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>    zip_framework <span style="color:#719e07">=</span> zip_framework_name(target)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>    target_framework_path <span style="color:#719e07">=</span> framework_folder_path_for_target_name(target<span style="color:#719e07">.</span>name)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>    zip_framework_path <span style="color:#719e07">=</span> framework_folder_path_for_target_name(zip_framework)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>    <span style="color:#586e75"># ftp server 已有相同 Tag 的包</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>    <span style="color:#719e07">return</span> <span style="color:#719e07">if</span> <span style="color:#b58900">self</span><span style="color:#719e07">.</span>remote_framework_names<span style="color:#719e07">.</span>include? zip_framework
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>    <span style="color:#586e75"># 本地 archive 失败</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>    <span style="color:#719e07">return</span> <span style="color:#719e07">if</span> <span style="color:#719e07">!</span><span style="color:#cb4b16">File</span><span style="color:#719e07">.</span>exist?(target_framework_path) <span style="color:#719e07">||</span> <span style="color:#cb4b16">Dir</span><span style="color:#719e07">.</span>empty?(target_framework_path)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>    <span style="color:#719e07">begin</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>        <span style="color:#cb4b16">Zipper</span><span style="color:#719e07">.</span>new(target_framework_path, zip_framework_path)<span style="color:#719e07">.</span>write <span style="color:#719e07">unless</span> <span style="color:#cb4b16">File</span><span style="color:#719e07">.</span>exist?(zip_framework_path)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>        <span style="color:#b58900">self</span><span style="color:#719e07">.</span>ftp<span style="color:#719e07">.</span>put(zip_framework_path, remote_framework_dir)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>        remote_zip_framework_path <span style="color:#719e07">=</span> <span style="color:#b58900">self</span><span style="color:#719e07">.</span>ftp<span style="color:#719e07">.</span>local_file(remote_framework_dir <span style="color:#719e07">+</span> zip_framework)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>        <span style="color:#cb4b16">FileUtils</span><span style="color:#719e07">.</span>mv zip_framework_path, remote_zip_framework_path, <span style="color:#2aa198">:force</span> <span style="color:#719e07">=&gt;</span> <span style="color:#719e07">true</span>    
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>    <span style="color:#719e07">rescue</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>        <span style="color:#cb4b16">Pod</span><span style="color:#719e07">::</span><span style="color:#cb4b16">UI</span><span style="color:#719e07">.</span>puts <span style="color:#2aa198">&#34;ReTry To Sync Once&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>        <span style="color:#b58900">self</span><span style="color:#719e07">.</span>reset_ftp
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>        sync_prebuild_framework_to_server(target)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span><span style="color:#719e07">end</span>
+</code></pre></div><p>实践过程中，为了方便直接是利用了公司现有的 ftp 文件服务器，单独开了一个进行目录维护。相比 CocoaPods-binary 仅增加了 ftp_tools.rb 和 zip_tools.rb 两个文件，实现比较简单这里就不贴出来了。</p>
 <h2 id="限制">限制</h2>
 <ul>
 <li>最终的 binary size 会比使用源码的时候大一点，不建议最终上传 Store 的时候使用；</li>

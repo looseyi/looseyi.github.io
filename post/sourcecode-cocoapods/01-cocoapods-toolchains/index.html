@@ -95,7 +95,7 @@ if (!doNotTrack) {
   <meta itemprop="name" content="1. 版本管理工具及 Ruby 工具链环境">
 <meta itemprop="description" content="CocoaPods 历险记这个专题是 Edmond 和冬瓜 是对于 iOS / macOS 工程中版本管理工具 CocoaPods 的实现细节、原理、源码、实践与经验的分享记录，旨在帮助大家能够更加了解这个依赖管理"><meta itemprop="datePublished" content="2020-06-10T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2020-06-10T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="4714">
+<meta itemprop="wordCount" content="4638">
 <meta itemprop="keywords" content="CocoaPods,iOS,Ruby," />
   
   <meta name="twitter:card" content="summary"/>
@@ -204,19 +204,10 @@ if (!doNotTrack) {
 </ul>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/1591356928689-4afddee3-9ca8-4392-8ccc-00ac114e4fe9.jpeg" alt=""></p>
 <p>Git submodule 是依赖 <code>.gitmodules</code> 文件来记录子模块的。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="o">[</span><span class="n">submodule</span> <span class="s2">&#34;ReactNative&#34;</span><span class="o">]</span>
-	<span class="n">path</span> <span class="o">=</span> <span class="no">ReactNative</span>
-	<span class="n">url</span> <span class="o">=</span> <span class="ss">https</span><span class="p">:</span><span class="sr">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">facebook</span><span class="o">/</span><span class="no">ReactNative</span><span class="o">.</span><span class="n">git</span>
-</code></pre></td></tr></table>
-</div>
-</div><p><code>.gitmodules</code> 仅记录了 path 和 url 以及模块名称的基本信息， 但是我们还需要记录每个 Submodule Repo 的 commit 信息，而这 commit 信息是记录在 <code>.git/modules</code> 目录下。同时被添加到 <code>.gitmodules</code> 中的 path 也会被 git 直接 ignore 掉。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#719e07">[</span>submodule <span style="color:#2aa198">&#34;ReactNative&#34;</span><span style="color:#719e07">]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>	path <span style="color:#719e07">=</span> <span style="color:#cb4b16">ReactNative</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>	url <span style="color:#719e07">=</span> <span style="color:#2aa198">https</span>:<span style="color:#dc322f">//</span>github<span style="color:#719e07">.</span>com<span style="color:#719e07">/</span>facebook<span style="color:#719e07">/</span><span style="color:#cb4b16">ReactNative</span><span style="color:#719e07">.</span>git
+</code></pre></div><p><code>.gitmodules</code> 仅记录了 path 和 url 以及模块名称的基本信息， 但是我们还需要记录每个 Submodule Repo 的 commit 信息，而这 commit 信息是记录在 <code>.git/modules</code> 目录下。同时被添加到 <code>.gitmodules</code> 中的 path 也会被 git 直接 ignore 掉。</p>
 <h2 id="package-manger">Package Manger</h2>
 <p>作为 Git Submodule 的强化版，PM 基本都具备了语义化的版本检查能力，依赖递归查找，依赖冲突解决，以及针对具体依赖的构建能力和二进制包等。简单对比如下：</p>
 <table>
@@ -295,21 +286,11 @@ if (!doNotTrack) {
 <h3 id="gemfile"><code>Gemfile</code></h3>
 <p><strong>可以说 <code>CocoaPods</code> 其实是 iOS 版的 RubyGems + Bundler 组合。Bundler 依据项目中的 <code>Gemfile</code> 文件来管理 Gem，而 <code>CocoaPods</code> 通过 Podfile 来管理 Pod。</strong></p>
 <p><a href="https://bundler.io/v2.0/gemfile.html" title="Gemfile">Gemfile</a> 配置如下：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">source</span> <span class="s1">&#39;https://gems.example.com&#39;</span> <span class="k">do</span>
-  <span class="n">gem</span> <span class="s1">&#39;cocoapods&#39;</span><span class="p">,</span> <span class="s1">&#39;1.8.4&#39;</span><span class="err">是管理</span> <span class="no">Gem</span> <span class="err">依赖的工具</span>
-  <span class="n">gem</span> <span class="s1">&#39;another_gem&#39;</span><span class="p">,</span> <span class="ss">:git</span> <span class="o">=&gt;</span> <span class="s1">&#39;https://looseyi.github.io.git&#39;</span><span class="p">,</span> <span class="ss">:branch</span> <span class="o">=&gt;</span> <span class="s1">&#39;master&#39;</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>可见，Podfile 的 DSL 写法和 Gemfile 如出一辙。那什么情况会用到 Gemfile 呢 ？</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>source <span style="color:#2aa198">&#39;https://gems.example.com&#39;</span> <span style="color:#719e07">do</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>  gem <span style="color:#2aa198">&#39;cocoapods&#39;</span>, <span style="color:#2aa198">&#39;1.8.4&#39;</span>是管理 <span style="color:#cb4b16">Gem</span> 依赖的工具
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>  gem <span style="color:#2aa198">&#39;another_gem&#39;</span>, <span style="color:#2aa198">:git</span> <span style="color:#719e07">=&gt;</span> <span style="color:#2aa198">&#39;https://looseyi.github.io.git&#39;</span>, <span style="color:#2aa198">:branch</span> <span style="color:#719e07">=&gt;</span> <span style="color:#2aa198">&#39;master&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span><span style="color:#719e07">end</span>
+</code></pre></div><p>可见，Podfile 的 DSL 写法和 Gemfile 如出一辙。那什么情况会用到 Gemfile 呢 ？</p>
 <p><code>CocoaPods</code> 每年都会有一些重大版本的升级，前面聊到过 <code>CocoaPods</code> 在 <code>install</code> 过程中会对项目的 <code>.xcodeproj</code> 文件进行修改，不同版本其有所不同，这些在变更都可能导致大量 <code>conflicts</code>，处理不好，项目就不能正常运行了。我想你一定不愿意去修改 <code>.xcodeproj</code> 的冲突。</p>
 <p>如果项目是基于 <code>fastlane</code> 来进行持续集成的相关工作以及 App 的打包工作等，也需要其版本管理等功能。</p>
 <h1 id="如何安装一套可管控的-ruby-工具链">如何安装一套可管控的 Ruby 工具链？</h1>
@@ -317,151 +298,64 @@ if (!doNotTrack) {
 <p>以下是我认为比较可控的 Ruby 工具链分层管理图。下面我们逐一讲述每一层的管理方式，以及实际的操作方法。</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/1591692591825-5e8b38bb-cf2d-4435-b9b1-704b02df1202.png" alt="可管控工具链的分层结构"></p>
 <h2 id="1-使用-homebrew-安装-rbenv">1. 使用 <code>homebrew</code> 安装 <code>rbenv</code></h2>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell">$ brew install rbenv
-</code></pre></td></tr></table>
-</div>
-</div><p>安装成功后输入 <code>rbenv</code>  就可以看到相关提示：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell">$ rbenv
-
-rbenv 1.1.2
-Usage: rbenv &lt;command&gt; <span class="o">[</span>&lt;args&gt;<span class="o">]</span>
-
-Some useful rbenv commands are:
-   commands    List all available rbenv commands
-   <span class="nb">local</span>       Set or show the <span class="nb">local</span> application-specific Ruby version
-   global      Set or show the global Ruby version
-   shell       Set or show the shell-specific Ruby version
-   install     Install a Ruby version using ruby-build
-   uninstall   Uninstall a specific Ruby version
-   rehash      Rehash rbenv shims <span class="o">(</span>run this after installing executables<span class="o">)</span>
-   version     Show the current Ruby version and its origin
-   versions    List installed Ruby versions
-   which       Display the full path to an executable
-   whence      List all Ruby versions that contain the given executable
-
-See <span class="sb">`</span>rbenv <span class="nb">help</span> &lt;command&gt;<span class="err">&#39;</span> <span class="k">for</span> information on a specific command.
-For full documentation, see: https://github.com/rbenv/rbenv#readme
-</code></pre></td></tr></table>
-</div>
-</div><h2 id="2-使用-rbenv-管理-ruby-版本">2. 使用 <code>rbenv</code> 管理 Ruby 版本</h2>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>$ brew install rbenv
+</code></pre></div><p>安装成功后输入 <code>rbenv</code>  就可以看到相关提示：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span>$ rbenv
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>rbenv 1.1.2
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>Usage: rbenv &lt;command&gt; <span style="color:#719e07">[</span>&lt;args&gt;<span style="color:#719e07">]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>Some useful rbenv commands are:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>   commands    List all available rbenv commands
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>   <span style="color:#b58900">local</span>       Set or show the <span style="color:#b58900">local</span> application-specific Ruby version
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>   global      Set or show the global Ruby version
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>   shell       Set or show the shell-specific Ruby version
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>   install     Install a Ruby version using ruby-build
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>   uninstall   Uninstall a specific Ruby version
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>   rehash      Rehash rbenv shims <span style="color:#719e07">(</span>run this after installing executables<span style="color:#719e07">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>   version     Show the current Ruby version and its origin
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>   versions    List installed Ruby versions
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>   which       Display the full path to an executable
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>   whence      List all Ruby versions that contain the given executable
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>See <span style="color:#586e75">`</span>rbenv <span style="color:#b58900">help</span> &lt;command&gt;&#39; <span style="color:#719e07">for</span> information on a specific command.
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>For full documentation, see: https://github.com/rbenv/rbenv#readme
+</code></pre></div><h2 id="2-使用-rbenv-管理-ruby-版本">2. 使用 <code>rbenv</code> 管理 Ruby 版本</h2>
 <p>使用 <code>rbenv</code>  来安装一个 Ruby 版本，这里我使用刚刚 release Ruby 2.7：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell">$ rbenv install 2.7.0
-</code></pre></td></tr></table>
-</div>
-</div><p>这个安装过程有些长，因为要下载 <code>openssl</code> 和 Ruby 的解释器，大概要 20 分钟左右。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>$ rbenv install 2.7.0
+</code></pre></div><p>这个安装过程有些长，因为要下载 <code>openssl</code> 和 Ruby 的解释器，大概要 20 分钟左右。</p>
 <p>安装成功后，我们让其在本地环境中生效：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell">$ rbenv shell 2.7.0
-</code></pre></td></tr></table>
-</div>
-</div><blockquote>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>$ rbenv shell 2.7.0
+</code></pre></div><blockquote>
 <p>输入上述命令后，可能会有报错。 <code>rbenv</code>  提示我们在 <code>.zshrc</code>  中增加一行 <code>eval &quot;$(rbenv init -)&quot;</code>  语句来对 <code>rbenv</code>  环境进行初始化。如果报错，我们增加并重启终端即可。</p>
 </blockquote>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell">$ ruby --version
-ruby 2.7.0p0 <span class="o">(</span>2019-12-25 revision 647ee6f091<span class="o">)</span> <span class="o">[</span>x86_64-darwin19<span class="o">]</span>
-$ which ruby
-/Users/gua/.rbenv/shims/ruby
-</code></pre></td></tr></table>
-</div>
-</div><p>切换之后我们发现 Ruby 已经切换到 <code>rbenv</code>  的管理版本，并且其启动 <code>PATH</code>  也已经变成 <code>rbenv</code>  管理下的 Ruby。并且我们可以看一下 Ruby 捆绑的 <code>Gem</code>  的 <code>PATH</code> ：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell">$ which gem
-/Users/bytedance/.rbenv/shims/gem
-</code></pre></td></tr></table>
-</div>
-</div><p>对应的 <code>Gem</code>  也已经变成 <code>rbenv</code>  中的 <code>PATH</code> 。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>$ ruby --version
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>ruby 2.7.0p0 <span style="color:#719e07">(</span>2019-12-25 revision 647ee6f091<span style="color:#719e07">)</span> <span style="color:#719e07">[</span>x86_64-darwin19<span style="color:#719e07">]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>$ which ruby
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>/Users/gua/.rbenv/shims/ruby
+</code></pre></div><p>切换之后我们发现 Ruby 已经切换到 <code>rbenv</code>  的管理版本，并且其启动 <code>PATH</code>  也已经变成 <code>rbenv</code>  管理下的 Ruby。并且我们可以看一下 Ruby 捆绑的 <code>Gem</code>  的 <code>PATH</code> ：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>$ which gem
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>/Users/bytedance/.rbenv/shims/gem
+</code></pre></div><p>对应的 <code>Gem</code>  也已经变成 <code>rbenv</code>  中的 <code>PATH</code> 。</p>
 <h2 id="3-查询系统级-gem-依赖">3. 查询系统级 <code>Gem</code> 依赖</h2>
 <p>如此，我们使用 <code>rbenv</code> 已经对 Ruby 及其 <code>Gem</code>  环境在版本上进行了环境隔离。我们可以通过 <code>gem list</code>  命令来查询当前系统环境下所有的 <code>Gem</code>  依赖：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell">$ gem list
-
-*** LOCAL GEMS ***
-
-activesupport <span class="o">(</span>4.2.11.3<span class="o">)</span>
-...
-claide <span class="o">(</span>1.0.3<span class="o">)</span>
-cocoapods <span class="o">(</span>1.9.3<span class="o">)</span>
-cocoapods-core <span class="o">(</span>1.9.3<span class="o">)</span>
-cocoapods-deintegrate <span class="o">(</span>1.0.4<span class="o">)</span>
-cocoapods-downloader <span class="o">(</span>1.3.0<span class="o">)</span>
-cocoapods-plugins <span class="o">(</span>1.0.0<span class="o">)</span>
-cocoapods-search <span class="o">(</span>1.0.0<span class="o">)</span>
-cocoapods-stats <span class="o">(</span>1.1.0<span class="o">)</span>
-cocoapods-trunk <span class="o">(</span>1.5.0<span class="o">)</span>
-cocoapods-try <span class="o">(</span>1.2.0<span class="o">)</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>记住这里的 <code>CocoaPods</code> 版本，我们后面项目中还会查询。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span>$ gem list
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>*** LOCAL GEMS ***
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>activesupport <span style="color:#719e07">(</span>4.2.11.3<span style="color:#719e07">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>...
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>claide <span style="color:#719e07">(</span>1.0.3<span style="color:#719e07">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>cocoapods <span style="color:#719e07">(</span>1.9.3<span style="color:#719e07">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>cocoapods-core <span style="color:#719e07">(</span>1.9.3<span style="color:#719e07">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>cocoapods-deintegrate <span style="color:#719e07">(</span>1.0.4<span style="color:#719e07">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>cocoapods-downloader <span style="color:#719e07">(</span>1.3.0<span style="color:#719e07">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>cocoapods-plugins <span style="color:#719e07">(</span>1.0.0<span style="color:#719e07">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>cocoapods-search <span style="color:#719e07">(</span>1.0.0<span style="color:#719e07">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>cocoapods-stats <span style="color:#719e07">(</span>1.1.0<span style="color:#719e07">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>cocoapods-trunk <span style="color:#719e07">(</span>1.5.0<span style="color:#719e07">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>cocoapods-try <span style="color:#719e07">(</span>1.2.0<span style="color:#719e07">)</span>
+</code></pre></div><p>记住这里的 <code>CocoaPods</code> 版本，我们后面项目中还会查询。</p>
 <p>如此我们已经完成了全部的 Ruby、Gem 环境的配置，我们通过一张漏斗图再来梳理一下：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/1591770762979-60f1adee-7b73-4ca8-b6a1-dbc917ae024e.png" alt="操作安装流程"></p>
 <h1 id="如何使用-bundler-管理工程中的-gem-环境">如何使用 Bundler 管理工程中的 Gem 环境</h1>
@@ -471,178 +365,76 @@ cocoapods-try <span class="o">(</span>1.2.0<span class="o">)</span>
 <p>以下也会逐一讲述每一层的管理方式，以及实际的操作方法。</p>
 <h2 id="1-在-ios-工程中初始化-bundler-环境">1. 在 iOS 工程中初始化 <code>Bundler</code> 环境</h2>
 <p>首先我们有一个 iOS Demo 工程 - <code>GuaDemo</code> ：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell">$ ls -al
-total <span class="m">0</span>
-drwxr-xr-x   <span class="m">4</span> gua  staff   <span class="m">128</span> Jun <span class="m">10</span> 14:47 .
-drwxr-xr-x@ <span class="m">52</span> gua  staff  <span class="m">1664</span> Jun <span class="m">10</span> 14:47 ..
-drwxr-xr-x   <span class="m">8</span> gua  staff   <span class="m">256</span> Jun <span class="m">10</span> 14:47 GuaDemo
-drwxr-xr-x@  <span class="m">5</span> gua  staff   <span class="m">160</span> Jun <span class="m">10</span> 14:47 GuaDemo.xcodeproj
-</code></pre></td></tr></table>
-</div>
-</div><p>首先先来初始化一个 <code>Bundler</code>  环境（其实就是自动创建一个 <code>Gemfile</code> 文件）：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell">$ bundle init
-
-Writing new Gemfile to /Users/Gua/GuaDemo/Gemfile
-</code></pre></td></tr></table>
-</div>
-</div><h2 id="2-在-gemfile-中声明使用的-cocoapods-版本并安装">2. 在 <code>Gemfile</code>  中声明使用的 <code>CocoaPods</code> 版本并安装</h2>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>$ ls -al
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>total <span style="color:#2aa198">0</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>drwxr-xr-x   <span style="color:#2aa198">4</span> gua  staff   <span style="color:#2aa198">128</span> Jun <span style="color:#2aa198">10</span> 14:47 .
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>drwxr-xr-x@ <span style="color:#2aa198">52</span> gua  staff  <span style="color:#2aa198">1664</span> Jun <span style="color:#2aa198">10</span> 14:47 ..
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>drwxr-xr-x   <span style="color:#2aa198">8</span> gua  staff   <span style="color:#2aa198">256</span> Jun <span style="color:#2aa198">10</span> 14:47 GuaDemo
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>drwxr-xr-x@  <span style="color:#2aa198">5</span> gua  staff   <span style="color:#2aa198">160</span> Jun <span style="color:#2aa198">10</span> 14:47 GuaDemo.xcodeproj
+</code></pre></div><p>首先先来初始化一个 <code>Bundler</code>  环境（其实就是自动创建一个 <code>Gemfile</code> 文件）：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>$ bundle init
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>Writing new Gemfile to /Users/Gua/GuaDemo/Gemfile
+</code></pre></div><h2 id="2-在-gemfile-中声明使用的-cocoapods-版本并安装">2. 在 <code>Gemfile</code>  中声明使用的 <code>CocoaPods</code> 版本并安装</h2>
 <p>之后我们编辑一下这个 <code>Gemfile</code> 文件，加入我们当前环境中需要使用 <code>CocoaPods 1.5.3</code> 这个版本，则使用 <code>Gemfile</code>  的 DSL 编写以下内容：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="c1"># frozen_string_literal: true</span>
-
-<span class="n">source</span> <span class="s2">&#34;https://rubygems.org&#34;</span>
-
-<span class="n">git_source</span><span class="p">(</span><span class="ss">:github</span><span class="p">)</span> <span class="p">{</span><span class="o">|</span><span class="n">repo_name</span><span class="o">|</span> <span class="s2">&#34;https://github.com/</span><span class="si">#{</span><span class="n">repo_name</span><span class="si">}</span><span class="s2">&#34;</span> <span class="p">}</span>
-
-<span class="c1"># gem &#34;rails&#34;</span>
-<span class="n">gem</span> <span class="s2">&#34;cocoapods&#34;</span><span class="p">,</span> <span class="s2">&#34;1.5.3&#34;</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>编写之后执行一下 <code>bundle install</code> ：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="err">$</span> <span class="n">bundle</span> <span class="n">install</span>
-<span class="no">Fetching</span> <span class="n">gem</span> <span class="n">metadata</span> <span class="n">from</span> <span class="ss">https</span><span class="p">:</span><span class="sr">//</span><span class="n">gems</span><span class="o">.</span><span class="n">ruby</span><span class="o">-</span><span class="n">china</span><span class="o">.</span><span class="n">com</span><span class="o">/............</span>
-<span class="no">Resolving</span> <span class="n">dependencies</span><span class="o">...</span>
-<span class="o">...</span>
-<span class="no">Fetching</span> <span class="n">cocoapods</span> <span class="mi">1</span><span class="o">.</span><span class="mi">5</span><span class="o">.</span><span class="mi">3</span>
-<span class="no">Installing</span> <span class="n">cocoapods</span> <span class="mi">1</span><span class="o">.</span><span class="mi">5</span><span class="o">.</span><span class="mi">3</span>
-<span class="no">Bundle</span> <span class="n">complete!</span> <span class="mi">1</span> <span class="no">Gemfile</span> <span class="n">dependency</span><span class="p">,</span> <span class="mi">30</span> <span class="n">gems</span> <span class="n">now</span> <span class="n">installed</span><span class="o">.</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>发现 <code>CocoaPods 1.5.3</code>  这个指定版本已经安装成功，并且还保存了一份 <code>Gemfile.lock</code>  文件用来锁存这次的依赖结果。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#586e75"># frozen_string_literal: true</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>source <span style="color:#2aa198">&#34;https://rubygems.org&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>git_source(<span style="color:#2aa198">:github</span>) {<span style="color:#719e07">|</span>repo_name<span style="color:#719e07">|</span> <span style="color:#2aa198">&#34;https://github.com/</span><span style="color:#2aa198">#{</span>repo_name<span style="color:#2aa198">}</span><span style="color:#2aa198">&#34;</span> }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span><span style="color:#586e75"># gem &#34;rails&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">8</span>gem <span style="color:#2aa198">&#34;cocoapods&#34;</span>, <span style="color:#2aa198">&#34;1.5.3&#34;</span>
+</code></pre></div><p>编写之后执行一下 <code>bundle install</code> ：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>$ bundle install
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span><span style="color:#cb4b16">Fetching</span> gem metadata from <span style="color:#2aa198">https</span>:<span style="color:#dc322f">//</span>gems<span style="color:#719e07">.</span>ruby<span style="color:#719e07">-</span>china<span style="color:#719e07">.</span>com<span style="color:#719e07">/............</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span><span style="color:#cb4b16">Resolving</span> dependencies<span style="color:#719e07">...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span><span style="color:#719e07">...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span><span style="color:#cb4b16">Fetching</span> cocoapods <span style="color:#2aa198">1</span><span style="color:#719e07">.</span><span style="color:#2aa198">5</span><span style="color:#719e07">.</span><span style="color:#2aa198">3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span><span style="color:#cb4b16">Installing</span> cocoapods <span style="color:#2aa198">1</span><span style="color:#719e07">.</span><span style="color:#2aa198">5</span><span style="color:#719e07">.</span><span style="color:#2aa198">3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span><span style="color:#cb4b16">Bundle</span> complete! <span style="color:#2aa198">1</span> <span style="color:#cb4b16">Gemfile</span> dependency, <span style="color:#2aa198">30</span> gems now installed<span style="color:#719e07">.</span>
+</code></pre></div><p>发现 <code>CocoaPods 1.5.3</code>  这个指定版本已经安装成功，并且还保存了一份 <code>Gemfile.lock</code>  文件用来锁存这次的依赖结果。</p>
 <h2 id="3-使用当前环境下的-cocoapods-版本操作-ios-工程">3. 使用当前环境下的 <code>CocoaPods</code> 版本操作 iOS 工程</h2>
 <p>此时我们可以检查一下当前 <code>Bundler</code> 环境下的 <code>Gem</code>  列表：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="err">$</span> <span class="n">bundle</span> <span class="nb">exec</span> <span class="n">gem</span> <span class="n">list</span>
-
-<span class="o">***</span> <span class="no">LOCAL</span> <span class="no">GEMS</span> <span class="o">***</span>
-
-<span class="n">activesupport</span> <span class="p">(</span><span class="mi">4</span><span class="o">.</span><span class="mi">2</span><span class="o">.</span><span class="mi">11</span><span class="o">.</span><span class="mi">3</span><span class="p">)</span>
-<span class="n">atomos</span> <span class="p">(</span><span class="mi">0</span><span class="o">.</span><span class="mi">1</span><span class="o">.</span><span class="mi">3</span><span class="p">)</span>
-<span class="n">bundler</span> <span class="p">(</span><span class="mi">2</span><span class="o">.</span><span class="mi">1</span><span class="o">.</span><span class="mi">4</span><span class="p">)</span>
-<span class="no">CFPropertyList</span> <span class="p">(</span><span class="mi">3</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">claide</span> <span class="p">(</span><span class="mi">1</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">3</span><span class="p">)</span>
-<span class="n">cocoapods</span> <span class="p">(</span><span class="mi">1</span><span class="o">.</span><span class="mi">5</span><span class="o">.</span><span class="mi">3</span><span class="p">)</span>
-<span class="o">...</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>发现相比于全局 <code>Gem</code> 列表，这个列表精简了许多，并且也只是基础 <code>Gem</code> 依赖和 <code>CocoaPods</code> 的 <code>Gem</code> 依赖。此时我们使用 <code>bundle exec pod install</code>  来执行 Install 这个操作，就可以使用 <code>CocoaPods 1.5.3</code>  版本来执行 <code>Pod</code>  操作了（当然，前提是你还需要写一个 <code>Podfile</code> ，大家都是 iOSer 这里就略过了）。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="err">$</span> <span class="n">bundle</span> <span class="nb">exec</span> <span class="n">pod</span> <span class="n">install</span>
-<span class="no">Analyzing</span> <span class="n">dependencies</span>
-<span class="no">Downloading</span> <span class="n">dependencies</span>
-<span class="no">Installing</span> <span class="no">SnapKit</span> <span class="p">(</span><span class="mi">5</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">1</span><span class="p">)</span>
-<span class="no">Integrating</span> <span class="n">client</span> <span class="n">project</span>
-<span class="o">[!]</span> <span class="no">Please</span> <span class="n">close</span> <span class="n">any</span> <span class="n">current</span> <span class="no">Xcode</span> <span class="n">sessions</span> <span class="ow">and</span> <span class="n">use</span> <span class="sb">`GuaDemo.xcworkspace`</span> <span class="k">for</span> <span class="n">this</span> <span class="n">project</span> <span class="n">from</span> <span class="n">now</span> <span class="n">on</span><span class="o">.</span>
-<span class="no">Sending</span> <span class="n">stats</span>
-<span class="no">Pod</span> <span class="n">installation</span> <span class="n">complete!</span> <span class="no">There</span> <span class="n">is</span> <span class="mi">1</span> <span class="n">dependency</span> <span class="n">from</span> <span class="n">the</span> <span class="no">Podfile</span> <span class="ow">and</span> <span class="mi">1</span> <span class="n">total</span> <span class="n">pod</span> <span class="n">installed</span><span class="o">.</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>可以再来看一下 <code>Podfile.lock</code>  文件：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">cat</span> <span class="no">Podfile</span><span class="o">.</span><span class="n">lock</span>
-<span class="ss">PODS</span><span class="p">:</span>
-  <span class="o">-</span> <span class="no">SnapKit</span> <span class="p">(</span><span class="mi">5</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">1</span><span class="p">)</span>
-
-<span class="ss">DEPENDENCIES</span><span class="p">:</span>
-  <span class="o">-</span> <span class="no">SnapKit</span> <span class="p">(</span><span class="o">~&gt;</span> <span class="mi">5</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">0</span><span class="p">)</span>
-
-<span class="no">SPEC</span> <span class="ss">REPOS</span><span class="p">:</span>
-  <span class="ss">https</span><span class="p">:</span><span class="sr">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">cocoapods</span><span class="o">/</span><span class="n">specs</span><span class="o">.</span><span class="n">git</span><span class="p">:</span>
-    <span class="o">-</span> <span class="no">SnapKit</span>
-
-<span class="no">SPEC</span> <span class="ss">CHECKSUMS</span><span class="p">:</span>
-  <span class="ss">SnapKit</span><span class="p">:</span> <span class="mi">97</span><span class="n">b92857e3df3a0c71833cce143274bf6ef8e5eb</span>
-
-<span class="no">PODFILE</span> <span class="ss">CHECKSUM</span><span class="p">:</span> <span class="mi">1</span><span class="n">a4b05aaf43554bc31c90f8dac5c2dc0490203e8</span>
-
-<span class="ss">COCOAPODS</span><span class="p">:</span> <span class="mi">1</span><span class="o">.</span><span class="mi">5</span><span class="o">.</span><span class="mi">3</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>发现使用的 <code>CocoaPods</code> 的版本确实是 <code>1.5.3</code> 。而当我们不使用 <code>bundle exec</code>  执行前缀，则会使用系统环境中的 <code>CocoaPods</code> 版本。如此我们也就验证了工程中的 <code>Gem</code> 环境和系统中的环境可以通过 <code>Bundler</code> 进行隔离。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span>$ bundle <span style="color:#b58900">exec</span> gem list
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span><span style="color:#719e07">***</span> <span style="color:#cb4b16">LOCAL</span> <span style="color:#cb4b16">GEMS</span> <span style="color:#719e07">***</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>activesupport (<span style="color:#2aa198">4</span><span style="color:#719e07">.</span><span style="color:#2aa198">2</span><span style="color:#719e07">.</span><span style="color:#2aa198">11</span><span style="color:#719e07">.</span><span style="color:#2aa198">3</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>atomos (<span style="color:#2aa198">0</span><span style="color:#719e07">.</span><span style="color:#2aa198">1</span><span style="color:#719e07">.</span><span style="color:#2aa198">3</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>bundler (<span style="color:#2aa198">2</span><span style="color:#719e07">.</span><span style="color:#2aa198">1</span><span style="color:#719e07">.</span><span style="color:#2aa198">4</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span><span style="color:#cb4b16">CFPropertyList</span> (<span style="color:#2aa198">3</span><span style="color:#719e07">.</span><span style="color:#2aa198">0</span><span style="color:#719e07">.</span><span style="color:#2aa198">2</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>claide (<span style="color:#2aa198">1</span><span style="color:#719e07">.</span><span style="color:#2aa198">0</span><span style="color:#719e07">.</span><span style="color:#2aa198">3</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>cocoapods (<span style="color:#2aa198">1</span><span style="color:#719e07">.</span><span style="color:#2aa198">5</span><span style="color:#719e07">.</span><span style="color:#2aa198">3</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span><span style="color:#719e07">...</span>
+</code></pre></div><p>发现相比于全局 <code>Gem</code> 列表，这个列表精简了许多，并且也只是基础 <code>Gem</code> 依赖和 <code>CocoaPods</code> 的 <code>Gem</code> 依赖。此时我们使用 <code>bundle exec pod install</code>  来执行 Install 这个操作，就可以使用 <code>CocoaPods 1.5.3</code>  版本来执行 <code>Pod</code>  操作了（当然，前提是你还需要写一个 <code>Podfile</code> ，大家都是 iOSer 这里就略过了）。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>$ bundle <span style="color:#b58900">exec</span> pod install
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span><span style="color:#cb4b16">Analyzing</span> dependencies
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span><span style="color:#cb4b16">Downloading</span> dependencies
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span><span style="color:#cb4b16">Installing</span> <span style="color:#cb4b16">SnapKit</span> (<span style="color:#2aa198">5</span><span style="color:#719e07">.</span><span style="color:#2aa198">0</span><span style="color:#719e07">.</span><span style="color:#2aa198">1</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span><span style="color:#cb4b16">Integrating</span> client project
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span><span style="color:#719e07">[!]</span> <span style="color:#cb4b16">Please</span> close any current <span style="color:#cb4b16">Xcode</span> sessions <span style="color:#719e07">and</span> use <span style="color:#586e75">`GuaDemo.xcworkspace`</span> <span style="color:#719e07">for</span> this project from now on<span style="color:#719e07">.</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span><span style="color:#cb4b16">Sending</span> stats
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">8</span><span style="color:#cb4b16">Pod</span> installation complete! <span style="color:#cb4b16">There</span> is <span style="color:#2aa198">1</span> dependency from the <span style="color:#cb4b16">Podfile</span> <span style="color:#719e07">and</span> <span style="color:#2aa198">1</span> total pod installed<span style="color:#719e07">.</span>
+</code></pre></div><p>可以再来看一下 <code>Podfile.lock</code>  文件：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span>cat <span style="color:#cb4b16">Podfile</span><span style="color:#719e07">.</span>lock
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span><span style="color:#2aa198">PODS</span>:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>  <span style="color:#719e07">-</span> <span style="color:#cb4b16">SnapKit</span> (<span style="color:#2aa198">5</span><span style="color:#719e07">.</span><span style="color:#2aa198">0</span><span style="color:#719e07">.</span><span style="color:#2aa198">1</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span><span style="color:#2aa198">DEPENDENCIES</span>:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>  <span style="color:#719e07">-</span> <span style="color:#cb4b16">SnapKit</span> (<span style="color:#719e07">~&gt;</span> <span style="color:#2aa198">5</span><span style="color:#719e07">.</span><span style="color:#2aa198">0</span><span style="color:#719e07">.</span><span style="color:#2aa198">0</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span><span style="color:#cb4b16">SPEC</span> <span style="color:#2aa198">REPOS</span>:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>  <span style="color:#2aa198">https</span>:<span style="color:#dc322f">//</span>github<span style="color:#719e07">.</span>com<span style="color:#719e07">/</span>cocoapods<span style="color:#719e07">/</span>specs<span style="color:#719e07">.</span>git:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>    <span style="color:#719e07">-</span> <span style="color:#cb4b16">SnapKit</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span><span style="color:#cb4b16">SPEC</span> <span style="color:#2aa198">CHECKSUMS</span>:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>  <span style="color:#2aa198">SnapKit</span>: <span style="color:#2aa198">97</span>b92857e3df3a0c71833cce143274bf6ef8e5eb
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span><span style="color:#cb4b16">PODFILE</span> <span style="color:#2aa198">CHECKSUM</span>: <span style="color:#2aa198">1</span>a4b05aaf43554bc31c90f8dac5c2dc0490203e8
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span><span style="color:#2aa198">COCOAPODS</span>: <span style="color:#2aa198">1</span><span style="color:#719e07">.</span><span style="color:#2aa198">5</span><span style="color:#719e07">.</span><span style="color:#2aa198">3</span>
+</code></pre></div><p>发现使用的 <code>CocoaPods</code> 的版本确实是 <code>1.5.3</code> 。而当我们不使用 <code>bundle exec</code>  执行前缀，则会使用系统环境中的 <code>CocoaPods</code> 版本。如此我们也就验证了工程中的 <code>Gem</code> 环境和系统中的环境可以通过 <code>Bundler</code> 进行隔离。</p>
 <h1 id="总结">总结</h1>
 <ul>
 <li>通过版本管理工具演进的角度可以看出，CocoaPods 的诞生并非一蹴而就，也是不断地借鉴其他管理工具的优点，一点点的发展起来的。VCS 工具从早期的 <code>SVN</code>、<code>Git</code>，再细分出 <code>Git Submodule</code>，再到各个语言的 <code>Package Manager</code> 也是一直在发展的。</li>

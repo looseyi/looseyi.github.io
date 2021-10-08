@@ -95,7 +95,7 @@ if (!doNotTrack) {
   <meta itemprop="name" content="WWDC21 - Discover concurrency in SwiftUI">
 <meta itemprop="description" content="WWDC21 Session 10019 - Discover concurrency in SwiftUI 本文知识目录 本文属于 WWDC21 中 SwiftUI 与 Concurrency 结合应用的文章。 关于 SwiftUI 可以查看这篇介绍：Introduction to SwiftUI，而 Swift Concurrency 算是今"><meta itemprop="datePublished" content="2021-06-11T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2021-06-11T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="3267">
+<meta itemprop="wordCount" content="3241">
 <meta itemprop="keywords" content="iOS&#39;,WWDC&#39;,SwiftUI," />
   
   <meta name="twitter:card" content="summary"/>
@@ -198,47 +198,19 @@ if (!doNotTrack) {
 <p>首先，定义了 <code>SpacePhoto</code>，它需要遵循 Codable 和 <a href="https://developer.apple.com/documentation/swift/identifiable">Identifiable</a> 这两个协议。Codeable 自不必多说，用于将原始数据解析成您定义的数据模型。而 Identifiable 协议则最早是在 SwiftUI 中出现的，在 Swift 5.1 被加入到 Swift 标准库中的。</p>
 <h3 id="identifiable">Identifiable</h3>
 <p>从字面看应该不难理解，它用来表示所关联的数据结构具有唯一标识。其定义如下：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">public</span> <span class="kd">protocol</span> <span class="nc">Identifiable</span> <span class="p">{</span>
-    <span class="n">associatedtype</span> <span class="n">ID</span> <span class="p">:</span> <span class="nb">Hashable</span>
-    <span class="kd">var</span> <span class="nv">id</span><span class="p">:</span> <span class="kc">Self</span><span class="p">.</span><span class="n">ID</span> <span class="p">{</span> <span class="kr">get</span> <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>在之前版本的 SwiftUI 中，您使用 ForEach 遍历 Array 时需要提供一个 ID 来标识 Element 的唯一性：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="n">ForEach</span><span class="p">(</span><span class="n">photos</span><span class="p">.</span><span class="n">items</span><span class="p">,</span> <span class="n">id</span><span class="p">:</span> <span class="err">\</span><span class="p">.</span><span class="n">id</span><span class="p">)</span> <span class="p">{</span> <span class="n">item</span> <span class="k">in</span>
-  <span class="n">PhotoView</span><span class="p">(</span><span class="n">photo</span><span class="p">:</span> <span class="n">item</span><span class="p">)</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>当你的 Model 遵循了 Identifiable 协议就可以直接使用：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="n">ForEach</span><span class="p">(</span><span class="n">photos</span><span class="p">.</span><span class="n">items</span><span class="p">)</span> <span class="p">{</span> <span class="n">item</span> <span class="k">in</span>
-  <span class="n">PhotoView</span><span class="p">(</span><span class="n">photo</span><span class="p">:</span> <span class="n">item</span><span class="p">)</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>下面是苹果给出的定义，Identifiable 的唯一性是<strong>不限定持续时间和使用范围</strong>，可以是下面的任意场景：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#268bd2">public</span> <span style="color:#268bd2">protocol</span> <span style="color:#268bd2">Identifiable</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>    associatedtype ID : <span style="color:#b58900">Hashable</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>    <span style="color:#268bd2">var</span> <span style="color:#268bd2">id</span>: <span style="color:#cb4b16">Self</span>.ID { <span style="color:#268bd2">get</span> }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>}
+</code></pre></div><p>在之前版本的 SwiftUI 中，您使用 ForEach 遍历 Array 时需要提供一个 ID 来标识 Element 的唯一性：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>ForEach(photos.items, id: \.id) { item <span style="color:#719e07">in</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>  PhotoView(photo: item)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>}
+</code></pre></div><p>当你的 Model 遵循了 Identifiable 协议就可以直接使用：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>ForEach(photos.items) { item <span style="color:#719e07">in</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>  PhotoView(photo: item)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>}
+</code></pre></div><p>下面是苹果给出的定义，Identifiable 的唯一性是<strong>不限定持续时间和使用范围</strong>，可以是下面的任意场景：</p>
 <ul>
 <li>保证始终唯一（例如：UUID)。</li>
 <li>每个环境永久唯一（例如：database record keys)。</li>
@@ -247,23 +219,12 @@ if (!doNotTrack) {
 <li>在当前集合中是唯一的（例如：collection index)。</li>
 </ul>
 <p>另外有意思的是，Identifiable 将引用语义扩展到值类型，Swift 为 AnyObject 提供了默认实现：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">extension</span> <span class="nc">Identifiable</span> <span class="k">where</span> <span class="kc">Self</span><span class="p">:</span> <span class="nb">AnyObject</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nv">id</span><span class="p">:</span> <span class="nb">ObjectIdentifier</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="nb">ObjectIdentifier</span><span class="p">(</span><span class="kc">self</span><span class="p">)</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><blockquote>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#268bd2">extension</span> <span style="color:#268bd2">Identifiable</span> <span style="color:#719e07">where</span> <span style="color:#cb4b16">Self</span>: <span style="color:#b58900">AnyObject</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>    <span style="color:#268bd2">var</span> <span style="color:#268bd2">id</span>: <span style="color:#b58900">ObjectIdentifier</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>        <span style="color:#719e07">return</span> <span style="color:#b58900">ObjectIdentifier</span>(<span style="color:#cb4b16">self</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>}
+</code></pre></div><blockquote>
 <p>关于 Identifiable 更详细的讨论强烈推荐 Mattt 的这篇文章 <a href="https://nshipster.com/identifiable/">Identifiable</a>。</p>
 </blockquote>
 <h3 id="user-interface">User Interface</h3>
@@ -274,25 +235,13 @@ if (!doNotTrack) {
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/10019-03-model-photos.png" alt="10019-03-model-photos"></p>
 <p>当有数据变更时，<code>ObservableObject</code> 中声明了 <strong>@Published</strong> 的属性将会收到 publisher 通过 <code>objectWillChange</code> 发来的通知。</p>
 <p>我们先提供一个简单的 PhotoView 来展示每个星云的 title：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">struct</span> <span class="nc">PhotoView</span><span class="p">:</span> <span class="n">View</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nv">photo</span><span class="p">:</span> <span class="n">SpacePhoto</span>
-    <span class="kd">var</span> <span class="nv">body</span><span class="p">:</span> <span class="n">some</span> <span class="n">View</span> <span class="p">{</span>
-        <span class="n">Text</span><span class="p">(</span><span class="n">photo</span><span class="p">.</span><span class="n">title</span><span class="p">)</span>
-	  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>接着我们在 Catalog 列表中来消费 photos。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#268bd2">struct</span> <span style="color:#268bd2">PhotoView</span>: View {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>    <span style="color:#268bd2">var</span> <span style="color:#268bd2">photo</span>: SpacePhoto
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>    <span style="color:#268bd2">var</span> <span style="color:#268bd2">body</span>: some View {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>        Text(photo.title)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>	  }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>}
+</code></pre></div><p>接着我们在 Catalog 列表中来消费 photos。</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/10019-04-view-photo.png" alt="10019-04-view-photo"></p>
 <p>逻辑也很简单，仅需在对应属性前增加 <code>@StateObject</code> 来表明 photos 数据是可变化的。</p>
 <p>上面的 Preview 效果就是纯文本版本的 Catalog list。这个最终效果是使用了两个特性：</p>
@@ -310,48 +259,20 @@ if (!doNotTrack) {
 <p>关于 Actior 详细信息，可查看 “<a href="https://developer.apple.com/videos/play/wwdc2021/10133/">Protect mutable state with Swift actors</a>”。</p>
 </blockquote>
 <p>这里做简单了解，Actor 是定义成一个遵循 Sendable 的协议：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">public</span> <span class="kd">protocol</span> <span class="nc">Actor</span> <span class="p">:</span> <span class="nb">AnyObject</span><span class="p">,</span> <span class="n">Sendable</span> <span class="p">{</span> <span class="p">}</span>
-
-<span class="kd">public</span> <span class="kd">protocol</span> <span class="nc">Sendable</span> <span class="p">{</span> <span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>Swift 提供了 <code>actor</code> 关键字，同时也是一种新的具体名义类型，同 class、struct、enum 等。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="n">actor</span> <span class="n">Photos</span> <span class="p">{</span>
-	<span class="kd">var</span> <span class="nv">items</span><span class="p">:</span> <span class="p">[</span><span class="n">SpacePhoto</span><span class="p">]</span>
-	<span class="p">...</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>Actor 在概念上类似于在并发环境中可以安全使用的类。 因为 Swift 确保在任何给定时间只能由单个线程访问 actor 内的可变状态，这有助于在编译器级别消除各种严重的错误。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#268bd2">public</span> <span style="color:#268bd2">protocol</span> <span style="color:#268bd2">Actor</span> : <span style="color:#b58900">AnyObject</span>, Sendable { }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span><span style="color:#268bd2">public</span> <span style="color:#268bd2">protocol</span> <span style="color:#268bd2">Sendable</span> { }
+</code></pre></div><p>Swift 提供了 <code>actor</code> 关键字，同时也是一种新的具体名义类型，同 class、struct、enum 等。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>actor Photos {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>	<span style="color:#268bd2">var</span> <span style="color:#268bd2">items</span>: [SpacePhoto]
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>	...
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>}
+</code></pre></div><p>Actor 在概念上类似于在并发环境中可以安全使用的类。 因为 Swift 确保在任何给定时间只能由单个线程访问 actor 内的可变状态，这有助于在编译器级别消除各种严重的错误。</p>
 <p>而 main actor 是 actor 的一个全局单例，其声明如下：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="p">@</span><span class="n">globalActor</span> <span class="kd">public</span> <span class="n">actor</span> <span class="n">MainActor</span> <span class="p">{</span>
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">let</span> <span class="nv">shared</span><span class="p">:</span> <span class="n">MainActor</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>我们通过添加 <code>@MainActor</code> 修饰后，Swift 会确保所修饰的代码会执行在主线程中。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>@globalActor <span style="color:#268bd2">public</span> actor MainActor {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>    <span style="color:#268bd2">public</span> <span style="color:#268bd2">static</span> <span style="color:#268bd2">let</span> <span style="color:#268bd2">shared</span>: MainActor
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>}
+</code></pre></div><p>我们通过添加 <code>@MainActor</code> 修饰后，Swift 会确保所修饰的代码会执行在主线程中。</p>
 <h3 id="swiftui-run-loop">SwiftUI run loop</h3>
 <p>run loop 过程，应用会不断接收用户事件，更新模型，最终将 SwiftUI 视图呈现到屏幕上。这里把每次循环的更新称作 “ticks of the run loop“。让我们展开这个循环，每个刻度表示一个循环，以便您可以连续查看多个刻度。</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/10019-06-run-loop-tick.png" alt="10019-06-run-loop-tick"></p>
@@ -382,239 +303,117 @@ if (!doNotTrack) {
 <h3 id="using-await">Using await</h3>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/10019-12-await-code.png" alt="10019-12-await-code"></p>
 <p>通过 <code>async / await</code> 的使用，使得状态变更能够在主线程被及时感知。上图中跳过的一段 tick 周期就是由于网络延迟等导致的 tick 空转。接下来就是实现 <code>fetchPhotos</code> 方法，逻辑很简单就是遍历 photos 然后获取对应 entity 和 image 即可：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span><span class="lnt">33
-</span><span class="lnt">34
-</span><span class="lnt">35
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="p">@</span><span class="n">MainActor</span>
-<span class="kd">class</span> <span class="nc">Photos</span><span class="p">:</span> <span class="n">ObservableObject</span> <span class="p">{</span>
-
-    <span class="p">@</span><span class="n">Published</span> <span class="kd">private</span><span class="p">(</span><span class="kr">set</span><span class="p">)</span> <span class="kd">var</span> <span class="nv">items</span><span class="p">:</span> <span class="p">[</span><span class="n">SpacePhoto</span><span class="p">]</span> <span class="p">=</span> <span class="p">[]</span>
-
-    <span class="c1">// Updates `items` to a new, random list of photos.</span>
-    <span class="kd">func</span> <span class="nf">updateItems</span><span class="p">()</span> <span class="n">async</span> <span class="p">{</span>
-        <span class="kd">let</span> <span class="nv">fetched</span> <span class="p">=</span> <span class="n">await</span> <span class="n">fetchPhotos</span><span class="p">()</span>
-        <span class="n">items</span> <span class="p">=</span> <span class="n">fetched</span>
-    <span class="p">}</span>
-
-    <span class="c1">// Fetches a new, random list of photos.</span>
-    <span class="kd">func</span> <span class="nf">fetchPhotos</span><span class="p">()</span> <span class="n">async</span> <span class="p">-&gt;</span> <span class="p">[</span><span class="n">SpacePhoto</span><span class="p">]</span> <span class="p">{</span>
-        <span class="kd">var</span> <span class="nv">downloaded</span><span class="p">:</span> <span class="p">[</span><span class="n">SpacePhoto</span><span class="p">]</span> <span class="p">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">query</span> <span class="k">in</span> <span class="n">Photos</span><span class="p">.</span><span class="n">keys</span> <span class="p">{</span>
-            <span class="kd">let</span> <span class="nv">url</span> <span class="p">=</span> <span class="n">SpacePhoto</span><span class="p">.</span><span class="n">request</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="n">query</span><span class="p">)</span>
-            <span class="k">if</span> <span class="kd">let</span> <span class="nv">photo</span> <span class="p">=</span> <span class="n">await</span> <span class="n">fetchPhoto</span><span class="p">(</span><span class="n">from</span><span class="p">:</span> <span class="n">url</span><span class="p">)</span> <span class="p">{</span>
-                <span class="n">downloaded</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">photo</span><span class="p">)</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-        <span class="k">return</span> <span class="n">downloaded</span>
-    <span class="p">}</span>
-
-    <span class="kd">func</span> <span class="nf">fetchPhoto</span><span class="p">(</span><span class="n">from</span> <span class="n">url</span><span class="p">:</span> <span class="n">URL</span><span class="p">)</span> <span class="n">async</span> <span class="p">-&gt;</span> <span class="n">SpacePhoto</span><span class="p">?</span> <span class="p">{</span>
-        <span class="k">do</span> <span class="p">{</span>
-            <span class="kd">let</span> <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="kc">_</span><span class="p">)</span> <span class="p">=</span> <span class="k">try</span> <span class="n">await</span> <span class="n">URLSession</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">data</span><span class="p">(</span><span class="n">from</span><span class="p">:</span> <span class="n">url</span><span class="p">)</span>
-            <span class="kd">let</span> <span class="nv">decoder</span> <span class="p">=</span> <span class="n">JSONDecoder</span><span class="p">()</span>
-            <span class="kd">let</span> <span class="nv">response</span> <span class="p">=</span> <span class="k">try</span> <span class="n">decoder</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="n">NASAResponse</span><span class="p">.</span><span class="kc">self</span><span class="p">,</span> <span class="n">from</span><span class="p">:</span> <span class="n">data</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">response</span><span class="p">.</span><span class="n">collection</span><span class="p">.</span><span class="n">items</span><span class="p">.</span><span class="n">randomElement</span><span class="p">()?.</span><span class="n">data</span>
-        <span class="p">}</span> <span class="k">catch</span> <span class="p">{</span>
-            <span class="bp">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
-            <span class="k">return</span> <span class="kc">nil</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><blockquote>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span>@MainActor
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span><span style="color:#268bd2">class</span> <span style="color:#268bd2">Photos</span>: ObservableObject {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>    @Published <span style="color:#268bd2">private</span>(<span style="color:#268bd2">set</span>) <span style="color:#268bd2">var</span> <span style="color:#268bd2">items</span>: [SpacePhoto] = []
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>    <span style="color:#586e75">// Updates `items` to a new, random list of photos.</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>    <span style="color:#268bd2">func</span> <span style="color:#268bd2">updateItems</span>() async {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>        <span style="color:#268bd2">let</span> <span style="color:#268bd2">fetched</span> = await fetchPhotos()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>        items = fetched
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>    <span style="color:#586e75">// Fetches a new, random list of photos.</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>    <span style="color:#268bd2">func</span> <span style="color:#268bd2">fetchPhotos</span>() async -&gt; [SpacePhoto] {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>        <span style="color:#268bd2">var</span> <span style="color:#268bd2">downloaded</span>: [SpacePhoto] = []
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>        <span style="color:#719e07">for</span> query <span style="color:#719e07">in</span> Photos.keys {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>            <span style="color:#268bd2">let</span> <span style="color:#268bd2">url</span> = SpacePhoto.request(key: query)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>            <span style="color:#719e07">if</span> <span style="color:#268bd2">let</span> <span style="color:#268bd2">photo</span> = await fetchPhoto(from: url) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>                downloaded.append(photo)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>            }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>        }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span>        <span style="color:#719e07">return</span> downloaded
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">22</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">23</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">24</span>    <span style="color:#268bd2">func</span> <span style="color:#268bd2">fetchPhoto</span>(from url: URL) async -&gt; SpacePhoto? {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">25</span>        <span style="color:#719e07">do</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">26</span>            <span style="color:#268bd2">let</span> (data, <span style="color:#cb4b16">_</span>) = <span style="color:#719e07">try</span> await URLSession.shared.data(from: url)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">27</span>            <span style="color:#268bd2">let</span> <span style="color:#268bd2">decoder</span> = JSONDecoder()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">28</span>            <span style="color:#268bd2">let</span> <span style="color:#268bd2">response</span> = <span style="color:#719e07">try</span> decoder.decode(NASAResponse.<span style="color:#cb4b16">self</span>, from: data)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">29</span>            <span style="color:#719e07">return</span> response.collection.items.randomElement()?.data
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">30</span>        } <span style="color:#719e07">catch</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">31</span>            <span style="color:#268bd2">print</span>(error)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">32</span>            <span style="color:#719e07">return</span> <span style="color:#cb4b16">nil</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">33</span>        }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">34</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">35</span>}
+</code></pre></div><blockquote>
 <p>这里提供的代码与官方 Demo 展示的 Photos 数据获取 API 稍有不同，本文采用了 NASA 提供的 <a href="https://images.nasa.gov/docs/images.nasa.gov_api_docs.pdf">image search API</a>。</p>
 </blockquote>
 <p>这里您用 <code>@MainActor</code> 来修饰了 Photos 类，之后 Swift Complier 会保证所有 Photos 的属性和方法都将通过  main actor 来访问。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="n">updateItems</span><span class="p">()</span> <span class="n">async</span> <span class="p">-&gt;</span>
-	<span class="n">fetchPhotos</span><span class="p">()</span> <span class="n">async</span> <span class="p">-&gt;</span>
-		<span class="n">fetchPhoto</span><span class="p">(</span><span class="n">from</span><span class="p">:)</span> <span class="n">async</span> <span class="p">-&gt;</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>可以看到三个方法都是使用了 async 关键字来声明其为异步执行。而对于 async 声明的方法，对应的需要配上 <strong>await</strong> 关键字。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>updateItems() async -&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>	fetchPhotos() async -&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>		fetchPhoto(from:) async -&gt;
+</code></pre></div><p>可以看到三个方法都是使用了 async 关键字来声明其为异步执行。而对于 async 声明的方法，对应的需要配上 <strong>await</strong> 关键字。</p>
 <p>最后就差 updateItems 的调用，让我们在 CatalogView 中来完成最后一步。</p>
 <h2 id="new-concurrency-tools">New concurrency tools</h2>
 <p>最后一节，我们来介绍几个支持异步更新的 API，为您的程序添加更友好的用户体验。</p>
 <h3 id="task--refreshable">Task &amp; Refreshable</h3>
 <p>SwiftUI 为 View 提供了新的入口来执行任务。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">struct</span> <span class="nc">CatalogView</span><span class="p">:</span> <span class="n">View</span> <span class="p">{</span>
-
-    <span class="p">@</span><span class="n">StateObject</span> <span class="kd">private</span> <span class="kd">var</span> <span class="nv">photos</span> <span class="p">=</span> <span class="n">Photos</span><span class="p">()</span>
-
-    <span class="kd">private</span> <span class="kd">var</span> <span class="nv">photoKey</span> <span class="p">=</span> <span class="p">[</span><span class="nb">String</span> <span class="p">:</span> <span class="n">SpacePhoto</span><span class="p">]()</span>
-
-    <span class="kd">var</span> <span class="nv">body</span><span class="p">:</span> <span class="n">some</span> <span class="n">View</span> <span class="p">{</span>
-        <span class="n">NavigationView</span> <span class="p">{</span>
-            <span class="n">List</span> <span class="p">{</span>
-                <span class="n">ForEach</span><span class="p">(</span><span class="n">photos</span><span class="p">.</span><span class="n">items</span><span class="p">)</span> <span class="p">{</span> <span class="n">item</span> <span class="k">in</span>
-                    <span class="n">PhotoView</span><span class="p">(</span><span class="n">photo</span><span class="p">:</span> <span class="n">item</span><span class="p">)</span>
-                        <span class="p">.</span><span class="n">listRowSeparator</span><span class="p">(.</span><span class="n">hidden</span><span class="p">)</span>
-                <span class="p">}</span>
-            <span class="p">}</span>
-            <span class="p">.</span><span class="n">navigationTitle</span><span class="p">(</span><span class="s">&#34;Catalog&#34;</span><span class="p">)</span>
-            <span class="p">.</span><span class="n">listStyle</span><span class="p">(.</span><span class="n">plain</span><span class="p">)</span>
-            <span class="p">.</span><span class="n">refreshable</span> <span class="p">{</span>
-                <span class="n">await</span> <span class="n">photos</span><span class="p">.</span><span class="n">updateItems</span><span class="p">()</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-        <span class="p">.</span><span class="n">task</span> <span class="p">{</span>
-            <span class="n">await</span> <span class="n">photos</span><span class="p">.</span><span class="n">updateItems</span><span class="p">()</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>当 View 展现屏幕上时候会触发任务的执行，在 View 消失时则会取消对应的任务。其定义如下：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">extension</span> <span class="nc">View</span> <span class="p">{</span>
-    <span class="p">@</span><span class="n">inlinable</span> <span class="kd">public</span> <span class="kd">func</span> <span class="nf">task</span><span class="p">(</span><span class="kc">_</span> <span class="n">action</span><span class="p">:</span> <span class="p">@</span><span class="n">escaping</span> <span class="p">()</span> <span class="n">async</span> <span class="p">-&gt;</span> <span class="nb">Void</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="n">some</span> <span class="n">View</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>另外一个 New API 是 <code>refreshable</code>，本质上是一个 <a href="https://developer.apple.com/documentation/swiftui/viewmodifier">ViewModifier</a>，这里我们给 List 添加上 <code>refreshable</code> 后，它就能响应用户的下拉刷新动作。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#268bd2">struct</span> <span style="color:#268bd2">CatalogView</span>: View {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>    @StateObject <span style="color:#268bd2">private</span> <span style="color:#268bd2">var</span> <span style="color:#268bd2">photos</span> = Photos()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>    <span style="color:#268bd2">private</span> <span style="color:#268bd2">var</span> <span style="color:#268bd2">photoKey</span> = [<span style="color:#b58900">String</span> : SpacePhoto]()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>    <span style="color:#268bd2">var</span> <span style="color:#268bd2">body</span>: some View {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>        NavigationView {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>            List {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>                ForEach(photos.items) { item <span style="color:#719e07">in</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>                    PhotoView(photo: item)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>                        .listRowSeparator(.hidden)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>                }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>            }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>            .navigationTitle(<span style="color:#2aa198">&#34;Catalog&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>            .listStyle(.plain)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>            .refreshable {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>                await photos.updateItems()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>            }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>        }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span>        .task {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">22</span>            await photos.updateItems()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">23</span>        }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">24</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">25</span>}
+</code></pre></div><p>当 View 展现屏幕上时候会触发任务的执行，在 View 消失时则会取消对应的任务。其定义如下：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#268bd2">extension</span> <span style="color:#268bd2">View</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>    @inlinable <span style="color:#268bd2">public</span> <span style="color:#268bd2">func</span> <span style="color:#268bd2">task</span>(<span style="color:#cb4b16">_</span> action: @escaping () async -&gt; <span style="color:#b58900">Void</span>) -&gt; some View
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>}
+</code></pre></div><p>另外一个 New API 是 <code>refreshable</code>，本质上是一个 <a href="https://developer.apple.com/documentation/swiftui/viewmodifier">ViewModifier</a>，这里我们给 List 添加上 <code>refreshable</code> 后，它就能响应用户的下拉刷新动作。</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/10019-14-refreshable.gif" alt="10019-14-refreshable"></p>
 <h3 id="asyncimage">AsyncImage</h3>
 <p>AsyncImage 可以帮助您实现异步下载和展示图片，再结合上 ProgressView 让 Image 在下载过程中作为 placeholder 展示。</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/10019-13-fetch-image.png" alt="10019-13-fetch-image"></p>
 <h3 id="custom-button-action">Custom Button Action</h3>
 <p>同 AsyncImage 一样的思路，您可以为 SaveButton 添加 ProgressView，当图片正在保存时以展示 ProgeessView 作为中间状态。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">struct</span> <span class="nc">SavePhotoButton</span><span class="p">:</span> <span class="n">View</span> <span class="p">{</span>
-
-    <span class="kd">var</span> <span class="nv">photo</span><span class="p">:</span> <span class="n">SpacePhoto</span>
-    <span class="p">@</span><span class="n">State</span> <span class="kd">private</span> <span class="kd">var</span> <span class="nv">isSaving</span> <span class="p">=</span> <span class="kc">false</span>
-
-    <span class="kd">var</span> <span class="nv">body</span><span class="p">:</span> <span class="n">some</span> <span class="n">View</span> <span class="p">{</span>
-        <span class="n">Button</span> <span class="p">{</span>
-            <span class="n">async</span> <span class="p">{</span>
-                <span class="n">isSaving</span> <span class="p">=</span> <span class="kc">true</span>
-                <span class="n">await</span> <span class="n">photo</span><span class="p">.</span><span class="n">save</span><span class="p">()</span>
-                <span class="n">isSaving</span> <span class="p">=</span> <span class="kc">false</span>
-            <span class="p">}</span>
-        <span class="p">}</span> <span class="n">label</span><span class="p">:</span> <span class="p">{</span>
-            <span class="n">Text</span><span class="p">(</span><span class="s">&#34;Saved&#34;</span><span class="p">)</span>
-                <span class="p">.</span><span class="n">opacity</span><span class="p">(</span><span class="n">isSaving</span> <span class="p">?</span> <span class="mi">0</span> <span class="p">:</span> <span class="mi">1</span><span class="p">)</span>
-                <span class="p">.</span><span class="n">overlay</span> <span class="p">{</span>
-                    <span class="k">if</span> <span class="n">isSaving</span> <span class="p">{</span>
-                        <span class="n">ProgressView</span><span class="p">()</span>
-                    <span class="p">}</span>
-                <span class="p">}</span>
-        <span class="p">}</span>
-        <span class="p">.</span><span class="n">disabled</span><span class="p">(</span><span class="n">isSaving</span><span class="p">)</span>
-        <span class="p">.</span><span class="n">buttonStyle</span><span class="p">(.</span><span class="n">bordered</span><span class="p">)</span>
-        <span class="p">.</span><span class="n">controlSize</span><span class="p">(.</span><span class="n">small</span><span class="p">)</span> <span class="c1">// .large, .medium or .small</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>效果如下：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#268bd2">struct</span> <span style="color:#268bd2">SavePhotoButton</span>: View {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>    <span style="color:#268bd2">var</span> <span style="color:#268bd2">photo</span>: SpacePhoto
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>    @State <span style="color:#268bd2">private</span> <span style="color:#268bd2">var</span> <span style="color:#268bd2">isSaving</span> = <span style="color:#cb4b16">false</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>    <span style="color:#268bd2">var</span> <span style="color:#268bd2">body</span>: some View {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>        Button {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>            async {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>                isSaving = <span style="color:#cb4b16">true</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>                await photo.save()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>                isSaving = <span style="color:#cb4b16">false</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>            }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>        } label: {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>            Text(<span style="color:#2aa198">&#34;Saved&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>                .opacity(isSaving ? <span style="color:#2aa198">0</span> : <span style="color:#2aa198">1</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>                .overlay {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>                    <span style="color:#719e07">if</span> isSaving {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>                        ProgressView()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>                    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>                }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span>        }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">22</span>        .disabled(isSaving)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">23</span>        .buttonStyle(.bordered)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">24</span>        .controlSize(.small) <span style="color:#586e75">// .large, .medium or .small</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">25</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">26</span>}
+</code></pre></div><p>效果如下：</p>
 <p><!-- raw HTML omitted --></p>
 <h4 id="tips">Tips</h4>
 <p>由于本文脱水过程 Apple 还未提供 Session 中的示例工程，这里作者参照视频中的代码提供了功能完备的 <a href="https://github.com/looseyi/WWDC-SampleCode.git">Demo Project</a>，有兴趣的小伙伴自取。记得用 Xcode 13 打开 😊。</p>

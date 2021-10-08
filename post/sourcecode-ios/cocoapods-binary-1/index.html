@@ -95,7 +95,7 @@ if (!doNotTrack) {
   <meta itemprop="name" content="浅析 cocoapods-binary">
 <meta itemprop="description" content="介绍 cocoapods-binary 最早是在 CocoaPods 的 Blog 中发现的：pre-compiling dependencies。虽非官方出品，但却是国内程序员的力作，medium 原版介绍"><meta itemprop="datePublished" content="2021-10-02T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2021-10-02T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="4780">
+<meta itemprop="wordCount" content="4707">
 <meta itemprop="keywords" content="CocoaPods,iOS,Binary," />
   
   <meta name="twitter:card" content="summary"/>
@@ -194,170 +194,79 @@ if (!doNotTrack) {
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gfopbdyts7j20l10f3dh6.jpg" alt="pre_install.png"></p>
 <p>当我们在命令行中执行 <code>pod install</code>，CocoaPods 会依次执行 👆 图的几个方法。cocoapods-binary 的 <code>pre_install</code> 就是在 prepare 阶段插入的逻辑。</p>
 <p>这里的 <code>pre_install</code> 不同于 <code>Podfile</code> 中的 <a href="https://guides.cocoapods.org/syntax/podfile.html#pre_install">pre_install</a>，其拦截方式如下：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-Ruby" data-lang="Ruby"><span class="no">Pod</span><span class="o">::</span><span class="no">HooksManager</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s1">&#39;cocoapods-binary&#39;</span><span class="p">,</span> <span class="ss">:pre_install</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">installer_context</span><span class="o">|</span>
-	<span class="o">...</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>利用 CocoaPods 提供的 <a href="https://www.rubydoc.info/github/CocoaPods/CocoaPods/Pod/HooksManager">HooksManager</a> 注册 <code>pre_install</code> hook 来下载 binary pods。过程分两步：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Ruby" data-lang="Ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#cb4b16">Pod</span><span style="color:#719e07">::</span><span style="color:#cb4b16">HooksManager</span><span style="color:#719e07">.</span>register(<span style="color:#2aa198">&#39;cocoapods-binary&#39;</span>, <span style="color:#2aa198">:pre_install</span>) <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>installer_context<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>	<span style="color:#719e07">...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span><span style="color:#719e07">end</span>
+</code></pre></div><p>利用 CocoaPods 提供的 <a href="https://www.rubydoc.info/github/CocoaPods/CocoaPods/Pod/HooksManager">HooksManager</a> 注册 <code>pre_install</code> hook 来下载 binary pods。过程分两步：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gflvtlvtqvj208n067aa9.jpg" alt="Main.png"></p>
 <h2 id="环境检查">环境检查</h2>
 <p>环境检查，首先是通过标记全局的 <code>is_prebuild_stage</code> 来防止 <code>pre_install</code> 重复的进入。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-Ruby" data-lang="Ruby"><span class="k">if</span> <span class="no">Pod</span><span class="o">.</span><span class="n">is_prebuild_stage</span>
-  	 <span class="k">next</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>接着检查 podfile 是否设置了 <code>use_framework!</code>。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-Ruby" data-lang="Ruby"><span class="n">podfile</span> <span class="o">=</span> <span class="n">installer_context</span><span class="o">.</span><span class="n">podfile</span>
-<span class="n">podfile</span><span class="o">.</span><span class="n">target_definition_list</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">target_definition</span><span class="o">|</span>
-    <span class="k">next</span> <span class="k">if</span> <span class="n">target_definition</span><span class="o">.</span><span class="n">prebuild_framework_pod_names</span><span class="o">.</span><span class="n">empty?</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">target_definition</span><span class="o">.</span><span class="n">uses_frameworks?</span>
-        <span class="no">STDERR</span><span class="o">.</span><span class="n">puts</span> <span class="s2">&#34;[!] Cocoapods-binary requires `use_frameworks!`&#34;</span><span class="o">.</span><span class="n">red</span>
-        <span class="nb">exit</span>
-    <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>即 cocoapods-binary 需要打出的包为 framework 的形式。了解更多 CocoaPods 使用 framework 的原因，请猛戳 <a href="https://stackoverflow.com/questions/41210249/why-do-we-use-use-frameworks-in-cocoapods">这里</a>。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Ruby" data-lang="Ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#719e07">if</span> <span style="color:#cb4b16">Pod</span><span style="color:#719e07">.</span>is_prebuild_stage
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>  	 <span style="color:#719e07">next</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span><span style="color:#719e07">end</span>
+</code></pre></div><p>接着检查 podfile 是否设置了 <code>use_framework!</code>。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Ruby" data-lang="Ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>podfile <span style="color:#719e07">=</span> installer_context<span style="color:#719e07">.</span>podfile
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>podfile<span style="color:#719e07">.</span>target_definition_list<span style="color:#719e07">.</span>each <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>target_definition<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>    <span style="color:#719e07">next</span> <span style="color:#719e07">if</span> target_definition<span style="color:#719e07">.</span>prebuild_framework_pod_names<span style="color:#719e07">.</span>empty?
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>    <span style="color:#719e07">if</span> <span style="color:#719e07">not</span> target_definition<span style="color:#719e07">.</span>uses_frameworks?
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>        <span style="color:#cb4b16">STDERR</span><span style="color:#719e07">.</span>puts <span style="color:#2aa198">&#34;[!] Cocoapods-binary requires `use_frameworks!`&#34;</span><span style="color:#719e07">.</span>red
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>        <span style="color:#b58900">exit</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">8</span><span style="color:#719e07">end</span>
+</code></pre></div><p>即 cocoapods-binary 需要打出的包为 framework 的形式。了解更多 CocoaPods 使用 framework 的原因，请猛戳 <a href="https://stackoverflow.com/questions/41210249/why-do-we-use-use-frameworks-in-cocoapods">这里</a>。</p>
 <h2 id="binary-pod-的下载安装">Binary Pod 的下载安装</h2>
 <blockquote>
 <p>这里说的 binary pod 都是在 podfile 中被标记为 <code>:binary =&gt; true</code> 的。</p>
 </blockquote>
 <p>安装前需要 hook 相关方法进行预编译状态检查，并在安装结束后将它们重置。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-Ruby" data-lang="Ruby"><span class="no">Pod</span><span class="o">.</span><span class="n">is_prebuild_stage</span> <span class="o">=</span> <span class="kp">true</span>
-<span class="no">Pod</span><span class="o">::</span><span class="no">Podfile</span><span class="o">::</span><span class="no">DSL</span><span class="o">.</span><span class="n">enable_prebuild_patch</span> <span class="kp">true</span>
-<span class="no">Pod</span><span class="o">::</span><span class="no">Installer</span><span class="o">.</span><span class="n">force_disable_integration</span> <span class="kp">true</span>
-<span class="no">Pod</span><span class="o">::</span><span class="no">Config</span><span class="o">.</span><span class="n">force_disable_write_lockfile</span> <span class="kp">true</span>
-<span class="no">Pod</span><span class="o">::</span><span class="no">Installer</span><span class="o">.</span><span class="n">disable_install_complete_message</span> <span class="kp">true</span>
-<span class="o">...</span> 
-<span class="c1"># install 成功后将 👆 5 个变量重置为 false</span>
-<span class="no">Pod</span><span class="o">::</span><span class="no">UserInterface</span><span class="o">.</span><span class="n">warnings</span> <span class="o">=</span> <span class="o">[]</span> <span class="c1"># clean the warning in the prebuild step, it&#39;s duplicated.</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>接着初始化 binary_installer：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-Ruby" data-lang="Ruby"><span class="n">update</span> <span class="o">=</span> <span class="kp">nil</span>
-<span class="n">repo_update</span> <span class="o">=</span> <span class="kp">nil</span>
-<span class="kp">include</span> <span class="no">ObjectSpace</span>
-<span class="no">ObjectSpace</span><span class="o">.</span><span class="n">each_object</span><span class="p">(</span><span class="no">Pod</span><span class="o">::</span><span class="no">Installer</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">installer</span><span class="o">|</span>
-    <span class="n">update</span> <span class="o">=</span> <span class="n">installer</span><span class="o">.</span><span class="n">update</span>
-    <span class="n">repo_update</span> <span class="o">=</span> <span class="n">installer</span><span class="o">.</span><span class="n">repo_update</span>
-<span class="p">}</span>
-
-<span class="n">standard_sandbox</span> <span class="o">=</span> <span class="n">installer_context</span><span class="o">.</span><span class="n">sandbox</span>
-<span class="n">prebuild_sandbox</span> <span class="o">=</span> <span class="no">Pod</span><span class="o">::</span><span class="no">PrebuildSandbox</span><span class="o">.</span><span class="n">from_standard_sandbox</span><span class="p">(</span><span class="n">standard_sandbox</span><span class="p">)</span>
-<span class="n">prebuild_podfile</span> <span class="o">=</span> <span class="no">Pod</span><span class="o">::</span><span class="no">Podfile</span><span class="o">.</span><span class="n">from_Ruby</span><span class="p">(</span><span class="n">podfile</span><span class="o">.</span><span class="n">defined_in_file</span><span class="p">)</span>
-<span class="n">lockfile</span> <span class="o">=</span> <span class="n">installer_context</span><span class="o">.</span><span class="n">lockfile</span>
-<span class="n">binary_installer</span> <span class="o">=</span> <span class="no">Pod</span><span class="o">::</span><span class="no">Installer</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">prebuild_sandbox</span><span class="p">,</span> <span class="n">prebuild_podfile</span><span class="p">,</span> <span class="n">lockfile</span><span class="p">)</span>
-
-<span class="c1"># install ...</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>installer 的初始化需要：<code>prebuild_sandbox</code>、<code>prebuild_podfile</code>、<code>lockfile</code>。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Ruby" data-lang="Ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#cb4b16">Pod</span><span style="color:#719e07">.</span>is_prebuild_stage <span style="color:#719e07">=</span> <span style="color:#719e07">true</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span><span style="color:#cb4b16">Pod</span><span style="color:#719e07">::</span><span style="color:#cb4b16">Podfile</span><span style="color:#719e07">::</span><span style="color:#cb4b16">DSL</span><span style="color:#719e07">.</span>enable_prebuild_patch <span style="color:#719e07">true</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span><span style="color:#cb4b16">Pod</span><span style="color:#719e07">::</span><span style="color:#cb4b16">Installer</span><span style="color:#719e07">.</span>force_disable_integration <span style="color:#719e07">true</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span><span style="color:#cb4b16">Pod</span><span style="color:#719e07">::</span><span style="color:#cb4b16">Config</span><span style="color:#719e07">.</span>force_disable_write_lockfile <span style="color:#719e07">true</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span><span style="color:#cb4b16">Pod</span><span style="color:#719e07">::</span><span style="color:#cb4b16">Installer</span><span style="color:#719e07">.</span>disable_install_complete_message <span style="color:#719e07">true</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span><span style="color:#719e07">...</span> 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span><span style="color:#586e75"># install 成功后将 👆 5 个变量重置为 false</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">8</span><span style="color:#cb4b16">Pod</span><span style="color:#719e07">::</span><span style="color:#cb4b16">UserInterface</span><span style="color:#719e07">.</span>warnings <span style="color:#719e07">=</span> <span style="color:#719e07">[]</span> <span style="color:#586e75"># clean the warning in the prebuild step, it&#39;s duplicated.</span>
+</code></pre></div><p>接着初始化 binary_installer：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Ruby" data-lang="Ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span>update <span style="color:#719e07">=</span> <span style="color:#719e07">nil</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>repo_update <span style="color:#719e07">=</span> <span style="color:#719e07">nil</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span><span style="color:#719e07">include</span> <span style="color:#cb4b16">ObjectSpace</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span><span style="color:#cb4b16">ObjectSpace</span><span style="color:#719e07">.</span>each_object(<span style="color:#cb4b16">Pod</span><span style="color:#719e07">::</span><span style="color:#cb4b16">Installer</span>) { <span style="color:#719e07">|</span>installer<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>    update <span style="color:#719e07">=</span> installer<span style="color:#719e07">.</span>update
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>    repo_update <span style="color:#719e07">=</span> installer<span style="color:#719e07">.</span>repo_update
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>standard_sandbox <span style="color:#719e07">=</span> installer_context<span style="color:#719e07">.</span>sandbox
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>prebuild_sandbox <span style="color:#719e07">=</span> <span style="color:#cb4b16">Pod</span><span style="color:#719e07">::</span><span style="color:#cb4b16">PrebuildSandbox</span><span style="color:#719e07">.</span>from_standard_sandbox(standard_sandbox)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>prebuild_podfile <span style="color:#719e07">=</span> <span style="color:#cb4b16">Pod</span><span style="color:#719e07">::</span><span style="color:#cb4b16">Podfile</span><span style="color:#719e07">.</span>from_Ruby(podfile<span style="color:#719e07">.</span>defined_in_file)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>lockfile <span style="color:#719e07">=</span> installer_context<span style="color:#719e07">.</span>lockfile
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>binary_installer <span style="color:#719e07">=</span> <span style="color:#cb4b16">Pod</span><span style="color:#719e07">::</span><span style="color:#cb4b16">Installer</span><span style="color:#719e07">.</span>new(prebuild_sandbox, prebuild_podfile, lockfile)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span><span style="color:#586e75"># install ...</span>
+</code></pre></div><p>installer 的初始化需要：<code>prebuild_sandbox</code>、<code>prebuild_podfile</code>、<code>lockfile</code>。</p>
 <p><code>prebuild_sandbox</code> 管理的目录在 <code>Pods/_Prebuild</code>，它是 Sandbox 的子类。Sandbox 管理着 CocoaPods 的 <code>/Pods</code> 目录。</p>
 <p>lockfile 和 prebuild_podfile 是分别从工程目录的 <code>podfile.lock</code> 和 <code>Podfile</code> 中读取的。</p>
 <h3 id="install">install</h3>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-Ruby" data-lang="Ruby"><span class="k">if</span> <span class="n">binary_installer</span><span class="o">.</span><span class="n">have_exact_prebuild_cache?</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">update</span>
-    <span class="n">binary_installer</span><span class="o">.</span><span class="n">install_when_cache_hit!</span>
-<span class="k">else</span>
-    <span class="n">binary_installer</span><span class="o">.</span><span class="n">update</span> <span class="o">=</span> <span class="n">update</span>
-    <span class="n">binary_installer</span><span class="o">.</span><span class="n">repo_update</span> <span class="o">=</span> <span class="n">repo_update</span>
-    <span class="n">binary_installer</span><span class="o">.</span><span class="n">install!</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>当缓存命中且没有 pod 需要更新时，会执行 <code>install_when_cache_hit!</code> （就是打印一下 cache pods），否则开始 binary pod 的下载，下载目录就在  <code>Pods/_Prebuild</code> 下。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Ruby" data-lang="Ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#719e07">if</span> binary_installer<span style="color:#719e07">.</span>have_exact_prebuild_cache? <span style="color:#719e07">&amp;&amp;</span> <span style="color:#719e07">!</span>update
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>    binary_installer<span style="color:#719e07">.</span>install_when_cache_hit!
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span><span style="color:#719e07">else</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>    binary_installer<span style="color:#719e07">.</span>update <span style="color:#719e07">=</span> update
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>    binary_installer<span style="color:#719e07">.</span>repo_update <span style="color:#719e07">=</span> repo_update
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>    binary_installer<span style="color:#719e07">.</span>install!
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span><span style="color:#719e07">end</span>
+</code></pre></div><p>当缓存命中且没有 pod 需要更新时，会执行 <code>install_when_cache_hit!</code> （就是打印一下 cache pods），否则开始 binary pod 的下载，下载目录就在  <code>Pods/_Prebuild</code> 下。</p>
 <h2 id="预编译环境控制">预编译环境控制</h2>
 <p>聊一下上面的 5 个环境控制开关，定义在 <a href="https://github.com/leavez/cocoapods-binary/blob/master/lib/cocoapods-binary/helper/feature_switches.rb">feature_switches.rb</a> 。</p>
 <h3 id="is_prebuild_stag">is_prebuild_stag</h3>
 <blockquote>
 <p>用于标记当前是否在进行 binary install。</p>
 </blockquote>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">class_attr_accessor</span> <span class="ss">:is_prebuild_stage</span>
-
-<span class="k">def</span> <span class="nf">class_attr_accessor</span><span class="p">(</span><span class="n">symbol</span><span class="p">)</span>
-    <span class="nb">self</span><span class="o">.</span><span class="n">class</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="ss">:attr_accessor</span><span class="p">,</span> <span class="n">symbol</span><span class="p">)</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p><code>attr_accessor</code> 是 Ruby 为 instance 提供的 Access 方法，类似 Objc 的 <code>@perperty</code> 可以自动生成 getter &amp; setter。作者利用 Ruby 的动态调用，将 symbol 发送给 <code>attr_accessor</code> 来添加 <code>class_attr_accessor</code> 的扩展。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>class_attr_accessor <span style="color:#2aa198">:is_prebuild_stage</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span><span style="color:#719e07">def</span> <span style="color:#268bd2">class_attr_accessor</span>(symbol)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>    <span style="color:#b58900">self</span><span style="color:#719e07">.</span>class<span style="color:#719e07">.</span>send(<span style="color:#2aa198">:attr_accessor</span>, symbol)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span><span style="color:#719e07">end</span>
+</code></pre></div><p><code>attr_accessor</code> 是 Ruby 为 instance 提供的 Access 方法，类似 Objc 的 <code>@perperty</code> 可以自动生成 getter &amp; setter。作者利用 Ruby 的动态调用，将 symbol 发送给 <code>attr_accessor</code> 来添加 <code>class_attr_accessor</code> 的扩展。</p>
 <h3 id="enable_prebuild_patch">enable_prebuild_patch</h3>
 <blockquote>
 <p>用于过滤出需要预编译的 pod，默认为 false。</p>
@@ -368,49 +277,25 @@ if (!doNotTrack) {
 <li>在所有 targets 之前的全局参数：<code>all_binary!</code></li>
 </ul>
 <p>enable_prebuild_patch 就是用于实现这两个变量的判断逻辑，只有在 binary install 时会将 enable_prebuild_patch 设为 true，开启之后不需要预编译的 <code>pod</code> 都会被忽略掉。实现如下：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-Ruby" data-lang="Ruby"><span class="k">class</span> <span class="nc">Podfile</span>
-    <span class="k">module</span> <span class="nn">DSL</span>        
-        <span class="vc">@@enable_prebuild_patch</span> <span class="o">=</span> <span class="kp">false</span>
-        <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">enable_prebuild_patch</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-            <span class="vc">@@enable_prebuild_patch</span> <span class="o">=</span> <span class="n">value</span>
-        <span class="k">end</span>
-
-        <span class="n">old_method</span> <span class="o">=</span> <span class="nb">instance_method</span><span class="p">(</span><span class="ss">:pod</span><span class="p">)</span>
-        <span class="n">define_method</span><span class="p">(</span><span class="ss">:pod</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="nb">name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="o">|</span>
-            <span class="k">if</span> <span class="o">!</span><span class="vc">@@enable_prebuild_patch</span>
-                <span class="n">old_method</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span><span class="o">.</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
-                <span class="k">return</span>
-            <span class="k">end</span>
-            <span class="c1"># --- patch content ---</span>
-            <span class="o">...</span>
-        <span class="k">end</span>
-    <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>由于可选参数 <code>:binary =&gt; true</code> 是添加在每个 pod 上，因此我们需要先 hook pod 实现来获取 options。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Ruby" data-lang="Ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">class</span> <span style="color:#268bd2">Podfile</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>    <span style="color:#719e07">module</span> DSL        
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>        @@enable_prebuild_patch <span style="color:#719e07">=</span> <span style="color:#719e07">false</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>        <span style="color:#719e07">def</span> <span style="color:#268bd2">self</span><span style="color:#719e07">.</span><span style="color:#268bd2">enable_prebuild_patch</span>(value)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>            @@enable_prebuild_patch <span style="color:#719e07">=</span> value
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>        <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>        old_method <span style="color:#719e07">=</span> <span style="color:#b58900">instance_method</span>(<span style="color:#2aa198">:pod</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>        define_method(<span style="color:#2aa198">:pod</span>) <span style="color:#719e07">do</span> <span style="color:#719e07">|</span><span style="color:#b58900">name</span>, <span style="color:#719e07">*</span>args<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>            <span style="color:#719e07">if</span> <span style="color:#719e07">!</span>@@enable_prebuild_patch
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>                old_method<span style="color:#719e07">.</span>bind(<span style="color:#b58900">self</span>)<span style="color:#719e07">.</span>(<span style="color:#b58900">name</span>, <span style="color:#719e07">*</span>args)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>                <span style="color:#719e07">return</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>            <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>            <span style="color:#586e75"># --- patch content ---</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>            <span style="color:#719e07">...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>        <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span><span style="color:#719e07">end</span>
+</code></pre></div><p>由于可选参数 <code>:binary =&gt; true</code> 是添加在每个 pod 上，因此我们需要先 hook pod 实现来获取 options。</p>
 <ol>
 <li>通过 <code>instance_method</code> 获取旧的 <code>pod</code> 方法</li>
 <li>用 <code>define_method</code> 来完成重载</li>
@@ -418,37 +303,19 @@ if (!doNotTrack) {
 </ol>
 <p><strong>Ruby Method Swizzling 三部曲</strong> 😂 ，后续还有许多使用该方式的 hook 操作。</p>
 <p>接着看 patch content 逻辑：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-Ruby" data-lang="Ruby"><span class="n">should_prebuild</span> <span class="o">=</span> <span class="no">Pod</span><span class="o">::</span><span class="no">Podfile</span><span class="o">::</span><span class="no">DSL</span><span class="o">.</span><span class="n">prebuild_all</span>
-<span class="n">local</span> <span class="o">=</span> <span class="kp">false</span>
-
-<span class="n">options</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">last</span>
-<span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">is_a?</span><span class="p">(</span><span class="no">Hash</span><span class="p">)</span> <span class="ow">and</span> <span class="n">options</span><span class="o">[</span><span class="no">Pod</span><span class="o">::</span><span class="no">Prebuild</span><span class="o">.</span><span class="n">keyword</span><span class="o">]</span> <span class="o">!=</span> <span class="kp">nil</span>
-    <span class="n">should_prebuild</span> <span class="o">=</span> <span class="n">options</span><span class="o">[</span><span class="no">Pod</span><span class="o">::</span><span class="no">Prebuild</span><span class="o">.</span><span class="n">keyword</span><span class="o">]</span>
-    <span class="n">local</span> <span class="o">=</span> <span class="p">(</span><span class="n">options</span><span class="o">[</span><span class="ss">:path</span><span class="o">]</span> <span class="o">!=</span> <span class="kp">nil</span><span class="p">)</span>
-<span class="k">end</span>
-
-<span class="k">if</span> <span class="n">should_prebuild</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">local</span><span class="p">)</span>
-    <span class="n">old_method</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span><span class="o">.</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><ol>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Ruby" data-lang="Ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span>should_prebuild <span style="color:#719e07">=</span> <span style="color:#cb4b16">Pod</span><span style="color:#719e07">::</span><span style="color:#cb4b16">Podfile</span><span style="color:#719e07">::</span><span style="color:#cb4b16">DSL</span><span style="color:#719e07">.</span>prebuild_all
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>local <span style="color:#719e07">=</span> <span style="color:#719e07">false</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>options <span style="color:#719e07">=</span> args<span style="color:#719e07">.</span>last
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span><span style="color:#719e07">if</span> options<span style="color:#719e07">.</span>is_a?(<span style="color:#cb4b16">Hash</span>) <span style="color:#719e07">and</span> options<span style="color:#719e07">[</span><span style="color:#cb4b16">Pod</span><span style="color:#719e07">::</span><span style="color:#cb4b16">Prebuild</span><span style="color:#719e07">.</span>keyword<span style="color:#719e07">]</span> <span style="color:#719e07">!=</span> <span style="color:#719e07">nil</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>    should_prebuild <span style="color:#719e07">=</span> options<span style="color:#719e07">[</span><span style="color:#cb4b16">Pod</span><span style="color:#719e07">::</span><span style="color:#cb4b16">Prebuild</span><span style="color:#719e07">.</span>keyword<span style="color:#719e07">]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>    local <span style="color:#719e07">=</span> (options<span style="color:#719e07">[</span><span style="color:#2aa198">:path</span><span style="color:#719e07">]</span> <span style="color:#719e07">!=</span> <span style="color:#719e07">nil</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span><span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span><span style="color:#719e07">if</span> should_prebuild <span style="color:#719e07">and</span> (<span style="color:#719e07">not</span> local)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>    old_method<span style="color:#719e07">.</span>bind(<span style="color:#b58900">self</span>)<span style="color:#719e07">.</span>(<span style="color:#b58900">name</span>, <span style="color:#719e07">*</span>args)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span><span style="color:#719e07">end</span>
+</code></pre></div><ol>
 <li>
 <p>检查总开关 <code>prebuild_all</code> 对应的是 <code>all_binary!</code> 的声明。</p>
 </li>
@@ -481,150 +348,76 @@ if (!doNotTrack) {
 <p>option to disable write lockfiles</p>
 </blockquote>
 <p>正常的 pod install 会生成 <code>podfile.lock</code> 文件以保存上次的 Pods 依赖配置。在预编译中我们通过替换 <code>lockfile_path</code> 将锁文件保存到了 <code>Pods/_Prebuild/Manifest.lock.tmp</code>。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-Ruby" data-lang="Ruby"><span class="k">class</span> <span class="nc">Config</span>
-    <span class="vc">@@force_disable_write_lockfile</span> <span class="o">=</span> <span class="kp">false</span>
-    <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">force_disable_write_lockfile</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-        <span class="vc">@@force_disable_write_lockfile</span> <span class="o">=</span> <span class="n">value</span>
-    <span class="k">end</span>
-    
-    <span class="n">old_method</span> <span class="o">=</span> <span class="nb">instance_method</span><span class="p">(</span><span class="ss">:lockfile_path</span><span class="p">)</span>
-    <span class="n">define_method</span><span class="p">(</span><span class="ss">:lockfile_path</span><span class="p">)</span> <span class="k">do</span> 
-        <span class="k">if</span> <span class="vc">@@force_disable_write_lockfile</span>
-            <span class="k">return</span> <span class="no">PrebuildSandbox</span><span class="o">.</span><span class="n">from_standard_sanbox_path</span><span class="p">(</span><span class="n">sandbox_root</span><span class="p">)</span><span class="o">.</span><span class="n">root</span> <span class="o">+</span> <span class="s1">&#39;Manifest.lock.tmp&#39;</span>
-        <span class="k">else</span>
-            <span class="k">return</span> <span class="n">old_method</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span><span class="o">.</span><span class="p">()</span>
-        <span class="k">end</span>
-    <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gfm5t282twj20xb0hqjut.jpg" alt="feature_switch.png"></p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Ruby" data-lang="Ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">class</span> <span style="color:#268bd2">Config</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>    @@force_disable_write_lockfile <span style="color:#719e07">=</span> <span style="color:#719e07">false</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>    <span style="color:#719e07">def</span> <span style="color:#268bd2">self</span><span style="color:#719e07">.</span><span style="color:#268bd2">force_disable_write_lockfile</span>(value)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>        @@force_disable_write_lockfile <span style="color:#719e07">=</span> value
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>    
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>    old_method <span style="color:#719e07">=</span> <span style="color:#b58900">instance_method</span>(<span style="color:#2aa198">:lockfile_path</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>    define_method(<span style="color:#2aa198">:lockfile_path</span>) <span style="color:#719e07">do</span> 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>        <span style="color:#719e07">if</span> @@force_disable_write_lockfile
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>            <span style="color:#719e07">return</span> <span style="color:#cb4b16">PrebuildSandbox</span><span style="color:#719e07">.</span>from_standard_sanbox_path(sandbox_root)<span style="color:#719e07">.</span>root <span style="color:#719e07">+</span> <span style="color:#2aa198">&#39;Manifest.lock.tmp&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>        <span style="color:#719e07">else</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>            <span style="color:#719e07">return</span> old_method<span style="color:#719e07">.</span>bind(<span style="color:#b58900">self</span>)<span style="color:#719e07">.</span>()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>        <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span><span style="color:#719e07">end</span>
+</code></pre></div><p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gfm5t282twj20xb0hqjut.jpg" alt="feature_switch.png"></p>
 <h1 id="binary-pod-的预编译">Binary Pod 的预编译</h1>
 <p>cocoapods-binary 在下载 binary pod 源码前会先检查是否已经有预编译好的二进制包，如果没有缓存才会开始binary pod 的下载和预编译。</p>
 <h2 id="预编译的缓存查询">预编译的缓存查询</h2>
 <p>缓存查询方法为 <strong>have_exact_prebuild_cache?</strong> ，我们在前面提到过，来看其实现：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-Ruby" data-lang="Ruby"><span class="k">def</span> <span class="nf">have_exact_prebuild_cache?</span>
-    <span class="k">return</span> <span class="kp">false</span> <span class="k">if</span> <span class="n">local_manifest</span> <span class="o">==</span> <span class="kp">nil</span> <span class="c1"># step 1</span>
-    <span class="c1"># step 2</span>
-    <span class="n">changes</span> <span class="o">=</span> <span class="n">prebuild_pods_changes</span>
-    <span class="n">added</span> <span class="o">=</span> <span class="n">changes</span><span class="o">.</span><span class="n">added</span>
-    <span class="n">changed</span> <span class="o">=</span> <span class="n">changes</span><span class="o">.</span><span class="n">changed</span> 
-    <span class="n">unchanged</span> <span class="o">=</span> <span class="n">changes</span><span class="o">.</span><span class="n">unchanged</span>
-    <span class="n">deleted</span> <span class="o">=</span> <span class="n">changes</span><span class="o">.</span><span class="n">deleted</span> 
-    
-    <span class="n">exsited_framework_pod_names</span> <span class="o">=</span> <span class="n">sandbox</span><span class="o">.</span><span class="n">exsited_framework_pod_names</span>
-    <span class="n">missing</span> <span class="o">=</span> <span class="n">unchanged</span><span class="o">.</span><span class="n">select</span> <span class="k">do</span> <span class="o">|</span><span class="n">pod_name</span><span class="o">|</span>
-        <span class="ow">not</span> <span class="n">exsited_framework_pod_names</span><span class="o">.</span><span class="n">include?</span><span class="p">(</span><span class="n">pod_name</span><span class="p">)</span>
-    <span class="k">end</span>
-
-    <span class="n">needed</span> <span class="o">=</span> <span class="p">(</span><span class="n">added</span> <span class="o">+</span> <span class="n">changed</span> <span class="o">+</span> <span class="n">deleted</span> <span class="o">+</span> <span class="n">missing</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">needed</span><span class="o">.</span><span class="n">empty?</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><ol>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Ruby" data-lang="Ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">def</span> <span style="color:#268bd2">have_exact_prebuild_cache?</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>    <span style="color:#719e07">return</span> <span style="color:#719e07">false</span> <span style="color:#719e07">if</span> local_manifest <span style="color:#719e07">==</span> <span style="color:#719e07">nil</span> <span style="color:#586e75"># step 1</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>    <span style="color:#586e75"># step 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>    changes <span style="color:#719e07">=</span> prebuild_pods_changes
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>    added <span style="color:#719e07">=</span> changes<span style="color:#719e07">.</span>added
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>    changed <span style="color:#719e07">=</span> changes<span style="color:#719e07">.</span>changed 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>    unchanged <span style="color:#719e07">=</span> changes<span style="color:#719e07">.</span>unchanged
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>    deleted <span style="color:#719e07">=</span> changes<span style="color:#719e07">.</span>deleted 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>    
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>    exsited_framework_pod_names <span style="color:#719e07">=</span> sandbox<span style="color:#719e07">.</span>exsited_framework_pod_names
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>    missing <span style="color:#719e07">=</span> unchanged<span style="color:#719e07">.</span>select <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>pod_name<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>        <span style="color:#719e07">not</span> exsited_framework_pod_names<span style="color:#719e07">.</span>include?(pod_name)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>    needed <span style="color:#719e07">=</span> (added <span style="color:#719e07">+</span> changed <span style="color:#719e07">+</span> deleted <span style="color:#719e07">+</span> missing)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>    <span style="color:#719e07">return</span> needed<span style="color:#719e07">.</span>empty?
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span><span style="color:#719e07">end</span>
+</code></pre></div><ol>
 <li>检查 <code>PrebuildSandbox</code> 下是否存在 <code>Manifest.lock</code> 文件，没有则说明没有成功执行过 binary pod 安装过也就不会有缓存，可以直接 return false</li>
 <li>执行 <code>prebuild_pods_changes</code> 获取 pod 变更</li>
 <li>执行 <code>exsited_framework_pod_names</code> 查看是否有预编译过的 framework</li>
 <li>结合前两步的结果判断是否存在缓存</li>
 </ol>
 <h3 id="预编译的-mainfest-检查">预编译的 mainfest 检查</h3>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-Ruby" data-lang="Ruby"><span class="k">def</span> <span class="nf">local_manifest</span> 
-    <span class="k">if</span> <span class="ow">not</span> <span class="vi">@local_manifest_inited</span>
-        <span class="vi">@local_manifest_inited</span> <span class="o">=</span> <span class="kp">true</span>
-        <span class="k">raise</span> <span class="s2">&#34;This method should be call before generate project&#34;</span> <span class="k">unless</span> <span class="nb">self</span><span class="o">.</span><span class="n">analysis_result</span> <span class="o">==</span> <span class="kp">nil</span>
-        <span class="vi">@local_manifest</span> <span class="o">=</span> <span class="nb">self</span><span class="o">.</span><span class="n">sandbox</span><span class="o">.</span><span class="n">manifest</span>
-    <span class="k">end</span>
-    <span class="vi">@local_manifest</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>local_manifest 其实是 ruby 的一个方法，作用上面介绍过，那 Manifest.lock 文件又是啥？详细：<a href="https://www.objc.io/issues/6-build-tools/cocoapods-under-the-hood/">objc.io</a></p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Ruby" data-lang="Ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#719e07">def</span> <span style="color:#268bd2">local_manifest</span> 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>    <span style="color:#719e07">if</span> <span style="color:#719e07">not</span> @local_manifest_inited
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>        @local_manifest_inited <span style="color:#719e07">=</span> <span style="color:#719e07">true</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>        <span style="color:#719e07">raise</span> <span style="color:#2aa198">&#34;This method should be call before generate project&#34;</span> <span style="color:#719e07">unless</span> <span style="color:#b58900">self</span><span style="color:#719e07">.</span>analysis_result <span style="color:#719e07">==</span> <span style="color:#719e07">nil</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>        @local_manifest <span style="color:#719e07">=</span> <span style="color:#b58900">self</span><span style="color:#719e07">.</span>sandbox<span style="color:#719e07">.</span>manifest
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span>    @local_manifest
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">8</span><span style="color:#719e07">end</span>
+</code></pre></div><p>local_manifest 其实是 ruby 的一个方法，作用上面介绍过，那 Manifest.lock 文件又是啥？详细：<a href="https://www.objc.io/issues/6-build-tools/cocoapods-under-the-hood/">objc.io</a></p>
 <blockquote>
 <p>This is a copy of the <code>Podfile.lock</code> that gets created every time you run <code>pod install</code>. If you’ve ever seen the error <code>The sandbox is not in sync with the Podfile.lock</code>, it’s because this file is no longer the same as the <code>Podfile.lock</code>.</p>
 </blockquote>
 <p>由于 <code>Pods</code> 目录并不一定会添加到项目的 version control 中，所以利用 <code>Mainfest.lock</code> 来确保工程师在运行项目前能够准确更新对应的 pod。否则会导致 build 失败等各种问题。</p>
 <h3 id="预编译的-pods-变更检查">预编译的 pods 变更检查</h3>
 <p>接着通过 <code>prebuild_pods_changes</code> 检查是否有需要更新的 pod：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-Ruby" data-lang="Ruby"><span class="k">def</span> <span class="nf">prebuild_pods_changes</span>
-    <span class="k">return</span> <span class="kp">nil</span> <span class="k">if</span> <span class="n">local_manifest</span><span class="o">.</span><span class="n">nil?</span>
-    <span class="k">if</span> <span class="vi">@prebuild_pods_changes</span><span class="o">.</span><span class="n">nil?</span>
-        <span class="n">changes</span> <span class="o">=</span> <span class="n">local_manifest</span><span class="o">.</span><span class="n">detect_changes_with_podfile</span><span class="p">(</span><span class="n">podfile</span><span class="p">)</span>
-        <span class="vi">@prebuild_pods_changes</span> <span class="o">=</span> <span class="no">Analyzer</span><span class="o">::</span><span class="no">SpecsState</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">changes</span><span class="p">)</span>
-        <span class="c1"># save the chagnes info for later stage</span>
-        <span class="no">Pod</span><span class="o">::</span><span class="no">Prebuild</span><span class="o">::</span><span class="no">Passer</span><span class="o">.</span><span class="n">prebuild_pods_changes</span> <span class="o">=</span> <span class="vi">@prebuild_pods_changes</span> 
-    <span class="k">end</span>
-    <span class="vi">@prebuild_pods_changes</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>方法第一行也检查了 <code>local_manifest</code> 是因为会被多处调用，所有这里也添加了判断。核心是依赖 cocoapods-core 的 <a href="https://www.Rubydoc.info/gems/cocoapods-core/Pod%2FLockfile:detect_changes_with_podfile">detect_changes_with_podfile</a> 来获取需要更新的 pods，其描述如下：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Ruby" data-lang="Ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">def</span> <span style="color:#268bd2">prebuild_pods_changes</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>    <span style="color:#719e07">return</span> <span style="color:#719e07">nil</span> <span style="color:#719e07">if</span> local_manifest<span style="color:#719e07">.</span>nil?
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>    <span style="color:#719e07">if</span> @prebuild_pods_changes<span style="color:#719e07">.</span>nil?
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>        changes <span style="color:#719e07">=</span> local_manifest<span style="color:#719e07">.</span>detect_changes_with_podfile(podfile)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>        @prebuild_pods_changes <span style="color:#719e07">=</span> <span style="color:#cb4b16">Analyzer</span><span style="color:#719e07">::</span><span style="color:#cb4b16">SpecsState</span><span style="color:#719e07">.</span>new(changes)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>        <span style="color:#586e75"># save the chagnes info for later stage</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>        <span style="color:#cb4b16">Pod</span><span style="color:#719e07">::</span><span style="color:#cb4b16">Prebuild</span><span style="color:#719e07">::</span><span style="color:#cb4b16">Passer</span><span style="color:#719e07">.</span>prebuild_pods_changes <span style="color:#719e07">=</span> @prebuild_pods_changes 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>    @prebuild_pods_changes
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span><span style="color:#719e07">end</span>
+</code></pre></div><p>方法第一行也检查了 <code>local_manifest</code> 是因为会被多处调用，所有这里也添加了判断。核心是依赖 cocoapods-core 的 <a href="https://www.Rubydoc.info/gems/cocoapods-core/Pod%2FLockfile:detect_changes_with_podfile">detect_changes_with_podfile</a> 来获取需要更新的 pods，其描述如下：</p>
 <blockquote>
 <p>Analyzes the <a href="https://www.Rubydoc.info/gems/cocoapods-core/Pod/Lockfile">Pod::Lockfile</a> and detects any changes applied to the <a href="https://www.Rubydoc.info/gems/cocoapods-core/Pod/Podfile">Podfile</a> since the last installation.</p>
 </blockquote>
@@ -643,89 +436,42 @@ if (!doNotTrack) {
 <p>最后从 <code>unchanged</code> 中查找 <code>exsited_framework_pod_names</code> 来判断是否有已预编译过的 framework。</p>
 <h3 id="预编译的-framework-缓存检查">预编译的 framework 缓存检查</h3>
 <p>预编译的 framework 检查即 <code> exsited_framework_pod_names</code> 从 <code>exsited_framework_name_pairs</code> 中 map 过来的。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-Ruby" data-lang="Ruby"><span class="k">def</span> <span class="nf">exsited_framework_pod_names</span>
-    <span class="n">exsited_framework_name_pairs</span><span class="o">.</span><span class="n">map</span> <span class="p">{</span><span class="o">|</span><span class="n">pair</span><span class="o">|</span> <span class="n">pair</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="p">}</span><span class="o">.</span><span class="n">uniq</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p><strong>exsited_framework_name_pairs</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-Ruby" data-lang="Ruby"><span class="k">def</span> <span class="nf">pod_name_for_target_folder</span><span class="p">(</span><span class="n">target_folder_path</span><span class="p">)</span>
-    <span class="nb">name</span> <span class="o">=</span> <span class="no">Pathname</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">target_folder_path</span><span class="p">)</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">find</span> <span class="k">do</span> <span class="o">|</span><span class="n">child</span><span class="o">|</span>
-        <span class="n">child</span><span class="o">.</span><span class="n">to_s</span><span class="o">.</span><span class="n">end_with?</span> <span class="s2">&#34;.pod_name&#34;</span>
-    <span class="k">end</span>
-    <span class="nb">name</span> <span class="o">=</span> <span class="nb">name</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="s2">&#34;.pod_name&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">to_s</span> <span class="k">unless</span> <span class="nb">name</span><span class="o">.</span><span class="n">nil?</span>
-    <span class="nb">name</span> <span class="o">||=</span> <span class="no">Pathname</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">target_folder_path</span><span class="p">)</span><span class="o">.</span><span class="n">basename</span><span class="o">.</span><span class="n">to_s</span> <span class="c1"># for compatibility with older version</span>
-<span class="k">end</span>
-
-<span class="c1"># Array&lt;[target_name, pod_name]&gt;</span>
-<span class="k">def</span> <span class="nf">exsited_framework_name_pairs</span>
-    <span class="k">return</span> <span class="o">[]</span> <span class="k">unless</span> <span class="n">generate_framework_path</span><span class="o">.</span><span class="n">exist?</span>
-    <span class="n">generate_framework_path</span><span class="o">.</span><span class="n">children</span><span class="p">()</span><span class="o">.</span><span class="n">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">framework_path</span><span class="o">|</span>
-        <span class="k">if</span> <span class="n">framework_path</span><span class="o">.</span><span class="n">directory?</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="ow">not</span> <span class="n">framework_path</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">empty?</span><span class="p">)</span>
-            <span class="o">[</span><span class="n">framework_path</span><span class="o">.</span><span class="n">basename</span><span class="o">.</span><span class="n">to_s</span><span class="p">,</span>  <span class="n">pod_name_for_target_folder</span><span class="p">(</span><span class="n">framework_path</span><span class="p">)</span><span class="o">]</span>
-        <span class="k">else</span>
-            <span class="kp">nil</span>
-        <span class="k">end</span>
-    <span class="k">end</span><span class="o">.</span><span class="n">reject</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:nil?</span><span class="p">)</span><span class="o">.</span><span class="n">uniq</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>该方法虽然逻辑简单，却是比较核心的逻辑之一。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Ruby" data-lang="Ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#719e07">def</span> <span style="color:#268bd2">exsited_framework_pod_names</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>    exsited_framework_name_pairs<span style="color:#719e07">.</span>map {<span style="color:#719e07">|</span>pair<span style="color:#719e07">|</span> pair<span style="color:#719e07">[</span><span style="color:#2aa198">1</span><span style="color:#719e07">]</span>}<span style="color:#719e07">.</span>uniq
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span><span style="color:#719e07">end</span>
+</code></pre></div><p><strong>exsited_framework_name_pairs</strong></p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Ruby" data-lang="Ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">def</span> <span style="color:#268bd2">pod_name_for_target_folder</span>(target_folder_path)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>    <span style="color:#b58900">name</span> <span style="color:#719e07">=</span> <span style="color:#cb4b16">Pathname</span><span style="color:#719e07">.</span>new(target_folder_path)<span style="color:#719e07">.</span>children<span style="color:#719e07">.</span>find <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>child<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>        child<span style="color:#719e07">.</span>to_s<span style="color:#719e07">.</span>end_with? <span style="color:#2aa198">&#34;.pod_name&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>    <span style="color:#b58900">name</span> <span style="color:#719e07">=</span> <span style="color:#b58900">name</span><span style="color:#719e07">.</span>basename(<span style="color:#2aa198">&#34;.pod_name&#34;</span>)<span style="color:#719e07">.</span>to_s <span style="color:#719e07">unless</span> <span style="color:#b58900">name</span><span style="color:#719e07">.</span>nil?
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>    <span style="color:#b58900">name</span> <span style="color:#719e07">||=</span> <span style="color:#cb4b16">Pathname</span><span style="color:#719e07">.</span>new(target_folder_path)<span style="color:#719e07">.</span>basename<span style="color:#719e07">.</span>to_s <span style="color:#586e75"># for compatibility with older version</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span><span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span><span style="color:#586e75"># Array&lt;[target_name, pod_name]&gt;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span><span style="color:#719e07">def</span> <span style="color:#268bd2">exsited_framework_name_pairs</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>    <span style="color:#719e07">return</span> <span style="color:#719e07">[]</span> <span style="color:#719e07">unless</span> generate_framework_path<span style="color:#719e07">.</span>exist?
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>    generate_framework_path<span style="color:#719e07">.</span>children()<span style="color:#719e07">.</span>map <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>framework_path<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>        <span style="color:#719e07">if</span> framework_path<span style="color:#719e07">.</span>directory? <span style="color:#719e07">&amp;&amp;</span> (<span style="color:#719e07">not</span> framework_path<span style="color:#719e07">.</span>children<span style="color:#719e07">.</span>empty?)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>            <span style="color:#719e07">[</span>framework_path<span style="color:#719e07">.</span>basename<span style="color:#719e07">.</span>to_s,  pod_name_for_target_folder(framework_path)<span style="color:#719e07">]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>        <span style="color:#719e07">else</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>            <span style="color:#719e07">nil</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>        <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>    <span style="color:#719e07">end</span><span style="color:#719e07">.</span>reject(<span style="color:#719e07">&amp;</span><span style="color:#2aa198">:nil?</span>)<span style="color:#719e07">.</span>uniq
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span><span style="color:#719e07">end</span>
+</code></pre></div><p>该方法虽然逻辑简单，却是比较核心的逻辑之一。</p>
 <p>它最终调用 <code>pod_name_for_target_folder</code> 来检查 <code>Pods/_Prebuild/GeneratedFrameworks</code> 目录下对应的 framework 中是否存在以 <strong>.pod_name</strong> 为结尾的文件，来标示该 framework 是否完成了预编译。它就是一个空文件而已。</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gfmci591ncj20np0g3q53.jpg" alt="exact_prebuild_cache.png"></p>
 <h2 id="target-编译">Target 编译</h2>
 <p>通过 <code>pre_install</code> 下载完 pods 后就要开始编译啦，入口如下：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-Ruby" data-lang="Ruby"><span class="n">old_method2</span> <span class="o">=</span> <span class="nb">instance_method</span><span class="p">(</span><span class="ss">:run_plugins_post_install_hooks</span><span class="p">)</span>
-<span class="n">define_method</span><span class="p">(</span><span class="ss">:run_plugins_post_install_hooks</span><span class="p">)</span> <span class="k">do</span> 
-    <span class="n">old_method2</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span><span class="o">.</span><span class="p">()</span>
-    <span class="k">if</span> <span class="no">Pod</span><span class="o">::</span><span class="n">is_prebuild_stage</span>
-        <span class="nb">self</span><span class="o">.</span><span class="n">prebuild_frameworks!</span>
-    <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>为了保证 <code>prebuild_frameworks!</code> 是在最后一步执行，作者并未通过 <code>HooksManager</code> 来添加 plugins 的 <code>post_install</code> 而是直接 <strong>Override</strong> 了它的调用方法。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Ruby" data-lang="Ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>old_method2 <span style="color:#719e07">=</span> <span style="color:#b58900">instance_method</span>(<span style="color:#2aa198">:run_plugins_post_install_hooks</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>define_method(<span style="color:#2aa198">:run_plugins_post_install_hooks</span>) <span style="color:#719e07">do</span> 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>    old_method2<span style="color:#719e07">.</span>bind(<span style="color:#b58900">self</span>)<span style="color:#719e07">.</span>()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>    <span style="color:#719e07">if</span> <span style="color:#cb4b16">Pod</span><span style="color:#719e07">::</span>is_prebuild_stage
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>        <span style="color:#b58900">self</span><span style="color:#719e07">.</span>prebuild_frameworks!
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span><span style="color:#719e07">end</span>
+</code></pre></div><p>为了保证 <code>prebuild_frameworks!</code> 是在最后一步执行，作者并未通过 <code>HooksManager</code> 来添加 plugins 的 <code>post_install</code> 而是直接 <strong>Override</strong> 了它的调用方法。</p>
 <p>关于 install hooks，CocoaPods 提供了两种类型：Podfile hook 和 plugin hook。</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gfnfd0b99ij210r0hqtbm.jpg" alt="hooks.png"></p>
 <p>插件的 hooks 操作都是通过 <code>HooksManager</code> 来完成调用的，podfile 中提供的 hooks 则是单独的方法执行时机也是各有不同。</p>
@@ -746,29 +492,15 @@ if (!doNotTrack) {
 <ol>
 <li>对于 static framework 需要在编译后，手动将相关资源 copy 回来。因此，需要先将对应路径保存。</li>
 </ol>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-Ruby" data-lang="Ruby"><span class="n">path_objects</span> <span class="o">=</span> <span class="n">resources</span><span class="o">.</span><span class="n">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">path</span><span class="o">|</span>
-    <span class="n">object</span> <span class="o">=</span> <span class="no">Prebuild</span><span class="o">::</span><span class="no">Passer</span><span class="o">::</span><span class="no">ResourcePath</span><span class="o">.</span><span class="n">new</span>
-    <span class="n">object</span><span class="o">.</span><span class="n">real_file_path</span> <span class="o">=</span> <span class="n">framework_path</span> <span class="o">+</span> <span class="no">File</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-    <span class="n">object</span><span class="o">.</span><span class="n">target_file_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">gsub</span><span class="p">(</span><span class="s1">&#39;${PODS_ROOT}&#39;</span><span class="p">,</span> <span class="n">standard_sandbox_path</span><span class="o">.</span><span class="n">to_s</span><span class="p">)</span> <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">start_with?</span> <span class="s1">&#39;${PODS_ROOT}&#39;</span>
-    <span class="n">object</span><span class="o">.</span><span class="n">target_file_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">gsub</span><span class="p">(</span><span class="s2">&#34;${PODS_CONFIGURATION_BUILD_DIR}&#34;</span><span class="p">,</span> <span class="n">standard_sandbox_path</span><span class="o">.</span><span class="n">to_s</span><span class="p">)</span> <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">start_with?</span> <span class="s2">&#34;${PODS_CONFIGURATION_BUILD_DIR}&#34;</span>
-    <span class="n">object</span>
-<span class="k">end</span>
-<span class="no">Prebuild</span><span class="o">::</span><span class="no">Passer</span><span class="o">.</span><span class="n">resources_to_copy_for_static_framework</span><span class="o">[</span><span class="n">target</span><span class="o">.</span><span class="n">name</span><span class="o">]</span> <span class="o">=</span> <span class="n">path_objects</span>
-</code></pre></td></tr></table>
-</div>
-</div><ol start="2">
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Ruby" data-lang="Ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>path_objects <span style="color:#719e07">=</span> resources<span style="color:#719e07">.</span>map <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>path<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>    object <span style="color:#719e07">=</span> <span style="color:#cb4b16">Prebuild</span><span style="color:#719e07">::</span><span style="color:#cb4b16">Passer</span><span style="color:#719e07">::</span><span style="color:#cb4b16">ResourcePath</span><span style="color:#719e07">.</span>new
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>    object<span style="color:#719e07">.</span>real_file_path <span style="color:#719e07">=</span> framework_path <span style="color:#719e07">+</span> <span style="color:#cb4b16">File</span><span style="color:#719e07">.</span>basename(path)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>    object<span style="color:#719e07">.</span>target_file_path <span style="color:#719e07">=</span> path<span style="color:#719e07">.</span>gsub(<span style="color:#2aa198">&#39;${PODS_ROOT}&#39;</span>, standard_sandbox_path<span style="color:#719e07">.</span>to_s) <span style="color:#719e07">if</span> path<span style="color:#719e07">.</span>start_with? <span style="color:#2aa198">&#39;${PODS_ROOT}&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>    object<span style="color:#719e07">.</span>target_file_path <span style="color:#719e07">=</span> path<span style="color:#719e07">.</span>gsub(<span style="color:#2aa198">&#34;${PODS_CONFIGURATION_BUILD_DIR}&#34;</span>, standard_sandbox_path<span style="color:#719e07">.</span>to_s) <span style="color:#719e07">if</span> path<span style="color:#719e07">.</span>start_with? <span style="color:#2aa198">&#34;${PODS_CONFIGURATION_BUILD_DIR}&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>    object
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span><span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">8</span><span style="color:#cb4b16">Prebuild</span><span style="color:#719e07">::</span><span style="color:#cb4b16">Passer</span><span style="color:#719e07">.</span>resources_to_copy_for_static_framework<span style="color:#719e07">[</span>target<span style="color:#719e07">.</span>name<span style="color:#719e07">]</span> <span style="color:#719e07">=</span> path_objects
+</code></pre></div><ol start="2">
 <li>如果 pod 中包含了 <strong>vendored library</strong> 和 <strong>vendered framework</strong> 也会在 build 后 copy 回来。</li>
 </ol>
 <p><strong>第三步：清理无用文件和 pods</strong></p>
@@ -784,87 +516,44 @@ if (!doNotTrack) {
 <li>清除 prebuild spec 中的 resource_bundles；</li>
 </ol>
 <p>简化后逻辑如下：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span><span class="lnt">33
-</span><span class="lnt">34
-</span><span class="lnt">35
-</span><span class="lnt">36
-</span><span class="lnt">37
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-Ruby" data-lang="Ruby"><span class="n">old_method2</span> <span class="o">=</span> <span class="nb">instance_method</span><span class="p">(</span><span class="ss">:resolve_dependencies</span><span class="p">)</span>
-<span class="n">define_method</span><span class="p">(</span><span class="ss">:resolve_dependencies</span><span class="p">)</span> <span class="k">do</span>
-		
-    <span class="nb">self</span><span class="o">.</span><span class="n">remove_target_files_if_needed</span> <span class="c1"># 1</span>
-   
-    <span class="n">old_method2</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span><span class="o">.</span><span class="p">()</span>    
-    <span class="nb">self</span><span class="o">.</span><span class="n">validate_every_pod_only_have_one_form</span>
-
-    <span class="n">cache</span> <span class="o">=</span> <span class="o">[]</span>
-    <span class="n">specs</span> <span class="o">=</span> <span class="nb">self</span><span class="o">.</span><span class="n">analysis_result</span><span class="o">.</span><span class="n">specifications</span>
-    <span class="n">prebuilt_specs</span> <span class="o">=</span> <span class="p">(</span><span class="n">specs</span><span class="o">.</span><span class="n">select</span> <span class="k">do</span> <span class="o">|</span><span class="n">spec</span><span class="o">|</span>
-        <span class="nb">self</span><span class="o">.</span><span class="n">prebuild_pod_names</span><span class="o">.</span><span class="n">include?</span> <span class="n">spec</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">name</span>
-    <span class="k">end</span><span class="p">)</span>
-
-    <span class="n">prebuilt_specs</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">spec</span><span class="o">|</span>
-		  <span class="c1"># 2</span>
-        <span class="n">targets</span> <span class="o">=</span> <span class="no">Pod</span><span class="o">.</span><span class="n">fast_get_targets_for_pod_name</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">self</span><span class="o">.</span><span class="n">pod_targets</span><span class="p">,</span> <span class="n">cache</span><span class="p">)</span>
-        <span class="n">targets</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">target</span><span class="o">|</span>
-            <span class="n">framework_file_path</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">framework_name</span>
-            <span class="n">framework_file_path</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&#34;/&#34;</span> <span class="o">+</span> <span class="n">framework_file_path</span> <span class="k">if</span> <span class="n">targets</span><span class="o">.</span><span class="n">count</span> <span class="o">&gt;</span> <span class="mi">1</span>
-            <span class="n">add_vendered_framework</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">target</span><span class="o">.</span><span class="n">platform</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">to_s</span><span class="p">,</span> <span class="n">framework_file_path</span><span class="p">)</span>
-        <span class="k">end</span>
-        
-        <span class="n">empty_source_files</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
-			
-        <span class="c1"># 3</span>
-        <span class="k">if</span> <span class="n">spec</span><span class="o">.</span><span class="n">attributes_hash</span><span class="o">[</span><span class="s2">&#34;resource_bundles&#34;</span><span class="o">]</span>
-            <span class="n">bundle_names</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">attributes_hash</span><span class="o">[</span><span class="s2">&#34;resource_bundles&#34;</span><span class="o">].</span><span class="n">keys</span>
-            <span class="n">spec</span><span class="o">.</span><span class="n">attributes_hash</span><span class="o">[</span><span class="s2">&#34;resource_bundles&#34;</span><span class="o">]</span> <span class="o">=</span> <span class="kp">nil</span> 
-            <span class="n">spec</span><span class="o">.</span><span class="n">attributes_hash</span><span class="o">[</span><span class="s2">&#34;resources&#34;</span><span class="o">]</span> <span class="o">||=</span> <span class="o">[]</span>
-            <span class="n">spec</span><span class="o">.</span><span class="n">attributes_hash</span><span class="o">[</span><span class="s2">&#34;resources&#34;</span><span class="o">]</span> <span class="o">+=</span> <span class="n">bundle_names</span><span class="o">.</span><span class="n">map</span><span class="p">{</span><span class="o">|</span><span class="n">n</span><span class="o">|</span> <span class="n">n</span><span class="o">+</span><span class="s2">&#34;.bundle&#34;</span><span class="p">}</span>
-        <span class="k">end</span>
-
-        <span class="c1"># to avoid the warning of missing license</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">attributes_hash</span><span class="o">[</span><span class="s2">&#34;license&#34;</span><span class="o">]</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>关于这三步操作，分别做一些解答。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Ruby" data-lang="Ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span>old_method2 <span style="color:#719e07">=</span> <span style="color:#b58900">instance_method</span>(<span style="color:#2aa198">:resolve_dependencies</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>define_method(<span style="color:#2aa198">:resolve_dependencies</span>) <span style="color:#719e07">do</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>		
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>    <span style="color:#b58900">self</span><span style="color:#719e07">.</span>remove_target_files_if_needed <span style="color:#586e75"># 1</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>   
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>    old_method2<span style="color:#719e07">.</span>bind(<span style="color:#b58900">self</span>)<span style="color:#719e07">.</span>()    
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>    <span style="color:#b58900">self</span><span style="color:#719e07">.</span>validate_every_pod_only_have_one_form
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>    cache <span style="color:#719e07">=</span> <span style="color:#719e07">[]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>    specs <span style="color:#719e07">=</span> <span style="color:#b58900">self</span><span style="color:#719e07">.</span>analysis_result<span style="color:#719e07">.</span>specifications
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>    prebuilt_specs <span style="color:#719e07">=</span> (specs<span style="color:#719e07">.</span>select <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>spec<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>        <span style="color:#b58900">self</span><span style="color:#719e07">.</span>prebuild_pod_names<span style="color:#719e07">.</span>include? spec<span style="color:#719e07">.</span>root<span style="color:#719e07">.</span>name
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>    <span style="color:#719e07">end</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>    prebuilt_specs<span style="color:#719e07">.</span>each <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>spec<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>		  <span style="color:#586e75"># 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>        targets <span style="color:#719e07">=</span> <span style="color:#cb4b16">Pod</span><span style="color:#719e07">.</span>fast_get_targets_for_pod_name(spec<span style="color:#719e07">.</span>root<span style="color:#719e07">.</span>name, <span style="color:#b58900">self</span><span style="color:#719e07">.</span>pod_targets, cache)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>        targets<span style="color:#719e07">.</span>each <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>target<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>            framework_file_path <span style="color:#719e07">=</span> target<span style="color:#719e07">.</span>framework_name
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>            framework_file_path <span style="color:#719e07">=</span> target<span style="color:#719e07">.</span>name <span style="color:#719e07">+</span> <span style="color:#2aa198">&#34;/&#34;</span> <span style="color:#719e07">+</span> framework_file_path <span style="color:#719e07">if</span> targets<span style="color:#719e07">.</span>count <span style="color:#719e07">&gt;</span> <span style="color:#2aa198">1</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span>            add_vendered_framework(spec, target<span style="color:#719e07">.</span>platform<span style="color:#719e07">.</span>name<span style="color:#719e07">.</span>to_s, framework_file_path)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">22</span>        <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">23</span>        
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">24</span>        empty_source_files(spec)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">25</span>			
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">26</span>        <span style="color:#586e75"># 3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">27</span>        <span style="color:#719e07">if</span> spec<span style="color:#719e07">.</span>attributes_hash<span style="color:#719e07">[</span><span style="color:#2aa198">&#34;resource_bundles&#34;</span><span style="color:#719e07">]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">28</span>            bundle_names <span style="color:#719e07">=</span> spec<span style="color:#719e07">.</span>attributes_hash<span style="color:#719e07">[</span><span style="color:#2aa198">&#34;resource_bundles&#34;</span><span style="color:#719e07">].</span>keys
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">29</span>            spec<span style="color:#719e07">.</span>attributes_hash<span style="color:#719e07">[</span><span style="color:#2aa198">&#34;resource_bundles&#34;</span><span style="color:#719e07">]</span> <span style="color:#719e07">=</span> <span style="color:#719e07">nil</span> 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">30</span>            spec<span style="color:#719e07">.</span>attributes_hash<span style="color:#719e07">[</span><span style="color:#2aa198">&#34;resources&#34;</span><span style="color:#719e07">]</span> <span style="color:#719e07">||=</span> <span style="color:#719e07">[]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">31</span>            spec<span style="color:#719e07">.</span>attributes_hash<span style="color:#719e07">[</span><span style="color:#2aa198">&#34;resources&#34;</span><span style="color:#719e07">]</span> <span style="color:#719e07">+=</span> bundle_names<span style="color:#719e07">.</span>map{<span style="color:#719e07">|</span>n<span style="color:#719e07">|</span> n<span style="color:#719e07">+</span><span style="color:#2aa198">&#34;.bundle&#34;</span>}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">32</span>        <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">33</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">34</span>        <span style="color:#586e75"># to avoid the warning of missing license</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">35</span>        spec<span style="color:#719e07">.</span>attributes_hash<span style="color:#719e07">[</span><span style="color:#2aa198">&#34;license&#34;</span><span style="color:#719e07">]</span> <span style="color:#719e07">=</span> {}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">36</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">37</span><span style="color:#719e07">end</span>
+</code></pre></div><p>关于这三步操作，分别做一些解答。</p>
 <p>第一步的清理工作是在执行原有逻辑前执行，是为了避免生成的旧的 targets 文件触发文件修改的警告。</p>
 <p>call original 后又执行了一次 <code>validate_every_pod_only_have_one_form</code>，虽然没有副作用，但目的是为了避免一些异常情况下，某些 pod 以源码的形式又出现在其他 target 中。</p>
 <p><strong>target_checker</strong> 中作者提到过 cocoapods-binary 有一个限制：</p>
@@ -876,175 +565,84 @@ if (!doNotTrack) {
 <p>因为 pod install 中 ，如果 podspec 指定了 <code>resource_bundles</code> ，Xcode 是会为我们生成 bundle target 的。而我们在 static framework 中已经生成并 copy 了，所以避免重复需要清除一下。</p>
 <h2 id="download-dependencies">download dependencies</h2>
 <p>这一步是 hook 了 <code>download_dependencies</code> 执行中会触发的一个方法：<code>install_source_of_pod</code></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-Ruby" data-lang="Ruby"><span class="n">old_method</span> <span class="o">=</span> <span class="nb">instance_method</span><span class="p">(</span><span class="ss">:install_source_of_pod</span><span class="p">)</span>
-<span class="n">define_method</span><span class="p">(</span><span class="ss">:install_source_of_pod</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">pod_name</span><span class="o">|</span>
-
-    <span class="c1"># original logic ...</span>
-    <span class="k">if</span> <span class="nb">self</span><span class="o">.</span><span class="n">prebuild_pod_names</span><span class="o">.</span><span class="n">include?</span> <span class="n">pod_name</span>
-        <span class="n">pod_installer</span><span class="o">.</span><span class="n">install_for_prebuild!</span><span class="p">(</span><span class="nb">self</span><span class="o">.</span><span class="n">sandbox</span><span class="p">)</span>
-    <span class="k">else</span>
-        <span class="n">pod_installer</span><span class="o">.</span><span class="n">install!</span>
-    <span class="k">end</span>
-    <span class="c1"># original logic ...</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>这里的目的是为跳过 binary pod 的下载，以及完成 symbol link 的操作。简化逻辑如下：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span><span class="lnt">33
-</span><span class="lnt">34
-</span><span class="lnt">35
-</span><span class="lnt">36
-</span><span class="lnt">37
-</span><span class="lnt">38
-</span><span class="lnt">39
-</span><span class="lnt">40
-</span><span class="lnt">41
-</span><span class="lnt">42
-</span><span class="lnt">43
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-Ruby" data-lang="Ruby"><span class="k">def</span> <span class="nf">install_for_prebuild!</span><span class="p">(</span><span class="n">standard_sanbox</span><span class="p">)</span>
-    <span class="k">return</span> <span class="k">if</span> <span class="n">standard_sanbox</span><span class="o">.</span><span class="n">local?</span> <span class="nb">self</span><span class="o">.</span><span class="n">name</span>
-
-    <span class="n">prebuild_sandbox</span> <span class="o">=</span> <span class="no">Pod</span><span class="o">::</span><span class="no">PrebuildSandbox</span><span class="o">.</span><span class="n">from_standard_sandbox</span><span class="p">(</span><span class="n">standard_sanbox</span><span class="p">)</span>
-    <span class="n">target_names</span> <span class="o">=</span> <span class="n">prebuild_sandbox</span><span class="o">.</span><span class="n">existed_target_names_for_pod_name</span><span class="p">(</span><span class="nb">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-    
-    <span class="n">target_names</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="nb">name</span><span class="o">|</span>
-
-        <span class="n">real_file_folder</span> <span class="o">=</span> <span class="n">prebuild_sandbox</span><span class="o">.</span><span class="n">framework_folder_path_for_target_name</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
-                
-        <span class="n">target_folder</span> <span class="o">=</span> <span class="n">standard_sanbox</span><span class="o">.</span><span class="n">pod_dir</span><span class="p">(</span><span class="nb">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">target_names</span><span class="o">.</span><span class="n">count</span> <span class="o">&gt;</span> <span class="mi">1</span> 
-            <span class="n">target_folder</span> <span class="o">+=</span> <span class="n">real_file_folder</span><span class="o">.</span><span class="n">basename</span>
-        <span class="k">end</span>
-        <span class="n">target_folder</span><span class="o">.</span><span class="n">rmtree</span> <span class="k">if</span> <span class="n">target_folder</span><span class="o">.</span><span class="n">exist?</span>
-        <span class="n">target_folder</span><span class="o">.</span><span class="n">mkpath</span>
-
-
-        <span class="n">walk</span><span class="p">(</span><span class="n">real_file_folder</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">child</span><span class="o">|</span>
-            <span class="n">source</span> <span class="o">=</span> <span class="n">child</span>
-            <span class="c1"># only make symlink to file and `.framework` folder</span>
-            <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">directory?</span> <span class="ow">and</span> <span class="o">[</span><span class="s2">&#34;.framework&#34;</span><span class="p">,</span> <span class="s2">&#34;.dSYM&#34;</span><span class="o">].</span><span class="n">include?</span> <span class="n">child</span><span class="o">.</span><span class="n">extname</span>
-                <span class="n">mirror_with_symlink</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">real_file_folder</span><span class="p">,</span> <span class="n">target_folder</span><span class="p">)</span>
-                <span class="k">next</span> <span class="kp">false</span>  <span class="c1"># return false means don&#39;t go deeper</span>
-            <span class="k">elsif</span> <span class="n">child</span><span class="o">.</span><span class="n">file?</span>
-                <span class="n">mirror_with_symlink</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">real_file_folder</span><span class="p">,</span> <span class="n">target_folder</span><span class="p">)</span>
-                <span class="k">next</span> <span class="kp">true</span>
-            <span class="k">else</span>
-                <span class="k">next</span> <span class="kp">true</span>
-            <span class="k">end</span>
-        <span class="k">end</span>
-
-        <span class="c1"># symbol link copy resource for static framework</span>
-        <span class="nb">hash</span> <span class="o">=</span> <span class="no">Prebuild</span><span class="o">::</span><span class="no">Passer</span><span class="o">.</span><span class="n">resources_to_copy_for_static_framework</span> <span class="o">||</span> <span class="p">{}</span>
-        
-        <span class="n">path_objects</span> <span class="o">=</span> <span class="nb">hash</span><span class="o">[</span><span class="nb">name</span><span class="o">]</span>
-        <span class="k">if</span> <span class="n">path_objects</span> <span class="o">!=</span> <span class="kp">nil</span>
-            <span class="n">path_objects</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">object</span><span class="o">|</span>
-                <span class="n">make_link</span><span class="p">(</span><span class="n">object</span><span class="o">.</span><span class="n">real_file_path</span><span class="p">,</span> <span class="n">object</span><span class="o">.</span><span class="n">target_file_path</span><span class="p">)</span>
-            <span class="k">end</span>
-        <span class="k">end</span>
-    <span class="k">end</span> <span class="c1"># of for each </span>
-<span class="k">end</span> <span class="c1"># of method</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>核心是 <strong>walk</strong> 方法，它遍历每个 static framework 目录下的文件和 <code>.framework</code> 文件夹，将其作为 <code>Pods</code> 目录下对应文件的引用。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Ruby" data-lang="Ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span>old_method <span style="color:#719e07">=</span> <span style="color:#b58900">instance_method</span>(<span style="color:#2aa198">:install_source_of_pod</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>define_method(<span style="color:#2aa198">:install_source_of_pod</span>) <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>pod_name<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>    <span style="color:#586e75"># original logic ...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>    <span style="color:#719e07">if</span> <span style="color:#b58900">self</span><span style="color:#719e07">.</span>prebuild_pod_names<span style="color:#719e07">.</span>include? pod_name
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>        pod_installer<span style="color:#719e07">.</span>install_for_prebuild!(<span style="color:#b58900">self</span><span style="color:#719e07">.</span>sandbox)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>    <span style="color:#719e07">else</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>        pod_installer<span style="color:#719e07">.</span>install!
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>    <span style="color:#586e75"># original logic ...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span><span style="color:#719e07">end</span>
+</code></pre></div><p>这里的目的是为跳过 binary pod 的下载，以及完成 symbol link 的操作。简化逻辑如下：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Ruby" data-lang="Ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">def</span> <span style="color:#268bd2">install_for_prebuild!</span>(standard_sanbox)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>    <span style="color:#719e07">return</span> <span style="color:#719e07">if</span> standard_sanbox<span style="color:#719e07">.</span>local? <span style="color:#b58900">self</span><span style="color:#719e07">.</span>name
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>    prebuild_sandbox <span style="color:#719e07">=</span> <span style="color:#cb4b16">Pod</span><span style="color:#719e07">::</span><span style="color:#cb4b16">PrebuildSandbox</span><span style="color:#719e07">.</span>from_standard_sandbox(standard_sanbox)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>    target_names <span style="color:#719e07">=</span> prebuild_sandbox<span style="color:#719e07">.</span>existed_target_names_for_pod_name(<span style="color:#b58900">self</span><span style="color:#719e07">.</span>name)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>    
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>    target_names<span style="color:#719e07">.</span>each <span style="color:#719e07">do</span> <span style="color:#719e07">|</span><span style="color:#b58900">name</span><span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>        real_file_folder <span style="color:#719e07">=</span> prebuild_sandbox<span style="color:#719e07">.</span>framework_folder_path_for_target_name(<span style="color:#b58900">name</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>                
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>        target_folder <span style="color:#719e07">=</span> standard_sanbox<span style="color:#719e07">.</span>pod_dir(<span style="color:#b58900">self</span><span style="color:#719e07">.</span>name)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>        <span style="color:#719e07">if</span> target_names<span style="color:#719e07">.</span>count <span style="color:#719e07">&gt;</span> <span style="color:#2aa198">1</span> 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>            target_folder <span style="color:#719e07">+=</span> real_file_folder<span style="color:#719e07">.</span>basename
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>        <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>        target_folder<span style="color:#719e07">.</span>rmtree <span style="color:#719e07">if</span> target_folder<span style="color:#719e07">.</span>exist?
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>        target_folder<span style="color:#719e07">.</span>mkpath
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>        walk(real_file_folder) <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>child<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>            source <span style="color:#719e07">=</span> child
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span>            <span style="color:#586e75"># only make symlink to file and `.framework` folder</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">22</span>            <span style="color:#719e07">if</span> child<span style="color:#719e07">.</span>directory? <span style="color:#719e07">and</span> <span style="color:#719e07">[</span><span style="color:#2aa198">&#34;.framework&#34;</span>, <span style="color:#2aa198">&#34;.dSYM&#34;</span><span style="color:#719e07">].</span>include? child<span style="color:#719e07">.</span>extname
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">23</span>                mirror_with_symlink(source, real_file_folder, target_folder)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">24</span>                <span style="color:#719e07">next</span> <span style="color:#719e07">false</span>  <span style="color:#586e75"># return false means don&#39;t go deeper</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">25</span>            <span style="color:#719e07">elsif</span> child<span style="color:#719e07">.</span>file?
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">26</span>                mirror_with_symlink(source, real_file_folder, target_folder)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">27</span>                <span style="color:#719e07">next</span> <span style="color:#719e07">true</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">28</span>            <span style="color:#719e07">else</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">29</span>                <span style="color:#719e07">next</span> <span style="color:#719e07">true</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">30</span>            <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">31</span>        <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">32</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">33</span>        <span style="color:#586e75"># symbol link copy resource for static framework</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">34</span>        <span style="color:#b58900">hash</span> <span style="color:#719e07">=</span> <span style="color:#cb4b16">Prebuild</span><span style="color:#719e07">::</span><span style="color:#cb4b16">Passer</span><span style="color:#719e07">.</span>resources_to_copy_for_static_framework <span style="color:#719e07">||</span> {}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">35</span>        
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">36</span>        path_objects <span style="color:#719e07">=</span> <span style="color:#b58900">hash</span><span style="color:#719e07">[</span><span style="color:#b58900">name</span><span style="color:#719e07">]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">37</span>        <span style="color:#719e07">if</span> path_objects <span style="color:#719e07">!=</span> <span style="color:#719e07">nil</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">38</span>            path_objects<span style="color:#719e07">.</span>each <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>object<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">39</span>                make_link(object<span style="color:#719e07">.</span>real_file_path, object<span style="color:#719e07">.</span>target_file_path)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">40</span>            <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">41</span>        <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">42</span>    <span style="color:#719e07">end</span> <span style="color:#586e75"># of for each </span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">43</span><span style="color:#719e07">end</span> <span style="color:#586e75"># of method</span>
+</code></pre></div><p>核心是 <strong>walk</strong> 方法，它遍历每个 static framework 目录下的文件和 <code>.framework</code> 文件夹，将其作为 <code>Pods</code> 目录下对应文件的引用。</p>
 <h2 id="embedframeworksscript">EmbedFrameworksScript</h2>
 <p>这一步是为了解决 symbol link 后，对于 embeded framework 中产生的问题。<code>embedded framework</code> 是苹果在 iOS 8 后提出的代码共享方案，为了解决宿主 App 和 Extensions 的代码共用而产生的。详细 <a href="https://medium.com/hootsuite-engineering/an-introduction-to-creating-and-distributing-embedded-frameworks-in-ios-367b7a45a304">medium</a> 文章；</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-Ruby" data-lang="Ruby"><span class="n">old_method</span> <span class="o">=</span> <span class="nb">instance_method</span><span class="p">(</span><span class="ss">:script</span><span class="p">)</span>
-<span class="n">define_method</span><span class="p">(</span><span class="ss">:script</span><span class="p">)</span> <span class="k">do</span>
-
-    <span class="n">script</span> <span class="o">=</span> <span class="n">old_method</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span><span class="o">.</span><span class="p">()</span>
-    <span class="n">patch</span> <span class="o">=</span> <span class="s">&lt;&lt;-SH.strip_heredoc
-</span><span class="s"></span>        <span class="c1">#!/bin/sh</span>
-        <span class="n">old_read_link</span><span class="o">=</span><span class="sb">`which readlink`</span>
-        <span class="n">readlink</span> <span class="p">()</span> <span class="p">{</span>
-            <span class="n">path</span><span class="o">=</span><span class="sb">`$old_read_link $1`</span><span class="p">;</span>
-            <span class="k">if</span> <span class="o">[</span> <span class="err">$</span><span class="p">(</span><span class="n">echo</span> <span class="s2">&#34;$path&#34;</span> <span class="o">|</span> <span class="n">cut</span> <span class="o">-</span><span class="n">c</span> <span class="mi">1</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
-                <span class="n">echo</span> <span class="vg">$path</span><span class="p">;</span>
-            <span class="k">else</span>
-                <span class="n">echo</span> <span class="s2">&#34;`dirname $1`/$path&#34;</span><span class="p">;</span>
-            <span class="n">fi</span>
-        <span class="p">}</span>
-    <span class="no">SH</span>
-    <span class="n">script</span> <span class="o">=</span> <span class="n">script</span><span class="o">.</span><span class="n">gsub</span> <span class="s2">&#34;rsync --delete&#34;</span><span class="p">,</span> <span class="s2">&#34;rsync --copy-links --delete&#34;</span>    
-    <span class="n">patch</span> <span class="o">+</span> <span class="n">script</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>上一步中把 pod target 文件夹中的 framework 文件改成了相对路径的 symblink，而 EmbedFrameworksScript 是通过 <code>readlink</code> 的方式来读取路径，它对相对路径的处理不太好，这里需要重写。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Ruby" data-lang="Ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span>old_method <span style="color:#719e07">=</span> <span style="color:#b58900">instance_method</span>(<span style="color:#2aa198">:script</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>define_method(<span style="color:#2aa198">:script</span>) <span style="color:#719e07">do</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>    script <span style="color:#719e07">=</span> old_method<span style="color:#719e07">.</span>bind(<span style="color:#b58900">self</span>)<span style="color:#719e07">.</span>()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>    patch <span style="color:#719e07">=</span> <span style="color:#2aa198">&lt;&lt;-SH.strip_heredoc
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span><span style="color:#2aa198"></span>        <span style="color:#586e75">#!/bin/sh</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>        old_read_link<span style="color:#719e07">=</span><span style="color:#586e75">`which readlink`</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>        readlink () {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>            path<span style="color:#719e07">=</span><span style="color:#586e75">`$old_read_link $1`</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>            <span style="color:#719e07">if</span> <span style="color:#719e07">[</span> $(echo <span style="color:#2aa198">&#34;$path&#34;</span> <span style="color:#719e07">|</span> cut <span style="color:#719e07">-</span>c <span style="color:#2aa198">1</span><span style="color:#719e07">-</span><span style="color:#2aa198">1</span>) <span style="color:#719e07">=</span> <span style="color:#2aa198">&#39;/&#39;</span> <span style="color:#719e07">]</span>; <span style="color:#719e07">then</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>                echo $path;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>            <span style="color:#719e07">else</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>                echo <span style="color:#2aa198">&#34;`dirname $1`/$path&#34;</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>            fi
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>        }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>    <span style="color:#cb4b16">SH</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>    script <span style="color:#719e07">=</span> script<span style="color:#719e07">.</span>gsub <span style="color:#2aa198">&#34;rsync --delete&#34;</span>, <span style="color:#2aa198">&#34;rsync --copy-links --delete&#34;</span>    
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>    patch <span style="color:#719e07">+</span> script
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span><span style="color:#719e07">end</span>
+</code></pre></div><p>上一步中把 pod target 文件夹中的 framework 文件改成了相对路径的 symblink，而 EmbedFrameworksScript 是通过 <code>readlink</code> 的方式来读取路径，它对相对路径的处理不太好，这里需要重写。</p>
 <p>重写其实就是在把相对路径改为绝对路径。</p>
 <h2 id="流程图">流程图</h2>
 <p>最后贴一下，梳理的流程图：</p>
@@ -1087,7 +685,7 @@ if (!doNotTrack) {
   
   <nav class="post-nav">
      
-    <a class="next" href="https://looseyi.github.io/post/sourcecode-cocoapods/09-cocoapods-xcode-object/"><span>9. Xcode 工程文件编辑</span><span>→</span></a>
+    <a class="next" href="https://looseyi.github.io/post/sourcecode-cocoapods/09-cocoapods-xcodeproj-edit/"><span>9. Xcode 工程文件编辑</span><span>→</span></a>
     
   </nav>
   

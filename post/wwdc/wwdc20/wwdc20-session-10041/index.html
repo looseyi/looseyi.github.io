@@ -95,7 +95,7 @@ if (!doNotTrack) {
   <meta itemprop="name" content="WWDC20 - What&#39;s new in SwiftUI">
 <meta itemprop="description" content="WWDC 2020 Session 10041 - What&rsquo;s new in SwiftUI 本文知识目录 对于 iOS 开发而言， WWDC 2019 中推出的 SwiftUI 无疑是最受关注的一项技术，它可以在所有 Apple 平台上构建出色的用户界面。而今年我们迎来"><meta itemprop="datePublished" content="2020-06-26T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2020-06-26T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="5010">
+<meta itemprop="wordCount" content="4991">
 <meta itemprop="keywords" content="iOS&#39;,WWDC&#39;,SwiftUI," />
   
   <meta name="twitter:card" content="summary"/>
@@ -286,91 +286,46 @@ if (!doNotTrack) {
 <p>现在，让我们跳到 SwiftUI 对 toolbar 的支持以及自定义控件的新方法。</p>
 <h2 id="toolbar">Toolbar</h2>
 <p>从 macOS Big Sur 中漂亮的外观到更新的 iPad 系统体验，再到 watchOS 上的 primary actions。今年，我们可使用 SwiftUI 新增的 <code>.toolbar</code> 修饰符构造所有这些API：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span><span class="lnt">33
-</span><span class="lnt">34
-</span><span class="lnt">35
-</span><span class="lnt">36
-</span><span class="lnt">37
-</span><span class="lnt">38
-</span><span class="lnt">39
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="c1">// Toolbar</span>
-<span class="n">BookList</span><span class="p">()</span>
-	<span class="p">.</span><span class="n">toolbar</span> <span class="p">{</span> <span class="c1">// #1</span>
-		<span class="n">Button</span><span class="p">(</span><span class="n">action</span><span class="p">:</span> <span class="p">.</span><span class="n">recordProgress</span><span class="p">)</span> <span class="p">{</span>
-			<span class="n">Label</span><span class="p">(</span><span class="s">&#34;Record Progress&#34;</span><span class="p">,</span> <span class="n">systemImage</span><span class="p">:</span> <span class="s">&#34;book.circle&#34;</span><span class="p">)</span>
-		<span class="p">}</span>
-	<span class="p">}</span>
-      
-<span class="n">BookList</span><span class="p">()</span>
-	<span class="p">.</span><span class="n">toolbar</span> <span class="p">{</span> <span class="c1">// #2 和 #1 是同等效果</span>
-		<span class="n">ToolbarItem</span><span class="p">(</span><span class="n">placement</span><span class="p">:</span> <span class="p">.</span><span class="n">primaryAction</span><span class="p">)</span> <span class="p">{</span>
-         <span class="n">Button</span><span class="p">(</span><span class="n">action</span><span class="p">:</span> <span class="n">recordProgress</span><span class="p">)</span> <span class="p">{</span>
-				<span class="n">Label</span><span class="p">(</span><span class="s">&#34;Record Progress&#34;</span><span class="p">,</span> <span class="n">systemImage</span><span class="p">:</span> <span class="s">&#34;book.circle&#34;</span><span class="p">)</span>
-      	<span class="p">}</span>
-		<span class="p">}</span>
-	<span class="p">}</span>
-      
-<span class="n">BookList</span><span class="p">()</span>
-	<span class="p">.</span><span class="n">toolbar</span> <span class="p">{</span> <span class="c1">// #3</span>
-		<span class="n">ToolbarItem</span><span class="p">(</span><span class="n">placement</span><span class="p">:</span> <span class="p">.</span><span class="n">confirmationAction</span><span class="p">)</span> <span class="p">{</span> 
-			<span class="n">Button</span><span class="p">(</span><span class="s">&#34;Save&#34;</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="n">saveProgress</span><span class="p">)</span>
-		<span class="p">}</span>
-      <span class="n">ToolbarItem</span><span class="p">(</span><span class="n">placement</span><span class="p">:</span> <span class="p">.</span><span class="n">cancellationAction</span><span class="p">)</span> <span class="p">{}</span>
-			<span class="n">Button</span><span class="p">(</span><span class="s">&#34;Cacnel&#34;</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="n">dismissSheet</span><span class="p">)</span>
-		<span class="p">}</span>
-	<span class="p">}</span>
-<span class="n">BooDetail</span><span class="p">()</span>
-	<span class="p">.</span><span class="n">toolbar</span> <span class="p">{</span> <span class="c1">// #4</span>
-      <span class="n">ToolbarItem</span> <span class="p">{</span>
-         <span class="n">Button</span><span class="p">(</span><span class="n">action</span><span class="p">:</span> <span class="n">recordProgress</span><span class="p">)</span> <span class="p">{</span>
-            <span class="n">Label</span><span class="p">(</span><span class="s">&#34;Progress&#34;</span><span class="p">,</span> <span class="n">systemImage</span><span class="p">:</span> <span class="s">&#34;book.circle&#34;</span><span class="p">)</span>
-         <span class="p">}</span>         
-      <span class="p">}</span>
-      <span class="n">ToolbarItem</span><span class="p">(</span><span class="n">placement</span><span class="p">:</span> <span class="p">.</span><span class="n">bottomBar</span><span class="p">)</span>
-      	<span class="n">Button</span><span class="p">(</span><span class="n">action</span><span class="p">:</span> <span class="p">.</span><span class="n">shareBook</span><span class="p">)</span> <span class="p">{</span>
-				<span class="n">Label</span><span class="p">(</span><span class="s">&#34;Share&#34;</span><span class="p">,</span> <span class="n">systemImage</span><span class="p">:</span> <span class="s">&#34;square.and.arrow.up&#34;</span><span class="p">)</span>
-      	<span class="p">}</span>
-      <span class="p">}</span>
-	<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>上述代码的效果如下：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#586e75">// Toolbar</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>BookList()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>	.toolbar { <span style="color:#586e75">// #1</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>		Button(action: .recordProgress) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>			Label(<span style="color:#2aa198">&#34;Record Progress&#34;</span>, systemImage: <span style="color:#2aa198">&#34;book.circle&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>		}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>	}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>      
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>BookList()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>	.toolbar { <span style="color:#586e75">// #2 和 #1 是同等效果</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>		ToolbarItem(placement: .primaryAction) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>         Button(action: recordProgress) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>				Label(<span style="color:#2aa198">&#34;Record Progress&#34;</span>, systemImage: <span style="color:#2aa198">&#34;book.circle&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>      	}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>		}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>	}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>      
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>BookList()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>	.toolbar { <span style="color:#586e75">// #3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>		ToolbarItem(placement: .confirmationAction) { 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span>			Button(<span style="color:#2aa198">&#34;Save&#34;</span>, action: saveProgress)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">22</span>		}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">23</span>      ToolbarItem(placement: .cancellationAction) {}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">24</span>			Button(<span style="color:#2aa198">&#34;Cacnel&#34;</span>, action: dismissSheet)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">25</span>		}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">26</span>	}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">27</span>BooDetail()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">28</span>	.toolbar { <span style="color:#586e75">// #4</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">29</span>      ToolbarItem {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">30</span>         Button(action: recordProgress) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">31</span>            Label(<span style="color:#2aa198">&#34;Progress&#34;</span>, systemImage: <span style="color:#2aa198">&#34;book.circle&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">32</span>         }         
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">33</span>      }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">34</span>      ToolbarItem(placement: .bottomBar)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">35</span>      	Button(action: .shareBook) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">36</span>				Label(<span style="color:#2aa198">&#34;Share&#34;</span>, systemImage: <span style="color:#2aa198">&#34;square.and.arrow.up&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">37</span>      	}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">38</span>      }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">39</span>	}
+</code></pre></div><p>上述代码的效果如下：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/14-toolbaritem.png" alt=""></p>
 <p>上面代码列出了构造一个 toolbar 的多种方式。toolbar items 与 SwiftUI 中的其他视图组成基本相同，在上面的几个例子中，均由 button 实现的。</p>
 <p>另一个示例是 <code>principal</code> 语义的使用，它将在应用程序的突出位置中显示，就像我们下面看到的：</p>
@@ -380,50 +335,25 @@ if (!doNotTrack) {
 <p>我们也可以指定放置的位置来进行额外的控制，尤其是对于相对较小的屏幕。例如，在 iOS 中通过指定分享 item 的 <code>.bottomBar</code> 位置等。</p>
 <h2 id="label">Label</h2>
 <p>在上面的示例代码中，你应该发现了 SwiftUI 中 Label 视图的新用法：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="n">Label</span> <span class="p">{</span>
-	<span class="n">Text</span><span class="p">(</span><span class="s">&#34;Progress&#34;</span><span class="p">)</span>
-<span class="p">}</span> <span class="n">icon</span><span class="p">:</span> <span class="p">{</span>
-	<span class="n">Image</span><span class="p">(</span><span class="n">systemName</span><span class="p">:</span> <span class="s">&#34;book.circle&#34;</span><span class="p">)</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p><code>Label</code> 现在可以是 <code>Text</code> 和 <code>Image</code> 的组合，我们不仅可以使用国际化的 Key 来配置不同语言的标题，还能利用 <code>system image</code> 和 <code>SF Symbol</code> 来设置图标。想了解更多 <code>SF Symbol 2.0</code> 请访问 <a href="https://developer.apple.com/videos/play/wwdc2020/10207">Session - 10207</a>。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>Label {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>	Text(<span style="color:#2aa198">&#34;Progress&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>} icon: {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>	Image(systemName: <span style="color:#2aa198">&#34;book.circle&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>}
+</code></pre></div><p><code>Label</code> 现在可以是 <code>Text</code> 和 <code>Image</code> 的组合，我们不仅可以使用国际化的 Key 来配置不同语言的标题，还能利用 <code>system image</code> 和 <code>SF Symbol</code> 来设置图标。想了解更多 <code>SF Symbol 2.0</code> 请访问 <a href="https://developer.apple.com/videos/play/wwdc2020/10207">Session - 10207</a>。</p>
 <p>对于前面的 toolbar 的示例，<code>Label</code> 默认仅会在按钮上显示出图标，而文本则用于辅助的目的。这一行为同样作用于 <code>menu list</code>。</p>
 <h3 id="label-list">Label List</h3>
 <p>我们的 <code>Label</code> 支持以列表展示啦。无论图标大小如何，本文都完美对齐，并且对于不同大小的的动态类型字体，<code>Label</code> 也能发挥作用。
 来看一段代码：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="n">List</span> <span class="p">{</span>
-	<span class="n">Label</span><span class="p">(</span><span class="s">&#34;Intruduction to SwiftUI&#34;</span><span class="p">,</span> 
-         <span class="n">systemImage</span><span class="p">:</span> <span class="s">&#34;hand.wawve&#34;</span><span class="p">)</span>
-   <span class="n">Label</span><span class="p">(</span><span class="s">&#34;SwiftUI Essentials&#34;</span><span class="p">,</span> 
-         <span class="n">systemImage</span><span class="p">:</span> <span class="s">&#34;handstudentdesk&#34;</span><span class="p">)</span>
-   <span class="n">Label</span><span class="p">(</span><span class="s">&#34;Data Essentials to SwiftUI&#34;</span><span class="p">,</span> 
-         <span class="n">systemImage</span><span class="p">:</span> <span class="s">&#34;flowchart&#34;</span><span class="p">)</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p><code>Label</code> 默认以 <code>large</code> 尺寸的布局展示。当更改为 <code>extraLarge</code> 时，图标和标题都会自动更新，而且能很好地重排文本和增加列表行。当然，还支持可以更大尺寸的 <code>accessibilityLarge</code>。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>List {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>	Label(<span style="color:#2aa198">&#34;Intruduction to SwiftUI&#34;</span>, 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>         systemImage: <span style="color:#2aa198">&#34;hand.wawve&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>   Label(<span style="color:#2aa198">&#34;SwiftUI Essentials&#34;</span>, 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>         systemImage: <span style="color:#2aa198">&#34;handstudentdesk&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>   Label(<span style="color:#2aa198">&#34;Data Essentials to SwiftUI&#34;</span>, 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span>         systemImage: <span style="color:#2aa198">&#34;flowchart&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">8</span>}
+</code></pre></div><p><code>Label</code> 默认以 <code>large</code> 尺寸的布局展示。当更改为 <code>extraLarge</code> 时，图标和标题都会自动更新，而且能很好地重排文本和增加列表行。当然，还支持可以更大尺寸的 <code>accessibilityLarge</code>。</p>
 <p>对于更大的字体，Label 会更新为文字环绕，以最大程度地增加可见文字的数量。</p>
 <p>对比效果如下：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/17-list%2520label.png" alt=""></p>
@@ -435,17 +365,9 @@ if (!doNotTrack) {
 <h2 id="new-views">New Views</h2>
 <h3 id="progressview">ProgressView</h3>
 <p>SwiftUI 现在支持 <code>ProgressView</code> 了，它不仅支持线性样式，还带来了环形样式。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="n">ProgressView</span><span class="p">(</span><span class="s">&#34;Downloading Photo&#34;</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">percentComplet</span><span class="p">)</span>
-	<span class="p">.</span><span class="n">progressViewStyle</span><span class="p">(</span><span class="n">CircularProgressViewStyle</span><span class="p">(</span><span class="n">tint</span><span class="p">:</span> <span class="p">.</span><span class="n">blue</span><span class="p">))</span>
-</code></pre></td></tr></table>
-</div>
-</div><h3 id="gauges">Gauges</h3>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>ProgressView(<span style="color:#2aa198">&#34;Downloading Photo&#34;</span>, value: percentComplet)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>	.progressViewStyle(CircularProgressViewStyle(tint: .blue))
+</code></pre></div><h3 id="gauges">Gauges</h3>
 <p>对于 <code>watchOS 7+</code> 现在可以在 SwiftUI 获取仪表盘视图了。</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/20-guage.jpg" alt=""></p>
 <p>对于 <code>Guage</code> 视图，我们可以对 minimum 和 maximum 值进行可选设置来控制是否显示。</p>
@@ -469,69 +391,35 @@ if (!doNotTrack) {
 <h3 id="dynamic-type-scaling">Dynamic Type Scaling</h3>
 <p>现在在 SwiftUI 中，图像可以作为文本的一部分嵌入其中，并且作为统一的整理来响应动态的变化。</p>
 <p>这里其实是通过一个新的属性包装器 <code>ScaledMetric</code>，来描述自定义的非文本度量标准 (例如布局) <code>ScaledMetric</code> 会根据当前的基准值来自动缩放尺寸。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="c1">// Dynamic Type Scaling</span>
-<span class="p">@</span><span class="n">ScaledMetric</span> <span class="kd">private</span> <span class="kd">var</span> <span class="nv">padding</span><span class="p">:</span> <span class="n">CGFloat</span> <span class="p">=</span> <span class="mf">10.0</span>
-<span class="n">VStack</span> <span class="p">{</span>
-	<span class="n">Text</span><span class="p">(</span><span class="n">albmu</span><span class="p">.</span><span class="n">nmae</span><span class="p">)</span>
-		<span class="p">.</span><span class="n">font</span><span class="p">(.</span><span class="n">custom</span><span class="p">(</span><span class="s">&#34;AvenirNext-Regular&#34;</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="mi">30</span><span class="p">))</span>
-		
-	<span class="n">Text</span><span class="p">(</span><span class="s">&#34;</span><span class="si">\(</span><span class="n">Image</span><span class="si">(</span><span class="n">systemName</span><span class="p">:</span> <span class="s">&#34;music.mic&#34;</span><span class="si">))</span><span class="s"> </span><span class="si">\(</span><span class="n">album</span><span class="p">.</span><span class="n">artist</span><span class="si">)</span><span class="s">&#34;</span><span class="p">)</span>
-		<span class="p">.</span><span class="n">font</span><span class="p">(.</span><span class="n">custom</span><span class="p">(</span><span class="s">&#34;AvenirNext-Regular&#34;</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="mi">17</span><span class="p">))</span>
-<span class="p">}</span>
-<span class="p">.</span><span class="n">padding</span><span class="p">(</span><span class="n">padding</span><span class="p">)</span>
-<span class="p">.</span><span class="n">background</span><span class="p">(...)</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>缩放效果如下：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#586e75">// Dynamic Type Scaling</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>@ScaledMetric <span style="color:#268bd2">private</span> <span style="color:#268bd2">var</span> <span style="color:#268bd2">padding</span>: CGFloat = <span style="color:#2aa198">10.0</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>VStack {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>	Text(albmu.nmae)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>		.font(.custom(<span style="color:#2aa198">&#34;AvenirNext-Regular&#34;</span>, size: <span style="color:#2aa198">30</span>))
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>		
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>	Text(<span style="color:#2aa198">&#34;</span><span style="color:#2aa198">\(</span>Image<span style="color:#2aa198">(</span>systemName: <span style="color:#2aa198">&#34;music.mic&#34;</span><span style="color:#2aa198">))</span><span style="color:#2aa198"> </span><span style="color:#2aa198">\(</span>album.artist<span style="color:#2aa198">)</span><span style="color:#2aa198">&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>		.font(.custom(<span style="color:#2aa198">&#34;AvenirNext-Regular&#34;</span>, size: <span style="color:#2aa198">17</span>))
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>.padding(padding)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>.background(...)
+</code></pre></div><p>缩放效果如下：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/25-dynamicTypeScaling.png" alt=""></p>
 <p>总之，通过这些使得基于响应式的自定义布局变得很容易，同时又具有良好的表现。当然，我们能做的不止于此，即使是系统控件，也能随心所欲的自定义它们的样式。</p>
 <p>哦，对了。颜色也是同样可以自定义的。</p>
 <h3 id="list-item-tinting">List Item Tinting</h3>
 <p>最后再介绍一个列表元素的 tineColor，现在我们可以针对不同的 item 轻松配置不同的 tintingColor。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="n">List</span> <span class="p">{</span>
-	<span class="n">Section</span> <span class="p">{</span>
-		<span class="n">Label</span><span class="p">(</span><span class="s">&#34;Menu&#34;</span><span class="p">,</span> <span class="n">systemImage</span><span class="p">:</span> <span class="s">&#34;list.bullet&#34;</span><span class="p">)</span>
-		<span class="n">Label</span><span class="p">(</span><span class="s">&#34;Menu&#34;</span><span class="p">,</span> <span class="n">systemImage</span><span class="p">:</span> <span class="s">&#34;heart&#34;</span><span class="p">)</span>
-			<span class="p">.</span><span class="n">listItemTine</span><span class="p">(.</span><span class="n">red</span><span class="p">)</span>				
-		<span class="n">Label</span><span class="p">(</span><span class="s">&#34;Menu&#34;</span><span class="p">,</span> <span class="n">systemImage</span><span class="p">:</span> <span class="s">&#34;seal&#34;</span><span class="p">)</span>
-			<span class="p">.</span><span class="n">listItemTine</span><span class="p">(.</span><span class="n">purple</span><span class="p">)</span>		
-	<span class="p">}</span>
-	<span class="n">Section</span><span class="p">(</span><span class="n">header</span><span class="p">:</span> <span class="n">Text</span><span class="p">(</span><span class="s">&#34;Recipes&#34;</span><span class="p">))</span> <span class="p">{...</span> <span class="p">}</span>
-		<span class="p">.</span><span class="n">listItemTine</span><span class="p">(.</span><span class="n">monochrome</span><span class="p">)</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>对比效果：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span>List {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>	Section {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>		Label(<span style="color:#2aa198">&#34;Menu&#34;</span>, systemImage: <span style="color:#2aa198">&#34;list.bullet&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>		Label(<span style="color:#2aa198">&#34;Menu&#34;</span>, systemImage: <span style="color:#2aa198">&#34;heart&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>			.listItemTine(.red)				
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>		Label(<span style="color:#2aa198">&#34;Menu&#34;</span>, systemImage: <span style="color:#2aa198">&#34;seal&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>			.listItemTine(.purple)		
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>	}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>	Section(header: Text(<span style="color:#2aa198">&#34;Recipes&#34;</span>)) {... }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>		.listItemTine(.monochrome)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>}
+</code></pre></div><p>对比效果：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/30-List%2520Item%2520Tinting.png" alt=""></p>
 <h1 id="system-integration">System Integration</h1>
 <p>最后一节，来简单聊一聊，SwiftUI 与系统的深度集成。</p>

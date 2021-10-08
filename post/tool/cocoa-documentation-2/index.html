@@ -95,7 +95,7 @@ if (!doNotTrack) {
   <meta itemprop="name" content="Cocoa 文档注释与生成工具使用 - Jazzy &#43; SourceKitten">
 <meta itemprop="description" content="我们在前文 《Cocoa 代码注释与文档生成》 中详细介绍了如何为 Swift &amp; ObjC 的代码编写符合规范的注释，以及使用 Jazzy 来生成项目文档。 今天我们来尝试一下，如"><meta itemprop="datePublished" content="2020-06-18T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2020-06-18T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="4168">
+<meta itemprop="wordCount" content="4098">
 <meta itemprop="keywords" content="iOS&#39;,Document,SourceKit,Jazzy,gitpage," />
   
   <meta name="twitter:card" content="summary"/>
@@ -211,75 +211,38 @@ if (!doNotTrack) {
 <p>我们要做的就是往 <code>index.html</code> 内添加含对应的标签，并将标签链接指向各个依赖库的文档地址就可以了。</p>
 <h2 id="索引页">索引页</h2>
 <p>下面是我们需要修改的代码，完整的 index.html 模版可访问 <a href="https://github.com/looseyi/jazzy-template/blob/master/index/index.html">Jazzy-template</a>。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;content-wrapper&#34;</span><span class="p">&gt;</span>
-    ...
-    <span class="p">&lt;</span><span class="nt">article</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;main-content&#34;</span><span class="p">&gt;</span>
-    <span class="p">&lt;</span><span class="nt">section</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;section&#34;</span><span class="p">&gt;</span>
-        <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;section-content top-matter&#34;</span><span class="p">&gt;</span>
-            <span class="p">&lt;</span><span class="nt">h3</span> <span class="na">id</span><span class="o">=</span><span class="s">&#39;authors&#39;</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;heading&#39;</span><span class="p">&gt;</span>业务库<span class="p">&lt;/</span><span class="nt">h3</span><span class="p">&gt;</span>
-        <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-    <span class="p">&lt;/</span><span class="nt">section</span><span class="p">&gt;</span>
-    <span class="p">&lt;</span><span class="nt">section</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;section&#34;</span><span class="p">&gt;</span>
-        <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;section-content&#34;</span><span class="p">&gt;</span>
-        <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;task-group&#34;</span><span class="p">&gt;</span>
-            <span class="p">&lt;</span><span class="nt">ul</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;item-container&#34;</span><span class="p">&gt;</span>
-	            <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;</span>token-business<span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
-            <span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
-        <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-        <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-    <span class="p">&lt;/</span><span class="nt">section</span><span class="p">&gt;</span>
-    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;section-content top-matter&#34;</span><span class="p">&gt;</span>
-        <span class="p">&lt;</span><span class="nt">h3</span> <span class="na">id</span><span class="o">=</span><span class="s">&#39;authors&#39;</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;heading&#39;</span><span class="p">&gt;</span>基础库<span class="p">&lt;/</span><span class="nt">h3</span><span class="p">&gt;</span>
-    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-    <span class="p">&lt;</span><span class="nt">section</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;section&#34;</span><span class="p">&gt;</span>
-        <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;section-content&#34;</span><span class="p">&gt;</span>
-        <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;task-group&#34;</span><span class="p">&gt;</span>
-            <span class="p">&lt;</span><span class="nt">ul</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;item-container&#34;</span><span class="p">&gt;</span>
-            <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;</span>token-base<span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
-            <span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
-        <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-        <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-    <span class="p">&lt;/</span><span class="nt">section</span><span class="p">&gt;</span>
-    <span class="p">&lt;/</span><span class="nt">article</span><span class="p">&gt;</span>
-<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>要修改的就是上面的 <code>&lt;li&gt;token-*&lt;/lib&gt;</code> 元素，这里留的默认 token 是为了方便替换。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span>&lt;<span style="color:#268bd2">div</span> class<span style="color:#719e07">=</span><span style="color:#2aa198">&#34;content-wrapper&#34;</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>    ...
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>    &lt;<span style="color:#268bd2">article</span> class<span style="color:#719e07">=</span><span style="color:#2aa198">&#34;main-content&#34;</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>    &lt;<span style="color:#268bd2">section</span> class<span style="color:#719e07">=</span><span style="color:#2aa198">&#34;section&#34;</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>        &lt;<span style="color:#268bd2">div</span> class<span style="color:#719e07">=</span><span style="color:#2aa198">&#34;section-content top-matter&#34;</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>            &lt;<span style="color:#268bd2">h3</span> id<span style="color:#719e07">=</span><span style="color:#2aa198">&#39;authors&#39;</span> class<span style="color:#719e07">=</span><span style="color:#2aa198">&#39;heading&#39;</span>&gt;业务库&lt;/<span style="color:#268bd2">h3</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>        &lt;/<span style="color:#268bd2">div</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>    &lt;/<span style="color:#268bd2">section</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>    &lt;<span style="color:#268bd2">section</span> class<span style="color:#719e07">=</span><span style="color:#2aa198">&#34;section&#34;</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>        &lt;<span style="color:#268bd2">div</span> class<span style="color:#719e07">=</span><span style="color:#2aa198">&#34;section-content&#34;</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>        &lt;<span style="color:#268bd2">div</span> class<span style="color:#719e07">=</span><span style="color:#2aa198">&#34;task-group&#34;</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>            &lt;<span style="color:#268bd2">ul</span> class<span style="color:#719e07">=</span><span style="color:#2aa198">&#34;item-container&#34;</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>	            &lt;<span style="color:#268bd2">li</span>&gt;token-business&lt;/<span style="color:#268bd2">li</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>            &lt;/<span style="color:#268bd2">ul</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>        &lt;/<span style="color:#268bd2">div</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>        &lt;/<span style="color:#268bd2">div</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>    &lt;/<span style="color:#268bd2">section</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>    &lt;<span style="color:#268bd2">div</span> class<span style="color:#719e07">=</span><span style="color:#2aa198">&#34;section-content top-matter&#34;</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>        &lt;<span style="color:#268bd2">h3</span> id<span style="color:#719e07">=</span><span style="color:#2aa198">&#39;authors&#39;</span> class<span style="color:#719e07">=</span><span style="color:#2aa198">&#39;heading&#39;</span>&gt;基础库&lt;/<span style="color:#268bd2">h3</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>    &lt;/<span style="color:#268bd2">div</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span>    &lt;<span style="color:#268bd2">section</span> class<span style="color:#719e07">=</span><span style="color:#2aa198">&#34;section&#34;</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">22</span>        &lt;<span style="color:#268bd2">div</span> class<span style="color:#719e07">=</span><span style="color:#2aa198">&#34;section-content&#34;</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">23</span>        &lt;<span style="color:#268bd2">div</span> class<span style="color:#719e07">=</span><span style="color:#2aa198">&#34;task-group&#34;</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">24</span>            &lt;<span style="color:#268bd2">ul</span> class<span style="color:#719e07">=</span><span style="color:#2aa198">&#34;item-container&#34;</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">25</span>            &lt;<span style="color:#268bd2">li</span>&gt;token-base&lt;/<span style="color:#268bd2">li</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">26</span>            &lt;/<span style="color:#268bd2">ul</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">27</span>        &lt;/<span style="color:#268bd2">div</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">28</span>        &lt;/<span style="color:#268bd2">div</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">29</span>    &lt;/<span style="color:#268bd2">section</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">30</span>    &lt;/<span style="color:#268bd2">article</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">31</span>&lt;/<span style="color:#268bd2">div</span>&gt;
+</code></pre></div><p>要修改的就是上面的 <code>&lt;li&gt;token-*&lt;/lib&gt;</code> 元素，这里留的默认 token 是为了方便替换。</p>
 <h3 id="业务库">业务库</h3>
 <p>由于业务库逻辑一般会比较多，如果和基础库文档放一起，可能会导致生成文档的太大，Github Page 无法正常解析。因此，需要单独的文档仓库来存放文档。</p>
 <h3 id="基础库">基础库</h3>
@@ -300,61 +263,26 @@ if (!doNotTrack) {
 <h2 id="swift-依赖库的文档生成">Swift 依赖库的文档生成</h2>
 <p>之前在 <a href="https://juejin.im/post/5ee70d7ff265da76d66c3c60">《Cocoa 代码注释与文档生成》</a> 中介绍的 Swift 的文档生成都是基于该项目的 <code>project</code> 工程或者是 SwiftPM 配置来完成。好在 Pod 也为我们生成对应的 <code>project</code>，我们仅需通过 <code>--build-tool-arguments</code> 来指定 <code>project</code> 和 <code>target</code> 就可以了。</p>
 <p>从零开始，我们先新建一个 Demo.xcodeproj 并配置如下 Podfile：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">target</span> <span class="s1">&#39;Demo&#39;</span> <span class="k">do</span>
-	<span class="n">pod</span> <span class="s1">&#39;SnapKit&#39;</span>
-	<span class="n">pod</span> <span class="s1">&#39;AFNetworking&#39;</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>调用 Jazzy 生成 Swift 库 <code>SnapKit</code> 的文档：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell">$ bundle <span class="nb">exec</span> jazzy -o docs/SnapKit <span class="se">\
-</span><span class="se"></span>    --build-tool-arguments -project,Pods/Pods.xcodeproj,-target,SnapKit
-</code></pre></td></tr></table>
-</div>
-</div><p>通过 <code>-o</code> 将结果输出到 <code>docs/SnapKit</code> 目录下，执行后输出结果如下：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell">Running xcodebuild
-Parsing Constraint.swift <span class="o">(</span>1/34<span class="o">)</span>
-...
-Parsing UILayoutSupport+Extensions.swift <span class="o">(</span>34/34<span class="o">)</span>
-<span class="sb">`</span>ConstraintLayoutSupport<span class="sb">`</span> has no USR. ...
-9% documentation coverage with <span class="m">239</span> undocumented symbols
-included <span class="m">264</span> public or open symbols
-skipped <span class="m">81</span> private, fileprivate, or internal symbols <span class="o">(</span>use <span class="sb">`</span>--min-acl<span class="sb">`</span> to specify a different minimum ACL<span class="o">)</span>
-building site
-building search index
-jam out ♪♫ to your fresh new docs in <span class="sb">`</span>docs/SnapKit<span class="sb">`</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>可以看到 Jazzy 会遍历项目下的每个 swift 文件，对于项目中未引用的代码也会有提示。最后会输出代码的注释覆盖率，SnapKit 的覆盖率为 9%，有 239 个未注释的符号或变量。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>target <span style="color:#2aa198">&#39;Demo&#39;</span> <span style="color:#719e07">do</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>	pod <span style="color:#2aa198">&#39;SnapKit&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>	pod <span style="color:#2aa198">&#39;AFNetworking&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span><span style="color:#719e07">end</span>
+</code></pre></div><p>调用 Jazzy 生成 Swift 库 <code>SnapKit</code> 的文档：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>$ bundle <span style="color:#b58900">exec</span> jazzy -o docs/SnapKit <span style="color:#cb4b16">\
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span><span style="color:#cb4b16"></span>    --build-tool-arguments -project,Pods/Pods.xcodeproj,-target,SnapKit
+</code></pre></div><p>通过 <code>-o</code> 将结果输出到 <code>docs/SnapKit</code> 目录下，执行后输出结果如下：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span>Running xcodebuild
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>Parsing Constraint.swift <span style="color:#719e07">(</span>1/34<span style="color:#719e07">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>...
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>Parsing UILayoutSupport+Extensions.swift <span style="color:#719e07">(</span>34/34<span style="color:#719e07">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span><span style="color:#586e75">`</span>ConstraintLayoutSupport<span style="color:#586e75">`</span> has no USR. ...
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>9% documentation coverage with <span style="color:#2aa198">239</span> undocumented symbols
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>included <span style="color:#2aa198">264</span> public or open symbols
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>skipped <span style="color:#2aa198">81</span> private, fileprivate, or internal symbols <span style="color:#719e07">(</span>use <span style="color:#586e75">`</span>--min-acl<span style="color:#586e75">`</span> to specify a different minimum ACL<span style="color:#719e07">)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>building site
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>building search index
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>jam out ♪♫ to your fresh new docs in <span style="color:#586e75">`</span>docs/SnapKit<span style="color:#586e75">`</span>
+</code></pre></div><p>可以看到 Jazzy 会遍历项目下的每个 swift 文件，对于项目中未引用的代码也会有提示。最后会输出代码的注释覆盖率，SnapKit 的覆盖率为 9%，有 239 个未注释的符号或变量。</p>
 <h3 id="指定文档的范围">指定文档的范围</h3>
 <p>需要注意的是，Jazzy 可以通过 <code>--min-acl</code> 来控制输出文档的范围。</p>
 <ul>
@@ -367,33 +295,17 @@ jam out ♪♫ to your fresh new docs in <span class="sb">`</span>docs/SnapKit<s
 </ul>
 <h2 id="objc-依赖库的文档生成">ObjC 依赖库的文档生成</h2>
 <p>相比 Swift，Objc 的依赖库需要多处理 <code>umbrella header</code> 的问题。先看 AFNetworking 的文档生成命令：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell">$ <span class="nv">lib_name</span><span class="o">=</span>AFNetworking
-<span class="nv">lib_path</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/Pods/<span class="nv">$lib_name</span>
-<span class="nv">umbrella_header</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$lib_path</span><span class="s2">/</span><span class="nv">$lib_name</span><span class="s2">/</span><span class="nv">$lib_name</span><span class="s2">-umbrella.h&#34;</span>
-<span class="nv">sdk_path</span><span class="o">=</span><span class="sb">`</span>xcrun --show-sdk-path --sdk iphonesimulator<span class="sb">`</span>
-
-bundle <span class="nb">exec</span> jazzy -o docs/<span class="nv">$lib_name</span> <span class="se">\
-</span><span class="se"></span>--objc <span class="se">\
-</span><span class="se"></span>--sdk iphoneos <span class="se">\
-</span><span class="se"></span>--build-tool-arguments <span class="se">\
-</span><span class="se"></span>--objc,<span class="nv">$umbrella_header</span>,--,-x,objective-c,-isysroot,<span class="nv">$sdk_path</span>,-I,<span class="nv">$lib_path</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>第一个是需要指定 <code>--objc</code>，因为 Jazzy 默认解析 Swift 项目。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span>$ <span style="color:#268bd2">lib_name</span><span style="color:#719e07">=</span>AFNetworking
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span><span style="color:#268bd2">lib_path</span><span style="color:#719e07">=</span><span style="color:#719e07">$(</span><span style="color:#b58900">pwd</span><span style="color:#719e07">)</span>/Pods/<span style="color:#268bd2">$lib_name</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span><span style="color:#268bd2">umbrella_header</span><span style="color:#719e07">=</span><span style="color:#2aa198">&#34;</span><span style="color:#268bd2">$lib_path</span><span style="color:#2aa198">/</span><span style="color:#268bd2">$lib_name</span><span style="color:#2aa198">/</span><span style="color:#268bd2">$lib_name</span><span style="color:#2aa198">-umbrella.h&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span><span style="color:#268bd2">sdk_path</span><span style="color:#719e07">=</span><span style="color:#586e75">`</span>xcrun --show-sdk-path --sdk iphonesimulator<span style="color:#586e75">`</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>bundle <span style="color:#b58900">exec</span> jazzy -o docs/<span style="color:#268bd2">$lib_name</span> <span style="color:#cb4b16">\
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span><span style="color:#cb4b16"></span>--objc <span style="color:#cb4b16">\
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span><span style="color:#cb4b16"></span>--sdk iphoneos <span style="color:#cb4b16">\
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span><span style="color:#cb4b16"></span>--build-tool-arguments <span style="color:#cb4b16">\
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span><span style="color:#cb4b16"></span>--objc,<span style="color:#268bd2">$umbrella_header</span>,--,-x,objective-c,-isysroot,<span style="color:#268bd2">$sdk_path</span>,-I,<span style="color:#268bd2">$lib_path</span>
+</code></pre></div><p>第一个是需要指定 <code>--objc</code>，因为 Jazzy 默认解析 Swift 项目。</p>
 <p>再来看 <code>    --build-tool-arguments</code> 后跟的几个参数：</p>
 <ul>
 <li>&ndash;objc &lt;umbrella-header PATH&gt;：这里的 <code>--objc</code> 是通知 SourceKitten 我要解析的是 Objc 的头文件，后面紧跟的为依赖库的 umbrella header</li>
@@ -411,203 +323,95 @@ bundle <span class="nb">exec</span> jazzy -o docs/<span class="nv">$lib_name</sp
 <p>那么问题来了：<strong>如何正确的获取源码所在目录</strong>。</p>
 <p>首先想到的是和通过 <code>.podspec</code> 文件就能准确拿到 Source 目录。不过比较难实现，我们只能拿到的是 <code>Local Podspecs</code> 下的 <code>.podspec</code> 文件，否则需要在 <code>pod install</code> 时才能获取到。但是这么做需要修改 Podfile 也比较麻烦。</p>
 <p>选择简单粗暴的方式，直接列出可能出现的 Source 路径：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># /A/Classes/...</span>
-<span class="c1"># /A/src/a/...</span>
-<span class="c1"># /A/A/Classe/... </span>
-<span class="c1"># /A/A/Classes/... </span>
-<span class="c1"># /A/A/Source/..</span>
-<span class="c1"># /A/A/Sources/..</span>
-<span class="c1"># /A/Source/A/...</span>
-<span class="c1"># /A/Sources/A/... </span>
-<span class="c1"># /A/Source/...</span>
-<span class="c1"># /A/A/..</span>
-<span class="c1"># /A/...</span>
-<span class="c1"># libextobjc/extobjc</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>有用 <code>Classes</code>、 <code>Source</code>、<code>Sources</code>、<code>src</code> 等等，情况五花八门，逐一匹配就可以了。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#586e75"># /A/Classes/...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span><span style="color:#586e75"># /A/src/a/...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span><span style="color:#586e75"># /A/A/Classe/... </span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span><span style="color:#586e75"># /A/A/Classes/... </span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span><span style="color:#586e75"># /A/A/Source/..</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span><span style="color:#586e75"># /A/A/Sources/..</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span><span style="color:#586e75"># /A/Source/A/...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span><span style="color:#586e75"># /A/Sources/A/... </span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span><span style="color:#586e75"># /A/Source/...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span><span style="color:#586e75"># /A/A/..</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span><span style="color:#586e75"># /A/...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span><span style="color:#586e75"># libextobjc/extobjc</span>
+</code></pre></div><p>有用 <code>Classes</code>、 <code>Source</code>、<code>Sources</code>、<code>src</code> 等等，情况五花八门，逐一匹配就可以了。</p>
 <p>这么做是可以覆盖大部分的情况，但是仍然发现部分私有库生成的文档缺失甚至是空的。最终发现的问题是：<strong>clang 没有递归处理多级目录的文件</strong>，这里应该是参数没有正确设置，查看了 <a href="https://clang.llvm.org/docs/ClangCommandLineReference.html">Clang 手册</a> 感觉就是 <code>-I</code> 参数，不过也没有生效，有了解的同学求指点。</p>
 <p>咋办，先暴力解决：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell">find <span class="nv">$lib_path</span> -type f ! -regex <span class="s1">&#39;*.\(h\|m\|swift\)&#39;</span> <span class="se">\
-</span><span class="se"></span>    ! -name <span class="s1">&#39;*.json&#39;</span> <span class="se">\
-</span><span class="se"></span>    ! -name <span class="s1">&#39;*.pdf&#39;</span> <span class="se">\
-</span><span class="se"></span>    -exec mv -i <span class="o">{}</span> <span class="nv">$lib_path</span> <span class="se">\;</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>将子目录下文件全部移到 framework 源码目录下，再通过 Jazzy 来生成文档，算是暂时解决问题了。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>find <span style="color:#268bd2">$lib_path</span> -type f ! -regex <span style="color:#2aa198">&#39;*.\(h\|m\|swift\)&#39;</span> <span style="color:#cb4b16">\
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span><span style="color:#cb4b16"></span>    ! -name <span style="color:#2aa198">&#39;*.json&#39;</span> <span style="color:#cb4b16">\
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span><span style="color:#cb4b16"></span>    ! -name <span style="color:#2aa198">&#39;*.pdf&#39;</span> <span style="color:#cb4b16">\
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span><span style="color:#cb4b16"></span>    -exec mv -i <span style="color:#719e07">{}</span> <span style="color:#268bd2">$lib_path</span> <span style="color:#cb4b16">\;</span>
+</code></pre></div><p>将子目录下文件全部移到 framework 源码目录下，再通过 Jazzy 来生成文档，算是暂时解决问题了。</p>
 <p>然而 AFNetworking 的文档依旧不是完整的，不过属于另外一种情况。目录如下，大家可以 🤔 一下：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gfyzo504r8j212s0h0gql.jpg" alt="WechatIMG12.png"></p>
 <h2 id="swift--objc-混编依赖库的文档生成">Swift &amp; ObjC 混编依赖库的文档生成</h2>
 <p>对 Swift &amp; ObjC 混编的依赖库本身是不提倡的，虽然在实际开发过程中无法避免。</p>
 <p>为了测试混编库的文档生成，这里新建一个 Pod 库：<a href="https://github.com/looseyi/Mixin">Mixin</a>，添加了 MixinSwift 和 MixinObjC 两个类：</p>
 <h3 id="mixinswift">MixinSwift</h3>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="c1">/// Test Swfit Class import Objective-C&#39;s property</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MixinSwift</span><span class="p">:</span> <span class="n">NSObject</span> <span class="p">{</span>
-
-    <span class="c1">/// say hello from Swift</span>
-    <span class="kr">@objc</span> <span class="kd">public</span> <span class="kd">static</span> <span class="kd">let</span> <span class="nv">sayHi</span><span class="p">:</span> <span class="nb">String</span> <span class="p">=</span> <span class="s">&#34;Hi, I&#39;m from Swift&#34;</span>
-
-    <span class="c1">/// call Objective-C say Hi</span>
-    <span class="kr">@objc</span> <span class="kd">public</span> <span class="kd">class</span> <span class="nc">func</span> <span class="n">callObjC</span><span class="p">()</span> <span class="p">{</span>
-        <span class="bp">print</span><span class="p">(</span><span class="s">&#34;hello from MixinObjc: </span><span class="si">\(</span><span class="n">MixinObjC</span><span class="p">.</span><span class="n">sayHi</span><span class="si">)</span><span class="s">&#34;</span><span class="p">)</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><h3 id="mixinobjc">MixinObjC</h3>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-objective-c" data-lang="objective-c"><span class="cp">#import &#34;MixinObjC.h&#34;
-</span><span class="cp">#import &lt;Mixin/Mixin-Swift.h&gt;
-</span><span class="cp"></span>
-<span class="k">@implementation</span> <span class="nc">MixinObjC</span>
-
- <span class="o">+</span> <span class="p">(</span><span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="n">sayHi</span>
-<span class="p">{</span>
-    <span class="k">return</span> <span class="s">@&#34;Hi, I&#39;m from Objective-C&#34;</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="o">+</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">callSwift</span>
-<span class="p">{</span>
-    <span class="n">NSLog</span><span class="p">(</span><span class="s">@&#34;hello from MixinSwift: %@&#34;</span><span class="p">,</span> <span class="n">MixinSwift</span><span class="p">.</span><span class="n">sayHi</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="k">@end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>由于 Jazzy 无法直接生成混编项目的文档，这里需要通过 <code>SourceKitten</code> 分别将 Swift 和 ObjC 的代码注释转成 json 的中间格式，才能生存完整的文档。生成命令如下：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="nv">lib_name</span><span class="o">=</span>Mixin
-<span class="nv">output</span><span class="o">=</span><span class="s2">&#34;public/docs/</span><span class="nv">$lib_name</span><span class="s2">&#34;</span>
-<span class="nv">swift_doc</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$output</span><span class="s2">/</span><span class="nv">$lib_name</span><span class="s2">-swift-doc.json&#34;</span>
-<span class="nv">objc_doc</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$output</span><span class="s2">/</span><span class="nv">$lib_name</span><span class="s2">-objc-doc.json&#34;</span>
-
-<span class="nv">lib_path</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/Pods/<span class="nv">$lib_name</span>/<span class="nv">$lib_name</span>/Classes
-<span class="nv">umbrella_header</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$lib_path</span><span class="s2">/</span><span class="nv">$lib_name</span><span class="s2">-umbrella.h&#34;</span>
-<span class="nv">sdk_path</span><span class="o">=</span><span class="sb">`</span>xcrun --show-sdk-path --sdk iphonesimulator<span class="sb">`</span>
-
-sourcekitten doc --objc <span class="nv">$umbrella_header</span> <span class="se">\
-</span><span class="se"></span>      -- -x objective-c -isysroot <span class="nv">$sdk_path</span> <span class="se">\
-</span><span class="se"></span>      -I <span class="nv">$lib_path</span> <span class="se">\
-</span><span class="se"></span>      -fmodules &gt; <span class="nv">$objc_doc</span>
-
-sourcekitten doc -- -project Pods/Pods.xcodeproj -target Mixin &gt; <span class="nv">$swift_doc</span>
-
-jazzy -o <span class="nv">$output</span> --sourcekitten-sourcefile <span class="nv">$swift_doc</span>,<span class="nv">$objc_doc</span> 
-</code></pre></td></tr></table>
-</div>
-</div><p>文档如下：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#586e75">/// Test Swfit Class import Objective-C&#39;s property</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span><span style="color:#268bd2">public</span> <span style="color:#268bd2">class</span> <span style="color:#268bd2">MixinSwift</span>: NSObject {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>    <span style="color:#586e75">/// say hello from Swift</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>    <span style="color:#268bd2">@objc</span> <span style="color:#268bd2">public</span> <span style="color:#268bd2">static</span> <span style="color:#268bd2">let</span> <span style="color:#268bd2">sayHi</span>: <span style="color:#b58900">String</span> = <span style="color:#2aa198">&#34;Hi, I&#39;m from Swift&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>    <span style="color:#586e75">/// call Objective-C say Hi</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>    <span style="color:#268bd2">@objc</span> <span style="color:#268bd2">public</span> <span style="color:#268bd2">class</span> <span style="color:#268bd2">func</span> callObjC() {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>        <span style="color:#268bd2">print</span>(<span style="color:#2aa198">&#34;hello from MixinObjc: </span><span style="color:#2aa198">\(</span>MixinObjC.sayHi<span style="color:#2aa198">)</span><span style="color:#2aa198">&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>}
+</code></pre></div><h3 id="mixinobjc">MixinObjC</h3>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">#import &#34;MixinObjC.h&#34;
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span><span style="color:#719e07">#import &lt;Mixin/Mixin-Swift.h&gt;
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span><span style="color:#719e07"></span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span><span style="color:#719e07">@implementation</span> <span style="color:#268bd2">MixinObjC</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span> <span style="color:#719e07">+</span> (NSString <span style="color:#719e07">*</span>)sayHi
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>{
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>    <span style="color:#719e07">return</span> <span style="color:#2aa198">@&#34;Hi, I&#39;m from Objective-C&#34;</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span><span style="color:#719e07">+</span> (<span style="color:#dc322f">void</span>)callSwift
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>{
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>    NSLog(<span style="color:#2aa198">@&#34;hello from MixinSwift: %@&#34;</span>, MixinSwift.sayHi);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span><span style="color:#719e07">@end</span>
+</code></pre></div><p>由于 Jazzy 无法直接生成混编项目的文档，这里需要通过 <code>SourceKitten</code> 分别将 Swift 和 ObjC 的代码注释转成 json 的中间格式，才能生存完整的文档。生成命令如下：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#268bd2">lib_name</span><span style="color:#719e07">=</span>Mixin
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span><span style="color:#268bd2">output</span><span style="color:#719e07">=</span><span style="color:#2aa198">&#34;public/docs/</span><span style="color:#268bd2">$lib_name</span><span style="color:#2aa198">&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span><span style="color:#268bd2">swift_doc</span><span style="color:#719e07">=</span><span style="color:#2aa198">&#34;</span><span style="color:#268bd2">$output</span><span style="color:#2aa198">/</span><span style="color:#268bd2">$lib_name</span><span style="color:#2aa198">-swift-doc.json&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span><span style="color:#268bd2">objc_doc</span><span style="color:#719e07">=</span><span style="color:#2aa198">&#34;</span><span style="color:#268bd2">$output</span><span style="color:#2aa198">/</span><span style="color:#268bd2">$lib_name</span><span style="color:#2aa198">-objc-doc.json&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span><span style="color:#268bd2">lib_path</span><span style="color:#719e07">=</span><span style="color:#719e07">$(</span><span style="color:#b58900">pwd</span><span style="color:#719e07">)</span>/Pods/<span style="color:#268bd2">$lib_name</span>/<span style="color:#268bd2">$lib_name</span>/Classes
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span><span style="color:#268bd2">umbrella_header</span><span style="color:#719e07">=</span><span style="color:#2aa198">&#34;</span><span style="color:#268bd2">$lib_path</span><span style="color:#2aa198">/</span><span style="color:#268bd2">$lib_name</span><span style="color:#2aa198">-umbrella.h&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span><span style="color:#268bd2">sdk_path</span><span style="color:#719e07">=</span><span style="color:#586e75">`</span>xcrun --show-sdk-path --sdk iphonesimulator<span style="color:#586e75">`</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>sourcekitten doc --objc <span style="color:#268bd2">$umbrella_header</span> <span style="color:#cb4b16">\
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span><span style="color:#cb4b16"></span>      -- -x objective-c -isysroot <span style="color:#268bd2">$sdk_path</span> <span style="color:#cb4b16">\
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span><span style="color:#cb4b16"></span>      -I <span style="color:#268bd2">$lib_path</span> <span style="color:#cb4b16">\
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span><span style="color:#cb4b16"></span>      -fmodules &gt; <span style="color:#268bd2">$objc_doc</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>sourcekitten doc -- -project Pods/Pods.xcodeproj -target Mixin &gt; <span style="color:#268bd2">$swift_doc</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>jazzy -o <span style="color:#268bd2">$output</span> --sourcekitten-sourcefile <span style="color:#268bd2">$swift_doc</span>,<span style="color:#268bd2">$objc_doc</span> 
+</code></pre></div><p>文档如下：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gfzy7mk9nrj20km0a1js4.jpg" alt="WechatIMG13.png"></p>
 <h2 id="依赖库类型判断">依赖库类型判断</h2>
 <p>由于不同类型的依赖库，其生成文档的脚本有所不同，我们还需要判断每个依赖库类型，是纯 ObjC、纯 Swift 还是混编类型。解决方式就是对 Source 目录下的文件类型进行 count 以判断依赖库类型：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="nv">swift_count</span><span class="o">=</span><span class="sb">`</span>find <span class="nv">$lib_path</span> -maxdepth <span class="m">6</span> -type f  -name <span class="s1">&#39;*.swift&#39;</span> <span class="p">|</span> wc -l<span class="sb">`</span>
-<span class="nv">objc_count</span><span class="o">=</span><span class="sb">`</span>find <span class="nv">$lib_path</span> -maxdepth <span class="m">6</span> -type f  -name <span class="s1">&#39;*.m&#39;</span> <span class="p">|</span> wc -l<span class="sb">`</span>
-
-<span class="c1"># file state, 0: only objc, 1: only swift, 2: swift &amp; objc</span>
-<span class="nv">lib_state</span><span class="o">=</span><span class="m">0</span>
-<span class="k">if</span> <span class="o">[[</span> <span class="nv">$swift_count</span> -ge <span class="m">1</span> <span class="o">&amp;&amp;</span> <span class="nv">$objc_count</span> -ge <span class="m">1</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span> 
-    <span class="nv">lib_state</span><span class="o">=</span><span class="m">2</span>
-<span class="k">elif</span> <span class="o">[[</span> <span class="nv">$swift_count</span> -eq <span class="m">0</span> <span class="o">&amp;&amp;</span> <span class="nv">$objc_count</span> -ge <span class="m">1</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span> 
-    <span class="nv">lib_state</span><span class="o">=</span><span class="m">0</span>
-<span class="k">elif</span> <span class="o">[[</span> <span class="nv">$swift_count</span> -ge <span class="m">1</span> <span class="o">&amp;&amp;</span> <span class="nv">$objc_count</span> -eq <span class="m">0</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span> 
-    <span class="nv">lib_state</span><span class="o">=</span><span class="m">1</span>
-<span class="k">fi</span>
-</code></pre></td></tr></table>
-</div>
-</div><h1 id="静态文档的部署">静态文档的部署</h1>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#268bd2">swift_count</span><span style="color:#719e07">=</span><span style="color:#586e75">`</span>find <span style="color:#268bd2">$lib_path</span> -maxdepth <span style="color:#2aa198">6</span> -type f  -name <span style="color:#2aa198">&#39;*.swift&#39;</span> | wc -l<span style="color:#586e75">`</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span><span style="color:#268bd2">objc_count</span><span style="color:#719e07">=</span><span style="color:#586e75">`</span>find <span style="color:#268bd2">$lib_path</span> -maxdepth <span style="color:#2aa198">6</span> -type f  -name <span style="color:#2aa198">&#39;*.m&#39;</span> | wc -l<span style="color:#586e75">`</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span><span style="color:#586e75"># file state, 0: only objc, 1: only swift, 2: swift &amp; objc</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span><span style="color:#268bd2">lib_state</span><span style="color:#719e07">=</span><span style="color:#2aa198">0</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span><span style="color:#719e07">if</span> <span style="color:#719e07">[[</span> <span style="color:#268bd2">$swift_count</span> -ge <span style="color:#2aa198">1</span> <span style="color:#719e07">&amp;&amp;</span> <span style="color:#268bd2">$objc_count</span> -ge <span style="color:#2aa198">1</span> <span style="color:#719e07">]]</span>; <span style="color:#719e07">then</span> 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>    <span style="color:#268bd2">lib_state</span><span style="color:#719e07">=</span><span style="color:#2aa198">2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span><span style="color:#719e07">elif</span> <span style="color:#719e07">[[</span> <span style="color:#268bd2">$swift_count</span> -eq <span style="color:#2aa198">0</span> <span style="color:#719e07">&amp;&amp;</span> <span style="color:#268bd2">$objc_count</span> -ge <span style="color:#2aa198">1</span> <span style="color:#719e07">]]</span>; <span style="color:#719e07">then</span> 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>    <span style="color:#268bd2">lib_state</span><span style="color:#719e07">=</span><span style="color:#2aa198">0</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span><span style="color:#719e07">elif</span> <span style="color:#719e07">[[</span> <span style="color:#268bd2">$swift_count</span> -ge <span style="color:#2aa198">1</span> <span style="color:#719e07">&amp;&amp;</span> <span style="color:#268bd2">$objc_count</span> -eq <span style="color:#2aa198">0</span> <span style="color:#719e07">]]</span>; <span style="color:#719e07">then</span> 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>    <span style="color:#268bd2">lib_state</span><span style="color:#719e07">=</span><span style="color:#2aa198">1</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span><span style="color:#719e07">fi</span>
+</code></pre></div><h1 id="静态文档的部署">静态文档的部署</h1>
 <p>我们使用是 Github Page 来进行文档部署，特别简单仅需在 repo 的设置页指定文档类型就可以了。剩下的就是提交代码，Git 会自动触发编译。</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gg09xcwxccj20jd0cawfr.jpg" alt="WechatIMG14.png"></p>
 <p>更多介绍请查看 <a href="https://help.github.com/en/github/working-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site">Github Page 说明</a>。</p>
@@ -618,32 +422,14 @@ jazzy -o <span class="nv">$output</span> --sourcekitten-sourcefile <span class="
 <p>尽管我们当前的方案可以正确的生成文档，但是其实还可以更进一步。</p>
 <p>当前的文档生成是基于 <code>project</code> 的方式，而我们完全可以针对每一个文件生成一份 json 数据，最后在把它们全部粘一起。命令的话 SourceKitten 都准备好了：</p>
 <p><strong>Swift 文件解析</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell">$ sourcekitten doc --single-file <span class="nv">$input_file</span> -- -j4 <span class="nv">$input_file</span> &gt;&gt; <span class="nv">$temp_outout</span>
-</code></pre></td></tr></table>
-</div>
-</div><p><strong>ObjC .h 文件解析</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell">$ sourcekitten doc --objc <span class="se">\
-</span><span class="se"></span>   --single-file <span class="nv">$input_file</span> <span class="se">\
-</span><span class="se"></span>   -- -x objective-c <span class="se">\
-</span><span class="se"></span>   -isysroot <span class="nv">$sdk_path</span> <span class="se">\
-</span><span class="se"></span>   -I <span class="nv">$lib_path</span> -fmodules &gt;&gt; <span class="nv">$temp_outout</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>通过这种方式，既不不需要配置 <code>project</code> 判断依赖库类型，也省去了查找找 umbrella header 的麻烦。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>$ sourcekitten doc --single-file <span style="color:#268bd2">$input_file</span> -- -j4 <span style="color:#268bd2">$input_file</span> &gt;&gt; <span style="color:#268bd2">$temp_outout</span>
+</code></pre></div><p><strong>ObjC .h 文件解析</strong></p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>$ sourcekitten doc --objc <span style="color:#cb4b16">\
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span><span style="color:#cb4b16"></span>   --single-file <span style="color:#268bd2">$input_file</span> <span style="color:#cb4b16">\
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span><span style="color:#cb4b16"></span>   -- -x objective-c <span style="color:#cb4b16">\
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span><span style="color:#cb4b16"></span>   -isysroot <span style="color:#268bd2">$sdk_path</span> <span style="color:#cb4b16">\
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span><span style="color:#cb4b16"></span>   -I <span style="color:#268bd2">$lib_path</span> -fmodules &gt;&gt; <span style="color:#268bd2">$temp_outout</span>
+</code></pre></div><p>通过这种方式，既不不需要配置 <code>project</code> 判断依赖库类型，也省去了查找找 umbrella header 的麻烦。</p>
 <p>完整脚本传送门：<a href="https://github.com/looseyi/ScriptTools/blob/master/doc_deploy.sh">docs_deploy.sh</a></p>
 <h1 id="总结">总结</h1>
 <ul>

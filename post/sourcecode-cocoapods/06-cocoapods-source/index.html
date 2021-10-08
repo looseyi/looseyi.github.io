@@ -95,7 +95,7 @@ if (!doNotTrack) {
   <meta itemprop="name" content="6. PodSpec 管理策略">
 <meta itemprop="description" content="本文目录 引子 本文是 Core 的最后一篇，它与另外两篇文章「Podfile 解析逻辑」和「PodSpec 文件分析」共同支撑起 CocoaPods 世界的骨架。CocoaPo"><meta itemprop="datePublished" content="2020-11-06T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2020-11-06T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="6228">
+<meta itemprop="wordCount" content="6131">
 <meta itemprop="keywords" content="CocoaPods,iOS,Ruby," />
   
   <meta name="twitter:card" content="summary"/>
@@ -185,194 +185,92 @@ if (!doNotTrack) {
 <h1 id="source">Source</h1>
 <p>作为 <code>PodSpec</code> 的聚合仓库，Spec Repo <strong>记录着所有 <code>pod</code> 所发布的不同版本的 <code>PodSpec</code> 文件</strong>。该仓库对应到 Core 的数据结构为 <code>Source</code>，即为今天的主角。</p>
 <p>整个 <code>Source</code> 的结构比较简单，它基本是围绕着 Git 来做文章，主要是对 <code>PodSpec</code> 文件进行各种查找更新操作。结构如下：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span><span class="lnt">33
-</span><span class="lnt">34
-</span><span class="lnt">35
-</span><span class="lnt">36
-</span><span class="lnt">37
-</span><span class="lnt">38
-</span><span class="lnt">39
-</span><span class="lnt">40
-</span><span class="lnt">41
-</span><span class="lnt">42
-</span><span class="lnt">43
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="c1"># 用于检查 spec 是否符合当前 Source 要求</span>
-<span class="nb">require</span> <span class="s1">&#39;cocoapods-core/source/acceptor&#39;</span>
-<span class="c1"># 记录本地 source 的集合</span>
-<span class="nb">require</span> <span class="s1">&#39;cocoapods-core/source/aggregate&#39;</span>
-<span class="c1"># 用于校验 source 的错误和警告</span>
-<span class="nb">require</span> <span class="s1">&#39;cocoapods-core/source/health_reporter&#39;</span>
-<span class="c1"># source 管理器</span>
-<span class="nb">require</span> <span class="s1">&#39;cocoapods-core/source/manager&#39;</span>
-<span class="c1"># source 元数据</span>
-<span class="nb">require</span> <span class="s1">&#39;cocoapods-core/source/metadata&#39;</span>
-
-<span class="k">module</span> <span class="nn">Pod</span>
-  <span class="k">class</span> <span class="nc">Source</span>
-    <span class="c1"># 仓库默认的 Git 分支</span>
-    <span class="no">DEFAULT_SPECS_BRANCH</span> <span class="o">=</span> <span class="s1">&#39;master&#39;</span><span class="o">.</span><span class="n">freeze</span>
-    <span class="c1"># 记录仓库的元数据</span>
-    <span class="kp">attr_reader</span> <span class="ss">:metadata</span>
-    <span class="c1"># 记录仓库的本地地址</span>
-    <span class="kp">attr_reader</span> <span class="ss">:repo</span>
-    <span class="c1"># repo 仓库地址 ~/.cocoapods/repos/{repo_name}</span>
-    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">repo</span><span class="p">)</span>
-      <span class="vi">@repo</span> <span class="o">=</span> <span class="no">Pathname</span><span class="p">(</span><span class="n">repo</span><span class="p">)</span><span class="o">.</span><span class="n">expand_path</span>
-      <span class="vi">@versions_by_name</span> <span class="o">=</span> <span class="p">{}</span>
-      <span class="n">refresh_metadata</span>
-    <span class="k">end</span>
-    <span class="c1"># 读取 Git 仓库中的 remote url 或 .git 目录</span>
-    <span class="k">def</span> <span class="nf">url</span>
-      <span class="vi">@url</span> <span class="o">||=</span> <span class="k">begin</span>
-        <span class="n">remote</span> <span class="o">=</span> <span class="n">repo_git</span><span class="p">(</span><span class="sx">%w(config --get remote.origin.url)</span><span class="p">)</span>
-        <span class="k">if</span> <span class="o">!</span><span class="n">remote</span><span class="o">.</span><span class="n">empty?</span>
-          <span class="n">remote</span>
-        <span class="k">elsif</span> <span class="p">(</span><span class="n">repo</span> <span class="o">+</span> <span class="s1">&#39;.git&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">exist?</span>
-          <span class="s2">&#34;file://</span><span class="si">#{</span><span class="n">repo</span><span class="si">}</span><span class="s2">/.git&#34;</span>
-        <span class="k">end</span>
-      <span class="k">end</span>
-    <span class="k">end</span>
-
-    <span class="k">def</span> <span class="nf">type</span>
-      <span class="n">git?</span> <span class="p">?</span> <span class="s1">&#39;git&#39;</span> <span class="p">:</span> <span class="s1">&#39;file system&#39;</span>
-    <span class="k">end</span>
-    <span class="c1"># ...</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p><code>Source</code> 还有两个子类 <strong>CDNSource</strong> 和 <strong>TrunkSource</strong>，TrunkSouce 是 CocoaPods 的默认仓库。在版本 1.7.2 之前 Master Repo 的 URL 指向为 Github 的 <a href="https://github.com/CocoaPods/Specs">Specs 仓库</a>，这也是造成我们每次 <code>pod install</code> 或 <code>pod update</code> 慢的原因之一。它不仅保存了近 10 年来 PodSpec 文件同时还包括 Git 记录，再加上墙的原因，每次更新都非常痛苦。而在 1.7.2 之后 CocoaPods 的默认 Source 终于改为了 CDN 指向，同时支持按需下载，缓解了 <code>pod</code> 更新和磁盘占用过大问题。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#586e75"># 用于检查 spec 是否符合当前 Source 要求</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span><span style="color:#b58900">require</span> <span style="color:#2aa198">&#39;cocoapods-core/source/acceptor&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span><span style="color:#586e75"># 记录本地 source 的集合</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span><span style="color:#b58900">require</span> <span style="color:#2aa198">&#39;cocoapods-core/source/aggregate&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span><span style="color:#586e75"># 用于校验 source 的错误和警告</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span><span style="color:#b58900">require</span> <span style="color:#2aa198">&#39;cocoapods-core/source/health_reporter&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span><span style="color:#586e75"># source 管理器</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span><span style="color:#b58900">require</span> <span style="color:#2aa198">&#39;cocoapods-core/source/manager&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span><span style="color:#586e75"># source 元数据</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span><span style="color:#b58900">require</span> <span style="color:#2aa198">&#39;cocoapods-core/source/metadata&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span><span style="color:#719e07">module</span> Pod
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>  <span style="color:#719e07">class</span> <span style="color:#268bd2">Source</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>    <span style="color:#586e75"># 仓库默认的 Git 分支</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>    <span style="color:#cb4b16">DEFAULT_SPECS_BRANCH</span> <span style="color:#719e07">=</span> <span style="color:#2aa198">&#39;master&#39;</span><span style="color:#719e07">.</span>freeze
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>    <span style="color:#586e75"># 记录仓库的元数据</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>    <span style="color:#719e07">attr_reader</span> <span style="color:#2aa198">:metadata</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>    <span style="color:#586e75"># 记录仓库的本地地址</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>    <span style="color:#719e07">attr_reader</span> <span style="color:#2aa198">:repo</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>    <span style="color:#586e75"># repo 仓库地址 ~/.cocoapods/repos/{repo_name}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span>    <span style="color:#719e07">def</span> <span style="color:#268bd2">initialize</span>(repo)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">22</span>      @repo <span style="color:#719e07">=</span> <span style="color:#cb4b16">Pathname</span>(repo)<span style="color:#719e07">.</span>expand_path
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">23</span>      @versions_by_name <span style="color:#719e07">=</span> {}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">24</span>      refresh_metadata
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">25</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">26</span>    <span style="color:#586e75"># 读取 Git 仓库中的 remote url 或 .git 目录</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">27</span>    <span style="color:#719e07">def</span> <span style="color:#268bd2">url</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">28</span>      @url <span style="color:#719e07">||=</span> <span style="color:#719e07">begin</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">29</span>        remote <span style="color:#719e07">=</span> repo_git(<span style="color:#2aa198">%w(config --get remote.origin.url)</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">30</span>        <span style="color:#719e07">if</span> <span style="color:#719e07">!</span>remote<span style="color:#719e07">.</span>empty?
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">31</span>          remote
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">32</span>        <span style="color:#719e07">elsif</span> (repo <span style="color:#719e07">+</span> <span style="color:#2aa198">&#39;.git&#39;</span>)<span style="color:#719e07">.</span>exist?
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">33</span>          <span style="color:#2aa198">&#34;file://</span><span style="color:#2aa198">#{</span>repo<span style="color:#2aa198">}</span><span style="color:#2aa198">/.git&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">34</span>        <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">35</span>      <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">36</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">37</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">38</span>    <span style="color:#719e07">def</span> <span style="color:#268bd2">type</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">39</span>      git? ? <span style="color:#2aa198">&#39;git&#39;</span> : <span style="color:#2aa198">&#39;file system&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">40</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">41</span>    <span style="color:#586e75"># ...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">42</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">43</span><span style="color:#719e07">end</span>
+</code></pre></div><p><code>Source</code> 还有两个子类 <strong>CDNSource</strong> 和 <strong>TrunkSource</strong>，TrunkSouce 是 CocoaPods 的默认仓库。在版本 1.7.2 之前 Master Repo 的 URL 指向为 Github 的 <a href="https://github.com/CocoaPods/Specs">Specs 仓库</a>，这也是造成我们每次 <code>pod install</code> 或 <code>pod update</code> 慢的原因之一。它不仅保存了近 10 年来 PodSpec 文件同时还包括 Git 记录，再加上墙的原因，每次更新都非常痛苦。而在 1.7.2 之后 CocoaPods 的默认 Source 终于改为了 CDN 指向，同时支持按需下载，缓解了 <code>pod</code> 更新和磁盘占用过大问题。</p>
 <p><code>Source</code> 的依赖关系如下：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gmmes1krayj20ow0bi3yp.jpg" alt="01-Source"></p>
 <p>回到 <code>Source</code> 来看其如何初始化的，可以看到其构造函数 <code>#initialize(repo)</code> 将传入的 repo 地址保存后，直接调用了 <code>#refresh_metadata</code> 来完成元数据的加载：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">refresh_metadata</span>
-  <span class="vi">@metadata</span> <span class="o">=</span> <span class="no">Metadata</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">metadata_path</span><span class="p">)</span>
-<span class="k">end</span>
-
-<span class="k">def</span> <span class="nf">metadata_path</span>
-  <span class="n">repo</span> <span class="o">+</span> <span class="s1">&#39;CocoaPods-version.yml&#39;</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><h2 id="metadata">Metadata</h2>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#719e07">def</span> <span style="color:#268bd2">refresh_metadata</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>  @metadata <span style="color:#719e07">=</span> <span style="color:#cb4b16">Metadata</span><span style="color:#719e07">.</span>from_file(metadata_path)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span><span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span><span style="color:#719e07">def</span> <span style="color:#268bd2">metadata_path</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>  repo <span style="color:#719e07">+</span> <span style="color:#2aa198">&#39;CocoaPods-version.yml&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span><span style="color:#719e07">end</span>
+</code></pre></div><h2 id="metadata">Metadata</h2>
 <p>Metadata 是保存在 repo 目录下，名为 <code>CocoaPods-version.yml</code> 的文件，<strong>用于记录该 Source 所支持的 CocoaPods 的版本以及仓库的分片规则</strong>。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="nb">autoload</span> <span class="ss">:Digest</span><span class="p">,</span> <span class="s1">&#39;digest/md5&#39;</span>
-<span class="nb">require</span> <span class="s1">&#39;active_support/hash_with_indifferent_access&#39;</span>
-<span class="nb">require</span> <span class="s1">&#39;active_support/core_ext/hash/indifferent_access&#39;</span>
-
-<span class="k">module</span> <span class="nn">Pod</span>
-  <span class="k">class</span> <span class="nc">Source</span>
-    <span class="k">class</span> <span class="nc">Metadata</span>
-      <span class="c1"># 最低可支持的 CocoaPods 版本，对应字段 `min`</span>
-      <span class="kp">attr_reader</span> <span class="ss">:minimum_cocoapods_version</span>
-      <span class="c1"># 最高可支持的 CocoaPods 版本，对应字段 `max`</span>
-      <span class="kp">attr_reader</span> <span class="ss">:maximum_cocoapods_version</span>
-      <span class="c1"># 最新 CocoaPods 版本，对应字段 `last`</span>
-      <span class="kp">attr_reader</span> <span class="ss">:latest_cocoapods_version</span>
-      <span class="c1"># 规定截取的关键字段的前缀长度和数量</span>
-      <span class="kp">attr_reader</span> <span class="ss">:prefix_lengths</span>
-      <span class="c1"># 可兼容的 CocoaPods 最新版本</span>
-      <span class="kp">attr_reader</span> <span class="ss">:last_compatible_versions</span>
-      <span class="c1"># ...</span>
-    <span class="k">end</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>这里以笔者 💻 环境中 Master 仓库下的 <code>CocoaPods-version.yml</code> 文件内容为例：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="nn">---</span><span class="w">
-</span><span class="w"></span><span class="nt">min</span><span class="p">:</span><span class="w"> </span><span class="m">1.0.0</span><span class="w">
-</span><span class="w"></span><span class="nt">last</span><span class="p">:</span><span class="w"> </span><span class="m">1.10.0</span><span class="l">.beta.1</span><span class="w">
-</span><span class="w"></span><span class="nt">prefix_lengths</span><span class="p">:</span><span class="w">
-</span><span class="w"></span>- <span class="m">1</span><span class="w">
-</span><span class="w"></span>- <span class="m">1</span><span class="w">
-</span><span class="w"></span>- <span class="m">1</span><span class="w">
-</span></code></pre></td></tr></table>
-</div>
-</div><p>最低支持版本为 <code>1.0.0</code>，最新可用版本为 <code> 1.10.0.beta.1</code>，以及最后这个 <code>prefix_lengths</code> 为 <code>[1, 1, 1]</code> 的数组。那么这个 <strong>prefix_lengths 的作用是什么呢 ？</strong></p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#b58900">autoload</span> <span style="color:#2aa198">:Digest</span>, <span style="color:#2aa198">&#39;digest/md5&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span><span style="color:#b58900">require</span> <span style="color:#2aa198">&#39;active_support/hash_with_indifferent_access&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span><span style="color:#b58900">require</span> <span style="color:#2aa198">&#39;active_support/core_ext/hash/indifferent_access&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span><span style="color:#719e07">module</span> Pod
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>  <span style="color:#719e07">class</span> <span style="color:#268bd2">Source</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>    <span style="color:#719e07">class</span> <span style="color:#268bd2">Metadata</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>      <span style="color:#586e75"># 最低可支持的 CocoaPods 版本，对应字段 `min`</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>      <span style="color:#719e07">attr_reader</span> <span style="color:#2aa198">:minimum_cocoapods_version</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>      <span style="color:#586e75"># 最高可支持的 CocoaPods 版本，对应字段 `max`</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>      <span style="color:#719e07">attr_reader</span> <span style="color:#2aa198">:maximum_cocoapods_version</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>      <span style="color:#586e75"># 最新 CocoaPods 版本，对应字段 `last`</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>      <span style="color:#719e07">attr_reader</span> <span style="color:#2aa198">:latest_cocoapods_version</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>      <span style="color:#586e75"># 规定截取的关键字段的前缀长度和数量</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>      <span style="color:#719e07">attr_reader</span> <span style="color:#2aa198">:prefix_lengths</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>      <span style="color:#586e75"># 可兼容的 CocoaPods 最新版本</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>      <span style="color:#719e07">attr_reader</span> <span style="color:#2aa198">:last_compatible_versions</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>      <span style="color:#586e75"># ...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span><span style="color:#719e07">end</span>
+</code></pre></div><p>这里以笔者 💻 环境中 Master 仓库下的 <code>CocoaPods-version.yml</code> 文件内容为例：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>---
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span><span style="color:#268bd2">min</span>: <span style="color:#2aa198">1.0.0</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span><span style="color:#268bd2">last</span>: <span style="color:#2aa198">1.10.0</span>.beta.1
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span><span style="color:#268bd2">prefix_lengths</span>:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>- <span style="color:#2aa198">1</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>- <span style="color:#2aa198">1</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span>- <span style="color:#2aa198">1</span>
+</code></pre></div><p>最低支持版本为 <code>1.0.0</code>，最新可用版本为 <code> 1.10.0.beta.1</code>，以及最后这个 <code>prefix_lengths</code> 为 <code>[1, 1, 1]</code> 的数组。那么这个 <strong>prefix_lengths 的作用是什么呢 ？</strong></p>
 <p>要回答这个问题，我们先来看一张 <code>Spec Repo</code> 的目录结构图：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gmmes6ydt8j22m60wg7bp.jpg" alt="02-trunk-folder"></p>
 <p>再 🤔 另外一个问题，<strong>为什么 CocoaPods 生成的目录结构是这样 ？</strong></p>
@@ -384,135 +282,68 @@ if (!doNotTrack) {
 <p>Tips：关于文件系统层次结构有兴趣的同学可以查看<a href="https://www.wikiwand.com/en/Filesystem_Hierarchy_Standard">FHS 标准</a>，以及知乎这篇：<a href="https://zhuanlan.zhihu.com/p/183238194#tocbar--13f51dj">传送门</a></p>
 </blockquote>
 <p>回到 CocoaPods，如何对 Master 仓库目录进行分片就涉及到 Metadata 类中的关键方法：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">path_fragment</span><span class="p">(</span><span class="n">pod_name</span><span class="p">,</span> <span class="n">version</span> <span class="o">=</span> <span class="kp">nil</span><span class="p">)</span>
-  <span class="n">prefixes</span> <span class="o">=</span> <span class="k">if</span> <span class="n">prefix_lengths</span><span class="o">.</span><span class="n">empty?</span>
-               <span class="o">[]</span>
-             <span class="k">else</span>
-               <span class="n">hashed</span> <span class="o">=</span> <span class="no">Digest</span><span class="o">::</span><span class="no">MD5</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">(</span><span class="n">pod_name</span><span class="p">)</span>
-               <span class="n">prefix_lengths</span><span class="o">.</span><span class="n">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">length</span><span class="o">|</span>
-                 <span class="n">hashed</span><span class="o">.</span><span class="n">slice!</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">length</span><span class="p">)</span>
-               <span class="k">end</span>
-             <span class="k">end</span>
-  <span class="n">prefixes</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="o">[</span><span class="n">pod_name</span><span class="p">,</span> <span class="n">version</span><span class="o">]</span><span class="p">)</span><span class="o">.</span><span class="n">compact</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p><code>#path_fragment</code> 会依据 pod_name 和 version 来生成 pod 对应的索引目录：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">def</span> <span style="color:#268bd2">path_fragment</span>(pod_name, version <span style="color:#719e07">=</span> <span style="color:#719e07">nil</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>  prefixes <span style="color:#719e07">=</span> <span style="color:#719e07">if</span> prefix_lengths<span style="color:#719e07">.</span>empty?
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>               <span style="color:#719e07">[]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>             <span style="color:#719e07">else</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>               hashed <span style="color:#719e07">=</span> <span style="color:#cb4b16">Digest</span><span style="color:#719e07">::</span><span style="color:#cb4b16">MD5</span><span style="color:#719e07">.</span>hexdigest(pod_name)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>               prefix_lengths<span style="color:#719e07">.</span>map <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>length<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>                 hashed<span style="color:#719e07">.</span>slice!(<span style="color:#2aa198">0</span>, length)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>               <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>             <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>  prefixes<span style="color:#719e07">.</span>concat(<span style="color:#719e07">[</span>pod_name, version<span style="color:#719e07">]</span>)<span style="color:#719e07">.</span>compact
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span><span style="color:#719e07">end</span>
+</code></pre></div><p><code>#path_fragment</code> 会依据 pod_name 和 version 来生成 pod 对应的索引目录：</p>
 <ol>
 <li>首先对 pod_name 进行 MD5 计算获取摘要；</li>
 <li>遍历 <code>prefix_lengths</code> 对生成的摘要不断截取指定的长度作为文件索引。</li>
 </ol>
 <p>以 <code>AFNetworking</code> 为例：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="err">$</span> <span class="no">Digest</span><span class="o">::</span><span class="no">MD5</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">(</span><span class="s1">&#39;AFNetworking&#39;</span><span class="p">)</span>
-<span class="s2">&#34;a75d452377f3996bdc4b623a5df25820&#34;</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>由于我们的 <code>prefix_lengths</code> 为 <code>[1, 1, 1]</code> 数组，那么它将会从左到右依次截取出一个字母，即： <code>a</code>、<code>7</code>、<code>5</code> ，这三个字母作为索引目录，它正好符合我们 👆 目录结构图中 AFNetworking 的所在位置。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>$ <span style="color:#cb4b16">Digest</span><span style="color:#719e07">::</span><span style="color:#cb4b16">MD5</span><span style="color:#719e07">.</span>hexdigest(<span style="color:#2aa198">&#39;AFNetworking&#39;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span><span style="color:#2aa198">&#34;a75d452377f3996bdc4b623a5df25820&#34;</span>
+</code></pre></div><p>由于我们的 <code>prefix_lengths</code> 为 <code>[1, 1, 1]</code> 数组，那么它将会从左到右依次截取出一个字母，即： <code>a</code>、<code>7</code>、<code>5</code> ，这三个字母作为索引目录，它正好符合我们 👆 目录结构图中 AFNetworking 的所在位置。</p>
 <h2 id="versions">Versions</h2>
 <p>要找到 <code>Podfile</code> 中限定版本号范围的 <code>PodSpec</code> 文件还需要需要最后一步，获取当前已发布的 Versions 列表，并通过比较 Version 得出最终所需的 <code>PodSpec</code> 文件。</p>
 <p>在上一步已通过 <code>metadata</code> 和 <code>pod_name</code> 计算出 <code>pod</code> 所在目录，接着就是找到 <code>pod</code> 目录下的 Versions 列表：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gmmesdsd18j222g0qcwjb.jpg" alt="03-versons-folder"></p>
 <p>获取 Versions：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">versions</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
-  <span class="k">return</span> <span class="kp">nil</span> <span class="k">unless</span> <span class="n">specs_dir</span>
-  <span class="k">raise</span> <span class="no">ArgumentError</span><span class="p">,</span> <span class="s1">&#39;No name&#39;</span> <span class="k">unless</span> <span class="nb">name</span>
-  <span class="n">pod_dir</span> <span class="o">=</span> <span class="n">pod_path</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
-  <span class="k">return</span> <span class="k">unless</span> <span class="n">pod_dir</span><span class="o">.</span><span class="n">exist?</span>
-  <span class="vi">@versions_by_name</span><span class="o">[</span><span class="nb">name</span><span class="o">]</span> <span class="o">||=</span> <span class="n">pod_dir</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">v</span><span class="o">|</span>
-    <span class="n">basename</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">basename</span><span class="o">.</span><span class="n">to_s</span>
-    <span class="k">begin</span>
-      <span class="no">Version</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">basename</span><span class="p">)</span> <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">directory?</span> <span class="o">&amp;&amp;</span> <span class="n">basename</span><span class="o">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="o">]</span> <span class="o">!=</span> <span class="s1">&#39;.&#39;</span>
-    <span class="k">rescue</span> <span class="no">ArgumentError</span>
-    <span class="k">raise</span> <span class="no">Informative</span><span class="p">,</span> <span class="s1">&#39;An unexpected version directory ...&#39;</span>
-    <span class="k">end</span>
-  <span class="k">end</span><span class="o">.</span><span class="n">compact</span><span class="o">.</span><span class="n">sort</span><span class="o">.</span><span class="n">reverse</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>该方法重点在于将 <code>pod_dir</code> 下的每个目录都转换成为了 <strong>Version</strong> 类型，并在最后进行了 sort 排序。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">def</span> <span style="color:#268bd2">versions</span>(<span style="color:#b58900">name</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>  <span style="color:#719e07">return</span> <span style="color:#719e07">nil</span> <span style="color:#719e07">unless</span> specs_dir
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>  <span style="color:#719e07">raise</span> <span style="color:#cb4b16">ArgumentError</span>, <span style="color:#2aa198">&#39;No name&#39;</span> <span style="color:#719e07">unless</span> <span style="color:#b58900">name</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>  pod_dir <span style="color:#719e07">=</span> pod_path(<span style="color:#b58900">name</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>  <span style="color:#719e07">return</span> <span style="color:#719e07">unless</span> pod_dir<span style="color:#719e07">.</span>exist?
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>  @versions_by_name<span style="color:#719e07">[</span><span style="color:#b58900">name</span><span style="color:#719e07">]</span> <span style="color:#719e07">||=</span> pod_dir<span style="color:#719e07">.</span>children<span style="color:#719e07">.</span>map <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>v<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>    basename <span style="color:#719e07">=</span> v<span style="color:#719e07">.</span>basename<span style="color:#719e07">.</span>to_s
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>    <span style="color:#719e07">begin</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>      <span style="color:#cb4b16">Version</span><span style="color:#719e07">.</span>new(basename) <span style="color:#719e07">if</span> v<span style="color:#719e07">.</span>directory? <span style="color:#719e07">&amp;&amp;</span> basename<span style="color:#719e07">[</span><span style="color:#2aa198">0</span>, <span style="color:#2aa198">1</span><span style="color:#719e07">]</span> <span style="color:#719e07">!=</span> <span style="color:#2aa198">&#39;.&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>    <span style="color:#719e07">rescue</span> <span style="color:#cb4b16">ArgumentError</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>    <span style="color:#719e07">raise</span> <span style="color:#cb4b16">Informative</span>, <span style="color:#2aa198">&#39;An unexpected version directory ...&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>  <span style="color:#719e07">end</span><span style="color:#719e07">.</span>compact<span style="color:#719e07">.</span>sort<span style="color:#719e07">.</span>reverse
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span><span style="color:#719e07">end</span>
+</code></pre></div><p>该方法重点在于将 <code>pod_dir</code> 下的每个目录都转换成为了 <strong>Version</strong> 类型，并在最后进行了 sort 排序。</p>
 <blockquote>
 <p><code>#versions</code> 方法主要在 <code>pod search</code> 命令中被调用，后续会介绍。</p>
 </blockquote>
 <p>来搂一眼 Version 类：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">Version</span> <span class="o">&lt;</span> <span class="no">Pod</span><span class="o">::</span><span class="no">Vendor</span><span class="o">::</span><span class="no">Gem</span><span class="o">::</span><span class="no">Version</span>
-  <span class="no">METADATA_PATTERN</span> <span class="o">=</span> <span class="s1">&#39;(\+[0-9a-zA-Z\-\.]+)&#39;</span>
-  <span class="no">VERSION_PATTERN</span> <span class="o">=</span> <span class="s2">&#34;[0-9]+(</span><span class="se">\\</span><span class="s2">.[0-9a-zA-Z</span><span class="se">\\</span><span class="s2">-]+)*</span><span class="si">#{</span><span class="no">METADATA_PATTERN</span><span class="si">}</span><span class="s2">?&#34;</span>
-  <span class="c1"># ...</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>该 Version 继承于 <a href="https://www.rubydoc.info/github/rubygems/rubygems/Gem/Version">Gem::Version</a> 并对其进行了扩展，实现了语义化版本号的标准，sort 排序也是基于语义化的版本来比较的，这里我们稍微展开一下。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#719e07">class</span> <span style="color:#268bd2">Version</span> <span style="color:#719e07">&lt;</span> <span style="color:#cb4b16">Pod</span><span style="color:#719e07">::</span><span style="color:#cb4b16">Vendor</span><span style="color:#719e07">::</span><span style="color:#cb4b16">Gem</span><span style="color:#719e07">::</span><span style="color:#cb4b16">Version</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>  <span style="color:#cb4b16">METADATA_PATTERN</span> <span style="color:#719e07">=</span> <span style="color:#2aa198">&#39;(\+[0-9a-zA-Z\-\.]+)&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>  <span style="color:#cb4b16">VERSION_PATTERN</span> <span style="color:#719e07">=</span> <span style="color:#2aa198">&#34;[0-9]+(</span><span style="color:#cb4b16">\\</span><span style="color:#2aa198">.[0-9a-zA-Z</span><span style="color:#cb4b16">\\</span><span style="color:#2aa198">-]+)*</span><span style="color:#2aa198">#{</span><span style="color:#cb4b16">METADATA_PATTERN</span><span style="color:#2aa198">}</span><span style="color:#2aa198">?&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>  <span style="color:#586e75"># ...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span><span style="color:#719e07">end</span>
+</code></pre></div><p>该 Version 继承于 <a href="https://www.rubydoc.info/github/rubygems/rubygems/Gem/Version">Gem::Version</a> 并对其进行了扩展，实现了语义化版本号的标准，sort 排序也是基于语义化的版本来比较的，这里我们稍微展开一下。</p>
 <h3 id="semantic-versioning">Semantic Versioning</h3>
 <p>语义化版本号（<a href="https://semver.org/">Semantic Versioning</a> 简称：SemVer）绝对是依赖管理工具绕不开的坎。<strong>语义化的版本就是让版本号更具语义化，可以传达出关于软件本身的一些重要信息而不只是简单的一串数字。</strong> 我们每次对 Pod 依赖进行更新，最后最重要的一步就是更新正确的版本号，一旦发布出去，再要更改就比较麻烦了。</p>
 <blockquote>
 <p><a href="https://github.com/semver/semver">SemVer</a> 是由 Tom Preston-Werner 发起的一个关于软件版本号的命名规范，该作者为 Gravatars 创办者同时也是 GitHub 联合创始人。</p>
 </blockquote>
 <p>那什么是语义化版本号有什么特别呢 ？我们以 AFNetworking 的 <strong>release tag</strong> 示例：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">3.0.0
-3.0.0-beta.1
-3.0.0-beta.2
-3.0.0-beta.3
-3.0.1
-</code></pre></td></tr></table>
-</div>
-</div><p>这些 tags 并非随意递增的，它们背后正是遵循了语义化版本的标准。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>3.0.0
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>3.0.0-beta.1
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>3.0.0-beta.2
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>3.0.0-beta.3
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>3.0.1
+</code></pre></div><p>这些 tags 并非随意递增的，它们背后正是遵循了语义化版本的标准。</p>
 <p><strong>基本规则</strong></p>
 <ul>
 <li>软件的版本通常由三位组成，如：X.Y.Z。</li>
@@ -525,27 +356,14 @@ if (!doNotTrack) {
 <p>主版本号.次版本号.修订号</p>
 </blockquote>
 <p>版本号递增规则如下：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="o">|</span> <span class="no">Code</span> <span class="n">status</span>        <span class="o">|</span> <span class="no">Stage</span>                  <span class="o">|</span> <span class="no">Example</span> <span class="n">version</span> <span class="o">|</span>
-<span class="o">|</span> <span class="o">------------------</span> <span class="o">|</span> <span class="o">----------------------</span> <span class="o">|</span> <span class="o">---------------</span> <span class="o">|</span>
-<span class="o">|</span> <span class="err">新品首发</span>             <span class="o">|</span> <span class="err">从</span> <span class="mi">1</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">0</span> <span class="err">开始</span>           <span class="o">|</span> <span class="mi">1</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">0</span>           <span class="o">|</span>
-<span class="o">|</span> <span class="err">向后兼容的</span> <span class="no">BugFix</span>    <span class="o">|</span> <span class="err">增加补丁号</span> <span class="n">Z</span>             <span class="o">|</span> <span class="mi">1</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">1</span>           <span class="o">|</span>
-<span class="o">|</span> <span class="err">向后兼容的</span> <span class="no">Feature</span>   <span class="o">|</span> <span class="err">增加次版本号</span> <span class="n">Y</span>           <span class="o">|</span> <span class="mi">1</span><span class="o">.</span><span class="mi">1</span><span class="o">.</span><span class="mi">0</span>           <span class="o">|</span>
-<span class="o">|</span> <span class="err">向后不兼容的改动</span>      <span class="o">|</span> <span class="err">增加主版本号</span> <span class="n">X</span>           <span class="o">|</span> <span class="mi">2</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">0</span>           <span class="o">|</span>
-<span class="o">|</span> <span class="err">重要版本的预览版</span>      <span class="o">|</span> <span class="err">补丁号后添加</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">rc</span>   <span class="o">|</span> <span class="mi">2</span><span class="o">.</span><span class="mi">1</span><span class="o">.</span><span class="mi">0</span><span class="o">-</span><span class="n">rc</span><span class="o">.</span><span class="mi">0</span>      <span class="o">|</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>关于 CocoaPods 的 Version 使用描述，<a href="https://guides.cocoapods.org/using/the-podfile.html#specifying-pod-versions">传送门</a>。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#719e07">|</span> <span style="color:#cb4b16">Code</span> status        <span style="color:#719e07">|</span> <span style="color:#cb4b16">Stage</span>                  <span style="color:#719e07">|</span> <span style="color:#cb4b16">Example</span> version <span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span><span style="color:#719e07">|</span> <span style="color:#719e07">------------------</span> <span style="color:#719e07">|</span> <span style="color:#719e07">----------------------</span> <span style="color:#719e07">|</span> <span style="color:#719e07">---------------</span> <span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span><span style="color:#719e07">|</span> 新品首发             <span style="color:#719e07">|</span> 从 <span style="color:#2aa198">1</span><span style="color:#719e07">.</span><span style="color:#2aa198">0</span><span style="color:#719e07">.</span><span style="color:#2aa198">0</span> 开始           <span style="color:#719e07">|</span> <span style="color:#2aa198">1</span><span style="color:#719e07">.</span><span style="color:#2aa198">0</span><span style="color:#719e07">.</span><span style="color:#2aa198">0</span>           <span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span><span style="color:#719e07">|</span> 向后兼容的 <span style="color:#cb4b16">BugFix</span>    <span style="color:#719e07">|</span> 增加补丁号 Z             <span style="color:#719e07">|</span> <span style="color:#2aa198">1</span><span style="color:#719e07">.</span><span style="color:#2aa198">0</span><span style="color:#719e07">.</span><span style="color:#2aa198">1</span>           <span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span><span style="color:#719e07">|</span> 向后兼容的 <span style="color:#cb4b16">Feature</span>   <span style="color:#719e07">|</span> 增加次版本号 Y           <span style="color:#719e07">|</span> <span style="color:#2aa198">1</span><span style="color:#719e07">.</span><span style="color:#2aa198">1</span><span style="color:#719e07">.</span><span style="color:#2aa198">0</span>           <span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span><span style="color:#719e07">|</span> 向后不兼容的改动      <span style="color:#719e07">|</span> 增加主版本号 X           <span style="color:#719e07">|</span> <span style="color:#2aa198">2</span><span style="color:#719e07">.</span><span style="color:#2aa198">0</span><span style="color:#719e07">.</span><span style="color:#2aa198">0</span>           <span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span><span style="color:#719e07">|</span> 重要版本的预览版      <span style="color:#719e07">|</span> 补丁号后添加 alpha, rc   <span style="color:#719e07">|</span> <span style="color:#2aa198">2</span><span style="color:#719e07">.</span><span style="color:#2aa198">1</span><span style="color:#719e07">.</span><span style="color:#2aa198">0</span><span style="color:#719e07">-</span>rc<span style="color:#719e07">.</span><span style="color:#2aa198">0</span>      <span style="color:#719e07">|</span>
+</code></pre></div><p>关于 CocoaPods 的 Version 使用描述，<a href="https://guides.cocoapods.org/using/the-podfile.html#specifying-pod-versions">传送门</a>。</p>
 <h2 id="cdnsource">CDNSource</h2>
 <p>CocoaPods 在 1.7.2 版本正式将 Master 仓库托管到 Netlify 的 CDN 上，当时关于如何支持这一特性的文章和说明铺天盖地，这里还是推荐大家看<a href="https://blog.cocoapods.org/CocoaPods-1.7.2/">官方说明</a>。另外，当时感受是似乎国内的部分 iOS 同学都炸了，各种标题党：<em>什么最完美的升级</em>等等。</p>
 <p>所以这里明确一下，对于 CocoaPods 的 Master 仓库支持了 CDN 的行为，仅解决了两个问题：</p>
@@ -558,415 +376,195 @@ if (!doNotTrack) {
 <p>PS：作为 iOS 工程师，就经常被前端同学 😒 。你看这 CocoaPods 也太垃圾了吧！！！一旦删掉 <code>Pods</code> 目录重新 install 就卡半天，缓存基本不生效，哪像 npm 多快 balabala &hellip;</p>
 </blockquote>
 <p>先来看 CDNSource 结构：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="nb">require</span> <span class="s1">&#39;cocoapods-core/source&#39;</span>
-<span class="c1"># ...</span>
-<span class="k">module</span> <span class="nn">Pod</span>
-  <span class="k">class</span> <span class="nc">CDNSource</span> <span class="o">&lt;</span> <span class="no">Source</span>
-    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">repo</span><span class="p">)</span>
-      <span class="c1"># 标记是否正在同步文件</span>
-      <span class="vi">@check_existing_files_for_update</span> <span class="o">=</span> <span class="kp">false</span>
-      <span class="c1"># 记录时间用于对比下载文件的新旧程度，以确认是否需要更新保存所下的资源</span>
-      <span class="vi">@startup_time</span> <span class="o">=</span> <span class="no">Time</span><span class="o">.</span><span class="n">new</span>
-      <span class="c1"># 缓存查询过的 PodSpec 资源</span>
-      <span class="vi">@version_arrays_by_fragment_by_name</span> <span class="o">=</span> <span class="p">{}</span>
-      <span class="k">super</span><span class="p">(</span><span class="n">repo</span><span class="p">)</span>
-    <span class="k">end</span>
-
-    <span class="k">def</span> <span class="nf">url</span>
-      <span class="vi">@url</span> <span class="o">||=</span> <span class="no">File</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;.url&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">chomp</span><span class="o">.</span><span class="n">chomp</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span>
-    <span class="k">end</span>
-
-    <span class="k">def</span> <span class="nf">type</span>
-      <span class="s1">&#39;CDN&#39;</span>
-    <span class="k">end</span>
-    <span class="c1"># ...</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>Source 类是基于 Github Repo 来同步更新 <code>PodSpec</code>，而 CDNSource 则是基于 CDN 服务所返回的 Response，因此将 Source 类的大部分方法重写了一个遍，具体会在 SourceManager 一节来展开。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#b58900">require</span> <span style="color:#2aa198">&#39;cocoapods-core/source&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span><span style="color:#586e75"># ...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span><span style="color:#719e07">module</span> Pod
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>  <span style="color:#719e07">class</span> <span style="color:#268bd2">CDNSource</span> <span style="color:#719e07">&lt;</span> <span style="color:#cb4b16">Source</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>    <span style="color:#719e07">def</span> <span style="color:#268bd2">initialize</span>(repo)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>      <span style="color:#586e75"># 标记是否正在同步文件</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>      @check_existing_files_for_update <span style="color:#719e07">=</span> <span style="color:#719e07">false</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>      <span style="color:#586e75"># 记录时间用于对比下载文件的新旧程度，以确认是否需要更新保存所下的资源</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>      @startup_time <span style="color:#719e07">=</span> <span style="color:#cb4b16">Time</span><span style="color:#719e07">.</span>new
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>      <span style="color:#586e75"># 缓存查询过的 PodSpec 资源</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>      @version_arrays_by_fragment_by_name <span style="color:#719e07">=</span> {}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>      <span style="color:#719e07">super</span>(repo)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>    <span style="color:#719e07">def</span> <span style="color:#268bd2">url</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>      @url <span style="color:#719e07">||=</span> <span style="color:#cb4b16">File</span><span style="color:#719e07">.</span>read(repo<span style="color:#719e07">.</span>join(<span style="color:#2aa198">&#39;.url&#39;</span>))<span style="color:#719e07">.</span>chomp<span style="color:#719e07">.</span>chomp(<span style="color:#2aa198">&#39;/&#39;</span>) <span style="color:#719e07">+</span> <span style="color:#2aa198">&#39;/&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>    <span style="color:#719e07">def</span> <span style="color:#268bd2">type</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>      <span style="color:#2aa198">&#39;CDN&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">22</span>    <span style="color:#586e75"># ...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">23</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">24</span><span style="color:#719e07">end</span>
+</code></pre></div><p>Source 类是基于 Github Repo 来同步更新 <code>PodSpec</code>，而 CDNSource 则是基于 CDN 服务所返回的 Response，因此将 Source 类的大部分方法重写了一个遍，具体会在 SourceManager 一节来展开。</p>
 <p>最后看一下 <code>TrunkSource</code> 类：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">module</span> <span class="nn">Pod</span>
-  <span class="k">class</span> <span class="nc">TrunkSource</span> <span class="o">&lt;</span> <span class="no">CDNSource</span>
-    <span class="c1"># 新版落盘后仓库名称</span>
-    <span class="no">TRUNK_REPO_NAME</span> <span class="o">=</span> <span class="s1">&#39;trunk&#39;</span><span class="o">.</span><span class="n">freeze</span>
-
-    <span class="no">TRUNK_REPO_URL</span> <span class="o">=</span> <span class="s1">&#39;https://cdn.cocoapods.org/&#39;</span><span class="o">.</span><span class="n">freeze</span>
-
-    <span class="k">def</span> <span class="nf">url</span>
-      <span class="vi">@url</span> <span class="o">||=</span> <span class="no">TRUNK_REPO_URL</span>
-      <span class="k">super</span>
-    <span class="k">end</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>核心就是重写了返回的 <code>url</code>，由于旧版 Spec 仓库名称为 <code>master</code> 为了加以区分，CDN 仓库则改名为 <code>trunk</code>。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">module</span> Pod
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>  <span style="color:#719e07">class</span> <span style="color:#268bd2">TrunkSource</span> <span style="color:#719e07">&lt;</span> <span style="color:#cb4b16">CDNSource</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>    <span style="color:#586e75"># 新版落盘后仓库名称</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>    <span style="color:#cb4b16">TRUNK_REPO_NAME</span> <span style="color:#719e07">=</span> <span style="color:#2aa198">&#39;trunk&#39;</span><span style="color:#719e07">.</span>freeze
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>    <span style="color:#cb4b16">TRUNK_REPO_URL</span> <span style="color:#719e07">=</span> <span style="color:#2aa198">&#39;https://cdn.cocoapods.org/&#39;</span><span style="color:#719e07">.</span>freeze
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>    <span style="color:#719e07">def</span> <span style="color:#268bd2">url</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>      @url <span style="color:#719e07">||=</span> <span style="color:#cb4b16">TRUNK_REPO_URL</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>      <span style="color:#719e07">super</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span><span style="color:#719e07">end</span>
+</code></pre></div><p>核心就是重写了返回的 <code>url</code>，由于旧版 Spec 仓库名称为 <code>master</code> 为了加以区分，CDN 仓库则改名为 <code>trunk</code>。</p>
 <h1 id="source-manager">Source Manager</h1>
 <p><code>Manager</code> 作为 source 的管理类，其主要任务为 source 的添加和获取，而对 <code>PodSpec</code> 文件的更新和查找行为则交由 source 各自实现。不过由于一个 <code>pod</code> 库可能对应多个不同的 source，这里又产生出 <code>Aggregate</code> 类来统一 <code>PodSpec</code> 的查询。</p>
 <p>它们的关系如下：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gmmesjqrkbj20ow0bit93.jpg" alt="04-manager"></p>
 <p>Manager 实现：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">module</span> <span class="nn">Pod</span>
-  <span class="k">class</span> <span class="nc">Source</span>
-    <span class="k">class</span> <span class="nc">Manager</span>
-      <span class="kp">attr_reader</span> <span class="ss">:repos_dir</span>
-
-      <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">repos_dir</span><span class="p">)</span>
-        <span class="vi">@repos_dir</span> <span class="o">=</span> <span class="no">Pathname</span><span class="p">(</span><span class="n">repos_dir</span><span class="p">)</span><span class="o">.</span><span class="n">expand_path</span>
-      <span class="k">end</span>
-
-      <span class="k">def</span> <span class="nf">source_repos</span>
-        <span class="k">return</span> <span class="o">[]</span> <span class="k">unless</span> <span class="n">repos_dir</span><span class="o">.</span><span class="n">exist?</span>
-        <span class="n">repos_dir</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:directory?</span><span class="p">)</span><span class="o">.</span><span class="n">sort_by</span> <span class="p">{</span> <span class="o">|</span><span class="n">d</span><span class="o">|</span> <span class="n">d</span><span class="o">.</span><span class="n">basename</span><span class="o">.</span><span class="n">to_s</span><span class="o">.</span><span class="n">downcase</span> <span class="p">}</span>
-      <span class="k">end</span>
-
-      <span class="k">def</span> <span class="nf">aggregate</span>
-        <span class="n">aggregate_with_repos</span><span class="p">(</span><span class="n">source_repos</span><span class="p">)</span>
-      <span class="k">end</span>
-
-      <span class="k">def</span> <span class="nf">aggregate_with_repos</span><span class="p">(</span><span class="n">repos</span><span class="p">)</span>
-        <span class="n">sources</span> <span class="o">=</span> <span class="n">repos</span><span class="o">.</span><span class="n">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">path</span><span class="o">|</span> <span class="n">source_from_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="p">}</span>
-        <span class="vi">@aggregates_by_repos</span> <span class="o">||=</span> <span class="p">{}</span>
-        <span class="vi">@aggregates_by_repos</span><span class="o">[</span><span class="n">repos</span><span class="o">]</span> <span class="o">||=</span> <span class="no">Source</span><span class="o">::</span><span class="no">Aggregate</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">sources</span><span class="p">)</span>
-      <span class="k">end</span>
-
-      <span class="k">def</span> <span class="nf">all</span>
-        <span class="n">aggregate</span><span class="o">.</span><span class="n">sources</span>
-      <span class="k">end</span>
-      <span class="c1"># ...</span>
-    <span class="k">end</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>Manager 类的初始化仅需要传入当前 repos 目录，即 <code>~/.cocoapods/repos</code>，而 Aggregate 的生成则保存 <code>repos_dir</code> 了目录下的 Source，用于后续处理。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">module</span> Pod
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>  <span style="color:#719e07">class</span> <span style="color:#268bd2">Source</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>    <span style="color:#719e07">class</span> <span style="color:#268bd2">Manager</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>      <span style="color:#719e07">attr_reader</span> <span style="color:#2aa198">:repos_dir</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>      <span style="color:#719e07">def</span> <span style="color:#268bd2">initialize</span>(repos_dir)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>        @repos_dir <span style="color:#719e07">=</span> <span style="color:#cb4b16">Pathname</span>(repos_dir)<span style="color:#719e07">.</span>expand_path
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>      <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>      <span style="color:#719e07">def</span> <span style="color:#268bd2">source_repos</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>        <span style="color:#719e07">return</span> <span style="color:#719e07">[]</span> <span style="color:#719e07">unless</span> repos_dir<span style="color:#719e07">.</span>exist?
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>        repos_dir<span style="color:#719e07">.</span>children<span style="color:#719e07">.</span>select(<span style="color:#719e07">&amp;</span><span style="color:#2aa198">:directory?</span>)<span style="color:#719e07">.</span>sort_by { <span style="color:#719e07">|</span>d<span style="color:#719e07">|</span> d<span style="color:#719e07">.</span>basename<span style="color:#719e07">.</span>to_s<span style="color:#719e07">.</span>downcase }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>      <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>      <span style="color:#719e07">def</span> <span style="color:#268bd2">aggregate</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>        aggregate_with_repos(source_repos)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>      <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>      <span style="color:#719e07">def</span> <span style="color:#268bd2">aggregate_with_repos</span>(repos)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>        sources <span style="color:#719e07">=</span> repos<span style="color:#719e07">.</span>map { <span style="color:#719e07">|</span>path<span style="color:#719e07">|</span> source_from_path(path) }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span>        @aggregates_by_repos <span style="color:#719e07">||=</span> {}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">22</span>        @aggregates_by_repos<span style="color:#719e07">[</span>repos<span style="color:#719e07">]</span> <span style="color:#719e07">||=</span> <span style="color:#cb4b16">Source</span><span style="color:#719e07">::</span><span style="color:#cb4b16">Aggregate</span><span style="color:#719e07">.</span>new(sources)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">23</span>      <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">24</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">25</span>      <span style="color:#719e07">def</span> <span style="color:#268bd2">all</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">26</span>        aggregate<span style="color:#719e07">.</span>sources
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">27</span>      <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">28</span>      <span style="color:#586e75"># ...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">29</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">30</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">31</span><span style="color:#719e07">end</span>
+</code></pre></div><p>Manager 类的初始化仅需要传入当前 repos 目录，即 <code>~/.cocoapods/repos</code>，而 Aggregate 的生成则保存 <code>repos_dir</code> 了目录下的 Source，用于后续处理。</p>
 <p>先看 Source 的生成，在 <code>#source_from_path</code> 中：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">source_from_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-  <span class="vi">@sources_by_path</span> <span class="o">||=</span> <span class="no">Hash</span><span class="o">.</span><span class="n">new</span> <span class="k">do</span> <span class="o">|</span><span class="nb">hash</span><span class="p">,</span> <span class="n">key</span><span class="o">|</span>
-    <span class="nb">hash</span><span class="o">[</span><span class="n">key</span><span class="o">]</span> <span class="o">=</span> <span class="k">case</span>
-                <span class="k">when</span> <span class="n">key</span><span class="o">.</span><span class="n">basename</span><span class="o">.</span><span class="n">to_s</span> <span class="o">==</span> <span class="no">Pod</span><span class="o">::</span><span class="no">TrunkSource</span><span class="o">::</span><span class="no">TRUNK_REPO_NAME</span>
-                  <span class="no">TrunkSource</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-                <span class="k">when</span> <span class="p">(</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;.url&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">exist?</span>
-                  <span class="no">CDNSource</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-                <span class="k">else</span>
-                  <span class="no">Source</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-                <span class="k">end</span>
-  <span class="k">end</span>
-  <span class="vi">@sources_by_path</span><span class="o">[</span><span class="n">path</span><span class="o">]</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>以 <code>repos_dir</code> 下的目录名称来区分类型，而 CDNSource 则需要确保其目录下存在名为 <code>.url</code> 的文件。同时会对生成的 source 进行缓存。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">def</span> <span style="color:#268bd2">source_from_path</span>(path)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>  @sources_by_path <span style="color:#719e07">||=</span> <span style="color:#cb4b16">Hash</span><span style="color:#719e07">.</span>new <span style="color:#719e07">do</span> <span style="color:#719e07">|</span><span style="color:#b58900">hash</span>, key<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>    <span style="color:#b58900">hash</span><span style="color:#719e07">[</span>key<span style="color:#719e07">]</span> <span style="color:#719e07">=</span> <span style="color:#719e07">case</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>                <span style="color:#719e07">when</span> key<span style="color:#719e07">.</span>basename<span style="color:#719e07">.</span>to_s <span style="color:#719e07">==</span> <span style="color:#cb4b16">Pod</span><span style="color:#719e07">::</span><span style="color:#cb4b16">TrunkSource</span><span style="color:#719e07">::</span><span style="color:#cb4b16">TRUNK_REPO_NAME</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>                  <span style="color:#cb4b16">TrunkSource</span><span style="color:#719e07">.</span>new(key)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>                <span style="color:#719e07">when</span> (key <span style="color:#719e07">+</span> <span style="color:#2aa198">&#39;.url&#39;</span>)<span style="color:#719e07">.</span>exist?
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>                  <span style="color:#cb4b16">CDNSource</span><span style="color:#719e07">.</span>new(key)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>                <span style="color:#719e07">else</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>                  <span style="color:#cb4b16">Source</span><span style="color:#719e07">.</span>new(key)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>                <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>  @sources_by_path<span style="color:#719e07">[</span>path<span style="color:#719e07">]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span><span style="color:#719e07">end</span>
+</code></pre></div><p>以 <code>repos_dir</code> 下的目录名称来区分类型，而 CDNSource 则需要确保其目录下存在名为 <code>.url</code> 的文件。同时会对生成的 source 进行缓存。</p>
 <p>最后看 Aggregate 结构，核心就两个 search 方法：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">module</span> <span class="nn">Pod</span>
-  <span class="k">class</span> <span class="nc">Source</span>
-    <span class="k">class</span> <span class="nc">Aggregate</span>
-      <span class="kp">attr_reader</span> <span class="ss">:sources</span>
-
-      <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">sources</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="s2">&#34;Cannot initialize an aggregate with a nil source: (</span><span class="si">#{</span><span class="n">sources</span><span class="si">}</span><span class="s2">)&#34;</span> <span class="k">if</span> <span class="n">sources</span><span class="o">.</span><span class="n">include?</span><span class="p">(</span><span class="kp">nil</span><span class="p">)</span>
-        <span class="vi">@sources</span> <span class="o">=</span> <span class="n">sources</span>
-      <span class="k">end</span>
-      <span class="c1"># 查询依赖对应的 specs</span>
-      <span class="k">def</span> <span class="nf">search</span><span class="p">(</span><span class="n">dependency</span><span class="p">)</span> <span class="o">...</span> <span class="k">end</span>
-       
-      <span class="c1"># 查询某个 pod 以发布的 specs</span>
-      <span class="k">def</span> <span class="nf">search_by_name</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">full_text_search</span> <span class="o">=</span> <span class="kp">false</span><span class="p">)</span> <span class="o">...</span> <span class="k">end</span>
-        
-      <span class="c1"># ...</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><h2 id="source-源起">Source 源起</h2>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">module</span> Pod
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>  <span style="color:#719e07">class</span> <span style="color:#268bd2">Source</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>    <span style="color:#719e07">class</span> <span style="color:#268bd2">Aggregate</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>      <span style="color:#719e07">attr_reader</span> <span style="color:#2aa198">:sources</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>      <span style="color:#719e07">def</span> <span style="color:#268bd2">initialize</span>(sources)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>        <span style="color:#719e07">raise</span> <span style="color:#2aa198">&#34;Cannot initialize an aggregate with a nil source: (</span><span style="color:#2aa198">#{</span>sources<span style="color:#2aa198">}</span><span style="color:#2aa198">)&#34;</span> <span style="color:#719e07">if</span> sources<span style="color:#719e07">.</span>include?(<span style="color:#719e07">nil</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>        @sources <span style="color:#719e07">=</span> sources
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>      <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>      <span style="color:#586e75"># 查询依赖对应的 specs</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>      <span style="color:#719e07">def</span> <span style="color:#268bd2">search</span>(dependency) <span style="color:#719e07">...</span> <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>       
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>      <span style="color:#586e75"># 查询某个 pod 以发布的 specs</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>      <span style="color:#719e07">def</span> <span style="color:#268bd2">search_by_name</span>(query, full_text_search <span style="color:#719e07">=</span> <span style="color:#719e07">false</span>) <span style="color:#719e07">...</span> <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>        
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>      <span style="color:#586e75"># ...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span><span style="color:#719e07">end</span>
+</code></pre></div><h2 id="source-源起">Source 源起</h2>
 <p>本节我们来谈谈 source 是如何添加到 <code>repo_dir</code> 目录下的。</p>
 <p>由前面的介绍可知，每个 source 中自带 <strong>url</strong>，在 Source 类中 url 读取自 Git 仓库的 <code>remote.origin.url</code> 或本地 <code>.git</code> 目录，而在 CDNSource 中 url 则是读取自当前目录下的  <code>.url</code> 文件所保存的 URL 地址。</p>
 <p>那 CDNSource 的  <strong><code>.url</code> 文件是在什么时候被写入的呢 ？</strong></p>
 <p>这需要从 <code>Podfile</code> 说起。很多老项目的 <code>Podfile</code> 开头部分大都会有一行或多行 source 命令：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">source</span> <span class="s1">&#39;https://github.com/CocoaPods/Specs.git&#39;</span>
-<span class="n">source</span> <span class="s1">&#39;https://github.com/artsy/Specs.git&#39;</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>用于指定项目中 <code>PodSpec</code> 的查找源，这些指定源最终会保存在 <code>~/.cocoapods/repos</code> 目录下的仓库。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>source <span style="color:#2aa198">&#39;https://github.com/CocoaPods/Specs.git&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>source <span style="color:#2aa198">&#39;https://github.com/artsy/Specs.git&#39;</span>
+</code></pre></div><p>用于指定项目中 <code>PodSpec</code> 的查找源，这些指定源最终会保存在 <code>~/.cocoapods/repos</code> 目录下的仓库。</p>
 <p>当敲下 <code>pod install</code> 命令后，在 <code>#resolve_dependencies</code> 阶段的依赖分析中将同时完成 sources 的初始化。</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gmmeso77rcj20ow0biaap.jpg" alt="01-pod-install"></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="c1"># lib/cocoapods/installer/analyzer.rb</span>
-
-<span class="k">def</span> <span class="nf">sources</span>
-  <span class="vi">@sources</span> <span class="o">||=</span> <span class="k">begin</span>
-    <span class="c1"># 省略获取 podfile、plugins、dependencies 的 source url ...</span>
-    <span class="n">sources</span> <span class="o">=</span> <span class="o">...</span>
-     
-    <span class="n">result</span> <span class="o">=</span> <span class="n">sources</span><span class="o">.</span><span class="n">uniq</span><span class="o">.</span><span class="n">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">source_url</span><span class="o">|</span>
-      <span class="n">sources_manager</span><span class="o">.</span><span class="n">find_or_create_source_with_url</span><span class="p">(</span><span class="n">source_url</span><span class="p">)</span>
-    <span class="k">end</span>
-    <span class="k">unless</span> <span class="n">plugin_sources</span><span class="o">.</span><span class="n">empty?</span>
-      <span class="n">result</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">*</span><span class="n">plugin_sources</span><span class="p">)</span>
-      <span class="n">plugin_sources</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">source</span><span class="o">|</span>
-        <span class="n">sources_manager</span><span class="o">.</span><span class="n">add_source</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
-      <span class="k">end</span>
-    <span class="k">end</span>
-    <span class="n">result</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>获取 sources url 之后会通过 <code>sources_manager</code> 来完成 source 更新，逻辑在 CocoaPods 项目的 Manager 扩展中：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span><span class="lnt">33
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="c1"># lib/cocoapods/sources_manager.rb</span>
-
-<span class="k">module</span> <span class="nn">Pod</span>
-  <span class="k">class</span> <span class="nc">Source</span>
-    <span class="k">class</span> <span class="nc">Manager</span>
-
-      <span class="k">def</span> <span class="nf">find_or_create_source_with_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-        <span class="n">source_with_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="o">||</span> <span class="n">create_source_with_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-      <span class="k">end</span>
-
-      <span class="k">def</span> <span class="nf">create_source_with_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-        <span class="nb">name</span> <span class="o">=</span> <span class="n">name_for_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-        <span class="n">is_cdn</span> <span class="o">=</span> <span class="n">cdn_url?</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-		  <span class="c1"># ...</span>
-        <span class="k">begin</span>
-          <span class="k">if</span> <span class="n">is_cdn</span>
-            <span class="no">Command</span><span class="o">::</span><span class="no">Repo</span><span class="o">::</span><span class="no">AddCDN</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="o">[</span><span class="nb">name</span><span class="p">,</span> <span class="n">url</span><span class="o">]</span><span class="p">)</span><span class="o">.</span><span class="n">run</span>
-          <span class="k">else</span>
-            <span class="no">Command</span><span class="o">::</span><span class="no">Repo</span><span class="o">::</span><span class="no">Add</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="o">[</span><span class="nb">name</span><span class="p">,</span> <span class="n">url</span><span class="o">]</span><span class="p">)</span><span class="o">.</span><span class="n">run</span>
-          <span class="k">end</span>
-        <span class="k">rescue</span> <span class="no">Informative</span> <span class="o">=&gt;</span> <span class="n">e</span>
-          <span class="k">raise</span> <span class="no">Informative</span><span class="p">,</span> <span class="c1"># ...</span>
-        <span class="k">ensure</span>
-          <span class="no">UI</span><span class="o">.</span><span class="n">title_level</span> <span class="o">=</span> <span class="n">previous_title_level</span>
-        <span class="k">end</span>
-        <span class="n">source</span> <span class="o">=</span> <span class="n">source_with_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="s2">&#34;Unable to create a source with URL </span><span class="si">#{</span><span class="n">url</span><span class="si">}</span><span class="s2">&#34;</span> <span class="k">unless</span> <span class="n">source</span>
-        <span class="n">source</span>
-      <span class="k">end</span>
-      <span class="c1"># ...</span>
-    <span class="k">end</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>查找会先调用 <code>#source_with_url</code> 进行缓存查询，如未命中则会先下载 Source 仓库，结束后重刷 aggreate 以更新 source。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="c1"># lib/cocoapods-core/source/manager.rb</span>
-
-<span class="k">def</span> <span class="nf">source_with_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-  <span class="n">url</span> <span class="o">=</span> <span class="n">canonic_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-  <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://github.com/cocoapods/specs&#39;</span> <span class="k">if</span> <span class="n">url</span> <span class="o">=~</span> <span class="sr">%r{github.com[:/]+cocoapods/specs}</span>
-  <span class="n">all</span><span class="o">.</span><span class="n">find</span> <span class="k">do</span> <span class="o">|</span><span class="n">source</span><span class="o">|</span>
-    <span class="n">source</span><span class="o">.</span><span class="n">url</span> <span class="o">&amp;&amp;</span> <span class="n">canonic_url</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">url</span><span class="p">)</span> <span class="o">==</span> <span class="n">url</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-
-<span class="k">def</span> <span class="nf">canonic_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-  <span class="n">url</span><span class="o">.</span><span class="n">downcase</span><span class="o">.</span><span class="n">gsub</span><span class="p">(</span><span class="sr">/\.git$/</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">gsub</span><span class="p">(</span><span class="sr">%r{\/$}</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>另外，仓库的下载的则会通过 <code>#cdn_url?</code> 方法区分，最后的下载则 📦 在两个命令类中，概括如下：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#586e75"># lib/cocoapods/installer/analyzer.rb</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span><span style="color:#719e07">def</span> <span style="color:#268bd2">sources</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>  @sources <span style="color:#719e07">||=</span> <span style="color:#719e07">begin</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>    <span style="color:#586e75"># 省略获取 podfile、plugins、dependencies 的 source url ...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>    sources <span style="color:#719e07">=</span> <span style="color:#719e07">...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>     
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>    result <span style="color:#719e07">=</span> sources<span style="color:#719e07">.</span>uniq<span style="color:#719e07">.</span>map <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>source_url<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>      sources_manager<span style="color:#719e07">.</span>find_or_create_source_with_url(source_url)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>    <span style="color:#719e07">unless</span> plugin_sources<span style="color:#719e07">.</span>empty?
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>      result<span style="color:#719e07">.</span>insert(<span style="color:#2aa198">0</span>, <span style="color:#719e07">*</span>plugin_sources)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>      plugin_sources<span style="color:#719e07">.</span>each <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>source<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>        sources_manager<span style="color:#719e07">.</span>add_source(source)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>      <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>    result
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span><span style="color:#719e07">end</span>
+</code></pre></div><p>获取 sources url 之后会通过 <code>sources_manager</code> 来完成 source 更新，逻辑在 CocoaPods 项目的 Manager 扩展中：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#586e75"># lib/cocoapods/sources_manager.rb</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span><span style="color:#719e07">module</span> Pod
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>  <span style="color:#719e07">class</span> <span style="color:#268bd2">Source</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>    <span style="color:#719e07">class</span> <span style="color:#268bd2">Manager</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>      <span style="color:#719e07">def</span> <span style="color:#268bd2">find_or_create_source_with_url</span>(url)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>        source_with_url(url) <span style="color:#719e07">||</span> create_source_with_url(url)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>      <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>      <span style="color:#719e07">def</span> <span style="color:#268bd2">create_source_with_url</span>(url)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>        <span style="color:#b58900">name</span> <span style="color:#719e07">=</span> name_for_url(url)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>        is_cdn <span style="color:#719e07">=</span> cdn_url?(url)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>		  <span style="color:#586e75"># ...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>        <span style="color:#719e07">begin</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>          <span style="color:#719e07">if</span> is_cdn
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>            <span style="color:#cb4b16">Command</span><span style="color:#719e07">::</span><span style="color:#cb4b16">Repo</span><span style="color:#719e07">::</span><span style="color:#cb4b16">AddCDN</span><span style="color:#719e07">.</span>parse(<span style="color:#719e07">[</span><span style="color:#b58900">name</span>, url<span style="color:#719e07">]</span>)<span style="color:#719e07">.</span>run
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>          <span style="color:#719e07">else</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>            <span style="color:#cb4b16">Command</span><span style="color:#719e07">::</span><span style="color:#cb4b16">Repo</span><span style="color:#719e07">::</span><span style="color:#cb4b16">Add</span><span style="color:#719e07">.</span>parse(<span style="color:#719e07">[</span><span style="color:#b58900">name</span>, url<span style="color:#719e07">]</span>)<span style="color:#719e07">.</span>run
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>          <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span>        <span style="color:#719e07">rescue</span> <span style="color:#cb4b16">Informative</span> <span style="color:#719e07">=&gt;</span> e
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">22</span>          <span style="color:#719e07">raise</span> <span style="color:#cb4b16">Informative</span>, <span style="color:#586e75"># ...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">23</span>        <span style="color:#719e07">ensure</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">24</span>          <span style="color:#cb4b16">UI</span><span style="color:#719e07">.</span>title_level <span style="color:#719e07">=</span> previous_title_level
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">25</span>        <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">26</span>        source <span style="color:#719e07">=</span> source_with_url(url)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">27</span>        <span style="color:#719e07">raise</span> <span style="color:#2aa198">&#34;Unable to create a source with URL </span><span style="color:#2aa198">#{</span>url<span style="color:#2aa198">}</span><span style="color:#2aa198">&#34;</span> <span style="color:#719e07">unless</span> source
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">28</span>        source
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">29</span>      <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">30</span>      <span style="color:#586e75"># ...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">31</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">32</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">33</span><span style="color:#719e07">end</span>
+</code></pre></div><p>查找会先调用 <code>#source_with_url</code> 进行缓存查询，如未命中则会先下载 Source 仓库，结束后重刷 aggreate 以更新 source。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#586e75"># lib/cocoapods-core/source/manager.rb</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span><span style="color:#719e07">def</span> <span style="color:#268bd2">source_with_url</span>(url)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>  url <span style="color:#719e07">=</span> canonic_url(url)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>  url <span style="color:#719e07">=</span> <span style="color:#2aa198">&#39;https://github.com/cocoapods/specs&#39;</span> <span style="color:#719e07">if</span> url <span style="color:#719e07">=~</span> <span style="color:#dc322f">%r{github.com[:/]+cocoapods/specs}</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>  all<span style="color:#719e07">.</span>find <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>source<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>    source<span style="color:#719e07">.</span>url <span style="color:#719e07">&amp;&amp;</span> canonic_url(source<span style="color:#719e07">.</span>url) <span style="color:#719e07">==</span> url
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span><span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span><span style="color:#719e07">def</span> <span style="color:#268bd2">canonic_url</span>(url)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>  url<span style="color:#719e07">.</span>downcase<span style="color:#719e07">.</span>gsub(<span style="color:#dc322f">/\.git$/</span>, <span style="color:#2aa198">&#39;&#39;</span>)<span style="color:#719e07">.</span>gsub(<span style="color:#dc322f">%r{\/$}</span>, <span style="color:#2aa198">&#39;&#39;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span><span style="color:#719e07">end</span>
+</code></pre></div><p>另外，仓库的下载的则会通过 <code>#cdn_url?</code> 方法区分，最后的下载则 📦 在两个命令类中，概括如下：</p>
 <ul>
 <li><strong>Command::Repo::AddCDN</strong>：即  <code>pod repo add-cdn</code> 命令，仅有的操作是将 url 写入 <code>.url</code> 文件中。</li>
 <li><strong>Command::Repo::Add</strong>：即 <code>pod repo add</code> 命令，对于普通类型的 Source 仓库下载本质就是 <code>git clone</code> 操作。</li>
@@ -976,83 +574,42 @@ if (!doNotTrack) {
 <h2 id="podspec-查询">PodSpec 查询</h2>
 <p>同样在 <code>#resolve_dependencies</code> 的依赖仲裁阶段，当 <strong>Molinillo</strong> 依赖仲裁开始前，会触发缓存查询 <code>#find_cached_set</code> 并最终调用到 Aggregate 的 <code>#search</code>。完整调用栈放在 <a href="https://gist.github.com/looseyi/492b220ea7e933e972b65876e491886f">gist</a> 上。</p>
 <p>我们来看看 <code>#search</code> 入口：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="c1"># lib/cocoapods-core/source/aggregate.rb</span>
-
-<span class="k">def</span> <span class="nf">search</span><span class="p">(</span><span class="n">dependency</span><span class="p">)</span>
-  <span class="n">found_sources</span> <span class="o">=</span> <span class="n">sources</span><span class="o">.</span><span class="n">select</span> <span class="p">{</span> <span class="o">|</span><span class="n">s</span><span class="o">|</span> <span class="n">s</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">dependency</span><span class="p">)</span> <span class="p">}</span>
-  <span class="k">unless</span> <span class="n">found_sources</span><span class="o">.</span><span class="n">empty?</span>
-    <span class="no">Specification</span><span class="o">::</span><span class="no">Set</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">dependency</span><span class="o">.</span><span class="n">root_name</span><span class="p">,</span> <span class="n">found_sources</span><span class="p">)</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>Aggregate 先遍历当前 sources 并进行 dependency 查找。由于 Git 仓库保存了完整的 PodSpecs，只要能在分片目录下查询到对应文件即可，最终结果会塞入 <code>Specification::Set</code> 返回。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#586e75"># lib/cocoapods-core/source/aggregate.rb</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span><span style="color:#719e07">def</span> <span style="color:#268bd2">search</span>(dependency)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>  found_sources <span style="color:#719e07">=</span> sources<span style="color:#719e07">.</span>select { <span style="color:#719e07">|</span>s<span style="color:#719e07">|</span> s<span style="color:#719e07">.</span>search(dependency) }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>  <span style="color:#719e07">unless</span> found_sources<span style="color:#719e07">.</span>empty?
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>    <span style="color:#cb4b16">Specification</span><span style="color:#719e07">::</span><span style="color:#cb4b16">Set</span><span style="color:#719e07">.</span>new(dependency<span style="color:#719e07">.</span>root_name, found_sources)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">8</span><span style="color:#719e07">end</span>
+</code></pre></div><p>Aggregate 先遍历当前 sources 并进行 dependency 查找。由于 Git 仓库保存了完整的 PodSpecs，只要能在分片目录下查询到对应文件即可，最终结果会塞入 <code>Specification::Set</code> 返回。</p>
 <blockquote>
 <p>Specification::Set 记录了当前 pod 关联的 Source，一个 pod 可能存在与多个不同的 Spec 仓库 中。</p>
 </blockquote>
 <h3 id="cdn-仓库查询">CDN 仓库查询</h3>
 <p>CDNSource 重写了 <code>#search</code> 实现：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="c1"># lib/cocoapods-core/cdn_source.rb</span>
-
-<span class="k">def</span> <span class="nf">search</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
-  <span class="k">unless</span> <span class="n">specs_dir</span>
-    <span class="k">raise</span> <span class="no">Informative</span><span class="p">,</span> <span class="s2">&#34;Unable to find a source named: `</span><span class="si">#{</span><span class="nb">name</span><span class="si">}</span><span class="s2">`&#34;</span>
-  <span class="k">end</span>
-  <span class="k">if</span> <span class="n">query</span><span class="o">.</span><span class="n">is_a?</span><span class="p">(</span><span class="no">Dependency</span><span class="p">)</span>
-    <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">root_name</span>
-  <span class="k">end</span>
-
-  <span class="n">fragment</span> <span class="o">=</span> <span class="n">pod_shard_fragment</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
-  <span class="n">ensure_versions_file_loaded</span><span class="p">(</span><span class="n">fragment</span><span class="p">)</span>
-  <span class="n">version_arrays_by_name</span> <span class="o">=</span> <span class="vi">@version_arrays_by_fragment_by_name</span><span class="o">[</span><span class="n">fragment</span><span class="o">]</span> <span class="o">||</span> <span class="p">{}</span>
-   
-  <span class="n">found</span> <span class="o">=</span> <span class="n">version_arrays_by_name</span><span class="o">[</span><span class="n">query</span><span class="o">].</span><span class="n">nil?</span> <span class="p">?</span> <span class="kp">nil</span> <span class="p">:</span> <span class="n">query</span>
-
-  <span class="k">if</span> <span class="n">found</span>
-    <span class="n">set</span> <span class="o">=</span> <span class="n">set</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
-    <span class="n">set</span> <span class="k">if</span> <span class="n">set</span><span class="o">.</span><span class="n">specification_name</span> <span class="o">==</span> <span class="n">query</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>逻辑两步走：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#586e75"># lib/cocoapods-core/cdn_source.rb</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span><span style="color:#719e07">def</span> <span style="color:#268bd2">search</span>(query)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>  <span style="color:#719e07">unless</span> specs_dir
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>    <span style="color:#719e07">raise</span> <span style="color:#cb4b16">Informative</span>, <span style="color:#2aa198">&#34;Unable to find a source named: `</span><span style="color:#2aa198">#{</span><span style="color:#b58900">name</span><span style="color:#2aa198">}</span><span style="color:#2aa198">`&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>  <span style="color:#719e07">if</span> query<span style="color:#719e07">.</span>is_a?(<span style="color:#cb4b16">Dependency</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>    query <span style="color:#719e07">=</span> query<span style="color:#719e07">.</span>root_name
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>  fragment <span style="color:#719e07">=</span> pod_shard_fragment(query)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>  ensure_versions_file_loaded(fragment)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>  version_arrays_by_name <span style="color:#719e07">=</span> @version_arrays_by_fragment_by_name<span style="color:#719e07">[</span>fragment<span style="color:#719e07">]</span> <span style="color:#719e07">||</span> {}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>   
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>  found <span style="color:#719e07">=</span> version_arrays_by_name<span style="color:#719e07">[</span>query<span style="color:#719e07">].</span>nil? ? <span style="color:#719e07">nil</span> : query
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>  <span style="color:#719e07">if</span> found
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>    set <span style="color:#719e07">=</span> set(query)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>    set <span style="color:#719e07">if</span> set<span style="color:#719e07">.</span>specification_name <span style="color:#719e07">==</span> query
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span><span style="color:#719e07">end</span>
+</code></pre></div><p>逻辑两步走：</p>
 <ol>
 <li>通过 <code>#ensure_versions_file_loaded</code> 检查 all_pods_versions 文件，如果不存在会进行下载操作。</li>
 <li>如果当前 source 包含查询的 pod，会创建 <code>Specification::Set</code> 作为查询结果，并在 <code>#specification_name</code> 方法内完成 <code>PodSpec</code> 的检查和下载。</li>
@@ -1060,233 +617,110 @@ if (!doNotTrack) {
 <p><strong>0x01 all_pods_versions 文件下载</strong></p>
 <p>依据前面提到的分片规则会将 pod 名称 MD5 分割后拼成 URL。</p>
 <p>以 <code>AFNetworking</code> 为例，经 <code>#pod_shard_fragment</code> 分割后获取的 fragment 为 <code>[a, 7, 5]</code>，则拼接后的 URL 为 <a href="https://cdn.cocoapods.org/all_pods_versions_a_7_5.txt">https://cdn.cocoapods.org/all_pods_versions_a_7_5.txt</a>，下载后的内容大致如下：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell">AFNetworking/0.10.0/0.10.1/.../4.0.1
-AppseeAnalytics/2.4.7/2.4.8/2.4.8.0/...
-DynamsoftBarcodeReader/7.1.0/...
-...
-</code></pre></td></tr></table>
-</div>
-</div><p>所包含的这些 pod 都是分片后得到的相同的地址，因此会保存在同一份 <code>all_pods_versions</code> 中。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">ensure_versions_file_loaded</span><span class="p">(</span><span class="n">fragment</span><span class="p">)</span>
-  <span class="k">return</span> <span class="k">if</span> <span class="o">!</span><span class="vi">@version_arrays_by_fragment_by_name</span><span class="o">[</span><span class="n">fragment</span><span class="o">].</span><span class="n">nil?</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="vi">@check_existing_files_for_update</span>
-
-  <span class="n">index_file_name</span> <span class="o">=</span> <span class="n">index_file_name_for_fragment</span><span class="p">(</span><span class="n">fragment</span><span class="p">)</span>
-  <span class="n">download_file</span><span class="p">(</span><span class="n">index_file_name</span><span class="p">)</span>
-  <span class="n">versions_raw</span> <span class="o">=</span> <span class="n">local_file</span><span class="p">(</span><span class="n">index_file_name</span><span class="p">,</span> <span class="o">&amp;</span><span class="ss">:to_a</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:chomp</span><span class="p">)</span>
-  <span class="vi">@version_arrays_by_fragment_by_name</span><span class="o">[</span><span class="n">fragment</span><span class="o">]</span> <span class="o">=</span> <span class="n">versions_raw</span><span class="o">.</span><span class="n">reduce</span><span class="p">({})</span> <span class="k">do</span> <span class="o">|</span><span class="nb">hash</span><span class="p">,</span> <span class="n">row</span><span class="o">|</span>
-    <span class="n">row</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
-    <span class="n">pod</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">shift</span>
-    <span class="n">versions</span> <span class="o">=</span> <span class="n">row</span>
-
-    <span class="nb">hash</span><span class="o">[</span><span class="n">pod</span><span class="o">]</span> <span class="o">=</span> <span class="n">versions</span>
-    <span class="nb">hash</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-
-<span class="k">def</span> <span class="nf">index_file_name_for_fragment</span><span class="p">(</span><span class="n">fragment</span><span class="p">)</span>
-  <span class="n">fragment_joined</span> <span class="o">=</span> <span class="n">fragment</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
-  <span class="n">fragment_joined</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">fragment_joined</span> <span class="k">unless</span> <span class="n">fragment</span><span class="o">.</span><span class="n">empty?</span>
-  <span class="s2">&#34;all_pods_versions</span><span class="si">#{</span><span class="n">fragment_joined</span><span class="si">}</span><span class="s2">.txt&#34;</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>另外每一份 pods_version 都会对应生成一个文件用于保存 ETag，具体会在下一节会介绍。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>AFNetworking/0.10.0/0.10.1/.../4.0.1
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>AppseeAnalytics/2.4.7/2.4.8/2.4.8.0/...
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>DynamsoftBarcodeReader/7.1.0/...
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>...
+</code></pre></div><p>所包含的这些 pod 都是分片后得到的相同的地址，因此会保存在同一份 <code>all_pods_versions</code> 中。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">def</span> <span style="color:#268bd2">ensure_versions_file_loaded</span>(fragment)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>  <span style="color:#719e07">return</span> <span style="color:#719e07">if</span> <span style="color:#719e07">!</span>@version_arrays_by_fragment_by_name<span style="color:#719e07">[</span>fragment<span style="color:#719e07">].</span>nil? <span style="color:#719e07">&amp;&amp;</span> <span style="color:#719e07">!</span>@check_existing_files_for_update
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>  index_file_name <span style="color:#719e07">=</span> index_file_name_for_fragment(fragment)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>  download_file(index_file_name)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>  versions_raw <span style="color:#719e07">=</span> local_file(index_file_name, <span style="color:#719e07">&amp;</span><span style="color:#2aa198">:to_a</span>)<span style="color:#719e07">.</span>map(<span style="color:#719e07">&amp;</span><span style="color:#2aa198">:chomp</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>  @version_arrays_by_fragment_by_name<span style="color:#719e07">[</span>fragment<span style="color:#719e07">]</span> <span style="color:#719e07">=</span> versions_raw<span style="color:#719e07">.</span>reduce({}) <span style="color:#719e07">do</span> <span style="color:#719e07">|</span><span style="color:#b58900">hash</span>, row<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>    row <span style="color:#719e07">=</span> row<span style="color:#719e07">.</span>split(<span style="color:#2aa198">&#39;/&#39;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>    pod <span style="color:#719e07">=</span> row<span style="color:#719e07">.</span>shift
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>    versions <span style="color:#719e07">=</span> row
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>    <span style="color:#b58900">hash</span><span style="color:#719e07">[</span>pod<span style="color:#719e07">]</span> <span style="color:#719e07">=</span> versions
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>    <span style="color:#b58900">hash</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span><span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span><span style="color:#719e07">def</span> <span style="color:#268bd2">index_file_name_for_fragment</span>(fragment)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>  fragment_joined <span style="color:#719e07">=</span> fragment<span style="color:#719e07">.</span>join(<span style="color:#2aa198">&#39;_&#39;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>  fragment_joined <span style="color:#719e07">=</span> <span style="color:#2aa198">&#39;_&#39;</span> <span style="color:#719e07">+</span> fragment_joined <span style="color:#719e07">unless</span> fragment<span style="color:#719e07">.</span>empty?
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>  <span style="color:#2aa198">&#34;all_pods_versions</span><span style="color:#2aa198">#{</span>fragment_joined<span style="color:#2aa198">}</span><span style="color:#2aa198">.txt&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span><span style="color:#719e07">end</span>
+</code></pre></div><p>另外每一份 pods_version 都会对应生成一个文件用于保存 ETag，具体会在下一节会介绍。</p>
 <p><strong>0x02 PodSpec 文件下载</strong></p>
 <p><code>#specification_name</code> 将从 <code>all_pods_versions</code> 索引文件中找出该 pod 所发布的版本号，依次检查下载对应版本的 <code>PodSpec.json</code> 文件。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">module</span> <span class="nn">Pod</span>
-  <span class="k">class</span> <span class="nc">Specification</span>
-    <span class="k">class</span> <span class="nc">Set</span>
-      <span class="kp">attr_reader</span> <span class="ss">:name</span>
-      <span class="kp">attr_reader</span> <span class="ss">:sources</span>
-      
-      <span class="k">def</span> <span class="nf">specification_name</span>
-        <span class="n">versions_by_source</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">source</span><span class="p">,</span> <span class="n">versions</span><span class="o">|</span>
-          <span class="k">next</span> <span class="k">unless</span> <span class="n">version</span> <span class="o">=</span> <span class="n">versions</span><span class="o">.</span><span class="n">first</span>
-          <span class="k">return</span> <span class="n">source</span><span class="o">.</span><span class="n">specification</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
-        <span class="k">end</span>
-        <span class="kp">nil</span>
-      <span class="k">end</span>
-
-      <span class="k">def</span> <span class="nf">versions_by_source</span>
-        <span class="vi">@versions_by_source</span> <span class="o">||=</span> <span class="n">sources</span><span class="o">.</span><span class="n">each_with_object</span><span class="p">({})</span> <span class="k">do</span> <span class="o">|</span><span class="n">source</span><span class="p">,</span> <span class="n">result</span><span class="o">|</span>
-          <span class="n">result</span><span class="o">[</span><span class="n">source</span><span class="o">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">versions</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
-        <span class="k">end</span>
-      <span class="k">end</span>
-      <span class="c1"># ...</span>
-    <span class="k">end</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>绕了一圈后回到 Source 的 <code>#versions</code> 方法，由于 CDN Source 不会全量下载 pod 的 PodSpec 文件，在 <a href="https://www.rubydoc.info/gems/cocoapods-core/Pod/CDNSource#versions-instance_method"><strong>#version</strong></a> 的检查过程会进行下载操作。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">module</span> Pod
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>  <span style="color:#719e07">class</span> <span style="color:#268bd2">Specification</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>    <span style="color:#719e07">class</span> <span style="color:#268bd2">Set</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>      <span style="color:#719e07">attr_reader</span> <span style="color:#2aa198">:name</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>      <span style="color:#719e07">attr_reader</span> <span style="color:#2aa198">:sources</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>      
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>      <span style="color:#719e07">def</span> <span style="color:#268bd2">specification_name</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>        versions_by_source<span style="color:#719e07">.</span>each <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>source, versions<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>          <span style="color:#719e07">next</span> <span style="color:#719e07">unless</span> version <span style="color:#719e07">=</span> versions<span style="color:#719e07">.</span>first
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>          <span style="color:#719e07">return</span> source<span style="color:#719e07">.</span>specification(<span style="color:#b58900">name</span>, version)<span style="color:#719e07">.</span>name
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>        <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>        <span style="color:#719e07">nil</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>      <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>      <span style="color:#719e07">def</span> <span style="color:#268bd2">versions_by_source</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>        @versions_by_source <span style="color:#719e07">||=</span> sources<span style="color:#719e07">.</span>each_with_object({}) <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>source, result<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>          result<span style="color:#719e07">[</span>source<span style="color:#719e07">]</span> <span style="color:#719e07">=</span> source<span style="color:#719e07">.</span>versions(<span style="color:#b58900">name</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>        <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>      <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>      <span style="color:#586e75"># ...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">22</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">23</span><span style="color:#719e07">end</span>
+</code></pre></div><p>绕了一圈后回到 Source 的 <code>#versions</code> 方法，由于 CDN Source 不会全量下载 pod 的 PodSpec 文件，在 <a href="https://www.rubydoc.info/gems/cocoapods-core/Pod/CDNSource#versions-instance_method"><strong>#version</strong></a> 的检查过程会进行下载操作。</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gk0tqzq5qoj20ow0bit9k.jpg" alt="08-cdn-search"></p>
 <h3 id="pod-search-查询命令">Pod Search 查询命令</h3>
 <p>CocoaPods 还提供了命令行工具 <code>cocoapods-search</code> 用于已发布的 <code>PodSpec</code> 查找：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell">$ pod search <span class="sb">`</span>QUERY<span class="sb">`</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>它提供了 Web 查询和本地查询。本地查询则不同于 <code>#search</code>，它需要调用 Aggregate 的 <code>#search_by_name</code> ，其实现同 <code>#search</code> 类似，最终也会走到 Source 的 <a href="https://www.rubydoc.info/gems/cocoapods-core/Pod/Source/Aggregate#search_by_name-instance_method">#versions</a> 方法。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>$ pod search <span style="color:#586e75">`</span>QUERY<span style="color:#586e75">`</span>
+</code></pre></div><p>它提供了 Web 查询和本地查询。本地查询则不同于 <code>#search</code>，它需要调用 Aggregate 的 <code>#search_by_name</code> ，其实现同 <code>#search</code> 类似，最终也会走到 Source 的 <a href="https://www.rubydoc.info/gems/cocoapods-core/Pod/Source/Aggregate#search_by_name-instance_method">#versions</a> 方法。</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gmmesx1nzpj20ow0biwex.jpg" alt="07-pod-search"></p>
 <blockquote>
 <p>注意，Gti 仓库的 <code>#search_by_name</code> 查询仍旧为文件查找，不会调用其 <code>#versions</code> 方法。</p>
 </blockquote>
 <h2 id="repo-更新">Repo 更新</h2>
 <p><code>pod install</code> 执行过程如果带上了 <code>--repo-update</code> 命令则在 <code>#resolve_dependencies</code> 阶段会触发 <code>#update_repositories</code> 更新 Spec 仓库：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="c1"># lib/cocoapods/installer/analyzer.rb</span>
-
-<span class="k">def</span> <span class="nf">update_repositories</span>
-  <span class="n">sources</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">source</span><span class="o">|</span>
-    <span class="k">if</span> <span class="n">source</span><span class="o">.</span><span class="n">updateable?</span>
-      <span class="n">sources_manager</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="kp">true</span><span class="p">)</span>
-    <span class="k">else</span>
-      <span class="no">UI</span><span class="o">.</span><span class="n">message</span> <span class="s2">&#34;Skipping ...&#34;</span>
-    <span class="k">end</span>
-  <span class="k">end</span>
-  <span class="vi">@specs_updated</span> <span class="o">=</span> <span class="kp">true</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>不过 <code>#update</code> 的实现逻辑在 CocoaPods 项目的 Manager 扩展中：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="c1"># lib/cocoapods/sources_managers.rb</span>
-
-<span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="n">source_name</span> <span class="o">=</span> <span class="kp">nil</span><span class="p">,</span> <span class="n">show_output</span> <span class="o">=</span> <span class="kp">false</span><span class="p">)</span>
-  <span class="k">if</span> <span class="n">source_name</span>
-    <span class="n">sources</span> <span class="o">=</span> <span class="o">[</span><span class="n">updateable_source_named</span><span class="p">(</span><span class="n">source_name</span><span class="p">)</span><span class="o">]</span>
-  <span class="k">else</span>
-    <span class="n">sources</span> <span class="o">=</span> <span class="n">updateable_sources</span>
-  <span class="k">end</span>
-
-  <span class="n">changed_spec_paths</span> <span class="o">=</span> <span class="p">{}</span>
-
-  <span class="c1"># Do not perform an update if the repos dir has not been setup yet.</span>
-  <span class="k">return</span> <span class="k">unless</span> <span class="n">repos_dir</span><span class="o">.</span><span class="n">exist?</span>
-
-  <span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&#34;</span><span class="si">#{</span><span class="n">repos_dir</span><span class="si">}</span><span class="s2">/Spec_Lock&#34;</span><span class="p">,</span> <span class="no">File</span><span class="o">::</span><span class="no">CREAT</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">f</span><span class="o">|</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">flock</span><span class="p">(</span><span class="no">File</span><span class="o">::</span><span class="no">LOCK_EX</span><span class="p">)</span>
-    <span class="n">sources</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">source</span><span class="o">|</span>
-      <span class="no">UI</span><span class="o">.</span><span class="n">section</span> <span class="s2">&#34;Updating spec repo `</span><span class="si">#{</span><span class="n">source</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">`&#34;</span> <span class="k">do</span>
-        <span class="n">changed_source_paths</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">show_output</span><span class="p">)</span>
-        <span class="n">changed_spec_paths</span><span class="o">[</span><span class="n">source</span><span class="o">]</span> <span class="o">=</span> <span class="n">changed_source_paths</span> <span class="k">if</span> <span class="n">changed_source_paths</span><span class="o">.</span><span class="n">count</span> <span class="o">&gt;</span> <span class="mi">0</span>
-        <span class="n">source</span><span class="o">.</span><span class="n">verify_compatibility!</span>
-      <span class="k">end</span>
-    <span class="k">end</span>
-  <span class="k">end</span>
-  <span class="n">update_search_index_if_needed_in_background</span><span class="p">(</span><span class="n">changed_spec_paths</span><span class="p">)</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><ol>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#586e75"># lib/cocoapods/installer/analyzer.rb</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span><span style="color:#719e07">def</span> <span style="color:#268bd2">update_repositories</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>  sources<span style="color:#719e07">.</span>each <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>source<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>    <span style="color:#719e07">if</span> source<span style="color:#719e07">.</span>updateable?
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>      sources_manager<span style="color:#719e07">.</span>update(source<span style="color:#719e07">.</span>name, <span style="color:#719e07">true</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>    <span style="color:#719e07">else</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>      <span style="color:#cb4b16">UI</span><span style="color:#719e07">.</span>message <span style="color:#2aa198">&#34;Skipping ...&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>  @specs_updated <span style="color:#719e07">=</span> <span style="color:#719e07">true</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span><span style="color:#719e07">end</span>
+</code></pre></div><p>不过 <code>#update</code> 的实现逻辑在 CocoaPods 项目的 Manager 扩展中：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#586e75"># lib/cocoapods/sources_managers.rb</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span><span style="color:#719e07">def</span> <span style="color:#268bd2">update</span>(source_name <span style="color:#719e07">=</span> <span style="color:#719e07">nil</span>, show_output <span style="color:#719e07">=</span> <span style="color:#719e07">false</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>  <span style="color:#719e07">if</span> source_name
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>    sources <span style="color:#719e07">=</span> <span style="color:#719e07">[</span>updateable_source_named(source_name)<span style="color:#719e07">]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>  <span style="color:#719e07">else</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>    sources <span style="color:#719e07">=</span> updateable_sources
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>  changed_spec_paths <span style="color:#719e07">=</span> {}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>  <span style="color:#586e75"># Do not perform an update if the repos dir has not been setup yet.</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>  <span style="color:#719e07">return</span> <span style="color:#719e07">unless</span> repos_dir<span style="color:#719e07">.</span>exist?
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>  <span style="color:#cb4b16">File</span><span style="color:#719e07">.</span>open(<span style="color:#2aa198">&#34;</span><span style="color:#2aa198">#{</span>repos_dir<span style="color:#2aa198">}</span><span style="color:#2aa198">/Spec_Lock&#34;</span>, <span style="color:#cb4b16">File</span><span style="color:#719e07">::</span><span style="color:#cb4b16">CREAT</span>) <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>f<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>    f<span style="color:#719e07">.</span>flock(<span style="color:#cb4b16">File</span><span style="color:#719e07">::</span><span style="color:#cb4b16">LOCK_EX</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>    sources<span style="color:#719e07">.</span>each <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>source<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>      <span style="color:#cb4b16">UI</span><span style="color:#719e07">.</span>section <span style="color:#2aa198">&#34;Updating spec repo `</span><span style="color:#2aa198">#{</span>source<span style="color:#719e07">.</span>name<span style="color:#2aa198">}</span><span style="color:#2aa198">`&#34;</span> <span style="color:#719e07">do</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>        changed_source_paths <span style="color:#719e07">=</span> source<span style="color:#719e07">.</span>update(show_output)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>        changed_spec_paths<span style="color:#719e07">[</span>source<span style="color:#719e07">]</span> <span style="color:#719e07">=</span> changed_source_paths <span style="color:#719e07">if</span> changed_source_paths<span style="color:#719e07">.</span>count <span style="color:#719e07">&gt;</span> <span style="color:#2aa198">0</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span>        source<span style="color:#719e07">.</span>verify_compatibility!
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">22</span>      <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">23</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">24</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">25</span>  update_search_index_if_needed_in_background(changed_spec_paths)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">26</span><span style="color:#719e07">end</span>
+</code></pre></div><ol>
 <li>
 <p>获取指定名称的 source，对 aggregate 返回的全部 sources 进行 filter，如未指定则 sources 全量。</p>
 </li>
@@ -1296,39 +730,20 @@ DynamsoftBarcodeReader/7.1.0/...
 </ol>
 <h3 id="git-仓库更新">Git 仓库更新</h3>
 <p>Git 仓库更新本质就是 Git 操作，即 <code>git pull</code>、<code>git checkout</code> 命令：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="n">show_output</span><span class="p">)</span>
-  <span class="k">return</span> <span class="o">[]</span> <span class="k">if</span> <span class="n">unchanged_github_repo?</span>
-  <span class="n">prev_commit_hash</span> <span class="o">=</span> <span class="n">git_commit_hash</span>
-  <span class="n">update_git_repo</span><span class="p">(</span><span class="n">show_output</span><span class="p">)</span>
-  <span class="vi">@versions_by_name</span><span class="o">.</span><span class="n">clear</span>
-  <span class="n">refresh_metadata</span>
-  <span class="k">if</span> <span class="n">version</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">last_compatible_version</span><span class="p">(</span><span class="no">Version</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="no">CORE_VERSION</span><span class="p">))</span>
-    <span class="n">tag</span> <span class="o">=</span> <span class="s2">&#34;v</span><span class="si">#{</span><span class="n">version</span><span class="si">}</span><span class="s2">&#34;</span>
-    <span class="no">CoreUI</span><span class="o">.</span><span class="n">warn</span> <span class="s2">&#34;Using the ...&#34;</span>
-    <span class="n">repo_git</span><span class="p">(</span><span class="o">[</span><span class="s1">&#39;checkout&#39;</span><span class="p">,</span> <span class="n">tag</span><span class="o">]</span><span class="p">)</span>
-  <span class="k">end</span>
-  <span class="n">diff_until_commit_hash</span><span class="p">(</span><span class="n">prev_commit_hash</span><span class="p">)</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p><code>#update_git_repo</code> 就是 <code>git fetch</code> + <code>git reset --hard [HEAD]</code> 的结合体，更新后会进行 cocoapods 版本兼容检查，最终输出 diff 信息。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">def</span> <span style="color:#268bd2">update</span>(show_output)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>  <span style="color:#719e07">return</span> <span style="color:#719e07">[]</span> <span style="color:#719e07">if</span> unchanged_github_repo?
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>  prev_commit_hash <span style="color:#719e07">=</span> git_commit_hash
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>  update_git_repo(show_output)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>  @versions_by_name<span style="color:#719e07">.</span>clear
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>  refresh_metadata
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>  <span style="color:#719e07">if</span> version <span style="color:#719e07">=</span> metadata<span style="color:#719e07">.</span>last_compatible_version(<span style="color:#cb4b16">Version</span><span style="color:#719e07">.</span>new(<span style="color:#cb4b16">CORE_VERSION</span>))
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>    tag <span style="color:#719e07">=</span> <span style="color:#2aa198">&#34;v</span><span style="color:#2aa198">#{</span>version<span style="color:#2aa198">}</span><span style="color:#2aa198">&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>    <span style="color:#cb4b16">CoreUI</span><span style="color:#719e07">.</span>warn <span style="color:#2aa198">&#34;Using the ...&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>    repo_git(<span style="color:#719e07">[</span><span style="color:#2aa198">&#39;checkout&#39;</span>, tag<span style="color:#719e07">]</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>  diff_until_commit_hash(prev_commit_hash)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span><span style="color:#719e07">end</span>
+</code></pre></div><p><code>#update_git_repo</code> 就是 <code>git fetch</code> + <code>git reset --hard [HEAD]</code> 的结合体，更新后会进行 cocoapods 版本兼容检查，最终输出 diff 信息。</p>
 <h3 id="cdn-仓库更新">CDN 仓库更新</h3>
 <p>Git 仓库是可以通过 Commit 信息来进行增量更新，那以静态资源方式缓存的 CDN 仓库是如何更新数据的呢 ？</p>
 <p>像浏览器或本地缓存<strong>本质是利用 ETag 来进行 Cache-Control</strong>，关于 CDN 缓存可以看这篇：<a href="https://zhuanlan.zhihu.com/p/65722520">传送门</a>。</p>
@@ -1336,102 +751,47 @@ DynamsoftBarcodeReader/7.1.0/...
 <p>Core 的实现也是如此，它会将各请求所对应的 ETag 以文件形式存储：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gmmet1emdjj20y50d9q4c.jpg" alt="06-source-cdn"></p>
 <p>⚠️ <strong>注意，在这个阶段 CDNSource 仅仅是更新当前目录下的索引文件</strong>，即 <code>all_pods_versions_x_x_x.txt</code>。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="n">_show_output</span><span class="p">)</span>
-  <span class="vi">@check_existing_files_for_update</span> <span class="o">=</span> <span class="kp">true</span>
-  <span class="k">begin</span>
-    <span class="n">preheat_existing_files</span>
-  <span class="k">ensure</span>
-    <span class="vi">@check_existing_files_for_update</span> <span class="o">=</span> <span class="kp">false</span>
-  <span class="k">end</span>
-  <span class="o">[]</span>
-<span class="k">end</span>
-
-<span class="k">def</span> <span class="nf">preheat_existing_files</span>
-  <span class="n">files_to_update</span> <span class="o">=</span> <span class="n">files_definitely_to_update</span> <span class="o">+</span> <span class="n">deprecated_local_podspecs</span> <span class="o">-</span> <span class="o">[</span><span class="s1">&#39;deprecated_podspecs.txt&#39;</span><span class="o">]</span>
-
-  <span class="n">concurrent_requests_catching_errors</span> <span class="k">do</span>
-    <span class="n">loaders</span> <span class="o">=</span> <span class="n">files_to_update</span><span class="o">.</span><span class="n">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">file</span><span class="o">|</span>
-      <span class="n">download_file_async</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
-    <span class="k">end</span>
-    <span class="no">Promises</span><span class="o">.</span><span class="n">zip_futures_on</span><span class="p">(</span><span class="no">HYDRA_EXECUTOR</span><span class="p">,</span> <span class="o">*</span><span class="n">loaders</span><span class="p">)</span><span class="o">.</span><span class="n">wait!</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><h3 id="pod-repo-更新命令">Pod Repo 更新命令</h3>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">def</span> <span style="color:#268bd2">update</span>(_show_output)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>  @check_existing_files_for_update <span style="color:#719e07">=</span> <span style="color:#719e07">true</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>  <span style="color:#719e07">begin</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>    preheat_existing_files
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>  <span style="color:#719e07">ensure</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>    @check_existing_files_for_update <span style="color:#719e07">=</span> <span style="color:#719e07">false</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>  <span style="color:#719e07">[]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span><span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span><span style="color:#719e07">def</span> <span style="color:#268bd2">preheat_existing_files</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>  files_to_update <span style="color:#719e07">=</span> files_definitely_to_update <span style="color:#719e07">+</span> deprecated_local_podspecs <span style="color:#719e07">-</span> <span style="color:#719e07">[</span><span style="color:#2aa198">&#39;deprecated_podspecs.txt&#39;</span><span style="color:#719e07">]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>  concurrent_requests_catching_errors <span style="color:#719e07">do</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>    loaders <span style="color:#719e07">=</span> files_to_update<span style="color:#719e07">.</span>map <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>file<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>      download_file_async(file)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>    <span style="color:#cb4b16">Promises</span><span style="color:#719e07">.</span>zip_futures_on(<span style="color:#cb4b16">HYDRA_EXECUTOR</span>, <span style="color:#719e07">*</span>loaders)<span style="color:#719e07">.</span>wait!
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span><span style="color:#719e07">end</span>
+</code></pre></div><h3 id="pod-repo-更新命令">Pod Repo 更新命令</h3>
 <p>CocoaPods 对于 sources 仓库的更新也提供了命令行工具：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-shell" data-lang="shell">    $ pod repo update <span class="sb">`</span><span class="o">[</span>NAME<span class="o">]</span><span class="sb">`</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>其实现如下：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="c1"># lib/cocoapods/command/repo/update.rb</span>
-
-<span class="k">module</span> <span class="nn">Pod</span>
-  <span class="k">class</span> <span class="nc">Command</span>
-    <span class="k">class</span> <span class="nc">Repo</span> <span class="o">&lt;</span> <span class="no">Command</span>
-      <span class="k">class</span> <span class="nc">Update</span> <span class="o">&lt;</span> <span class="no">Repo</span>
-        <span class="k">def</span> <span class="nf">run</span>
-          <span class="n">show_output</span> <span class="o">=</span> <span class="o">!</span><span class="n">config</span><span class="o">.</span><span class="n">silent?</span>
-          <span class="n">config</span><span class="o">.</span><span class="n">sources_manager</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="vi">@name</span><span class="p">,</span> <span class="n">show_output</span><span class="p">)</span>
-          <span class="n">exclude_repos_dir_from_backup</span>
-        <span class="k">end</span>
-        <span class="c1"># ...</span>
-      <span class="k">end</span>
-    <span class="k">end</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>在命令初始化时会保存指定的 Source 仓库名称 <code>@name</code>，接着通过 Mixin 的 <code>config</code> 来获取 <code>sources_manager</code> 触发更新。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>    $ pod repo update <span style="color:#586e75">`</span><span style="color:#719e07">[</span>NAME<span style="color:#719e07">]</span><span style="color:#586e75">`</span>
+</code></pre></div><p>其实现如下：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#586e75"># lib/cocoapods/command/repo/update.rb</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span><span style="color:#719e07">module</span> Pod
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>  <span style="color:#719e07">class</span> <span style="color:#268bd2">Command</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>    <span style="color:#719e07">class</span> <span style="color:#268bd2">Repo</span> <span style="color:#719e07">&lt;</span> <span style="color:#cb4b16">Command</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>      <span style="color:#719e07">class</span> <span style="color:#268bd2">Update</span> <span style="color:#719e07">&lt;</span> <span style="color:#cb4b16">Repo</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>        <span style="color:#719e07">def</span> <span style="color:#268bd2">run</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>          show_output <span style="color:#719e07">=</span> <span style="color:#719e07">!</span>config<span style="color:#719e07">.</span>silent?
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>          config<span style="color:#719e07">.</span>sources_manager<span style="color:#719e07">.</span>update(@name, show_output)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>          exclude_repos_dir_from_backup
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>        <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>        <span style="color:#586e75"># ...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>      <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span><span style="color:#719e07">end</span>
+</code></pre></div><p>在命令初始化时会保存指定的 Source 仓库名称 <code>@name</code>，接着通过 Mixin 的 <code>config</code> 来获取 <code>sources_manager</code> 触发更新。</p>
 <p>最后用一张图来收尾 CocoaPods Workflow：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gmmet7lhvwj20ow0biwet.jpg" alt="09-cocoapods-flow"></p>
 <h1 id="总结">总结</h1>

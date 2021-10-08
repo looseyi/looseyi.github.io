@@ -95,7 +95,7 @@ if (!doNotTrack) {
   <meta itemprop="name" content="WWDC20 - Build SwiftUI views for widgets">
 <meta itemprop="description" content="WWDC20 Session 10033 - Build SwiftUI views for widgets 本文知识目录 本文属于 WWDC20 中 Widgets 系列的文章。Widgets 是使用 SwiftUI 进行开发的，如果您对 SwiftUI 还不是很了解请翻看 Introduction to SwiftUI。如"><meta itemprop="datePublished" content="2020-06-27T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2020-06-27T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="2444">
+<meta itemprop="wordCount" content="2422">
 <meta itemprop="keywords" content="iOS&#39;,WWDC&#39;,SwiftUI," />
   
   <meta name="twitter:card" content="summary"/>
@@ -204,291 +204,135 @@ if (!doNotTrack) {
 <p>接着需要再新建一个 widge 的 target，这里我们选择基于 iOS 项目的 widget：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gg7aanjpejj20ka0em76h.jpg" alt="01-xcode-widget"></p>
 <p>生成之后，让我们配上 <code>Hello Widget！</code>，并在 <code>PreviewProvider</code> 处添加上 <strong><a href="https://developer.apple.com/documentation/widgetkit/widgetpreviewcontext">WidgetPreviewContext</a></strong>：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span><span class="lnt">9
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">struct</span> <span class="nc">CafeineDrinkWidget_Previews</span><span class="p">:</span> <span class="n">PreviewProvider</span> <span class="p">{</span>
-
-    <span class="kd">static</span> <span class="kd">var</span> <span class="nv">previews</span><span class="p">:</span> <span class="n">some</span> <span class="n">View</span> <span class="p">{</span>
-        <span class="n">Group</span> <span class="p">{</span>
-            <span class="n">CafeineDrinkWidgetEntryView</span><span class="p">(</span><span class="n">entry</span><span class="p">:</span> <span class="p">.</span><span class="n">preivewEntry</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="p">.</span><span class="n">previewData</span><span class="p">)</span>
-        <span class="p">}</span>
-        <span class="p">.</span><span class="n">previewContext</span><span class="p">(</span><span class="n">WidgetPreviewContext</span><span class="p">(</span><span class="n">family</span><span class="p">:</span> <span class="p">.</span><span class="n">systemSmall</span><span class="p">))</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>我们目前提供的 widget 样式分为三种：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">public</span> <span class="kd">enum</span> <span class="nc">WidgetFamily</span> <span class="p">:</span> <span class="nb">Int</span><span class="p">,</span> <span class="nb">RawRepresentable</span><span class="p">,</span> <span class="n">CustomDebugStringConvertible</span><span class="p">,</span> <span class="n">CustomStringConvertible</span> <span class="p">{</span>
-    <span class="c1">/// A small widget.</span>
-    <span class="k">case</span> <span class="n">systemSmall</span>
-    <span class="c1">/// A medium-sized widget.</span>
-    <span class="k">case</span> <span class="n">systemMedium</span>
-    <span class="c1">/// A large widget.</span>
-    <span class="k">case</span> <span class="n">systemLarge</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>让我们一起来看看最简版本的 widget 😄 。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#268bd2">struct</span> <span style="color:#268bd2">CafeineDrinkWidget_Previews</span>: PreviewProvider {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>    <span style="color:#268bd2">static</span> <span style="color:#268bd2">var</span> <span style="color:#268bd2">previews</span>: some View {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>        Group {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>            CafeineDrinkWidgetEntryView(entry: .preivewEntry, data: .previewData)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>        }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span>        .previewContext(WidgetPreviewContext(family: .systemSmall))
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">8</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">9</span>}
+</code></pre></div><p>我们目前提供的 widget 样式分为三种：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#268bd2">public</span> <span style="color:#268bd2">enum</span> <span style="color:#268bd2">WidgetFamily</span> : <span style="color:#b58900">Int</span>, <span style="color:#b58900">RawRepresentable</span>, CustomDebugStringConvertible, CustomStringConvertible {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>    <span style="color:#586e75">/// A small widget.</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>    <span style="color:#719e07">case</span> systemSmall
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>    <span style="color:#586e75">/// A medium-sized widget.</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>    <span style="color:#719e07">case</span> systemMedium
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>    <span style="color:#586e75">/// A large widget.</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span>    <span style="color:#719e07">case</span> systemLarge
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">8</span>}
+</code></pre></div><p>让我们一起来看看最简版本的 widget 😄 。</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gg7aannd6ej216u0rs1c4.jpg" alt="02-HelloWidget"></p>
 <h2 id="data-configuration">Data Configuration</h2>
 <p>接着，让我们把 <code>CaffeineWidgetData</code>  配置起来：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">struct</span> <span class="nc">CaffeineWidgetData</span> <span class="p">{</span>
-
-    <span class="kd">public</span> <span class="kd">let</span> <span class="nv">drinkName</span><span class="p">:</span> <span class="nb">String</span>
-    <span class="kd">public</span> <span class="kd">let</span> <span class="nv">drinkData</span><span class="p">:</span> <span class="n">Date</span>
-    <span class="kd">public</span> <span class="kd">let</span> <span class="nv">caffeineAmount</span><span class="p">:</span> <span class="n">Measurement</span><span class="p">&lt;</span><span class="n">UnitMass</span><span class="p">&gt;</span>
-<span class="p">}</span>
-
-<span class="kd">extension</span> <span class="nc">CaffeineWidgetData</span> <span class="p">{</span>
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">let</span> <span class="nv">previewData</span> <span class="p">=</span> <span class="n">CaffeineWidgetData</span><span class="p">(</span>
-        <span class="n">drinkName</span><span class="p">:</span> <span class="s">&#34;Cappuccino&#34;</span><span class="p">,</span>
-        <span class="n">drinkData</span><span class="p">:</span> <span class="n">Date</span><span class="p">().</span><span class="n">advanced</span><span class="p">(</span><span class="n">by</span><span class="p">:</span> <span class="o">-</span><span class="mi">60</span> <span class="o">*</span> <span class="mi">29</span> <span class="o">+</span> <span class="mi">5</span><span class="p">),</span>
-        <span class="n">caffeineAmount</span><span class="p">:</span> <span class="n">Measurement</span><span class="p">&lt;</span><span class="n">UnitMass</span><span class="p">&gt;(</span><span class="n">value</span><span class="p">:</span> <span class="mf">56.23</span><span class="p">,</span> <span class="n">unit</span><span class="p">:</span> <span class="p">.</span><span class="n">milligrams</span><span class="p">)</span>
-    <span class="p">)</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>接着再加上简单的 View  <code>LazyVStack</code> 和 <code>Text</code> 来承载我们新添的数据。效果如下：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#268bd2">struct</span> <span style="color:#268bd2">CaffeineWidgetData</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>    <span style="color:#268bd2">public</span> <span style="color:#268bd2">let</span> <span style="color:#268bd2">drinkName</span>: <span style="color:#b58900">String</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>    <span style="color:#268bd2">public</span> <span style="color:#268bd2">let</span> <span style="color:#268bd2">drinkData</span>: Date
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>    <span style="color:#268bd2">public</span> <span style="color:#268bd2">let</span> <span style="color:#268bd2">caffeineAmount</span>: Measurement&lt;UnitMass&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span><span style="color:#268bd2">extension</span> <span style="color:#268bd2">CaffeineWidgetData</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>    <span style="color:#268bd2">public</span> <span style="color:#268bd2">static</span> <span style="color:#268bd2">let</span> <span style="color:#268bd2">previewData</span> = CaffeineWidgetData(
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>        drinkName: <span style="color:#2aa198">&#34;Cappuccino&#34;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>        drinkData: Date().advanced(by: <span style="color:#719e07">-</span><span style="color:#2aa198">60</span> <span style="color:#719e07">*</span> <span style="color:#2aa198">29</span> <span style="color:#719e07">+</span> <span style="color:#2aa198">5</span>),
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>        caffeineAmount: Measurement&lt;UnitMass&gt;(value: <span style="color:#2aa198">56.23</span>, unit: .milligrams)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>    )
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>}
+</code></pre></div><p>接着再加上简单的 View  <code>LazyVStack</code> 和 <code>Text</code> 来承载我们新添的数据。效果如下：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gg7aanormsj211n0sjh5a.jpg" alt="04-previewData"></p>
 <p>有了基本结构后，我们再丰富一下。先加点背景色，这里我们用 <code>ZStack</code> 来包装：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">var</span> <span class="nv">body</span><span class="p">:</span> <span class="n">some</span> <span class="n">View</span> <span class="p">{</span>
-  	<span class="n">ZStack</span> <span class="p">{</span>
-      <span class="n">Color</span><span class="p">(</span><span class="s">&#34;cappuccino&#34;</span><span class="p">)</span>
-
-      <span class="n">LazyVStack</span><span class="p">(</span><span class="n">alignment</span><span class="p">:</span> <span class="p">.</span><span class="n">leading</span><span class="p">)</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
-   <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>让我们把 <code>drinkName</code> 和 <code>drinkDate</code> 也展示出来：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span><span class="lnt">9
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="n">Text</span><span class="p">(</span><span class="s">&#34;</span><span class="si">\(</span><span class="n">data</span><span class="p">.</span><span class="n">drinkName</span><span class="si">)</span><span class="s"> ☕️&#34;</span><span class="p">)</span>
-   <span class="p">.</span><span class="n">font</span><span class="p">(.</span><span class="n">body</span><span class="p">)</span>
-   <span class="p">.</span><span class="n">bold</span><span class="p">()</span>
-   <span class="p">.</span><span class="n">foregroundColor</span><span class="p">(</span><span class="n">Color</span><span class="p">(</span><span class="s">&#34;milk&#34;</span><span class="p">))</span>
-
-<span class="c1">/// NOTE: *New* Date provider API</span>
-<span class="n">Text</span><span class="p">(</span><span class="s">&#34;</span><span class="si">\(</span><span class="n">data</span><span class="p">.</span><span class="n">drinkDate</span><span class="p">,</span> <span class="n">style</span><span class="p">:</span> <span class="p">.</span><span class="n">relative</span><span class="si">)</span><span class="s"> ago&#34;</span><span class="p">)</span>
-   <span class="p">.</span><span class="n">font</span><span class="p">(.</span><span class="n">caption</span><span class="p">)</span>
-   <span class="p">.</span><span class="n">foregroundColor</span><span class="p">(</span><span class="n">Color</span><span class="p">(</span><span class="s">&#34;milk&#34;</span><span class="p">))</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>注意，这里我们使用了 SwiftUI 新出的 <code>DateStyle</code> API</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#268bd2">var</span> <span style="color:#268bd2">body</span>: some View {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>  	ZStack {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>      Color(<span style="color:#2aa198">&#34;cappuccino&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>      LazyVStack(alignment: .leading) { ... }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>   }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span>}
+</code></pre></div><p>让我们把 <code>drinkName</code> 和 <code>drinkDate</code> 也展示出来：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>Text(<span style="color:#2aa198">&#34;</span><span style="color:#2aa198">\(</span>data.drinkName<span style="color:#2aa198">)</span><span style="color:#2aa198"> ☕️&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>   .font(.body)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>   .bold()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>   .foregroundColor(Color(<span style="color:#2aa198">&#34;milk&#34;</span>))
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span><span style="color:#586e75">/// NOTE: *New* Date provider API</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span>Text(<span style="color:#2aa198">&#34;</span><span style="color:#2aa198">\(</span>data.drinkDate, style: .relative<span style="color:#2aa198">)</span><span style="color:#2aa198"> ago&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">8</span>   .font(.caption)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">9</span>   .foregroundColor(Color(<span style="color:#2aa198">&#34;milk&#34;</span>))
+</code></pre></div><p>注意，这里我们使用了 SwiftUI 新出的 <code>DateStyle</code> API</p>
 <h3 id="datestyle">DateStyle</h3>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">public</span> <span class="kd">struct</span> <span class="nc">DateStyle</span> <span class="p">{</span>
-
-    <span class="c1">/// A style displaying only the time component for a date.</span>
-    <span class="c1">/// Example output: </span>
-    <span class="c1">///     11:23PM</span>
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">let</span> <span class="nv">time</span><span class="p">:</span> <span class="n">Text</span><span class="p">.</span><span class="n">DateStyle</span>
-
-    <span class="c1">/// A style displaying a date.</span>
-    <span class="c1">/// Example output:</span>
-    <span class="c1">///     June 3, 2019</span>
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">let</span> <span class="nv">date</span><span class="p">:</span> <span class="n">Text</span><span class="p">.</span><span class="n">DateStyle</span>
-
-    <span class="c1">/// A style displaying a date as relative to now.</span>
-    <span class="c1">/// Example output:</span>
-    <span class="c1">///     2 hours, 23 minutes</span>
-    <span class="c1">///     1 year, 1 month</span>
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">let</span> <span class="nv">relative</span><span class="p">:</span> <span class="n">Text</span><span class="p">.</span><span class="n">DateStyle</span>
-
-    <span class="c1">/// A style displaying a date as offset from now.</span>
-    <span class="c1">/// Example output:</span>
-    <span class="c1">///     +2 hours</span>
-    <span class="c1">///     -3 months</span>
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">let</span> <span class="nv">offset</span><span class="p">:</span> <span class="n">Text</span><span class="p">.</span><span class="n">DateStyle</span>
-
-    <span class="c1">/// A style displaying a date as timer counting from now.</span>
-    <span class="c1">/// Example output:</span>
-    <span class="c1">///    2:32</span>
-    <span class="c1">///    36:59:01</span>
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">let</span> <span class="nv">timer</span><span class="p">:</span> <span class="n">Text</span><span class="p">.</span><span class="n">DateStyle</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>再来看一眼效果：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#268bd2">public</span> <span style="color:#268bd2">struct</span> <span style="color:#268bd2">DateStyle</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>    <span style="color:#586e75">/// A style displaying only the time component for a date.</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>    <span style="color:#586e75">/// Example output: </span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>    <span style="color:#586e75">///     11:23PM</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>    <span style="color:#268bd2">public</span> <span style="color:#268bd2">static</span> <span style="color:#268bd2">let</span> <span style="color:#268bd2">time</span>: Text.DateStyle
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>    <span style="color:#586e75">/// A style displaying a date.</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>    <span style="color:#586e75">/// Example output:</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>    <span style="color:#586e75">///     June 3, 2019</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>    <span style="color:#268bd2">public</span> <span style="color:#268bd2">static</span> <span style="color:#268bd2">let</span> <span style="color:#268bd2">date</span>: Text.DateStyle
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>    <span style="color:#586e75">/// A style displaying a date as relative to now.</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>    <span style="color:#586e75">/// Example output:</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>    <span style="color:#586e75">///     2 hours, 23 minutes</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>    <span style="color:#586e75">///     1 year, 1 month</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>    <span style="color:#268bd2">public</span> <span style="color:#268bd2">static</span> <span style="color:#268bd2">let</span> <span style="color:#268bd2">relative</span>: Text.DateStyle
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>    <span style="color:#586e75">/// A style displaying a date as offset from now.</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>    <span style="color:#586e75">/// Example output:</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span>    <span style="color:#586e75">///     +2 hours</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">22</span>    <span style="color:#586e75">///     -3 months</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">23</span>    <span style="color:#268bd2">public</span> <span style="color:#268bd2">static</span> <span style="color:#268bd2">let</span> <span style="color:#268bd2">offset</span>: Text.DateStyle
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">24</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">25</span>    <span style="color:#586e75">/// A style displaying a date as timer counting from now.</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">26</span>    <span style="color:#586e75">/// Example output:</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">27</span>    <span style="color:#586e75">///    2:32</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">28</span>    <span style="color:#586e75">///    36:59:01</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">29</span>    <span style="color:#268bd2">public</span> <span style="color:#268bd2">static</span> <span style="color:#268bd2">let</span> <span style="color:#268bd2">timer</span>: Text.DateStyle
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">30</span>}
+</code></pre></div><p>再来看一眼效果：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gg7aanrer2j214m0rr4ep.jpg" alt="05-allDataUsage"></p>
 <h2 id="restructuring">Restructuring</h2>
 <p>接下来，我们稍微调整一下代码结构，将内部的两个 <code>LazyStack</code> 抽离成单独的 View。这里可以用 Xcode 的 <code>Extra Subview</code> 来帮我们完成工作，我们只需将 🖱️移动到 <code>LazyStack</code> 上，按住 <code>Command</code> 并点击 🖱️ 就可以弹出如下窗口：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gg7aanun9zj20j20ib11g.jpg" alt="06-Extrack Subview"></p>
 <p>调整后，我们的结构就清爽很多了：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">var</span> <span class="nv">body</span><span class="p">:</span> <span class="n">some</span> <span class="n">View</span> <span class="p">{</span>
-    <span class="n">ZStack</span> <span class="p">{</span>
-        <span class="n">Color</span><span class="p">(</span><span class="s">&#34;cappuccino&#34;</span><span class="p">)</span>
-
-        <span class="n">LazyVStack</span><span class="p">(</span><span class="n">alignment</span><span class="p">:</span> <span class="p">.</span><span class="n">leading</span><span class="p">)</span> <span class="p">{</span>
-            <span class="n">CaffineAmountView</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">data</span><span class="p">)</span>
-            <span class="n">Spacer</span><span class="p">()</span>
-            <span class="n">DrinkView</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">data</span><span class="p">)</span>
-        <span class="p">}</span>
-        <span class="p">.</span><span class="n">padding</span><span class="p">(.</span><span class="n">all</span><span class="p">)</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>记得为我们新加的 <code>CaffineAmountView</code> 和 <code>DrinkView</code> 加上 <code>CaffeineWidgetData</code> 数据。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#268bd2">var</span> <span style="color:#268bd2">body</span>: some View {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>    ZStack {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>        Color(<span style="color:#2aa198">&#34;cappuccino&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>        LazyVStack(alignment: .leading) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>            CaffineAmountView(data: data)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>            Spacer()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>            DrinkView(data: data)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>        }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>        .padding(.all)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>}
+</code></pre></div><p>记得为我们新加的 <code>CaffineAmountView</code> 和 <code>DrinkView</code> 加上 <code>CaffeineWidgetData</code> 数据。</p>
 <h3 id="caffineamountview">CaffineAmountView</h3>
 <p>最后再用我们的另一个新的 API 来修改 <code>CaffineAmountView</code>。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">var</span> <span class="nv">body</span><span class="p">:</span> <span class="n">some</span> <span class="n">View</span> <span class="p">{</span>
-    <span class="n">LazyHStack</span> <span class="p">{</span>
-        <span class="n">VStack</span><span class="p">(</span><span class="n">alignment</span><span class="p">:</span> <span class="p">.</span><span class="n">leading</span><span class="p">)</span> <span class="p">{</span>
-            <span class="n">Text</span><span class="p">(</span><span class="s">&#34;Caffeine&#34;</span><span class="p">)</span>
-                <span class="p">.</span><span class="n">font</span><span class="p">(.</span><span class="n">body</span><span class="p">)</span>
-                <span class="p">.</span><span class="n">foregroundColor</span><span class="p">(</span><span class="n">Color</span><span class="p">(</span><span class="s">&#34;espresso&#34;</span><span class="p">))</span>
-                <span class="p">.</span><span class="n">bold</span><span class="p">()</span>
-
-            <span class="n">Text</span><span class="p">(</span><span class="n">Formatter</span><span class="p">.</span><span class="n">measurement</span><span class="p">.</span><span class="n">string</span><span class="p">(</span><span class="n">from</span><span class="p">:</span> <span class="n">data</span><span class="p">.</span><span class="n">caffeineAmount</span><span class="p">))</span>
-                <span class="p">.</span><span class="n">font</span><span class="p">(.</span><span class="n">title</span><span class="p">)</span>
-                <span class="p">.</span><span class="n">bold</span><span class="p">()</span>
-                <span class="p">.</span><span class="n">foregroundColor</span><span class="p">(</span><span class="n">Color</span><span class="p">(</span><span class="s">&#34;espresso&#34;</span><span class="p">))</span>
-                <span class="p">.</span><span class="n">minimumScaleFactor</span><span class="p">(</span><span class="mf">0.8</span><span class="p">)</span>
-        <span class="p">}</span>
-        <span class="n">Spacer</span><span class="p">(</span><span class="n">minLength</span><span class="p">:</span> <span class="mi">0</span><span class="p">)</span> <span class="c1">// #1</span>
-    <span class="p">}</span>
-    <span class="p">.</span><span class="n">padding</span><span class="p">(.</span><span class="n">all</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">)</span>
-    <span class="p">.</span><span class="n">background</span><span class="p">(</span><span class="n">ContainerRelativeShape</span><span class="p">().</span><span class="n">fill</span><span class="p">(</span><span class="n">Color</span><span class="p">(</span><span class="s">&#34;latte&#34;</span><span class="p">)))</span> <span class="c1">// #2</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>先注意一下，这里将 <code>Spacer</code> 的 minLength 设置为 0 是为了将整个 AmountView 的内容撑满。然后在编写 Demo 的过程中发现新增的 <code>LazyVStack</code> 在 layout 过程中有 bug，无法正常将内容撑满，所以这里改回用 <code>VStack</code>。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#268bd2">var</span> <span style="color:#268bd2">body</span>: some View {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>    LazyHStack {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>        VStack(alignment: .leading) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>            Text(<span style="color:#2aa198">&#34;Caffeine&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>                .font(.body)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>                .foregroundColor(Color(<span style="color:#2aa198">&#34;espresso&#34;</span>))
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>                .bold()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>            Text(Formatter.measurement.string(from: data.caffeineAmount))
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>                .font(.title)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>                .bold()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>                .foregroundColor(Color(<span style="color:#2aa198">&#34;espresso&#34;</span>))
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>                .minimumScaleFactor(<span style="color:#2aa198">0.8</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>        }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>        Spacer(minLength: <span style="color:#2aa198">0</span>) <span style="color:#586e75">// #1</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>    .padding(.all, <span style="color:#2aa198">8.0</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>    .background(ContainerRelativeShape().fill(Color(<span style="color:#2aa198">&#34;latte&#34;</span>))) <span style="color:#586e75">// #2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>}
+</code></pre></div><p>先注意一下，这里将 <code>Spacer</code> 的 minLength 设置为 0 是为了将整个 AmountView 的内容撑满。然后在编写 Demo 的过程中发现新增的 <code>LazyVStack</code> 在 layout 过程中有 bug，无法正常将内容撑满，所以这里改回用 <code>VStack</code>。</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gg7aanvwo6j21ds0n00wu.jpg" alt="07-LazyVStack"></p>
 <h3 id="containerrelativeshape">ContainerRelativeShape</h3>
 <blockquote>
@@ -504,33 +348,15 @@ if (!doNotTrack) {
 <p>首先是 <code>.envrioment</code> 修饰符在 DarkMode 下的效果，这个其实完全由我们配置的 ColorSet 来保证的。</p>
 <p><img src="http://ww1.sinaimg.cn/large/8157560cly1gg7aao0f8cj20jt05fgmr.jpg" alt="10-colorSet"></p>
 <p>然后我们在 View 上添加 <code>colorScheme</code> 的环境配置就可以了。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="n">CafeineDrinkWidgetEntryView</span><span class="p">(</span><span class="n">entry</span><span class="p">:</span> <span class="p">.</span><span class="n">preivewEntry</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="p">.</span><span class="n">previewData</span><span class="p">)</span>
-    <span class="p">.</span><span class="n">previewContext</span><span class="p">(</span><span class="n">WidgetPreviewContext</span><span class="p">(</span><span class="n">family</span><span class="p">:</span> <span class="p">.</span><span class="n">systemSmall</span><span class="p">))</span>
-    <span class="p">.</span><span class="n">environment</span><span class="p">(</span><span class="err">\</span><span class="p">.</span><span class="n">colorScheme</span><span class="p">,</span> <span class="p">.</span><span class="n">dark</span><span class="p">)</span>
-</code></pre></td></tr></table>
-</div>
-</div><h3 id="sizecategory">SizeCategory</h3>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>CafeineDrinkWidgetEntryView(entry: .preivewEntry, data: .previewData)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>    .previewContext(WidgetPreviewContext(family: .systemSmall))
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>    .environment(\.colorScheme, .dark)
+</code></pre></div><h3 id="sizecategory">SizeCategory</h3>
 <p>可通过  <code>.envrioment</code> 修饰符的  <code>sizeCategory</code> 来控制 widget 的字体大小。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="n">CafeineDrinkWidgetEntryView</span><span class="p">(</span><span class="n">entry</span><span class="p">:</span> <span class="p">.</span><span class="n">preivewEntry</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="p">.</span><span class="n">previewData</span><span class="p">)</span>
-    <span class="p">.</span><span class="n">previewContext</span><span class="p">(</span><span class="n">WidgetPreviewContext</span><span class="p">(</span><span class="n">family</span><span class="p">:</span> <span class="p">.</span><span class="n">systemSmall</span><span class="p">))</span>
-    <span class="p">.</span><span class="n">environment</span><span class="p">(</span><span class="err">\</span><span class="p">.</span><span class="n">sizeCategory</span><span class="p">,</span> <span class="p">.</span><span class="n">extraExtraLarge</span><span class="p">)</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>让我们先来看看这两种情况的效果：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>CafeineDrinkWidgetEntryView(entry: .preivewEntry, data: .previewData)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>    .previewContext(WidgetPreviewContext(family: .systemSmall))
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>    .environment(\.sizeCategory, .extraExtraLarge)
+</code></pre></div><p>让我们先来看看这两种情况的效果：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gg7aanyx89j218p0sjh3g.jpg" alt="09-previewSize"></p>
 <h3 id="placeholder">Placeholder</h3>
 <p>今年的 SwiftUI 还提供了一个特别棒的功能，我们可以通过 <code>isPlaceholder</code> 修饰符来设置骨架图。</p>
@@ -538,57 +364,29 @@ if (!doNotTrack) {
 <p><code>.isPlaceholder</code>  还支持对单个视图的控制等。不过，目前的 Xcode 12 Beta1 版本还无法使用 😅。大家就且看一下吧。</p>
 <h3 id="widgetfamily">WidgetFamily</h3>
 <p>最后一个预览，让我们一起看看如何通过 <code>WidgetFamily</code> 来控制 Widge 的展示。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">struct</span> <span class="nc">CafeineDrinkWidgetEntryView</span> <span class="p">:</span> <span class="n">View</span> <span class="p">{</span>
-    <span class="p">...</span>    
-    <span class="p">@</span><span class="n">Environment</span><span class="p">(</span><span class="err">\</span><span class="p">.</span><span class="n">widgetFamily</span><span class="p">)</span> <span class="kd">var</span> <span class="nv">widgetFamily</span>
-
-    <span class="kd">var</span> <span class="nv">body</span><span class="p">:</span> <span class="n">some</span> <span class="n">View</span> <span class="p">{</span>
-        <span class="n">ZStack</span> <span class="p">{</span>
-            <span class="p">...</span>
-            <span class="n">LazyHStack</span> <span class="p">{</span>
-                <span class="n">LazyVStack</span><span class="p">(</span><span class="n">alignment</span><span class="p">:</span> <span class="p">.</span><span class="n">leading</span><span class="p">)</span> <span class="p">{</span>
-                    <span class="n">CaffineAmountView</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">data</span><span class="p">)</span>
-                    <span class="n">Spacer</span><span class="p">()</span>
-                    <span class="n">DrinkView</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">data</span><span class="p">)</span>
-                <span class="p">}</span>
-                <span class="p">.</span><span class="n">padding</span><span class="p">(.</span><span class="n">all</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
-
-                <span class="k">if</span> <span class="n">widgetFamily</span> <span class="p">==</span> <span class="p">.</span><span class="n">systemMedium</span><span class="p">,</span> <span class="kd">let</span> <span class="nv">phoneName</span> <span class="p">=</span> <span class="n">data</span><span class="p">.</span><span class="n">phoneName</span> <span class="p">{</span>
-                    <span class="n">Image</span><span class="p">(</span><span class="n">phoneName</span><span class="p">).</span><span class="n">resizable</span><span class="p">()</span>
-                <span class="p">}</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>这里我们在 <code>widgetFamily</code> 为 <code>.systemMedium</code> 的情况下，为其添加了一张最后喝过的咖啡的图片。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#268bd2">struct</span> <span style="color:#268bd2">CafeineDrinkWidgetEntryView</span> : View {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>    ...    
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>    @Environment(\.widgetFamily) <span style="color:#268bd2">var</span> <span style="color:#268bd2">widgetFamily</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>    <span style="color:#268bd2">var</span> <span style="color:#268bd2">body</span>: some View {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>        ZStack {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>            ...
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>            LazyHStack {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>                LazyVStack(alignment: .leading) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>                    CaffineAmountView(data: data)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>                    Spacer()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>                    DrinkView(data: data)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>                }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>                .padding(.all, <span style="color:#2aa198">10</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>                <span style="color:#719e07">if</span> widgetFamily == .systemMedium, <span style="color:#268bd2">let</span> <span style="color:#268bd2">phoneName</span> = data.phoneName {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>                    Image(phoneName).resizable()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>                }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>            }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>        }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">22</span>}
+</code></pre></div><p>这里我们在 <code>widgetFamily</code> 为 <code>.systemMedium</code> 的情况下，为其添加了一张最后喝过的咖啡的图片。</p>
 <p>效果如下：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gg7aao6wfij20y3077n1x.jpg" alt="12-widgetFamily"></p>
 <h1 id="new-apis">New APIs</h1>

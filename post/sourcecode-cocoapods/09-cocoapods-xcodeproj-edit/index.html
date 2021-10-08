@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html lang="en">
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  
+  <title>9. Xcode 工程文件编辑 - Aha Edmond</title>
+
+  
+  
+  <meta name="description" content="本文目录 引子 通过「Xcode 工程文件解析」一文，我们了解到 project.pbxproj 文件的重要性，Xcode 正是通过它来管理项目中的各种源代码、脚本文件、资源文件、" />
+  <meta name="author" content="土土Edmond木" />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://looseyi.github.io/app.min.css" />
+
+  
+
+  
+  <link rel="preload" as="image" href="https://looseyi.github.io/theme.png" />
+
+  
+  <link rel="preload" as="image" href="https://looseyi.github.io/twitter.svg" />
+  
+  <link rel="preload" as="image" href="https://looseyi.github.io/github.svg" />
+  
+
+  
+  <link rel="icon" href="https://looseyi.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://looseyi.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.82.1" />
+
+  
+  
+  <link
+    rel="alternate"
+    type="application/rss&#43;xml"
+    href="https://looseyi.github.io/post/sourcecode-cocoapods/09-cocoapods-xcodeproj-edit/index.xml"
+    title="Aha Edmond"
+  />
+  
+
+  
+  
+  
+  
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-62789092-1', 'auto');
+	ga('set', 'anonymizeIp', true);
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+  
+  
+  
+  <meta property="og:title" content="9. Xcode 工程文件编辑" />
+<meta property="og:description" content="本文目录 引子 通过「Xcode 工程文件解析」一文，我们了解到 project.pbxproj 文件的重要性，Xcode 正是通过它来管理项目中的各种源代码、脚本文件、资源文件、" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://looseyi.github.io/post/sourcecode-cocoapods/09-cocoapods-xcodeproj-edit/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2021-08-08T00:00:00&#43;00:00" />
+<meta property="article:modified_time" content="2021-08-08T00:00:00&#43;00:00" />
+
+
+  
+  <meta itemprop="name" content="9. Xcode 工程文件编辑">
+<meta itemprop="description" content="本文目录 引子 通过「Xcode 工程文件解析」一文，我们了解到 project.pbxproj 文件的重要性，Xcode 正是通过它来管理项目中的各种源代码、脚本文件、资源文件、"><meta itemprop="datePublished" content="2021-08-08T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2021-08-08T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="5109">
+<meta itemprop="keywords" content="CocoaPods,iOS,Ruby," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="9. Xcode 工程文件编辑"/>
+<meta name="twitter:description" content="本文目录 引子 通过「Xcode 工程文件解析」一文，我们了解到 project.pbxproj 文件的重要性，Xcode 正是通过它来管理项目中的各种源代码、脚本文件、资源文件、"/>
+
+  
+  
+</head>
+
+
+  <body class="not-ready" data-menu="true">
+    <header class="header">
+  
+  <p class="logo">
+    <a class="site-name" href="https://looseyi.github.io/">Aha Edmond</a><a class="btn-dark"></a>
+  </p>
+  
+
+  <script>
+    let bodyClx = document.body.classList;
+    let btnDark = document.querySelector('.btn-dark');
+    let sysDark = window.matchMedia('(prefers-color-scheme: dark)');
+    let darkVal = localStorage.getItem('dark');
+
+    let setDark = (isDark) => {
+      bodyClx[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark ? 'yes' : 'no');
+    };
+
+    setDark(darkVal ? darkVal === 'yes' : sysDark.matches);
+    requestAnimationFrame(() => bodyClx.remove('not-ready'));
+
+    btnDark.addEventListener('click', () => setDark(!bodyClx.contains('dark')));
+    sysDark.addEventListener('change', (event) => setDark(event.matches));
+  </script>
+
+  
+  
+  <nav class="menu">
+    
+    <a class="" href="/">Home</a>
+    
+  </nav>
+  
+
+  
+  <nav class="social">
+    
+    <a
+      class="twitter"
+      style="--url: url(./twitter.svg)"
+      href="https://twitter.com/looseyi"
+      target="_blank"
+    ></a>
+    
+    <a
+      class="github"
+      style="--url: url(./github.svg)"
+      href="https://github.com/looseyi"
+      target="_blank"
+    ></a>
+    
+  </nav>
+  
+</header>
+
+
+    <main class="main">
+			
+
+<article class="post-single">
+  <header class="post-title">
+    <p>
+      <time>2021-08-08</time>
+      
+      <span>土土Edmond木</span>
+      
+    </p>
+    <h1>9. Xcode 工程文件编辑</h1>
+  </header>
+  <section class="post-content"><h1 id="本文目录">本文目录</h1>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/Xcode-project-edite.png" alt="Xcode-project-edite"></p>
+<h1 id="引子">引子</h1>
+<p>通过「<strong><a href="https://zhuanlan.zhihu.com/p/378474944">Xcode 工程文件解析</a></strong>」一文，我们了解到 <code>project.pbxproj</code> 文件的重要性，Xcode 正是通过它来管理项目中的各种源代码、脚本文件、资源文件、依赖库等。也深入的分析了 <code>project.pbxproj</code> 文件的组成部分，而 <a href="https://github.com/CocoaPods/Xcodeproj"><code>xcodeproj</code></a> 正是通过 Ruby 脚本来编辑该文件，从而将 Pod 依赖库添加进 Xcode 项目中。本文将会继续深入对 <code>xcodeproj</code> 的剖析。</p>
+<h1 id="object-attributes">Object Attributes</h1>
+<p>前文中我们提过 <code>xcodeproj</code> 通过 Ruby 的 <strong><a href="https://medium.com/@amliving/diving-into-rubys-attr-accessor-d34e2ccc5477">attr_accessor</a></strong> 特性，实现了一套对 <code>project.pbxproj</code> 文件结构的映射，将 Sections Object 中的 <strong>isa</strong> 字段作为类名，映射为对应的 Object 类。</p>
+<p>在 <code>xcodeproj</code> 中 Object 类的完整关系如下：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/09-xcode-object-01-classes.png" alt="09-xcode-object-01-classes"></p>
+<blockquote>
+<p>Tips: 图中以 <code>PBX</code> 为前缀的类型才是 project.pbxproj 中存在的 Object。</p>
+</blockquote>
+<h2 id="reference-attributes">Reference Attributes</h2>
+<p>前文已经介绍了基类 <code>AbstractObject</code> 和常规属性的修饰器 <code>attribute</code>, 它将常规属性的内容封装在 <code>AbstractObjectAttribute</code> 中，最终存入 <code>@attributes</code> 数组用于后续查询。</p>
+<p>而 Xcode 项目文件中除了常规属性之外，还有 Object 的引用关系和 objects 字典需要进行保存，如 <code>PBXProject</code> 对象就同时保存了对 <code>mainGroup</code> 和 <code>targets</code> 的引用，另外它们都需要在 objects 字典中有记录。在 <code>Xcodeproj</code> 中这些引用关系是通过特殊的对象来记录的。</p>
+<p>如果按引用是否存在多份不同对象来分类，可分喂为：</p>
+<ul>
+<li><strong>单一引用关系</strong>: 如项目 <code>PBXProject</code> 只会有一个 <code>mainGroup</code> 作为其主文件夹，另外每个 <code>PBXBuildFile</code> 也只会有一份 <code>PBXFileReference</code> 引用，它们之间是单一直接引用关系。</li>
+<li><strong>多引用</strong>: 如 <code>PBXNativeTarget</code> 可以存在多个构建规则和依赖：<code>PBXBuildRule</code>、<code>AbstractBuildPhase</code>, <code>PBXTargetDependency</code> 等。</li>
+</ul>
+<h3 id="单一引用关系">单一引用关系</h3>
+<p><strong>has_one 修饰器</strong></p>
+<blockquote>
+<p>Defines a new relationship to a single and synthesises the corresponding methods.</p>
+</blockquote>
+<p><code>has_one</code> 用于定义 Objects 间唯一引用关系，它会生成对应的 Access 方法来维护引用关系。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">def</span> <span style="color:#268bd2">has_one</span>(singular_name, isas)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>	isas <span style="color:#719e07">=</span> <span style="color:#719e07">[</span>isas<span style="color:#719e07">]</span> <span style="color:#719e07">unless</span> isas<span style="color:#719e07">.</span>is_a?(<span style="color:#b58900">Array</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>   <span style="color:#586e75"># 1. 创建 AbstractObjectAttribute </span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>	attrb <span style="color:#719e07">=</span> <span style="color:#cb4b16">AbstractObjectAttribute</span><span style="color:#719e07">.</span>new(<span style="color:#2aa198">:to_one</span>, singular_name, <span style="color:#b58900">self</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>	attrb<span style="color:#719e07">.</span>classes <span style="color:#719e07">=</span> isas
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>	add_attribute(attrb)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>   <span style="color:#586e75"># 2. 添加名为 `attrb.name` 的 Getter 方法</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>	<span style="color:#719e07">attr_reader</span>(attrb<span style="color:#719e07">.</span>name)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>	<span style="color:#586e75"># 1.9.2 fix, see https://github.com/CocoaPods/Xcodeproj/issues/40.</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>	<span style="color:#719e07">public</span>(attrb<span style="color:#719e07">.</span>name)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>   <span style="color:#586e75"># 3. 添加名为 `attrb.name=` 的 Setter 方法</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>	variable_name <span style="color:#719e07">=</span> <span style="color:#2aa198">:&#34;@</span><span style="color:#2aa198">#{</span>attrb<span style="color:#719e07">.</span>name<span style="color:#2aa198">}</span><span style="color:#2aa198">&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>	define_method(<span style="color:#2aa198">&#34;</span><span style="color:#2aa198">#{</span>attrb<span style="color:#719e07">.</span>name<span style="color:#2aa198">}</span><span style="color:#2aa198">=&#34;</span>) <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>value<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>		attrb<span style="color:#719e07">.</span>validate_value(value)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>		previous_value <span style="color:#719e07">=</span> <span style="color:#b58900">send</span>(attrb<span style="color:#719e07">.</span>name)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>		<span style="color:#719e07">return</span> value <span style="color:#719e07">if</span> previous_value <span style="color:#719e07">==</span> value
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>		mark_project_as_dirty!
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span>		previous_value<span style="color:#719e07">.</span>remove_referrer(<span style="color:#b58900">self</span>) <span style="color:#719e07">if</span> previous_value
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">22</span>		<span style="color:#b58900">instance_variable_set</span>(variable_name, value)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">23</span>		value<span style="color:#719e07">.</span>add_referrer(<span style="color:#b58900">self</span>) <span style="color:#719e07">if</span> value
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">24</span>	<span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">25</span><span style="color:#719e07">end</span>
+</code></pre></div><p>从这里的逻辑可以分为三部分，同常规属性修饰器实现一致：</p>
+<ol>
+<li>创建 <code>AbstractObjectAttribute</code> 用于记录属性类型  <code>isa</code> ，以及对应的值或者关联对象的 classes；</li>
+<li>通过 <code>attr_reader</code> 定义了名称为 <code>attrb.name</code> 的 getter 方法；</li>
+<li>通过 <code>define_method</code> 定义了名称为 <code>attrb.name=</code> 的 setter 方法；</li>
+</ol>
+<p>has_one 本质是通过 <code>attr_reader</code> 来获取属性的值，而 setter 则通过 <code>define_method</code> 动态添加。借用 Ruby runtime 能力，通过 <code>instance_variable_set</code> 将引用对象保存到对应的实例变量中。自定义 setter 主要为了处理新旧对象的引用关系，通过基类 <code>AbstractObject</code> 对象提供的 <code>add_referrer</code> 与 <code>remove_referrer</code> 来更新全局的 objects 表。</p>
+<p>再补充一点关于参数 <strong>isas</strong>，他会检查参数类型，保证类型 isas 为数组。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>isas <span style="color:#719e07">=</span> <span style="color:#719e07">[</span>isas<span style="color:#719e07">]</span> <span style="color:#719e07">unless</span> isas<span style="color:#719e07">.</span>is_a?(<span style="color:#b58900">Array</span>)
+</code></pre></div><p>而对于非 Array 类型则会手动创建 Array 来封装。Why ？为了解决 <code>project.pbxproj</code> 中一个属性可以支持多种不同 <strong>isa</strong> 类型。举个例子，如 <code>PBXBuildFile</code> 的 file_ref：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>has_one <span style="color:#2aa198">:file_ref</span>, <span style="color:#719e07">[</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>	<span style="color:#cb4b16">PBXFileReference</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>	<span style="color:#cb4b16">PBXGroup</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>	<span style="color:#cb4b16">PBXVariantGroup</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>	<span style="color:#cb4b16">XCVersionGroup</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>	<span style="color:#cb4b16">PBXReferenceProxy</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span><span style="color:#719e07">]</span>
+</code></pre></div><p>而对于仅支持一种 <strong>isa</strong> 类型的属性，如：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>has_one <span style="color:#2aa198">:build_configuration_list</span>, <span style="color:#cb4b16">XCConfigurationList</span>
+</code></pre></div><p>像这样声明的 <code>build_configuration_list</code> 属性，背后也是通过数组：<code>[XCConfigurationList]</code> 来保存引用对象的。</p>
+<h3 id="多引用关系">多引用关系</h3>
+<h4 id="has_many">has_many</h4>
+<p>has_many 用于定义一组有序的引用关系。它仅提供了 reader 方法。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">def</span> <span style="color:#268bd2">has_many</span>(plural_name, isas)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>   isas <span style="color:#719e07">=</span> <span style="color:#719e07">[</span>isas<span style="color:#719e07">]</span> <span style="color:#719e07">unless</span> isas<span style="color:#719e07">.</span>is_a?(<span style="color:#b58900">Array</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>   <span style="color:#586e75"># 1. 创建 AbstractObjectAttribute </span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>	attrb <span style="color:#719e07">=</span> <span style="color:#cb4b16">AbstractObjectAttribute</span><span style="color:#719e07">.</span>new(<span style="color:#2aa198">:to_many</span>, plural_name, <span style="color:#b58900">self</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>	attrb<span style="color:#719e07">.</span>classes <span style="color:#719e07">=</span> isas
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>	add_attribute(attrb)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>   <span style="color:#586e75"># 2. 添加名为 `attrb.name` 的 Getter 方法</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>	variable_name <span style="color:#719e07">=</span> <span style="color:#2aa198">:&#34;@</span><span style="color:#2aa198">#{</span>attrb<span style="color:#719e07">.</span>name<span style="color:#2aa198">}</span><span style="color:#2aa198">&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>	define_method(attrb<span style="color:#719e07">.</span>name) <span style="color:#719e07">do</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>		<span style="color:#586e75"># Here we are in the context of the instance</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>		list <span style="color:#719e07">=</span> <span style="color:#b58900">instance_variable_get</span>(variable_name)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>		<span style="color:#719e07">unless</span> list
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>			list <span style="color:#719e07">=</span> <span style="color:#cb4b16">ObjectList</span><span style="color:#719e07">.</span>new(attrb, <span style="color:#b58900">self</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>			<span style="color:#b58900">instance_variable_set</span>(variable_name, list)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>		<span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>		list
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>	<span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span><span style="color:#719e07">end</span>
+</code></pre></div><p>这里未提供 setter 方法，由于 <code>has_many</code> 声明创建的 ObjectList 对象作为容器，来记录关联对象。因此引用对象的变更是对容器元素的操作。</p>
+<p>接着来看实现：</p>
+<p>第一步也是创建并保存 <code>AbstractObjectAttribute</code>。getter 则比较简单，以惰性初始化的方式返回 <code>ObjectList</code> 数组。作为 Array 的子类 <code>ObjectList</code> 也提供了 <code>add_referrer</code> 与 <code>remove_referrer</code> 来更新关联对象的全局引用关系，后续会展开。</p>
+<p>has_many 使用如下：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#719e07">class</span> <span style="color:#268bd2">PBXNativeTarget</span> <span style="color:#719e07">&lt;</span> <span style="color:#cb4b16">AbstractTarget</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>	<span style="color:#586e75"># @return [PBXBuildRule] the build rules of this target.</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>	has_many <span style="color:#2aa198">:build_rules</span>, <span style="color:#cb4b16">PBXBuildRule</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span><span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span><span style="color:#719e07">class</span> <span style="color:#268bd2">PBXGroup</span> <span style="color:#719e07">&lt;</span> <span style="color:#cb4b16">AbstractTarget</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span>	<span style="color:#586e75"># @return [PBXBuildRule] the build phases of the target.</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">8</span>	has_many <span style="color:#2aa198">:children</span>, <span style="color:#719e07">[</span><span style="color:#cb4b16">PBXGroup</span>, <span style="color:#cb4b16">PBXFileReference</span>, <span style="color:#cb4b16">PBXReferenceProxy</span><span style="color:#719e07">]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">9</span><span style="color:#719e07">end</span>
+</code></pre></div><h4 id="has_many_references_by_keys">has_many_references_by_keys</h4>
+<p><code>has_many_references_by_keys</code> 同样为容器类引用，也是通过 ObjectList 来存储关联对象。不过<strong>它用于记录 project 之间的引用关系</strong>，我们知道在 Xcode 中 Project 是可以存在依赖关系。</p>
+<p>举个例子：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/09-xcode-object-02-nest-project.png" alt="09-xcode-object-02-nest-project"></p>
+<p>Example.xcodeproj 通过 <code>Add Files to Example</code> 方式直接将 A.xcodeproj 添加至该项目中，以方便我们同事管理多个项目。此时 <code>project.pbxproj</code> 文件则会增加一个字典 <strong>projectReferences</strong> 来记录该引用关系：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#dc322f">/* Begin PBXProject section */</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>		<span style="color:#2aa198">85</span><span style="color:#cb4b16">BB2A4F26DA8CB600AE6943</span> <span style="color:#dc322f">/* Project object */</span> <span style="color:#719e07">=</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>			isa <span style="color:#719e07">=</span> <span style="color:#cb4b16">PBXProject</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>			mainGroup <span style="color:#719e07">=</span> <span style="color:#2aa198">85</span><span style="color:#cb4b16">BB2A4E26DA8CB600AE6943</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>			<span style="color:#719e07">...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>			projectReferences <span style="color:#719e07">=</span> (
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>				{
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>					<span style="color:#cb4b16">ProductGroup</span> <span style="color:#719e07">=</span> <span style="color:#2aa198">85</span><span style="color:#cb4b16">BB2A9126DA916100AE6943</span> <span style="color:#dc322f">/* Products */</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>					<span style="color:#cb4b16">ProjectRef</span> <span style="color:#719e07">=</span> <span style="color:#2aa198">85</span><span style="color:#cb4b16">BB2A9026DA916100AE6943</span> <span style="color:#dc322f">/* A.xcodeproj */</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>				},
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>			);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>		};
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span><span style="color:#dc322f">/* End PBXProject section */</span>
+</code></pre></div><p>另外需要注意的是，由于引用的是一个完整的 Project，这里的 <code>ProjectRef</code> 指向的是一个 <strong>PBXFileReference</strong>：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#2aa198">85</span><span style="color:#cb4b16">BB2A9026DA916100AE6943</span> <span style="color:#dc322f">/* A.xcodeproj */</span> <span style="color:#719e07">=</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>	isa <span style="color:#719e07">=</span> <span style="color:#cb4b16">PBXFileReference</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>	lastKnownFileType <span style="color:#719e07">=</span> <span style="color:#2aa198">&#34;wrapper.pb-project&#34;</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>	<span style="color:#b58900">name</span> <span style="color:#719e07">=</span> A<span style="color:#719e07">.</span>xcodeproj;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>	path <span style="color:#719e07">=</span> A<span style="color:#719e07">/</span>A<span style="color:#719e07">.</span>xcodeproj;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>	sourceTree <span style="color:#719e07">=</span> <span style="color:#2aa198">&#34;&lt;group&gt;&#34;</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span>};
+</code></pre></div><p>这也给我们一个提示，<em><strong>大型工程的功能代码该如何高效组织</strong></em>。恰好 CocoaPods 在 <a href="https://blog.cocoapods.org/CocoaPods-1.7.0-beta/">1.7 版本</a>中提供的 install feature：<strong>generate_multiple_pod_projects</strong>，为 Pods 库生成多 Project 工程，则是他们提供的解决方案。</p>
+<p>这里简单介绍一下背景：</p>
+<blockquote>
+<p>从历史上看，CocoaPods 总是生成一个 Pods.xcodeproj，其中包含项目编译所需的所有目标和构建设置。对于较小的项目，仅使用一个包含整个 Podfile 的项目就可以了；但是，随着项目的增长，Pods.xcodeproj 文件的大小也会增加。</p>
+<p>Pods.xcodeproj 文件越大，Xcode 解析其内容所需的时间就越长，这会导致 Xcode 体验下降。通过将每个 pod 集成为自己独立的 Xcode project 并嵌套在顶级 Pods.xcodeproj 下，从而为更大的 CocoaPods 项目带来了一些显着的性能改进。</p>
+<p>此外，在大型代码库中，此功能可能特别有用，因为开发人员可以选择仅打开他们需要处理的特定 .xcodeproj（位于 Pods/ 目录下），而不是打开整个工作区，这会减慢他们的开发过程。</p>
+</blockquote>
+<p>回到本文中，<code>has_many_references_by_key</code> 就是用于记录 <code>projectReferences</code>，其实现如下：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#719e07">def</span> <span style="color:#268bd2">has_many_references_by_keys</span>(plural_name, classes_by_key)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>	attrb <span style="color:#719e07">=</span> <span style="color:#cb4b16">AbstractObjectAttribute</span><span style="color:#719e07">.</span>new(<span style="color:#2aa198">:references_by_keys</span>, plural_name, <span style="color:#b58900">self</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>	attrb<span style="color:#719e07">.</span>classes <span style="color:#719e07">=</span> classes_by_key<span style="color:#719e07">.</span>values
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>	attrb<span style="color:#719e07">.</span>classes_by_key <span style="color:#719e07">=</span> classes_by_key
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>	add_attribute(attrb)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span>	<span style="color:#586e75"># Getter 实现同 has_many, 通过 ObjectList 来存储</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">8</span>   <span style="color:#719e07">...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">9</span><span style="color:#719e07">end</span>
+</code></pre></div><p>该方法用于修饰 <code>PBXProject</code> 属性来关联其他项目文件，声明如下：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#719e07">class</span> <span style="color:#268bd2">PBXProject</span> <span style="color:#719e07">&lt;</span> <span style="color:#cb4b16">AbstractObject</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>   <span style="color:#586e75"># @return [Array&lt;ObjectDictionary&gt;] any reference to other projects.</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>	has_many_references_by_keys <span style="color:#2aa198">:project_references</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>                               <span style="color:#2aa198">:project_ref</span>   <span style="color:#719e07">=&gt;</span> <span style="color:#cb4b16">PBXFileReference</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>                               <span style="color:#2aa198">:product_group</span> <span style="color:#719e07">=&gt;</span> <span style="color:#cb4b16">PBXGroup</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span><span style="color:#719e07">end</span>
+</code></pre></div><p>而存储的元素为 <code>ObjectDictionary</code>，所记录的键值对为：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>{
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>	<span style="color:#2aa198">:project_ref</span>   <span style="color:#719e07">=&gt;</span> <span style="color:#cb4b16">PBXFileReference</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>	<span style="color:#2aa198">:product_group</span> <span style="color:#719e07">=&gt;</span> <span style="color:#cb4b16">PBXGroup</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>}
+</code></pre></div><p>同 <code>ObjectList</code> 类似，<code>ObjectDictionary</code> 作为 Hash 的子类也提供了 <code>add_referrer</code> 与 <code>remove_referrer</code> 来更新引用计数。具体我们在下一节展开。</p>
+<h2 id="object-configuration">Object Configuration</h2>
+<p>前文整体介绍了项目文件 <code>project.pbxproj</code> 的解析，而对于 Object 的解析方法 <strong>Object::configure_with_plist</strong> 并未展开。因为它涉及到本文的两个重要类型 <code>ObjectList</code> 与 <code>ObjectDictionary</code>，为了方便理解，我们在这里来详细分析。</p>
+<p>首先，回顾一下 <code>project.pbxproj</code> 解析 flow：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/02-parse-project.png" alt="02-parse-project"></p>
+<p>可以看到方法 <code>Object::objects_by_uuid</code> 会调用 <code>Project::new_from_plist</code> 完成 object 的遍历，直至 objects 解析完成。</p>
+<h3 id="configure_with_plist">configure_with_plist</h3>
+<p>让我们将 <code>Object::configure_with_plist</code> 展开。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/09-xcode-object-05-configure_with_plist.png.png" alt="09-xcode-object-05-configure_with_plist"></p>
+<p>内容主要分 5 个部分：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">def</span> <span style="color:#268bd2">configure_with_plist</span>(objects_by_uuid_plist)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>   <span style="color:#586e75">#1. 根据 uuid 获取 object 的属性字典</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>	object_plist <span style="color:#719e07">=</span> objects_by_uuid_plist<span style="color:#719e07">[</span>uuid<span style="color:#719e07">].</span>dup
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>	<span style="color:#719e07">unless</span> object_plist<span style="color:#719e07">[</span><span style="color:#2aa198">&#39;isa&#39;</span><span style="color:#719e07">]</span> <span style="color:#719e07">==</span> isa
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>		<span style="color:#719e07">raise</span> <span style="color:#2aa198">&#34;[Xcodeproj] Attempt to initialize `</span><span style="color:#2aa198">#{</span>isa<span style="color:#2aa198">}</span><span style="color:#2aa198">` from plist with &#34;</span> \
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>			<span style="color:#2aa198">&#34;different isa `</span><span style="color:#2aa198">#{</span>object_plist<span style="color:#2aa198">}</span><span style="color:#2aa198">`&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>	<span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>	object_plist<span style="color:#719e07">.</span>delete(<span style="color:#2aa198">&#39;isa&#39;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>   <span style="color:#586e75">#2. 常规属性解析</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>	simple_attributes<span style="color:#719e07">.</span>each <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>attrb<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>		attrb<span style="color:#719e07">.</span>set_value(<span style="color:#b58900">self</span>, object_plist<span style="color:#719e07">[</span>attrb<span style="color:#719e07">.</span>plist_name<span style="color:#719e07">]</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>		object_plist<span style="color:#719e07">.</span>delete(attrb<span style="color:#719e07">.</span>plist_name)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>	<span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>   <span style="color:#586e75">#3. 单一引用关系的属性解析</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>	to_one_attributes<span style="color:#719e07">.</span>each <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>attrb<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>		ref_uuid <span style="color:#719e07">=</span> object_plist<span style="color:#719e07">[</span>attrb<span style="color:#719e07">.</span>plist_name<span style="color:#719e07">]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>		<span style="color:#719e07">if</span> ref_uuid
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>			ref <span style="color:#719e07">=</span> object_with_uuid(ref_uuid, objects_by_uuid_plist, attrb)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>			attrb<span style="color:#719e07">.</span>set_value(<span style="color:#b58900">self</span>, ref) <span style="color:#719e07">if</span> ref
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span>		<span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">22</span>		object_plist<span style="color:#719e07">.</span>delete(attrb<span style="color:#719e07">.</span>plist_name)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">23</span>	<span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">24</span>   <span style="color:#586e75">#4. 多引用关系的 Object 解析</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">25</span>	to_many_attributes<span style="color:#719e07">.</span>each <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>attrb<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">26</span>		ref_uuids <span style="color:#719e07">=</span> object_plist<span style="color:#719e07">[</span>attrb<span style="color:#719e07">.</span>plist_name<span style="color:#719e07">]</span> <span style="color:#719e07">||</span> <span style="color:#719e07">[]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">27</span>		list <span style="color:#719e07">=</span> attrb<span style="color:#719e07">.</span>get_value(<span style="color:#b58900">self</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">28</span>		ref_uuids<span style="color:#719e07">.</span>each <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>uuid<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">29</span>			ref <span style="color:#719e07">=</span> object_with_uuid(uuid, objects_by_uuid_plist, attrb)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">30</span>			list <span style="color:#719e07">&lt;&lt;</span> ref <span style="color:#719e07">if</span> ref
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">31</span>		<span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">32</span>		object_plist<span style="color:#719e07">.</span>delete(attrb<span style="color:#719e07">.</span>plist_name)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">33</span>	<span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">34</span>   <span style="color:#586e75">#5. 多引用关系的 Project 解析</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">35</span>	references_by_keys_attributes<span style="color:#719e07">.</span>each <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>attrb<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">36</span>		hashes <span style="color:#719e07">=</span> object_plist<span style="color:#719e07">[</span>attrb<span style="color:#719e07">.</span>plist_name<span style="color:#719e07">]</span> <span style="color:#719e07">||</span> {}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">37</span>		list <span style="color:#719e07">=</span> attrb<span style="color:#719e07">.</span>get_value(<span style="color:#b58900">self</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">38</span>		hashes<span style="color:#719e07">.</span>each <span style="color:#719e07">do</span> <span style="color:#719e07">|</span><span style="color:#b58900">hash</span><span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">39</span>			dictionary <span style="color:#719e07">=</span> <span style="color:#cb4b16">ObjectDictionary</span><span style="color:#719e07">.</span>new(attrb, <span style="color:#b58900">self</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">40</span>			<span style="color:#b58900">hash</span><span style="color:#719e07">.</span>each <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>key, uuid<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">41</span>				ref <span style="color:#719e07">=</span> object_with_uuid(uuid, objects_by_uuid_plist, attrb)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">42</span>				dictionary<span style="color:#719e07">[</span>key<span style="color:#719e07">]</span> <span style="color:#719e07">=</span> ref <span style="color:#719e07">if</span> ref
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">43</span>			<span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">44</span>			list <span style="color:#719e07">&lt;&lt;</span> dictionary
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">45</span>		<span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">46</span>		object_plist<span style="color:#719e07">.</span>delete(attrb<span style="color:#719e07">.</span>plist_name)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">47</span>	<span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">48</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">49</span>	<span style="color:#719e07">unless</span> object_plist<span style="color:#719e07">.</span>empty?
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">50</span>		<span style="color:#cb4b16">UI</span><span style="color:#719e07">.</span>warn <span style="color:#2aa198">&#34;[!] Xcodeproj doesn&#39;t know about the following &#34;</span> \
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">51</span>						<span style="color:#2aa198">&#34;attributes </span><span style="color:#2aa198">#{</span>object_plist<span style="color:#719e07">.</span>inspect<span style="color:#2aa198">}</span><span style="color:#2aa198"> for the &#39;</span><span style="color:#2aa198">#{</span>isa<span style="color:#2aa198">}</span><span style="color:#2aa198">&#39; isa.&#34;</span> \
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">52</span>						<span style="color:#2aa198">&#34;</span><span style="color:#cb4b16">\n</span><span style="color:#2aa198">If this attribute was generated by Xcode please file &#34;</span> \
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">53</span>						<span style="color:#2aa198">&#39;an issue: https://github.com/CocoaPods/Xcodeproj/issues/new&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">54</span>	<span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">55</span><span style="color:#719e07">end</span>
+</code></pre></div><ol>
+<li>根据 uuid 获取 <code>project.pbxproj</code> object 对应的 plist 字典 object_plist；</li>
+<li>遍历 <code>simple_attributes</code>，将 object_plist 中与常规属性名一致的值存入对应的 attribute 中，并对 object_plist 中的值清除，避免无限赋值；</li>
+<li>单一引用的 Object 解析，遍历 <code>to_one_attributes</code>，从 object_plist 中取出对应的字典 ref_uuid 以生成 object 并绑定到当前对象。</li>
+<li>多引用关系的 Object 解析，遍历 <code>to_many_attributes</code>，从 object_plist 中取出对应的数组 ref_uuids，再遍历生成 Objects 存入 attrbute 的 list 中。</li>
+<li>多引用关系的 Project 解析，遍历 <code>references_by_keys_attributes</code>，从 object_plist 中取出对应的字典 hash，再遍历 hash 键值对生成项目引用对象，存入 attrbute 的 list 中。</li>
+</ol>
+<h3 id="object_with_uuid">object_with_uuid</h3>
+<p>上一节中，我们看到所有的引用属性的解析，都会调用 object_with_uuid，而该方法本身是缓存方法，最终记录了 rootObject 的 objects 表，key 为 uuid。该方法实现如下：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">def</span> <span style="color:#268bd2">object_with_uuid</span>(uuid, objects_by_uuid_plist, attribute)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>	<span style="color:#719e07">unless</span> object <span style="color:#719e07">=</span> project<span style="color:#719e07">.</span>objects_by_uuid<span style="color:#719e07">[</span>uuid<span style="color:#719e07">]</span> <span style="color:#719e07">||</span> project<span style="color:#719e07">.</span>new_from_plist(uuid, objects_by_uuid_plist)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>		<span style="color:#cb4b16">UI</span><span style="color:#719e07">.</span>warn <span style="color:#2aa198">&#34;`</span><span style="color:#2aa198">#{</span><span style="color:#b58900">inspect</span><span style="color:#2aa198">}</span><span style="color:#2aa198">` attempted to initialize an object with an unknown UUID. &#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>		<span style="color:#719e07">...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>	<span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>	object
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span><span style="color:#719e07">rescue</span> <span style="color:#cb4b16">NameError</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>	attributes <span style="color:#719e07">=</span> objects_by_uuid_plist<span style="color:#719e07">[</span>uuid<span style="color:#719e07">]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>	<span style="color:#719e07">raise</span> <span style="color:#2aa198">&#34;`</span><span style="color:#2aa198">#{</span>isa<span style="color:#2aa198">}</span><span style="color:#2aa198">` attempted to initialize an object with unknown ISA &#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>	<span style="color:#719e07">...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span><span style="color:#719e07">end</span>
+</code></pre></div><p>首先从 project 的 objects 表 objects_by_uuid 中查询 object，如不存在，则会通过 <code>Project::new_from_plist</code> 解析出对应的 object 并存入 objects 表中。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">def</span> <span style="color:#268bd2">new_from_plist</span>(uuid, objects_by_uuid_plist, root_object <span style="color:#719e07">=</span> <span style="color:#719e07">false</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>  attributes <span style="color:#719e07">=</span> objects_by_uuid_plist<span style="color:#719e07">[</span>uuid<span style="color:#719e07">]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>  <span style="color:#719e07">if</span> attributes
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>    <span style="color:#586e75">#1. </span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>    klass <span style="color:#719e07">=</span> <span style="color:#cb4b16">Object</span><span style="color:#719e07">.</span>const_get(attributes<span style="color:#719e07">[</span><span style="color:#2aa198">&#39;isa&#39;</span><span style="color:#719e07">]</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>    object <span style="color:#719e07">=</span> klass<span style="color:#719e07">.</span>new(<span style="color:#b58900">self</span>, uuid)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>	 <span style="color:#586e75">#2. </span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>    objects_by_uuid<span style="color:#719e07">[</span>uuid<span style="color:#719e07">]</span> <span style="color:#719e07">=</span> object
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>    object<span style="color:#719e07">.</span>add_referrer(<span style="color:#b58900">self</span>) <span style="color:#719e07">if</span> root_object
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>    <span style="color:#586e75">#3. </span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>    object<span style="color:#719e07">.</span>configure_with_plist(objects_by_uuid_plist)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>    object
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span><span style="color:#719e07">end</span>
+</code></pre></div><ol>
+<li>以 isa 字符串获取 Xcodeproj 中对应的 Xcode Object 类型 klass，以初始化 object；</li>
+<li>更新 rootObject 的 objects 表 objects_by_uuid，另外仅当 root_object 为 true 时，才会通过 <code>add_referrer</code> 将 project 与 root_object 关联；</li>
+<li>遍历 objects 字典以递归方式完成 objects 对象的初始化，并将 ISA 数据到 Xcode Object 的映射；</li>
+</ol>
+<p>我们知道 xcodeproj 提供的是对 <code>project.pbxproj</code> 的编辑能力，因此，对于 <code>objects_by_uuid</code> 的更新不能仅停留在对 <code>project.pbxproj</code> 的解析。当用户编辑引用对象时也需要保证 <code>objects_by_uuid</code> 的一致性。</p>
+<p>那么如何保证呢 ？答案就是通过 <code>add_referrer</code>。</p>
+<h2 id="全局-objects-索引">全局 Objects 索引</h2>
+<p>本节我们就来看看核心的 objects 表 <code>objects_by_uuid</code> 如何更新的。除了 <code>new_from_plist</code> 初始化 object 时主动更新 objects_by_uuid 之外，剩下的就是通过 <code>add_referrer</code> 与 <code>remove_referrer</code> 来完成。而该方法除了 <code>has_one</code> 属性会修改之外，<code>ObjectList</code> 和 <code>ObjectDictionary</code> 容器均提供了对应的接口。</p>
+<h3 id="add_referrer">add_referrer</h3>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">class</span> <span style="color:#268bd2">AbstractObject</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>	<span style="color:#719e07">attr_reader</span> <span style="color:#2aa198">:referrers</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>   
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>	<span style="color:#719e07">def</span> <span style="color:#268bd2">add_referrer</span>(referrer)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>		@referrers <span style="color:#719e07">&lt;&lt;</span> referrer
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>		@project<span style="color:#719e07">.</span>objects_by_uuid<span style="color:#719e07">[</span>uuid<span style="color:#719e07">]</span> <span style="color:#719e07">=</span> <span style="color:#b58900">self</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>	<span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>	<span style="color:#719e07">def</span> <span style="color:#268bd2">remove_referrer</span>(referrer)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>		@referrers<span style="color:#719e07">.</span>delete(referrer)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>		<span style="color:#719e07">if</span> @referrers<span style="color:#719e07">.</span>count <span style="color:#719e07">==</span> <span style="color:#2aa198">0</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>			mark_project_as_dirty!
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>			@project<span style="color:#719e07">.</span>objects_by_uuid<span style="color:#719e07">.</span>delete(uuid)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>		<span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>	<span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span><span style="color:#719e07">end</span>
+</code></pre></div><p>下面我们重点聊 <code>add_referrer</code>，删除引用的逻辑同 <code>add_referrer</code> 类似就不展开了。</p>
+<p><code>add_referrer</code> 实现就两行，用于记录  会通知 object 另一个对象正在引用它，并将其记录到 <code>referrers</code> 中。如果 object 之前没有引用，则将其添加到 <code>objects_by_uuid</code> 表中。</p>
+<p>前面提到 <code>Xcodeproj</code> 支持编辑 <code>project.pbxproj</code>，而<strong>对 <code>project.pbxproj</code> 的编辑本质上是修改 objects 属性与维护 <code>objects_by_uuid</code></strong>。因此，我们要做的事情就是保证引用属性被修改时，对应的 <code>referres</code> 和 <code>objects_by_uuid</code> 的同步。同步逻辑就封装在 <code>has_one</code>、<code>has_many</code>、 <code>has_many_references_by_keys </code> 这些引用修饰器中。</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/09-xcode-object-05-add_referrer.png" alt="09-xcode-object-05-add_referrer"></p>
+<h4 id="has_one"><code>has_one</code></h4>
+<p><code>has_one</code> 直接通过在定义的 attribute setter 方法中调用 <code>value.add_referrer(self) if value</code> 来完成引用更新。注意，它更新前会先调用 <code>remove_referrer</code> 清除前值的引用关系。</p>
+<h4 id="has_many-1"><code>has_many</code></h4>
+<p>对于数组引用类型，通过重载了 Array 的增加和删除方法来更新引用。</p>
+<p>我们在前文示例代码中提到过，如果想要将新增的文件添加在 Xcode 项目中，需要通过 <code>new_file_reference</code> 将文件所对应的 <code>PBXFileReference</code> 添加至 <code>PBXGroup</code> 下，即保存在 <code>children</code> 属性中。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#719e07">def</span> <span style="color:#268bd2">new_file_reference</span>(group, path, source_tree)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>	path <span style="color:#719e07">=</span> <span style="color:#cb4b16">Pathname</span><span style="color:#719e07">.</span>new(path)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>	ref <span style="color:#719e07">=</span> group<span style="color:#719e07">.</span>project<span style="color:#719e07">.</span>new(<span style="color:#cb4b16">PBXFileReference</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>	group<span style="color:#719e07">.</span>children <span style="color:#719e07">&lt;&lt;</span> ref
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>	<span style="color:#cb4b16">GroupableHelper</span><span style="color:#719e07">.</span>set_path_with_source_tree(ref, path, source_tree)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>	ref<span style="color:#719e07">.</span>set_last_known_file_type
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span>	ref
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">8</span><span style="color:#719e07">end</span>
+</code></pre></div><p>以 <code>PBXGroup</code> 的 <code>children</code> 属性为例，它就是通过 <code>ObjectList</code> 的 <code>&lt;&lt;</code> 方法来添加 <code>PBXFileReference</code>。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#719e07">def</span> <span style="color:#268bd2">&lt;&lt;</span>(object) <span style="color:#719e07">...</span> <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span><span style="color:#719e07">def</span> <span style="color:#268bd2">+</span>(object) <span style="color:#719e07">...</span> <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span><span style="color:#719e07">def</span> <span style="color:#268bd2">insert</span>(index, object) <span style="color:#719e07">...</span> <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span><span style="color:#719e07">def</span> <span style="color:#268bd2">unshift</span>(object) <span style="color:#719e07">...</span> <span style="color:#719e07">end</span>
+</code></pre></div><p>这几个增加 object 方法，均通过 <code>perform_additions_operations</code> 方法完成 object 的 <code>add_referrer</code> 方法调用。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#719e07">def</span> <span style="color:#268bd2">perform_additions_operations</span>(objects)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>	objects <span style="color:#719e07">=</span> <span style="color:#719e07">[</span>objects<span style="color:#719e07">]</span> <span style="color:#719e07">unless</span> objects<span style="color:#719e07">.</span>is_a?(<span style="color:#b58900">Array</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>	objects<span style="color:#719e07">.</span>each <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>obj<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>		owner<span style="color:#719e07">.</span>mark_project_as_dirty!
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>		obj<span style="color:#719e07">.</span>add_referrer(owner)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>		attribute<span style="color:#719e07">.</span>validate_value(obj) <span style="color:#719e07">unless</span> obj<span style="color:#719e07">.</span>is_a?(<span style="color:#cb4b16">ObjectDictionary</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span>	<span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">8</span><span style="color:#719e07">end</span>
+</code></pre></div><h4 id="has_many_references_by_keys-1"><code>has_many_references_by_keys</code></h4>
+<p><code>has_many_references_by_keys</code> 不同于 <code>has_many</code> 的是其储存的元素为 <code>ObjectDictionary</code>，<code>ObjectDictionary</code> 通过重载 Hash 的更新方法来更新引用：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">def</span> <span style="color:#268bd2">[]=</span>(key, object)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>	key <span style="color:#719e07">=</span> normalize_key(key)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>	<span style="color:#719e07">if</span> object
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>		perform_additions_operations(object, key)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>	<span style="color:#719e07">else</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>		perform_deletion_operations(<span style="color:#b58900">self</span><span style="color:#719e07">[</span>key<span style="color:#719e07">]</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>	<span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>	<span style="color:#719e07">super</span>(key, object)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span><span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span><span style="color:#719e07">def</span> <span style="color:#268bd2">perform_additions_operations</span>(object, key)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>	owner<span style="color:#719e07">.</span>mark_project_as_dirty!
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>	object<span style="color:#719e07">.</span>add_referrer(owner)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>	attribute<span style="color:#719e07">.</span>validate_value_for_key(object, key)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span><span style="color:#719e07">end</span>
+</code></pre></div><p>在 <code>perform_additions_operations</code> 中，同样调用 object 的 <code>add_referrer</code> 完成引用对象都更新。</p>
+<h1 id="通过-cli-添加-xcode-子项目依赖">通过 CLI 添加 Xcode 子项目依赖</h1>
+<p>最后一节，我们通过命令行添加 Xcode 子项目，来实践一下前面提到的知识点。</p>
+<p>要添加 Xcode 子项目依赖，本质也是添加文件引用，因此需要先调用 <code>new_reference</code>。当新建引用文件类型为 <code>.xcodeproj</code> 时，会调用 <code>new_subproject</code>。正如前文提到，在 Xcode 工程中添加普通文件也是通过 <code>new_reference</code> 来分发。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">def</span> <span style="color:#268bd2">new_reference</span>(group, path, source_tree)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>  ref <span style="color:#719e07">=</span> <span style="color:#719e07">case</span> <span style="color:#cb4b16">File</span><span style="color:#719e07">.</span>extname(path)<span style="color:#719e07">.</span>downcase
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>        <span style="color:#719e07">when</span> <span style="color:#2aa198">&#39;.xcdatamodeld&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>          new_xcdatamodeld(group, path, source_tree)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>        <span style="color:#719e07">when</span> <span style="color:#2aa198">&#39;.xcodeproj&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>          new_subproject(group, path, source_tree)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>        <span style="color:#719e07">else</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>          new_file_reference(group, path, source_tree)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>        <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>  configure_defaults_for_file_reference(ref)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>  ref
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span><span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span><span style="color:#719e07">def</span> <span style="color:#268bd2">new_subproject</span>(group, path, source_tree)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>   <span style="color:#586e75">#1. 新建 sub project 文件引用</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>	ref <span style="color:#719e07">=</span> new_file_reference(group, path, source_tree)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>	ref<span style="color:#719e07">.</span>include_in_index <span style="color:#719e07">=</span> <span style="color:#719e07">nil</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>   
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>   <span style="color:#586e75">#2.1 新建 sub product groups 分组</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span>	product_group_ref <span style="color:#719e07">=</span> find_products_group_ref(group, <span style="color:#719e07">true</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">22</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">23</span>   <span style="color:#586e75">#2.2 遍历子项目的 objects 表，将其 product framework 作为当前项目的的产物代理</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">24</span>	subproj <span style="color:#719e07">=</span> <span style="color:#cb4b16">Project</span><span style="color:#719e07">.</span>open(path)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">25</span>	subproj<span style="color:#719e07">.</span>products_group<span style="color:#719e07">.</span>files<span style="color:#719e07">.</span>each <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>product_reference<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">26</span>		container_proxy <span style="color:#719e07">=</span> group<span style="color:#719e07">.</span>project<span style="color:#719e07">.</span>new(<span style="color:#cb4b16">PBXContainerItemProxy</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">27</span>		container_proxy<span style="color:#719e07">.</span>container_portal <span style="color:#719e07">=</span> ref<span style="color:#719e07">.</span>uuid
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">28</span>		container_proxy<span style="color:#719e07">.</span>proxy_type <span style="color:#719e07">=</span> <span style="color:#cb4b16">Constants</span><span style="color:#719e07">::</span><span style="color:#cb4b16">PROXY_TYPES</span><span style="color:#719e07">[</span><span style="color:#2aa198">:reference</span><span style="color:#719e07">]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">29</span>		container_proxy<span style="color:#719e07">.</span>remote_global_id_string <span style="color:#719e07">=</span> product_reference<span style="color:#719e07">.</span>uuid
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">30</span>		container_proxy<span style="color:#719e07">.</span>remote_info <span style="color:#719e07">=</span> <span style="color:#2aa198">&#39;Subproject&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">31</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">32</span>		reference_proxy <span style="color:#719e07">=</span> group<span style="color:#719e07">.</span>project<span style="color:#719e07">.</span>new(<span style="color:#cb4b16">PBXReferenceProxy</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">33</span>		extension <span style="color:#719e07">=</span> <span style="color:#cb4b16">File</span><span style="color:#719e07">.</span>extname(product_reference<span style="color:#719e07">.</span>path)<span style="color:#719e07">[</span><span style="color:#2aa198">1</span><span style="color:#719e07">..-</span><span style="color:#2aa198">1</span><span style="color:#719e07">]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">34</span>		reference_proxy<span style="color:#719e07">.</span>file_type <span style="color:#719e07">=</span> <span style="color:#cb4b16">Constants</span><span style="color:#719e07">::</span><span style="color:#cb4b16">FILE_TYPES_BY_EXTENSION</span><span style="color:#719e07">[</span>extension<span style="color:#719e07">]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">35</span>		reference_proxy<span style="color:#719e07">.</span>path <span style="color:#719e07">=</span> product_reference<span style="color:#719e07">.</span>path
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">36</span>		reference_proxy<span style="color:#719e07">.</span>remote_ref <span style="color:#719e07">=</span> container_proxy
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">37</span>		reference_proxy<span style="color:#719e07">.</span>source_tree <span style="color:#719e07">=</span> <span style="color:#2aa198">&#39;BUILT_PRODUCTS_DIR&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">38</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">39</span>		product_group_ref <span style="color:#719e07">&lt;&lt;</span> reference_proxy
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">40</span>	<span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">41</span>	<span style="color:#586e75">#4. 创建 ObjectDictionary，将 subproject 的文件引用和产物引用记录其中，最后将 ObjectDictionary 存入 project_references</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">42</span>	attribute <span style="color:#719e07">=</span> <span style="color:#cb4b16">PBXProject</span><span style="color:#719e07">.</span>references_by_keys_attributes<span style="color:#719e07">.</span>find { <span style="color:#719e07">|</span>attrb<span style="color:#719e07">|</span> attrb<span style="color:#719e07">.</span>name <span style="color:#719e07">==</span> <span style="color:#2aa198">:project_references</span> }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">43</span>	project_reference <span style="color:#719e07">=</span> <span style="color:#cb4b16">ObjectDictionary</span><span style="color:#719e07">.</span>new(attribute, group<span style="color:#719e07">.</span>project<span style="color:#719e07">.</span>root_object)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">44</span>	project_reference<span style="color:#719e07">[</span><span style="color:#2aa198">:project_ref</span><span style="color:#719e07">]</span> <span style="color:#719e07">=</span> ref
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">45</span>	project_reference<span style="color:#719e07">[</span><span style="color:#2aa198">:product_group</span><span style="color:#719e07">]</span> <span style="color:#719e07">=</span> product_group_ref
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">46</span>	group<span style="color:#719e07">.</span>project<span style="color:#719e07">.</span>root_object<span style="color:#719e07">.</span>project_references <span style="color:#719e07">&lt;&lt;</span> project_reference
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">47</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">48</span>	ref
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">49</span><span style="color:#719e07">end</span>
+</code></pre></div><p>我们知道当 Xcode 项目中存在子项目时，Xcode 工程文件中将多出字典 <code>projectReferences</code>，它包含两个 key <code>project_ref</code> 与 <code>product_group</code>。想要以 CLI 的方式添加 Xcode 子项目依赖，就需要构造出 <code>projectReferences</code> 字典。</p>
+<p>具体步骤说明如下：</p>
+<h2 id="0x01-新建子工程文件引用">0x01 新建子工程文件引用</h2>
+<p>通过 <code>new_file_reference</code> 创建 <code>PBXReference</code> 以指向子项目的工程文件地址。</p>
+<h2 id="0x02-新建子工程-product-引用">0x02 新建子工程 Product 引用</h2>
+<p>通过 <code>projectReferences</code> 属性名可知，当我们添加 Xcode 子项目作为依赖时，本质上是将子项目的产物，以 framework 形式加进主工程。为此我们需要一个 Proxy 来指向该产物的 <strong>Xcode Object Identify</strong>，即 GUID。</p>
+<p>完整引用关系如下：</p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/09-xcode-object-06-product-group-ref.png" alt="09-xcode-object-06-product-group-ref"></p>
+<ol>
+<li>首先需要新建一个 <code>PBXGroup</code> 作为 product group reference。</li>
+<li>新建 <code>PBXReferenceProxy</code> 和 <code>PBXContainerItemProxy</code> 代理来桥接子项目的 GUID，对应为 container 代理的 <code>remote_global_id_string</code> 字段。同时还需要记录 container_portal，其值为子项目 Product Group 的 GUID。</li>
+</ol>
+<h2 id="0x03-写入-project_references">0x03 写入 project_references</h2>
+<p>新建 Object Dictionary 将前两步生成的 ref 分别记录在 <code>project_ref</code> 和 <code>product_group</code>，最后写入 rootObject 的 <code>project_references</code> 中。</p>
+<h1 id="总结">总结</h1>
+<p><code>xcodeproj</code> 利用属性修饰器不仅完成了对 Xcode 项目文件的映射，同时也支持了对 Xcode 项目文件的编辑。并且作者利用 AbstractObjectAttribute 和 ObjectList 抹除了不同类型的 Xcode Object 差异，为批量解析提供了便利。最后为了支持嵌套的 Xcode 工程，引入 ObjectDictionary 的同时仍旧保证了现有结构的完整性。另外从嵌套的 Xcode 工程，我们也能理解为何 Xcode 项目文件需要提供 GUID，毕竟，避免键值的冲突对于大型项目而言尤其重要。</p>
+<h1 id="知识点问题梳理">知识点问题梳理</h1>
+<p>这里罗列了五个问题用来考察你是否已经掌握了这篇文章，如果没有建议你加入<strong>收藏</strong>再次阅读：</p>
+<ol>
+<li>描述一下 <code>has_many_references_by_keys</code> 的实现和作用？</li>
+<li><code>has_one </code> 修饰的属性为何最终也声明为 ObjectList 类型？</li>
+<li>说说 <code>xcodeproj</code> 是如何保证全局 objects 索引的一致性？</li>
+<li>说说 <code>PBXReferenceProxy</code> 与 <code>PBXContainerItemProxy</code> 的作用？</li>
+<li>描述一下如何通过 CLI 添加 Xcode 子项目？</li>
+</ol>
+</section>
+
+  
+  
+  <footer class="post-tags">
+     
+    <a href="https://looseyi.github.io/tags/cocoapods">CocoaPods</a>
+     
+    <a href="https://looseyi.github.io/tags/ios">iOS</a>
+     
+    <a href="https://looseyi.github.io/tags/ruby">Ruby</a>
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="post-nav">
+    
+    <a class="prev" href="https://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-1/"><span>←</span><span>浅析 cocoapods-binary</span></a>
+     
+    <a class="next" href="https://looseyi.github.io/post/wwdc/wwdc21/wwdc21-session-10210/"><span>WWDC21 - 探索 Xcode 项目中构建配置的高级技巧</span><span>→</span></a>
+    
+  </nav>
+  
+
+  
+  
+</article>
+
+
+			
+
+  
+
+  
+    <script src="https://utteranc.es/client.js"
+            repo="looseyi/looseyi.github.io"
+            issue-term="pathname"
+            theme="github-light"
+            crossorigin="anonymous"
+            async>
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/utterance">comments powered by utterances.</a></noscript>
+
+		</main>
+
+    <footer class="footer">
+  <p>&copy; 2021 <a href="https://looseyi.github.io/">Aha Edmond</a></p>
+  <p>Powered by <a href="https://gohugo.io/" rel="noopener" target="_blank">Hugo️️</a>️</p>
+  <p>
+    <a href="https://github.com/nanxiaobei/hugo-paper" rel="noopener" target="_blank">Paper 5.1</a>
+  </p>
+</footer>
+
+		
+
+
+  </body>
+</html>

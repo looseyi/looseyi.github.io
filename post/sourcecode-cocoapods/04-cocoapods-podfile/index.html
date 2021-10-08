@@ -95,7 +95,7 @@ if (!doNotTrack) {
   <meta itemprop="name" content="4. Podfile 的解析逻辑">
 <meta itemprop="description" content="引子 在上文 CocoaPods 命令解析 中，我们通过对 CLAide 的源码分析，了解了 CocoaPods 是如何处理 pod 命令，多级命令又是如何组织和嵌套的，并解释了命令行输出所代表的含义。今天"><meta itemprop="datePublished" content="2020-09-17T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2020-09-17T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="5926">
+<meta itemprop="wordCount" content="5839">
 <meta itemprop="keywords" content="CocoaPods,iOS,Ruby," />
   
   <meta name="twitter:card" content="summary"/>
@@ -183,19 +183,10 @@ if (!doNotTrack) {
 <p>在介绍 Podfile 的内容结构之前，必须要谈谈 Xcode 的工程结构。</p>
 <h1 id="xcode-工程结构">Xcode 工程结构</h1>
 <p>我们先来看一个极简 Podfile 声明：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">target</span> <span class="s1">&#39;Demo&#39;</span> <span class="k">do</span>
-  <span class="n">pod</span> <span class="s1">&#39;Alamofire&#39;</span><span class="p">,</span> <span class="ss">:path</span> <span class="o">=&gt;</span> <span class="s1">&#39;./Alamofire&#39;</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>它编译后的工程目录如下：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>target <span style="color:#2aa198">&#39;Demo&#39;</span> <span style="color:#719e07">do</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>  pod <span style="color:#2aa198">&#39;Alamofire&#39;</span>, <span style="color:#2aa198">:path</span> <span style="color:#719e07">=&gt;</span> <span style="color:#2aa198">&#39;./Alamofire&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span><span style="color:#719e07">end</span>
+</code></pre></div><p>它编译后的工程目录如下：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cgy1gji200f30rj20o005haal.jpg" alt="02-xcode-structure"></p>
 <p>如你所见 Podfile 的配置是围绕 Xcode 的这些工程结构：<strong>Workspace、Project、Target 及 Build Setting</strong> 来展开的。
 作为包管理工具 CocoaPods 将所管理的 Pods 依赖库组装成一个个 Target，统一放入 <code>Pods.project</code> 中的 <code>Demo target</code>，并自动配置好 Target 间的依赖关系。</p>
@@ -252,97 +243,49 @@ Project 所管理的资源都来自它所包含的 Targets。特点如下：</p>
 <p>CocoaPods-Core 用于 CocoaPods 中配置文件的解析，包括 <code>Podfile</code>、<code>Podspec</code> 以及解析后的依赖锁存文件，如 Podfile.lock 等。</p>
 <h2 id="cocoapods-core-的文件构成">CocoaPods-Core 的文件构成</h2>
 <p>照例，我们先通过入口文件 <code>lib/cocoapods-core.rb</code> 来一窥 Core 项目的主要文件：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span><span class="lnt">33
-</span><span class="lnt">34
-</span><span class="lnt">35
-</span><span class="lnt">36
-</span><span class="lnt">37
-</span><span class="lnt">38
-</span><span class="lnt">39
-</span><span class="lnt">40
-</span><span class="lnt">41
-</span><span class="lnt">42
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">module</span> <span class="nn">Pod</span>
-  <span class="nb">require</span> <span class="s1">&#39;cocoapods-core/gem_version&#39;</span>
-
-  <span class="k">class</span> <span class="nc">PlainInformative</span> <span class="o">&lt;</span> <span class="no">StandardError</span><span class="p">;</span> <span class="k">end</span>
-  <span class="k">class</span> <span class="nc">Informative</span> <span class="o">&lt;</span> <span class="no">PlainInformative</span><span class="p">;</span> <span class="k">end</span>
-
-  <span class="nb">require</span> <span class="s1">&#39;pathname&#39;</span>
-  <span class="nb">require</span> <span class="s1">&#39;cocoapods-core/vendor&#39;</span>
-   
-  <span class="c1"># 用于存储 PodSpec 中的版本号</span>
-  <span class="nb">autoload</span> <span class="ss">:Version</span><span class="p">,</span>        <span class="s1">&#39;cocoapods-core/version&#39;</span>
-  <span class="c1"># pod 的版本限制</span>
-  <span class="nb">autoload</span> <span class="ss">:Requirement</span><span class="p">,</span>    <span class="s1">&#39;cocoapods-core/requirement&#39;</span>
-  <span class="c1"># 配置 Podfile 或 PodSpec 中的 pod 依赖</span>
-  <span class="nb">autoload</span> <span class="ss">:Dependency</span><span class="p">,</span>     <span class="s1">&#39;cocoapods-core/dependency&#39;</span>
-  <span class="c1"># 获取 Github 仓库信息</span>
-  <span class="nb">autoload</span> <span class="ss">:GitHub</span><span class="p">,</span>         <span class="s1">&#39;cocoapods-core/github&#39;</span>
-  <span class="c1"># 处理 HTTP 请求</span>
-  <span class="nb">autoload</span> <span class="ss">:HTTP</span><span class="p">,</span>           <span class="s1">&#39;cocoapods-core/http&#39;</span>
-  <span class="c1"># 记录最终 pod 的依赖信息</span>
-  <span class="nb">autoload</span> <span class="ss">:Lockfile</span><span class="p">,</span>       <span class="s1">&#39;cocoapods-core/lockfile&#39;</span>
-  <span class="c1"># 记录 SDK 的名称和 target 版本</span>
-  <span class="nb">autoload</span> <span class="ss">:Platform</span><span class="p">,</span>       <span class="s1">&#39;cocoapods-core/platform&#39;</span>
-  <span class="c1"># 对应 Podfile 文件的 class</span>
-  <span class="nb">autoload</span> <span class="ss">:Podfile</span><span class="p">,</span>        <span class="s1">&#39;cocoapods-core/podfile&#39;</span>
-  <span class="c1"># 管理 PodSpec 的集合</span>
-  <span class="nb">autoload</span> <span class="ss">:Source</span><span class="p">,</span>         <span class="s1">&#39;cocoapods-core/source&#39;</span>
-  <span class="c1"># 管理基于 CDN 来源的 PodSpec 集合</span>
-  <span class="nb">autoload</span> <span class="ss">:CDNSource</span><span class="p">,</span>      <span class="s1">&#39;cocoapods-core/cdn_source&#39;</span>
-  <span class="c1"># 管理基于 Trunk 来源的 PodSpec 集合</span>
-  <span class="nb">autoload</span> <span class="ss">:TrunkSource</span><span class="p">,</span>    <span class="s1">&#39;cocoapods-core/trunk_source&#39;</span>
-  <span class="c1"># 对应 PodSpec 文件的 class</span>
-  <span class="nb">autoload</span> <span class="ss">:Specification</span><span class="p">,</span>  <span class="s1">&#39;cocoapods-core/specification&#39;</span>
-  <span class="c1"># 将 pod 信息转为 .yml 文件，用于 lockfile 的序列化</span>
-  <span class="nb">autoload</span> <span class="ss">:YAMLHelper</span><span class="p">,</span>     <span class="s1">&#39;cocoapods-core/yaml_helper&#39;</span>
-  <span class="c1"># 记录 pod 依赖类型，是静态库/动态库</span>
-  <span class="nb">autoload</span> <span class="ss">:BuildType</span><span class="p">,</span>      <span class="s1">&#39;cocoapods-core/build_type&#39;</span>
-  
-  <span class="o">...</span>
-
-  <span class="no">Spec</span> <span class="o">=</span> <span class="no">Specification</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>将这些 Model 类按照对应的依赖关系进行划分，层级如下：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">module</span> Pod
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>  <span style="color:#b58900">require</span> <span style="color:#2aa198">&#39;cocoapods-core/gem_version&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>  <span style="color:#719e07">class</span> <span style="color:#268bd2">PlainInformative</span> <span style="color:#719e07">&lt;</span> <span style="color:#cb4b16">StandardError</span>; <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>  <span style="color:#719e07">class</span> <span style="color:#268bd2">Informative</span> <span style="color:#719e07">&lt;</span> <span style="color:#cb4b16">PlainInformative</span>; <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>  <span style="color:#b58900">require</span> <span style="color:#2aa198">&#39;pathname&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>  <span style="color:#b58900">require</span> <span style="color:#2aa198">&#39;cocoapods-core/vendor&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>   
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>  <span style="color:#586e75"># 用于存储 PodSpec 中的版本号</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>  <span style="color:#b58900">autoload</span> <span style="color:#2aa198">:Version</span>,        <span style="color:#2aa198">&#39;cocoapods-core/version&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>  <span style="color:#586e75"># pod 的版本限制</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>  <span style="color:#b58900">autoload</span> <span style="color:#2aa198">:Requirement</span>,    <span style="color:#2aa198">&#39;cocoapods-core/requirement&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>  <span style="color:#586e75"># 配置 Podfile 或 PodSpec 中的 pod 依赖</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>  <span style="color:#b58900">autoload</span> <span style="color:#2aa198">:Dependency</span>,     <span style="color:#2aa198">&#39;cocoapods-core/dependency&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>  <span style="color:#586e75"># 获取 Github 仓库信息</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>  <span style="color:#b58900">autoload</span> <span style="color:#2aa198">:GitHub</span>,         <span style="color:#2aa198">&#39;cocoapods-core/github&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>  <span style="color:#586e75"># 处理 HTTP 请求</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>  <span style="color:#b58900">autoload</span> <span style="color:#2aa198">:HTTP</span>,           <span style="color:#2aa198">&#39;cocoapods-core/http&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>  <span style="color:#586e75"># 记录最终 pod 的依赖信息</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span>  <span style="color:#b58900">autoload</span> <span style="color:#2aa198">:Lockfile</span>,       <span style="color:#2aa198">&#39;cocoapods-core/lockfile&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">22</span>  <span style="color:#586e75"># 记录 SDK 的名称和 target 版本</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">23</span>  <span style="color:#b58900">autoload</span> <span style="color:#2aa198">:Platform</span>,       <span style="color:#2aa198">&#39;cocoapods-core/platform&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">24</span>  <span style="color:#586e75"># 对应 Podfile 文件的 class</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">25</span>  <span style="color:#b58900">autoload</span> <span style="color:#2aa198">:Podfile</span>,        <span style="color:#2aa198">&#39;cocoapods-core/podfile&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">26</span>  <span style="color:#586e75"># 管理 PodSpec 的集合</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">27</span>  <span style="color:#b58900">autoload</span> <span style="color:#2aa198">:Source</span>,         <span style="color:#2aa198">&#39;cocoapods-core/source&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">28</span>  <span style="color:#586e75"># 管理基于 CDN 来源的 PodSpec 集合</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">29</span>  <span style="color:#b58900">autoload</span> <span style="color:#2aa198">:CDNSource</span>,      <span style="color:#2aa198">&#39;cocoapods-core/cdn_source&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">30</span>  <span style="color:#586e75"># 管理基于 Trunk 来源的 PodSpec 集合</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">31</span>  <span style="color:#b58900">autoload</span> <span style="color:#2aa198">:TrunkSource</span>,    <span style="color:#2aa198">&#39;cocoapods-core/trunk_source&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">32</span>  <span style="color:#586e75"># 对应 PodSpec 文件的 class</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">33</span>  <span style="color:#b58900">autoload</span> <span style="color:#2aa198">:Specification</span>,  <span style="color:#2aa198">&#39;cocoapods-core/specification&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">34</span>  <span style="color:#586e75"># 将 pod 信息转为 .yml 文件，用于 lockfile 的序列化</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">35</span>  <span style="color:#b58900">autoload</span> <span style="color:#2aa198">:YAMLHelper</span>,     <span style="color:#2aa198">&#39;cocoapods-core/yaml_helper&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">36</span>  <span style="color:#586e75"># 记录 pod 依赖类型，是静态库/动态库</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">37</span>  <span style="color:#b58900">autoload</span> <span style="color:#2aa198">:BuildType</span>,      <span style="color:#2aa198">&#39;cocoapods-core/build_type&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">38</span>  
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">39</span>  <span style="color:#719e07">...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">40</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">41</span>  <span style="color:#cb4b16">Spec</span> <span style="color:#719e07">=</span> <span style="color:#cb4b16">Specification</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">42</span><span style="color:#719e07">end</span>
+</code></pre></div><p>将这些 Model 类按照对应的依赖关系进行划分，层级如下：</p>
 <p><img src="http://cdn.nlark.com/yuque/0/2020/jpeg/98641/1599993134206-3a7f8fdb-611d-44c1-a2c4-026365408d5e.jpeg" alt=""></p>
 <h2 id="podfile-的主要数据结构">Podfile 的主要数据结构</h2>
 <p>先来了解 Podfile 的主要数据结构</p>
@@ -357,71 +300,36 @@ Project 所管理的资源都来自它所包含的 Targets。特点如下：</p>
 </blockquote>
 <p><code>TargetDefinition</code> 是一个多叉树结构，每个节点记录着 <code>Podfile</code> 中定义的 Pod 的 Source 来源、Build Setting、Pod 子依赖等。该树的根节点指向 <code>Podfile</code>，而 <code>Podfile</code> 中的 <code>root_target_definitions</code> 则记录着所有的 <code>TargetDefinition</code> 的根节点，正常情况下该 list 中只有一个 root 即 <strong><code>Pods.project</code></strong>。</p>
 <p>为了便于阅读，简化了大量的 DSL 配置相关的方法和属性并对代码顺序做了调整，大致结构如下：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">module</span> <span class="nn">Pod</span>
-  <span class="k">class</span> <span class="nc">Podfile</span>
-    <span class="k">class</span> <span class="nc">TargetDefinition</span>
-		<span class="c1"># 父节点: TargetDefinition 或者 Podfile</span>
-      <span class="kp">attr_reader</span> <span class="ss">:parent</span>
-      <span class="c1"># 子节点: TargetDefinition</span>
-      <span class="kp">attr_reader</span> <span class="ss">:children</span>
-      <span class="c1"># 记录 tareget 的配置信息</span>
-      <span class="kp">attr_accessor</span> <span class="ss">:internal_hash</span>
-
-      <span class="k">def</span> <span class="nf">root?</span>
-        <span class="n">parent</span><span class="o">.</span><span class="n">is_a?</span><span class="p">(</span><span class="no">Podfile</span><span class="p">)</span> <span class="o">||</span> <span class="n">parent</span><span class="o">.</span><span class="n">nil?</span>
-      <span class="k">end</span>
-
-      <span class="k">def</span> <span class="nf">root</span>
-        <span class="k">if</span> <span class="n">root?</span>
-          <span class="nb">self</span>
-        <span class="k">else</span>
-          <span class="n">parent</span><span class="o">.</span><span class="n">root</span>
-        <span class="k">end</span>
-      <span class="k">end</span>
-
-      <span class="k">def</span> <span class="nf">podfile</span>
-        <span class="n">root</span><span class="o">.</span><span class="n">parent</span>
-      <span class="k">end</span>
-       
-      <span class="c1"># ...</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>对应上一节 Xcode 工程结构中的 <code>Podfile</code> 关系如下：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">module</span> Pod
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>  <span style="color:#719e07">class</span> <span style="color:#268bd2">Podfile</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>    <span style="color:#719e07">class</span> <span style="color:#268bd2">TargetDefinition</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>		<span style="color:#586e75"># 父节点: TargetDefinition 或者 Podfile</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>      <span style="color:#719e07">attr_reader</span> <span style="color:#2aa198">:parent</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>      <span style="color:#586e75"># 子节点: TargetDefinition</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>      <span style="color:#719e07">attr_reader</span> <span style="color:#2aa198">:children</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>      <span style="color:#586e75"># 记录 tareget 的配置信息</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>      <span style="color:#719e07">attr_accessor</span> <span style="color:#2aa198">:internal_hash</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>      <span style="color:#719e07">def</span> <span style="color:#268bd2">root?</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>        parent<span style="color:#719e07">.</span>is_a?(<span style="color:#cb4b16">Podfile</span>) <span style="color:#719e07">||</span> parent<span style="color:#719e07">.</span>nil?
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>      <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>      <span style="color:#719e07">def</span> <span style="color:#268bd2">root</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>        <span style="color:#719e07">if</span> root?
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>          <span style="color:#b58900">self</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>        <span style="color:#719e07">else</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>          parent<span style="color:#719e07">.</span>root
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>        <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span>      <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">22</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">23</span>      <span style="color:#719e07">def</span> <span style="color:#268bd2">podfile</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">24</span>        root<span style="color:#719e07">.</span>parent
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">25</span>      <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">26</span>       
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">27</span>      <span style="color:#586e75"># ...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">28</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">29</span><span style="color:#719e07">end</span>
+</code></pre></div><p>对应上一节 Xcode 工程结构中的 <code>Podfile</code> 关系如下：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/1599993134189-fdfc2639-938d-47c7-ad69-1a8141502f8f.jpeg" alt=""></p>
 <p>CocoaPods 正是巧妙利用了 Xcode 工程结构的特点，引入  <code>Pods.project</code> 这一中间层，将主工程的 Pods 依赖全部转接到 <code>Pods.project</code> 上，最后再将 <code>Pods.project</code> 作为主项目的依赖。尽管这么做也受到了一些质疑和诟病（所谓的侵入性太强），但笔者的观点是，正得益于 <code>Pods.project</code> 这一设计隔绝了第三方依赖库对于主项目的频繁更改，也便于后续的管理和更新，体现了软件工程中的<strong>开放-关闭原则</strong>。</p>
 <p>比如，在 Pod 1.7.0 版本中支持的 <strong><a href="http://blog.cocoapods.org/CocoaPods-1.7.0-beta/">Multiple Xcodeproj Generation</a></strong> 就是解决随着项目的迭代而日益增大的 <code>Pods.project</code> 的问题。试想当你的项目中存在上百个依赖库，每个依赖库的变更都会影响到你的主工程，这将是非常可怕的事情。</p>
@@ -433,51 +341,26 @@ Project 所管理的资源都来自它所包含的 Targets。特点如下：</p>
 <p>这些 Targets 的依赖关系对应的就是 <code>TargetDefinition</code> 树中的各子节点的层级关系。如前面所说，<strong>有了 <code>Podfile</code> 这个根节点的指向，仅需对依赖树进行遍历，就能轻松获取完整的依赖关系</strong>。</p>
 <p>有了这层依赖树，对于某个 <code>Pod</code> 库的更新即是对树节点的更新，便可轻松的分析出此次更新涉及的影响。</p>
 <p>简化调整后的 Podfile 代码如下：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="nb">require</span> <span class="s1">&#39;cocoapods-core/podfile/dsl&#39;</span>
-<span class="nb">require</span> <span class="s1">&#39;cocoapods-core/podfile/target_definition&#39;</span>
-
-<span class="k">module</span> <span class="nn">Pod</span>
-  <span class="k">class</span> <span class="nc">Podfile</span>
-
-    <span class="kp">include</span> <span class="no">Pod</span><span class="o">::</span><span class="no">Podfile</span><span class="o">::</span><span class="no">DSL</span>
-    <span class="c1"># podfile 路径</span>
-    <span class="kp">attr_accessor</span> <span class="ss">:defined_in_file</span>
-    <span class="c1"># 所有的 TargetDefinition 的根节点, 正常只有一个，即 Pods.project target</span>
-    <span class="kp">attr_accessor</span> <span class="ss">:root_target_definitions</span>
-    <span class="c1"># 记录 Pods.project 项目的配置信息</span>
-    <span class="kp">attr_accessor</span> <span class="ss">:internal_hash</span>
-    <span class="c1"># 当前 DSL 解析使用的 TargetDefinition</span>
-    <span class="kp">attr_accessor</span> <span class="ss">:current_target_definition</span>
-
-    <span class="c1"># ...</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>直接看 <code>dsl.rb</code>，该文件内部定义了 Podfile DSL 支持的所有方法。通过 <strong>include</strong> 的使用将 <code>Pod::Podfile::DSL</code> 模块 Mix-in 后插入到 Podfile 类中。
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#b58900">require</span> <span style="color:#2aa198">&#39;cocoapods-core/podfile/dsl&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span><span style="color:#b58900">require</span> <span style="color:#2aa198">&#39;cocoapods-core/podfile/target_definition&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span><span style="color:#719e07">module</span> Pod
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>  <span style="color:#719e07">class</span> <span style="color:#268bd2">Podfile</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>    <span style="color:#719e07">include</span> <span style="color:#cb4b16">Pod</span><span style="color:#719e07">::</span><span style="color:#cb4b16">Podfile</span><span style="color:#719e07">::</span><span style="color:#cb4b16">DSL</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>    <span style="color:#586e75"># podfile 路径</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>    <span style="color:#719e07">attr_accessor</span> <span style="color:#2aa198">:defined_in_file</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>    <span style="color:#586e75"># 所有的 TargetDefinition 的根节点, 正常只有一个，即 Pods.project target</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>    <span style="color:#719e07">attr_accessor</span> <span style="color:#2aa198">:root_target_definitions</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>    <span style="color:#586e75"># 记录 Pods.project 项目的配置信息</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>    <span style="color:#719e07">attr_accessor</span> <span style="color:#2aa198">:internal_hash</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>    <span style="color:#586e75"># 当前 DSL 解析使用的 TargetDefinition</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>    <span style="color:#719e07">attr_accessor</span> <span style="color:#2aa198">:current_target_definition</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>    <span style="color:#586e75"># ...</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span><span style="color:#719e07">end</span>
+</code></pre></div><p>直接看 <code>dsl.rb</code>，该文件内部定义了 Podfile DSL 支持的所有方法。通过 <strong>include</strong> 的使用将 <code>Pod::Podfile::DSL</code> 模块 Mix-in 后插入到 Podfile 类中。
 想了解更多 Mix-in 特性，移步 <a href="https://mp.weixin.qq.com/s?__biz=MzA5MTM1NTc2Ng==&amp;mid=2458324049&amp;idx=1&amp;sn=8de53f46fbc52427cdb660b427cb8226&amp;chksm=870e0348b0798a5ed6d14715cc4a1af93cd168a5e15198acfb3b84ea49506b0f815fa891d683&amp;token=883887783&amp;lang=zh_CN#rd">Ruby 特性之 Mix-in</a>。</p>
 <h3 id="lockfile">Lockfile</h3>
 <blockquote>
@@ -486,45 +369,23 @@ Project 所管理的资源都来自它所包含的 Targets。特点如下：</p>
 <p><strong>Lockfile，顾名思义是用于记录最后一次 CocoaPods 所安装的 Pod 依赖库版本的信息快照。也就是生成的 <strong><code>Podfile.lock</code></strong>。</strong></p>
 <p>在 <code>pod install</code> 过程，Podfile 会结合它来确认最终所安装的 Pod 版本，固定 Pod 依赖库版本防止其自动更新。Lockfile 也作为 Pods 状态清单 (mainfest)，用于记录安装过程的中哪些 Pod 需要被删除或安装或更新等。</p>
 <p>以开头的 Podfile 经 <code>pod install</code> 所生成的 <code>Podfile.lock</code> 为例：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="ss">PODS</span><span class="p">:</span>
-  <span class="o">-</span> <span class="no">Alamofire</span> <span class="p">(</span><span class="mi">4</span><span class="o">.</span><span class="mi">6</span><span class="o">.</span><span class="mi">0</span><span class="p">)</span>
-
-<span class="ss">DEPENDENCIES</span><span class="p">:</span>
-  <span class="o">-</span> <span class="no">Alamofire</span> <span class="p">(</span><span class="n">from</span> <span class="sb">`./Alamofire`</span><span class="p">)</span>
-
-<span class="no">EXTERNAL</span> <span class="ss">SOURCES</span><span class="p">:</span>
-  <span class="ss">Alamofire</span><span class="p">:</span>
-    <span class="ss">:path</span><span class="p">:</span> <span class="s2">&#34;./Alamofire&#34;</span>
-
-<span class="no">SPEC</span> <span class="ss">CHECKSUMS</span><span class="p">:</span>
-  <span class="ss">Alamofire</span><span class="p">:</span> <span class="mi">0</span><span class="n">dda98a0ed7eec4bdcd5fe3cdd35fcd2b3022825</span>
-
-<span class="no">PODFILE</span> <span class="ss">CHECKSUM</span><span class="p">:</span> <span class="n">da12cc12a30cfb48ebc5d14e8f51737ab65e8241</span>
-
-<span class="ss">COCOAPODS</span><span class="p">:</span> <span class="mi">1</span><span class="o">.</span><span class="mi">10</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="n">beta</span><span class="o">.</span><span class="mi">2</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>我们来分析一下，通过该 Lockfile 能够获取哪些信息：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#2aa198">PODS</span>:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>  <span style="color:#719e07">-</span> <span style="color:#cb4b16">Alamofire</span> (<span style="color:#2aa198">4</span><span style="color:#719e07">.</span><span style="color:#2aa198">6</span><span style="color:#719e07">.</span><span style="color:#2aa198">0</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span><span style="color:#2aa198">DEPENDENCIES</span>:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>  <span style="color:#719e07">-</span> <span style="color:#cb4b16">Alamofire</span> (from <span style="color:#586e75">`./Alamofire`</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span><span style="color:#cb4b16">EXTERNAL</span> <span style="color:#2aa198">SOURCES</span>:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>  <span style="color:#2aa198">Alamofire</span>:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>    <span style="color:#2aa198">:path</span>: <span style="color:#2aa198">&#34;./Alamofire&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span><span style="color:#cb4b16">SPEC</span> <span style="color:#2aa198">CHECKSUMS</span>:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>  <span style="color:#2aa198">Alamofire</span>: <span style="color:#2aa198">0</span>dda98a0ed7eec4bdcd5fe3cdd35fcd2b3022825
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span><span style="color:#cb4b16">PODFILE</span> <span style="color:#2aa198">CHECKSUM</span>: da12cc12a30cfb48ebc5d14e8f51737ab65e8241
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span><span style="color:#2aa198">COCOAPODS</span>: <span style="color:#2aa198">1</span><span style="color:#719e07">.</span><span style="color:#2aa198">10</span><span style="color:#719e07">.</span><span style="color:#2aa198">0</span><span style="color:#719e07">.</span>beta<span style="color:#719e07">.</span><span style="color:#2aa198">2</span>
+</code></pre></div><p>我们来分析一下，通过该 Lockfile 能够获取哪些信息：</p>
 <table>
 <thead>
 <tr>
@@ -562,253 +423,120 @@ Project 所管理的资源都来自它所包含的 Targets。特点如下：</p>
 <h2 id="podfile-内容加载">Podfile 内容加载</h2>
 <h3 id="podfile-文件类型">Podfile 文件类型</h3>
 <p>你可以在 CocoaPods 的 <code>/lib/cocoapods/config.rb</code> 找到 Podfile 所支持的文件类型：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="no">PODFILE_NAMES</span> <span class="o">=</span> <span class="o">[</span>
-   <span class="s1">&#39;CocoaPods.podfile.yaml&#39;</span><span class="p">,</span>
-   <span class="s1">&#39;CocoaPods.podfile&#39;</span><span class="p">,</span>
-   <span class="s1">&#39;Podfile&#39;</span><span class="p">,</span>
-   <span class="s1">&#39;Podfile.rb&#39;</span><span class="p">,</span>
-<span class="o">].</span><span class="n">freeze</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>CocoaPods 按照上述命名优先级来查找工程目录下所对应的 Podfile 文件。当发现目录中存在 <strong>CocoaPods.podfile.yaml</strong> 文件时会优先加载。很多同学可能只知道到 Podfile 支持 Ruby 的文件格式，而不了解它还支持了 YAML 格式。YAML 是 <code>YAML Ain't Markup Language</code> 的缩写，其 <a href="https://yaml.org/">官方定义</a>：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#cb4b16">PODFILE_NAMES</span> <span style="color:#719e07">=</span> <span style="color:#719e07">[</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>   <span style="color:#2aa198">&#39;CocoaPods.podfile.yaml&#39;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>   <span style="color:#2aa198">&#39;CocoaPods.podfile&#39;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>   <span style="color:#2aa198">&#39;Podfile&#39;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>   <span style="color:#2aa198">&#39;Podfile.rb&#39;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span><span style="color:#719e07">].</span>freeze
+</code></pre></div><p>CocoaPods 按照上述命名优先级来查找工程目录下所对应的 Podfile 文件。当发现目录中存在 <strong>CocoaPods.podfile.yaml</strong> 文件时会优先加载。很多同学可能只知道到 Podfile 支持 Ruby 的文件格式，而不了解它还支持了 YAML 格式。YAML 是 <code>YAML Ain't Markup Language</code> 的缩写，其 <a href="https://yaml.org/">官方定义</a>：</p>
 <blockquote>
 <p>YAML is a human friendly data serialization standard for all programming languages.</p>
 </blockquote>
 <p>它是一种面向工程师友好的序列化语言。我们的 Lockfile 文件就是以 YAML 格式写入 <code>Podfile.lock</code> 中的。</p>
 <h3 id="podfile-文件读取">Podfile 文件读取</h3>
 <p>回到 <code>lib/cocoapods-core/podfile.rb</code> 来看读取方法：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">module</span> <span class="nn">Pod</span>
-
-  <span class="k">class</span> <span class="nc">Podfile</span>
-
-    <span class="kp">include</span> <span class="no">Pod</span><span class="o">::</span><span class="no">Podfile</span><span class="o">::</span><span class="no">DSL</span>
-
-    <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">from_file</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-      <span class="n">path</span> <span class="o">=</span> <span class="no">Pathname</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-      <span class="k">unless</span> <span class="n">path</span><span class="o">.</span><span class="n">exist?</span>
-        <span class="k">raise</span> <span class="no">Informative</span><span class="p">,</span> <span class="s2">&#34;No Podfile exists at path `</span><span class="si">#{</span><span class="n">path</span><span class="si">}</span><span class="s2">`.&#34;</span>
-      <span class="k">end</span>
-
-      <span class="c1"># 这里我们可以看出，Podfile 目前已经支持了结尾是 .podfile 和 .rb 后缀的文件名</span>
-      <span class="c1"># 其实是为了改善很多编译器使用文件后缀来确认 filetype，比如 vim</span>
-      <span class="c1"># 相比与 Podfile 这个文件名要更加的友好</span>
-      <span class="k">case</span> <span class="n">path</span><span class="o">.</span><span class="n">extname</span>
-      <span class="k">when</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;.podfile&#39;</span><span class="p">,</span> <span class="s1">&#39;.rb&#39;</span>
-        <span class="no">Podfile</span><span class="o">.</span><span class="n">from_ruby</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-      <span class="k">when</span> <span class="s1">&#39;.yaml&#39;</span>
-        <span class="c1"># 现在也支持了 .yaml 格式</span>
-        <span class="no">Podfile</span><span class="o">.</span><span class="n">from_yaml</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-      <span class="k">else</span>
-        <span class="k">raise</span> <span class="no">Informative</span><span class="p">,</span> <span class="s2">&#34;Unsupported Podfile format `</span><span class="si">#{</span><span class="n">path</span><span class="si">}</span><span class="s2">`.&#34;</span>
-      <span class="k">end</span>
-    <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p><code>from_file</code> 在 <code>pod install</code> 命令执行后的 <code>verify_podfile_exists!</code> 中被调用的：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">verify_podfile_exists!</span>
-  <span class="k">unless</span> <span class="n">config</span><span class="o">.</span><span class="n">podfile</span>
-    <span class="k">raise</span> <span class="no">Informative</span><span class="p">,</span> <span class="s2">&#34;No `Podfile&#39; found in the project directory.&#34;</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>而 Podfile 文件的读取就是 <code>config.podfile</code>  里触发的，代码在 CocoaPods 的 <code>config.rb</code> 文件中：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">podfile_path_in_dir</span><span class="p">(</span><span class="n">dir</span><span class="p">)</span>
-  <span class="no">PODFILE_NAMES</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">filename</span><span class="o">|</span>
-    <span class="n">candidate</span> <span class="o">=</span> <span class="n">dir</span> <span class="o">+</span> <span class="n">filename</span>
-    <span class="k">if</span> <span class="n">candidate</span><span class="o">.</span><span class="n">file?</span>
-      <span class="k">return</span> <span class="n">candidate</span>
-    <span class="k">end</span>
-  <span class="k">end</span>
-  <span class="kp">nil</span>
-<span class="k">end</span>
-
-<span class="k">def</span> <span class="nf">podfile_path</span>
-  <span class="vi">@podfile_path</span> <span class="o">||=</span> <span class="n">podfile_path_in_dir</span><span class="p">(</span><span class="n">installation_root</span><span class="p">)</span>
-<span class="k">end</span>
-
-<span class="k">def</span> <span class="nf">podfile</span>
-  <span class="vi">@podfile</span> <span class="o">||=</span> <span class="no">Podfile</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">podfile_path</span><span class="p">)</span> <span class="k">if</span> <span class="n">podfile_path</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>这里的方法 <code>podfile</code> 和 <code>podfile_path</code> 都是 lazy 加载的。最后 Core 的 <code>from_file</code> 将依据目录下的 <code>Podfile</code> 文件类型选择调用 <code>from_yaml</code> 或者 <code>from_ruby</code>。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">module</span> Pod
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>  <span style="color:#719e07">class</span> <span style="color:#268bd2">Podfile</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>    <span style="color:#719e07">include</span> <span style="color:#cb4b16">Pod</span><span style="color:#719e07">::</span><span style="color:#cb4b16">Podfile</span><span style="color:#719e07">::</span><span style="color:#cb4b16">DSL</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>    <span style="color:#719e07">def</span> <span style="color:#268bd2">self</span><span style="color:#719e07">.</span><span style="color:#268bd2">from_file</span>(path)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>      path <span style="color:#719e07">=</span> <span style="color:#cb4b16">Pathname</span><span style="color:#719e07">.</span>new(path)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>      <span style="color:#719e07">unless</span> path<span style="color:#719e07">.</span>exist?
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>        <span style="color:#719e07">raise</span> <span style="color:#cb4b16">Informative</span>, <span style="color:#2aa198">&#34;No Podfile exists at path `</span><span style="color:#2aa198">#{</span>path<span style="color:#2aa198">}</span><span style="color:#2aa198">`.&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>      <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>      <span style="color:#586e75"># 这里我们可以看出，Podfile 目前已经支持了结尾是 .podfile 和 .rb 后缀的文件名</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>      <span style="color:#586e75"># 其实是为了改善很多编译器使用文件后缀来确认 filetype，比如 vim</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>      <span style="color:#586e75"># 相比与 Podfile 这个文件名要更加的友好</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>      <span style="color:#719e07">case</span> path<span style="color:#719e07">.</span>extname
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>      <span style="color:#719e07">when</span> <span style="color:#2aa198">&#39;&#39;</span>, <span style="color:#2aa198">&#39;.podfile&#39;</span>, <span style="color:#2aa198">&#39;.rb&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>        <span style="color:#cb4b16">Podfile</span><span style="color:#719e07">.</span>from_ruby(path)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>      <span style="color:#719e07">when</span> <span style="color:#2aa198">&#39;.yaml&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>        <span style="color:#586e75"># 现在也支持了 .yaml 格式</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span>        <span style="color:#cb4b16">Podfile</span><span style="color:#719e07">.</span>from_yaml(path)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">22</span>      <span style="color:#719e07">else</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">23</span>        <span style="color:#719e07">raise</span> <span style="color:#cb4b16">Informative</span>, <span style="color:#2aa198">&#34;Unsupported Podfile format `</span><span style="color:#2aa198">#{</span>path<span style="color:#2aa198">}</span><span style="color:#2aa198">`.&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">24</span>      <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">25</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">26</span><span style="color:#719e07">end</span>
+</code></pre></div><p><code>from_file</code> 在 <code>pod install</code> 命令执行后的 <code>verify_podfile_exists!</code> 中被调用的：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#719e07">def</span> <span style="color:#268bd2">verify_podfile_exists!</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>  <span style="color:#719e07">unless</span> config<span style="color:#719e07">.</span>podfile
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>    <span style="color:#719e07">raise</span> <span style="color:#cb4b16">Informative</span>, <span style="color:#2aa198">&#34;No `Podfile&#39; found in the project directory.&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span><span style="color:#719e07">end</span>
+</code></pre></div><p>而 Podfile 文件的读取就是 <code>config.podfile</code>  里触发的，代码在 CocoaPods 的 <code>config.rb</code> 文件中：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">def</span> <span style="color:#268bd2">podfile_path_in_dir</span>(dir)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>  <span style="color:#cb4b16">PODFILE_NAMES</span><span style="color:#719e07">.</span>each <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>filename<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>    candidate <span style="color:#719e07">=</span> dir <span style="color:#719e07">+</span> filename
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>    <span style="color:#719e07">if</span> candidate<span style="color:#719e07">.</span>file?
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>      <span style="color:#719e07">return</span> candidate
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>  <span style="color:#719e07">nil</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span><span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span><span style="color:#719e07">def</span> <span style="color:#268bd2">podfile_path</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>  @podfile_path <span style="color:#719e07">||=</span> podfile_path_in_dir(installation_root)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span><span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span><span style="color:#719e07">def</span> <span style="color:#268bd2">podfile</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>  @podfile <span style="color:#719e07">||=</span> <span style="color:#cb4b16">Podfile</span><span style="color:#719e07">.</span>from_file(podfile_path) <span style="color:#719e07">if</span> podfile_path
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span><span style="color:#719e07">end</span>
+</code></pre></div><p>这里的方法 <code>podfile</code> 和 <code>podfile_path</code> 都是 lazy 加载的。最后 Core 的 <code>from_file</code> 将依据目录下的 <code>Podfile</code> 文件类型选择调用 <code>from_yaml</code> 或者 <code>from_ruby</code>。</p>
 <p>从 <code>Pod::Command::Install</code> 命令到 Podfile 文件加载的调用栈如下：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/1599993134203-782e510d-c084-4b57-98fe-970f5a38cc79.jpeg" alt=""></p>
 <h3 id="podfile-from-ruby-解析">Podfile From Ruby 解析</h3>
 <p>当我们通过 <code>pod init</code> 来初始化 CocoaPods 项目时，默认生成的 Podfile 名称就是 <code>Podfile</code>，那就从 <code>Podfile.from_ruby</code> 开始。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">from_ruby</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">contents</span> <span class="o">=</span> <span class="kp">nil</span><span class="p">)</span>
-  <span class="c1"># ①</span>
-  <span class="n">contents</span> <span class="o">||=</span> <span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r:utf-8&#39;</span><span class="p">,</span> <span class="o">&amp;</span><span class="ss">:read</span><span class="p">)</span>
-  <span class="c1"># 兼容 1.9 版本的 Rubinius 中的编码问题</span>
-  <span class="k">if</span> <span class="n">contents</span><span class="o">.</span><span class="n">respond_to?</span><span class="p">(</span><span class="ss">:encoding</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">contents</span><span class="o">.</span><span class="n">encoding</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s1">&#39;UTF-8&#39;</span>
-    <span class="n">contents</span><span class="o">.</span><span class="n">encode!</span><span class="p">(</span><span class="s1">&#39;UTF-8&#39;</span><span class="p">)</span>
-  <span class="k">end</span>
-
-  <span class="c1"># 对 Podfile 中不规范的单引号或双引号进行检查，并进行自动修正，及抛出错误</span>
-  <span class="k">if</span> <span class="n">contents</span><span class="o">.</span><span class="n">tr!</span><span class="p">(</span><span class="s1">&#39;“”‘’‛&#39;</span><span class="p">,</span> <span class="sx">%(&#34;&#34;&#39;&#39;&#39;)</span><span class="p">)</span>
-    <span class="no">CoreUI</span><span class="o">.</span><span class="n">warn</span> <span class="s2">&#34;...&#34;</span>
-  <span class="k">end</span>
-  <span class="c1"># ②</span>
-  <span class="n">podfile</span> <span class="o">=</span> <span class="no">Podfile</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">do</span>
-    <span class="k">begin</span>
-      <span class="nb">eval</span><span class="p">(</span><span class="n">contents</span><span class="p">,</span> <span class="kp">nil</span><span class="p">,</span> <span class="n">path</span><span class="o">.</span><span class="n">to_s</span><span class="p">)</span>
-    <span class="k">rescue</span> <span class="no">Exception</span> <span class="o">=&gt;</span> <span class="n">e</span>
-      <span class="n">message</span> <span class="o">=</span> <span class="s2">&#34;Invalid `</span><span class="si">#{</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="si">}</span><span class="s2">` file: </span><span class="si">#{</span><span class="n">e</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&#34;</span>
-      <span class="k">raise</span> <span class="no">DSLError</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">contents</span><span class="p">)</span>
-    <span class="k">end</span>
-  <span class="k">end</span>
-  <span class="n">podfile</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p><strong>①</strong> 是对 Podfile 内容的读取和编码，同时对可能出现的单引号和双引号的匹配问题进行了修正。
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">def</span> <span style="color:#268bd2">self</span><span style="color:#719e07">.</span><span style="color:#268bd2">from_ruby</span>(path, contents <span style="color:#719e07">=</span> <span style="color:#719e07">nil</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>  <span style="color:#586e75"># ①</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>  contents <span style="color:#719e07">||=</span> <span style="color:#cb4b16">File</span><span style="color:#719e07">.</span>open(path, <span style="color:#2aa198">&#39;r:utf-8&#39;</span>, <span style="color:#719e07">&amp;</span><span style="color:#2aa198">:read</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>  <span style="color:#586e75"># 兼容 1.9 版本的 Rubinius 中的编码问题</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>  <span style="color:#719e07">if</span> contents<span style="color:#719e07">.</span>respond_to?(<span style="color:#2aa198">:encoding</span>) <span style="color:#719e07">&amp;&amp;</span> contents<span style="color:#719e07">.</span>encoding<span style="color:#719e07">.</span>name <span style="color:#719e07">!=</span> <span style="color:#2aa198">&#39;UTF-8&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>    contents<span style="color:#719e07">.</span>encode!(<span style="color:#2aa198">&#39;UTF-8&#39;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>  <span style="color:#586e75"># 对 Podfile 中不规范的单引号或双引号进行检查，并进行自动修正，及抛出错误</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>  <span style="color:#719e07">if</span> contents<span style="color:#719e07">.</span>tr!(<span style="color:#2aa198">&#39;“”‘’‛&#39;</span>, <span style="color:#2aa198">%(&#34;&#34;&#39;&#39;&#39;)</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>    <span style="color:#cb4b16">CoreUI</span><span style="color:#719e07">.</span>warn <span style="color:#2aa198">&#34;...&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>  <span style="color:#586e75"># ②</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>  podfile <span style="color:#719e07">=</span> <span style="color:#cb4b16">Podfile</span><span style="color:#719e07">.</span>new(path) <span style="color:#719e07">do</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>    <span style="color:#719e07">begin</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>      <span style="color:#b58900">eval</span>(contents, <span style="color:#719e07">nil</span>, path<span style="color:#719e07">.</span>to_s)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>    <span style="color:#719e07">rescue</span> <span style="color:#cb4b16">Exception</span> <span style="color:#719e07">=&gt;</span> e
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>      message <span style="color:#719e07">=</span> <span style="color:#2aa198">&#34;Invalid `</span><span style="color:#2aa198">#{</span>path<span style="color:#719e07">.</span>basename<span style="color:#2aa198">}</span><span style="color:#2aa198">` file: </span><span style="color:#2aa198">#{</span>e<span style="color:#719e07">.</span>message<span style="color:#2aa198">}</span><span style="color:#2aa198">&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>      <span style="color:#719e07">raise</span> <span style="color:#cb4b16">DSLError</span><span style="color:#719e07">.</span>new(message, path, e, contents)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">22</span>  podfile
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">23</span><span style="color:#719e07">end</span>
+</code></pre></div><p><strong>①</strong> 是对 Podfile 内容的读取和编码，同时对可能出现的单引号和双引号的匹配问题进行了修正。
 <strong>②</strong> 以 <code>path</code> 和 <code>block</code> 为入参进行 <code>podfile</code> 类的初始化并将其放回，保存在全局的 <code>config.podfile</code> 中。</p>
 <blockquote>
 <p>Tips: 如果要在 Ruby 对象的初始化中传入参数，需要重载 Object 的 <a href="https://ruby-doc.org/docs/ruby-doc-bundle/UsersGuide/rg/objinitialization.html">initialize</a> 方法，这里的 Podfile.new(&hellip;) 本质上是 <code>initialize</code> 的方法调用。</p>
 </blockquote>
 <p><code>initialize</code> 方法所传入的尾随闭包 <code>block</code> 的核心在于内部的 <code>eval</code> 函数（在 <a href="https://zhuanlan.zhihu.com/p/187272448">CocoaPods 核心组件</a> 中有提到）：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="nb">eval</span><span class="p">(</span><span class="n">contents</span><span class="p">,</span> <span class="kp">nil</span><span class="p">,</span> <span class="n">path</span><span class="o">.</span><span class="n">to_s</span><span class="p">)</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>它将 Podfile 中的文本内容转化为方法执行，也就是说里面的参数是一段 Ruby 的代码字符串，通过 <code>eval</code> 方法可以直接执行。
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#b58900">eval</span>(contents, <span style="color:#719e07">nil</span>, path<span style="color:#719e07">.</span>to_s)
+</code></pre></div><p>它将 Podfile 中的文本内容转化为方法执行，也就是说里面的参数是一段 Ruby 的代码字符串，通过 <code>eval</code> 方法可以直接执行。
 继续看 Podfile 的 <code>initialize</code> 方法：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">defined_in_file</span> <span class="o">=</span> <span class="kp">nil</span><span class="p">,</span> <span class="n">internal_hash</span> <span class="o">=</span> <span class="p">{},</span> <span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
-  <span class="nb">self</span><span class="o">.</span><span class="n">defined_in_file</span> <span class="o">=</span> <span class="n">defined_in_file</span>
-  <span class="vi">@internal_hash</span> <span class="o">=</span> <span class="n">internal_hash</span>
-  <span class="k">if</span> <span class="n">block</span>
-    <span class="n">default_target_def</span> <span class="o">=</span> <span class="no">TargetDefinition</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;Pods&#39;</span><span class="p">,</span> <span class="nb">self</span><span class="p">)</span>
-    <span class="n">default_target_def</span><span class="o">.</span><span class="n">abstract</span> <span class="o">=</span> <span class="kp">true</span>
-    <span class="vi">@root_target_definitions</span> <span class="o">=</span> <span class="o">[</span><span class="n">default_target_def</span><span class="o">]</span>
-    <span class="vi">@current_target_definition</span> <span class="o">=</span> <span class="n">default_target_def</span>
-    <span class="nb">instance_eval</span><span class="p">(</span><span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
-  <span class="k">else</span>
-    <span class="vi">@root_target_definitions</span> <span class="o">=</span> <span class="o">[]</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>它定义了三个参数：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">def</span> <span style="color:#268bd2">initialize</span>(defined_in_file <span style="color:#719e07">=</span> <span style="color:#719e07">nil</span>, internal_hash <span style="color:#719e07">=</span> {}, <span style="color:#719e07">&amp;</span>block)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>  <span style="color:#b58900">self</span><span style="color:#719e07">.</span>defined_in_file <span style="color:#719e07">=</span> defined_in_file
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>  @internal_hash <span style="color:#719e07">=</span> internal_hash
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>  <span style="color:#719e07">if</span> block
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>    default_target_def <span style="color:#719e07">=</span> <span style="color:#cb4b16">TargetDefinition</span><span style="color:#719e07">.</span>new(<span style="color:#2aa198">&#39;Pods&#39;</span>, <span style="color:#b58900">self</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>    default_target_def<span style="color:#719e07">.</span>abstract <span style="color:#719e07">=</span> <span style="color:#719e07">true</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>    @root_target_definitions <span style="color:#719e07">=</span> <span style="color:#719e07">[</span>default_target_def<span style="color:#719e07">]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>    @current_target_definition <span style="color:#719e07">=</span> default_target_def
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>    <span style="color:#b58900">instance_eval</span>(<span style="color:#719e07">&amp;</span>block)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>  <span style="color:#719e07">else</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>    @root_target_definitions <span style="color:#719e07">=</span> <span style="color:#719e07">[]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span><span style="color:#719e07">end</span>
+</code></pre></div><p>它定义了三个参数：</p>
 <table>
 <thead>
 <tr>
@@ -841,341 +569,160 @@ Project 所管理的资源都来自它所包含的 Targets。特点如下：</p>
 </blockquote>
 <h3 id="podfile-from-yaml-解析">Podfile From YAML 解析</h3>
 <p>YAML 格式的 Podfile 加载需要借助 <strong>YAMLHelper</strong> 类来完成，YAMLHelper 则是基于 <a href="https://github.com/ruby/yaml">yaml</a> 的简单封装。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">from_yaml</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-  <span class="n">string</span> <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r:utf-8&#39;</span><span class="p">,</span> <span class="o">&amp;</span><span class="ss">:read</span><span class="p">)</span>
-
-  <span class="c1"># 为了解决 Rubinius incomplete encoding in 1.9 mode</span>
-	<span class="c1"># https://github.com/rubinius/rubinius/issues/1539</span>
-  <span class="k">if</span> <span class="n">string</span><span class="o">.</span><span class="n">respond_to?</span><span class="p">(</span><span class="ss">:encoding</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">string</span><span class="o">.</span><span class="n">encoding</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s1">&#39;UTF-8&#39;</span>
-    <span class="n">string</span><span class="o">.</span><span class="n">encode!</span><span class="p">(</span><span class="s1">&#39;UTF-8&#39;</span><span class="p">)</span>
-  <span class="k">end</span>
-  <span class="nb">hash</span> <span class="o">=</span> <span class="no">YAMLHelper</span><span class="o">.</span><span class="n">load_string</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
-  <span class="n">from_hash</span><span class="p">(</span><span class="nb">hash</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
-<span class="k">end</span>
-
-<span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">from_hash</span><span class="p">(</span><span class="nb">hash</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="kp">nil</span><span class="p">)</span>
-  <span class="n">internal_hash</span> <span class="o">=</span> <span class="nb">hash</span><span class="o">.</span><span class="n">dup</span>
-  <span class="n">target_definitions</span> <span class="o">=</span> <span class="n">internal_hash</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s1">&#39;target_definitions&#39;</span><span class="p">)</span> <span class="o">||</span> <span class="o">[]</span>
-  <span class="n">podfile</span> <span class="o">=</span> <span class="no">Podfile</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">internal_hash</span><span class="p">)</span>
-  <span class="n">target_definitions</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">definition_hash</span><span class="o">|</span>
-    <span class="n">definition</span> <span class="o">=</span> <span class="no">TargetDefinition</span><span class="o">.</span><span class="n">from_hash</span><span class="p">(</span><span class="n">definition_hash</span><span class="p">,</span> <span class="n">podfile</span><span class="p">)</span>
-    <span class="n">podfile</span><span class="o">.</span><span class="n">root_target_definitions</span> <span class="o">&lt;&lt;</span> <span class="n">definition</span>
-  <span class="k">end</span>
-  <span class="n">podfile</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>通过 <code>from_yaml</code> 将文件内容转成 Ruby hash 后转入 <code>from_hash</code> 方法。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">def</span> <span style="color:#268bd2">self</span><span style="color:#719e07">.</span><span style="color:#268bd2">from_yaml</span>(path)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>  string <span style="color:#719e07">=</span> <span style="color:#cb4b16">File</span><span style="color:#719e07">.</span>open(path, <span style="color:#2aa198">&#39;r:utf-8&#39;</span>, <span style="color:#719e07">&amp;</span><span style="color:#2aa198">:read</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>  <span style="color:#586e75"># 为了解决 Rubinius incomplete encoding in 1.9 mode</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>	<span style="color:#586e75"># https://github.com/rubinius/rubinius/issues/1539</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>  <span style="color:#719e07">if</span> string<span style="color:#719e07">.</span>respond_to?(<span style="color:#2aa198">:encoding</span>) <span style="color:#719e07">&amp;&amp;</span> string<span style="color:#719e07">.</span>encoding<span style="color:#719e07">.</span>name <span style="color:#719e07">!=</span> <span style="color:#2aa198">&#39;UTF-8&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>    string<span style="color:#719e07">.</span>encode!(<span style="color:#2aa198">&#39;UTF-8&#39;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>  <span style="color:#b58900">hash</span> <span style="color:#719e07">=</span> <span style="color:#cb4b16">YAMLHelper</span><span style="color:#719e07">.</span>load_string(string)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>  from_hash(<span style="color:#b58900">hash</span>, path)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span><span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span><span style="color:#719e07">def</span> <span style="color:#268bd2">self</span><span style="color:#719e07">.</span><span style="color:#268bd2">from_hash</span>(<span style="color:#b58900">hash</span>, path <span style="color:#719e07">=</span> <span style="color:#719e07">nil</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>  internal_hash <span style="color:#719e07">=</span> <span style="color:#b58900">hash</span><span style="color:#719e07">.</span>dup
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>  target_definitions <span style="color:#719e07">=</span> internal_hash<span style="color:#719e07">.</span>delete(<span style="color:#2aa198">&#39;target_definitions&#39;</span>) <span style="color:#719e07">||</span> <span style="color:#719e07">[]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>  podfile <span style="color:#719e07">=</span> <span style="color:#cb4b16">Podfile</span><span style="color:#719e07">.</span>new(path, internal_hash)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>  target_definitions<span style="color:#719e07">.</span>each <span style="color:#719e07">do</span> <span style="color:#719e07">|</span>definition_hash<span style="color:#719e07">|</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>    definition <span style="color:#719e07">=</span> <span style="color:#cb4b16">TargetDefinition</span><span style="color:#719e07">.</span>from_hash(definition_hash, podfile)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>    podfile<span style="color:#719e07">.</span>root_target_definitions <span style="color:#719e07">&lt;&lt;</span> definition
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span>  podfile
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">22</span><span style="color:#719e07">end</span>
+</code></pre></div><p>通过 <code>from_yaml</code> 将文件内容转成 Ruby hash 后转入 <code>from_hash</code> 方法。</p>
 <p>区别于 <code>from_ruby</code>，这里调用的 <code>initialize</code> 将读取的 hash 直接存入 <code>internal_hash</code>，然后利用 <code>TargetDefinition.from_hash</code> 来完成的 hash 内容到 targets 的转换，因此，这里无需传入 block 进行 DSL 解析和方法转换。</p>
 <h2 id="podfile-内容解析">Podfile 内容解析</h2>
 <p>前面提到 Podfile 的内容最终保存在 <code>internal_hash</code> 和 <code>target_definitions</code> 中，本质上都是使用了 <code>hash</code> 来保存数据。由于 YAML 文件格式的 Podfile 加载后就是 hash 对象，无需过多加工。唯一需要处理的是递归调用 TargetDefinition 的 <code>from_hash</code> 方法来解析 target 子节点的数据。</p>
 <p>因此，接下来的内容解析主要针对 Ruby 文件格式的 DSL 解析，我们以 <code>pod</code> 方法为例：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">target</span> <span class="s1">&#39;Example&#39;</span> <span class="k">do</span>
-	<span class="n">pod</span> <span class="s1">&#39;Alamofire&#39;</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>当解析到 <code>pod 'Alamofire'</code> 时，会先通过 <code>eval(contents, nil, path.to_s</code> 将其转换为 <code>dsl.rb</code> 中的方法：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">pod</span><span class="p">(</span><span class="nb">name</span> <span class="o">=</span> <span class="kp">nil</span><span class="p">,</span> <span class="o">*</span><span class="n">requirements</span><span class="p">)</span>
-  <span class="k">unless</span> <span class="nb">name</span>
-    <span class="k">raise</span> <span class="no">StandardError</span><span class="p">,</span> <span class="s1">&#39;A dependency requires a name.&#39;</span>
-  <span class="k">end</span>
-  <span class="n">current_target_definition</span><span class="o">.</span><span class="n">store_pod</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="o">*</span><span class="n">requirements</span><span class="p">)</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>name 为 Alamofire，由于我们没有指定对应的 Alamofire 版本，默认会使用最新版本。<code>requirements</code>  是控制 该 pod 来源获取或者 pod target 的编译选项等，例如：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span><span class="lnt">9
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">pod</span> <span class="s1">&#39;Alamofire&#39;</span><span class="p">,</span> <span class="s1">&#39;0.9&#39;</span>
-<span class="n">pod</span> <span class="s1">&#39;Alamofire&#39;</span><span class="p">,</span> <span class="ss">:modular_headers</span> <span class="o">=&gt;</span> <span class="kp">true</span>
-<span class="n">pod</span> <span class="s1">&#39;Alamofire&#39;</span><span class="p">,</span> <span class="ss">:configurations</span> <span class="o">=&gt;</span> <span class="o">[</span><span class="s1">&#39;Debug&#39;</span><span class="p">,</span> <span class="s1">&#39;Beta&#39;</span><span class="o">]</span>
-<span class="n">pod</span> <span class="s1">&#39;Alamofire&#39;</span><span class="p">,</span> <span class="ss">:source</span> <span class="o">=&gt;</span> <span class="s1">&#39;https://github.com/CocoaPods/Specs.git&#39;</span>
-<span class="n">pod</span> <span class="s1">&#39;Alamofire&#39;</span><span class="p">,</span> <span class="ss">:subspecs</span> <span class="o">=&gt;</span> <span class="o">[</span><span class="s1">&#39;Attribute&#39;</span><span class="p">,</span> <span class="s1">&#39;QuerySet&#39;</span><span class="o">]</span>
-<span class="n">pod</span> <span class="s1">&#39;Alamofire&#39;</span><span class="p">,</span> <span class="ss">:testspecs</span> <span class="o">=&gt;</span> <span class="o">[</span><span class="s1">&#39;UnitTests&#39;</span><span class="p">,</span> <span class="s1">&#39;SomeOtherTests&#39;</span><span class="o">]</span>
-<span class="n">pod</span> <span class="s1">&#39;Alamofire&#39;</span><span class="p">,</span> <span class="ss">:path</span> <span class="o">=&gt;</span> <span class="s1">&#39;~/Documents/AFNetworking&#39;</span>
-<span class="n">pod</span> <span class="s1">&#39;Alamofire&#39;</span><span class="p">,</span> <span class="ss">:podspec</span> <span class="o">=&gt;</span> <span class="s1">&#39;https://example.com/Alamofire.podspec&#39;</span>
-<span class="n">pod</span> <span class="s1">&#39;Alamofire&#39;</span><span class="p">,</span> <span class="ss">:git</span> <span class="o">=&gt;</span> <span class="s1">&#39;https://github.com/looseyi/Alamofire.git&#39;</span><span class="p">,</span> <span class="ss">:tag</span> <span class="o">=&gt;</span> <span class="s1">&#39;0.7.0&#39;</span>
-</code></pre></td></tr></table>
-</div>
-</div><blockquote>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>target <span style="color:#2aa198">&#39;Example&#39;</span> <span style="color:#719e07">do</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>	pod <span style="color:#2aa198">&#39;Alamofire&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span><span style="color:#719e07">end</span>
+</code></pre></div><p>当解析到 <code>pod 'Alamofire'</code> 时，会先通过 <code>eval(contents, nil, path.to_s</code> 将其转换为 <code>dsl.rb</code> 中的方法：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#719e07">def</span> <span style="color:#268bd2">pod</span>(<span style="color:#b58900">name</span> <span style="color:#719e07">=</span> <span style="color:#719e07">nil</span>, <span style="color:#719e07">*</span>requirements)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>  <span style="color:#719e07">unless</span> <span style="color:#b58900">name</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>    <span style="color:#719e07">raise</span> <span style="color:#cb4b16">StandardError</span>, <span style="color:#2aa198">&#39;A dependency requires a name.&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>  current_target_definition<span style="color:#719e07">.</span>store_pod(<span style="color:#b58900">name</span>, <span style="color:#719e07">*</span>requirements)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span><span style="color:#719e07">end</span>
+</code></pre></div><p>name 为 Alamofire，由于我们没有指定对应的 Alamofire 版本，默认会使用最新版本。<code>requirements</code>  是控制 该 pod 来源获取或者 pod target 的编译选项等，例如：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>pod <span style="color:#2aa198">&#39;Alamofire&#39;</span>, <span style="color:#2aa198">&#39;0.9&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>pod <span style="color:#2aa198">&#39;Alamofire&#39;</span>, <span style="color:#2aa198">:modular_headers</span> <span style="color:#719e07">=&gt;</span> <span style="color:#719e07">true</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>pod <span style="color:#2aa198">&#39;Alamofire&#39;</span>, <span style="color:#2aa198">:configurations</span> <span style="color:#719e07">=&gt;</span> <span style="color:#719e07">[</span><span style="color:#2aa198">&#39;Debug&#39;</span>, <span style="color:#2aa198">&#39;Beta&#39;</span><span style="color:#719e07">]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>pod <span style="color:#2aa198">&#39;Alamofire&#39;</span>, <span style="color:#2aa198">:source</span> <span style="color:#719e07">=&gt;</span> <span style="color:#2aa198">&#39;https://github.com/CocoaPods/Specs.git&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>pod <span style="color:#2aa198">&#39;Alamofire&#39;</span>, <span style="color:#2aa198">:subspecs</span> <span style="color:#719e07">=&gt;</span> <span style="color:#719e07">[</span><span style="color:#2aa198">&#39;Attribute&#39;</span>, <span style="color:#2aa198">&#39;QuerySet&#39;</span><span style="color:#719e07">]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>pod <span style="color:#2aa198">&#39;Alamofire&#39;</span>, <span style="color:#2aa198">:testspecs</span> <span style="color:#719e07">=&gt;</span> <span style="color:#719e07">[</span><span style="color:#2aa198">&#39;UnitTests&#39;</span>, <span style="color:#2aa198">&#39;SomeOtherTests&#39;</span><span style="color:#719e07">]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span>pod <span style="color:#2aa198">&#39;Alamofire&#39;</span>, <span style="color:#2aa198">:path</span> <span style="color:#719e07">=&gt;</span> <span style="color:#2aa198">&#39;~/Documents/AFNetworking&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">8</span>pod <span style="color:#2aa198">&#39;Alamofire&#39;</span>, <span style="color:#2aa198">:podspec</span> <span style="color:#719e07">=&gt;</span> <span style="color:#2aa198">&#39;https://example.com/Alamofire.podspec&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">9</span>pod <span style="color:#2aa198">&#39;Alamofire&#39;</span>, <span style="color:#2aa198">:git</span> <span style="color:#719e07">=&gt;</span> <span style="color:#2aa198">&#39;https://github.com/looseyi/Alamofire.git&#39;</span>, <span style="color:#2aa198">:tag</span> <span style="color:#719e07">=&gt;</span> <span style="color:#2aa198">&#39;0.7.0&#39;</span>
+</code></pre></div><blockquote>
 <p>Tips：requirements 最终是以 Gem::Requirement 对象来保存的。关于 pod 详细说明请移步：<a href="https://guides.cocoapods.org/syntax/podfile.html#pod">Podfile 手册</a>。</p>
 </blockquote>
 <p>对 name 进行校验后，直接转入 <code>current_target_definition</code> 毕竟 Pod 库都是存在 <code>Pods.project</code> 之下：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">store_pod</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="o">*</span><span class="n">requirements</span><span class="p">)</span>
-  <span class="k">return</span> <span class="k">if</span> <span class="n">parse_subspecs</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">requirements</span><span class="p">)</span> <span class="c1"># This parse method must be called first</span>
-  <span class="n">parse_inhibit_warnings</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">requirements</span><span class="p">)</span>
-  <span class="n">parse_modular_headers</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">requirements</span><span class="p">)</span>
-  <span class="n">parse_configuration_whitelist</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">requirements</span><span class="p">)</span>
-  <span class="n">parse_project_name</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">requirements</span><span class="p">)</span>
-
-  <span class="k">if</span> <span class="n">requirements</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">requirements</span><span class="o">.</span><span class="n">empty?</span>
-    <span class="n">pod</span> <span class="o">=</span> <span class="p">{</span> <span class="nb">name</span> <span class="o">=&gt;</span> <span class="n">requirements</span> <span class="p">}</span>
-  <span class="k">else</span>
-    <span class="n">pod</span> <span class="o">=</span> <span class="nb">name</span>
-  <span class="k">end</span>
-
-  <span class="n">get_hash_value</span><span class="p">(</span><span class="s1">&#39;dependencies&#39;</span><span class="p">,</span> <span class="o">[]</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">pod</span>
-  <span class="kp">nil</span>
-<span class="k">end</span>
-
-<span class="k">def</span> <span class="nf">get_hash_value</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">base_value</span> <span class="o">=</span> <span class="kp">nil</span><span class="p">)</span>
-  <span class="k">unless</span> <span class="no">HASH_KEYS</span><span class="o">.</span><span class="n">include?</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-    <span class="k">raise</span> <span class="no">StandardError</span><span class="p">,</span> <span class="s2">&#34;Unsupported hash key `</span><span class="si">#{</span><span class="n">key</span><span class="si">}</span><span class="s2">`&#34;</span>
-  <span class="k">end</span>
-  <span class="n">internal_hash</span><span class="o">[</span><span class="n">key</span><span class="o">]</span> <span class="o">=</span> <span class="n">base_value</span> <span class="k">if</span> <span class="n">internal_hash</span><span class="o">[</span><span class="n">key</span><span class="o">].</span><span class="n">nil?</span>
-  <span class="n">internal_hash</span><span class="o">[</span><span class="n">key</span><span class="o">]</span>
-<span class="k">end</span>
-
-<span class="k">def</span> <span class="nf">set_hash_value</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-  <span class="k">unless</span> <span class="no">HASH_KEYS</span><span class="o">.</span><span class="n">include?</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-    <span class="k">raise</span> <span class="no">StandardError</span><span class="p">,</span> <span class="s2">&#34;Unsupported hash key `</span><span class="si">#{</span><span class="n">key</span><span class="si">}</span><span class="s2">`&#34;</span>
-  <span class="k">end</span>
-  <span class="n">internal_hash</span><span class="o">[</span><span class="n">key</span><span class="o">]</span> <span class="o">=</span> <span class="n">value</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>经过一系列检查之后，调用 <code>get_hash_value</code> 获取 <code>internal_hash</code> 的 <code>dependencies</code>，并将 name 和 <code>requirements</code> 选项存入。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#719e07">def</span> <span style="color:#268bd2">store_pod</span>(<span style="color:#b58900">name</span>, <span style="color:#719e07">*</span>requirements)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>  <span style="color:#719e07">return</span> <span style="color:#719e07">if</span> parse_subspecs(<span style="color:#b58900">name</span>, requirements) <span style="color:#586e75"># This parse method must be called first</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>  parse_inhibit_warnings(<span style="color:#b58900">name</span>, requirements)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>  parse_modular_headers(<span style="color:#b58900">name</span>, requirements)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>  parse_configuration_whitelist(<span style="color:#b58900">name</span>, requirements)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>  parse_project_name(<span style="color:#b58900">name</span>, requirements)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>  <span style="color:#719e07">if</span> requirements <span style="color:#719e07">&amp;&amp;</span> <span style="color:#719e07">!</span>requirements<span style="color:#719e07">.</span>empty?
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>    pod <span style="color:#719e07">=</span> { <span style="color:#b58900">name</span> <span style="color:#719e07">=&gt;</span> requirements }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>  <span style="color:#719e07">else</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>    pod <span style="color:#719e07">=</span> <span style="color:#b58900">name</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>  get_hash_value(<span style="color:#2aa198">&#39;dependencies&#39;</span>, <span style="color:#719e07">[]</span>) <span style="color:#719e07">&lt;&lt;</span> pod
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>  <span style="color:#719e07">nil</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span><span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span><span style="color:#719e07">def</span> <span style="color:#268bd2">get_hash_value</span>(key, base_value <span style="color:#719e07">=</span> <span style="color:#719e07">nil</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>  <span style="color:#719e07">unless</span> <span style="color:#cb4b16">HASH_KEYS</span><span style="color:#719e07">.</span>include?(key)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>    <span style="color:#719e07">raise</span> <span style="color:#cb4b16">StandardError</span>, <span style="color:#2aa198">&#34;Unsupported hash key `</span><span style="color:#2aa198">#{</span>key<span style="color:#2aa198">}</span><span style="color:#2aa198">`&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">22</span>  internal_hash<span style="color:#719e07">[</span>key<span style="color:#719e07">]</span> <span style="color:#719e07">=</span> base_value <span style="color:#719e07">if</span> internal_hash<span style="color:#719e07">[</span>key<span style="color:#719e07">].</span>nil?
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">23</span>  internal_hash<span style="color:#719e07">[</span>key<span style="color:#719e07">]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">24</span><span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">25</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">26</span><span style="color:#719e07">def</span> <span style="color:#268bd2">set_hash_value</span>(key, value)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">27</span>  <span style="color:#719e07">unless</span> <span style="color:#cb4b16">HASH_KEYS</span><span style="color:#719e07">.</span>include?(key)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">28</span>    <span style="color:#719e07">raise</span> <span style="color:#cb4b16">StandardError</span>, <span style="color:#2aa198">&#34;Unsupported hash key `</span><span style="color:#2aa198">#{</span>key<span style="color:#2aa198">}</span><span style="color:#2aa198">`&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">29</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">30</span>  internal_hash<span style="color:#719e07">[</span>key<span style="color:#719e07">]</span> <span style="color:#719e07">=</span> value
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">31</span><span style="color:#719e07">end</span>
+</code></pre></div><p>经过一系列检查之后，调用 <code>get_hash_value</code> 获取 <code>internal_hash</code> 的 <code>dependencies</code>，并将 name 和 <code>requirements</code> 选项存入。</p>
 <p>这里的 <code>dependencies</code> key 是定义在 TargetDefinition 文件的 <code>**HASH_KEYS**</code>，表示 Core 所支持的配置参数:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="c1"># freeze 表示该数组不可修改。另外，%w 用于表示其中元素被单引号括起的数组。 </span>
-<span class="c1"># %W(#{foo} Bar Bar\ with\ space) =&gt; [&#34;Foo&#34;, &#34;Bar&#34;, &#34;Bar with space&#34;] </span>
-<span class="c1"># 对应的还有 %W 表示其中元素被双引号括起的数组。</span>
-
-<span class="no">HASH_KEYS</span> <span class="o">=</span> <span class="sx">%w(
-</span><span class="sx">  name
-</span><span class="sx">  platform
-</span><span class="sx">  podspecs
-</span><span class="sx">  exclusive
-</span><span class="sx">  link_with
-</span><span class="sx">  link_with_first_target
-</span><span class="sx">  inhibit_warnings
-</span><span class="sx">  use_modular_headers
-</span><span class="sx">  user_project_path
-</span><span class="sx">  build_configurations
-</span><span class="sx">  project_names
-</span><span class="sx">  dependencies
-</span><span class="sx">  script_phases
-</span><span class="sx">  children
-</span><span class="sx">  configuration_pod_whitelist
-</span><span class="sx">  uses_frameworks
-</span><span class="sx">  swift_version_requirements
-</span><span class="sx">  inheritance
-</span><span class="sx">  abstract
-</span><span class="sx">  swift_version
-</span><span class="sx">)</span><span class="o">.</span><span class="n">freeze</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>整个映射过程如下：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#586e75"># freeze 表示该数组不可修改。另外，%w 用于表示其中元素被单引号括起的数组。 </span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span><span style="color:#586e75"># %W(#{foo} Bar Bar\ with\ space) =&gt; [&#34;Foo&#34;, &#34;Bar&#34;, &#34;Bar with space&#34;] </span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span><span style="color:#586e75"># 对应的还有 %W 表示其中元素被双引号括起的数组。</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span><span style="color:#cb4b16">HASH_KEYS</span> <span style="color:#719e07">=</span> <span style="color:#2aa198">%w(
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span><span style="color:#2aa198">  name
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span><span style="color:#2aa198">  platform
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span><span style="color:#2aa198">  podspecs
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span><span style="color:#2aa198">  exclusive
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span><span style="color:#2aa198">  link_with
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span><span style="color:#2aa198">  link_with_first_target
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span><span style="color:#2aa198">  inhibit_warnings
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span><span style="color:#2aa198">  use_modular_headers
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span><span style="color:#2aa198">  user_project_path
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span><span style="color:#2aa198">  build_configurations
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span><span style="color:#2aa198">  project_names
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span><span style="color:#2aa198">  dependencies
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span><span style="color:#2aa198">  script_phases
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span><span style="color:#2aa198">  children
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span><span style="color:#2aa198">  configuration_pod_whitelist
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span><span style="color:#2aa198">  uses_frameworks
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">22</span><span style="color:#2aa198">  swift_version_requirements
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">23</span><span style="color:#2aa198">  inheritance
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">24</span><span style="color:#2aa198">  abstract
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">25</span><span style="color:#2aa198">  swift_version
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">26</span><span style="color:#2aa198">)</span><span style="color:#719e07">.</span>freeze
+</code></pre></div><p>整个映射过程如下：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/1599993134247-591416bf-8bbb-46cb-a8b9-86c41721acde.jpeg" alt=""></p>
 <h1 id="精细化的-podfile-配置">精细化的 Podfile 配置</h1>
 <p>最后一节让我们来展示一下 💪，看看 <code>Podfile</code> 所谓的 <code>targets</code> 之间的依赖关系可以玩出什么花来 😂。</p>
 <h2 id="target-嵌套">Target 嵌套</h2>
 <p>最简单的 <code>Podfile</code> 就是文章开头所展示的，不过在 <code>Podfile</code> 中还可以对 Target 进行嵌套使用。假设在我们的主工程同时维护了三个项目，它们都依赖了 Alamofire，通过俄罗斯套娃就能轻松满足条件：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">target</span> <span class="s1">&#39;Demo1&#39;</span> <span class="k">do</span>
-  <span class="n">pod</span> <span class="s1">&#39;Alamofire&#39;</span>
-
-  <span class="n">target</span> <span class="s1">&#39;Demo2&#39;</span> <span class="k">do</span>
-    <span class="n">target</span> <span class="s1">&#39;Demo3&#39;</span> <span class="k">do</span>
-    <span class="k">end</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>编译后的 <code>Pods.project</code> 项目结构如下：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>target <span style="color:#2aa198">&#39;Demo1&#39;</span> <span style="color:#719e07">do</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>  pod <span style="color:#2aa198">&#39;Alamofire&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>  target <span style="color:#2aa198">&#39;Demo2&#39;</span> <span style="color:#719e07">do</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>    target <span style="color:#2aa198">&#39;Demo3&#39;</span> <span style="color:#719e07">do</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>    <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">8</span><span style="color:#719e07">end</span>
+</code></pre></div><p>编译后的 <code>Pods.project</code> 项目结构如下：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cgy1gji2j7fb2pj21nk0q8wpl.jpg" alt="09-podfile-queue"></p>
 <p>我们知道，CocoaPods 在 <code>Pods.project</code> 中为每个在 Podfile 中声明的 Target 生成一个与之对应的专属 Target 来集成它的 Pod 依赖。对于有依赖关系的 Target 其生成的专属 Target 名称则会按照依赖关系叠加来命名，如  <code>target Demo3</code> 的专属 Target 名称为 <strong>Pods-Demo1-Demo2-Demo3</strong>。安装完成后主项目将会引入该专属 Target 来完成依赖关联，如 Demo3：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cgy1gji2kfu6xlj21nk0q8gw5.jpg" alt="10-podfile-link"></p>
 <p>关于 Target 嵌套，一个父节点是可以有多个子节点的：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">target</span> <span class="s1">&#39;Demo1&#39;</span> <span class="k">do</span>
-  <span class="n">pod</span> <span class="s1">&#39;Alamofire&#39;</span>
-
-  <span class="n">target</span> <span class="s1">&#39;Demo2&#39;</span> <span class="k">do</span>
-  	<span class="n">pod</span> <span class="s1">&#39;RxSwift&#39;</span>
-  <span class="k">end</span>
-  <span class="n">target</span> <span class="s1">&#39;Demo3&#39;</span> <span class="k">do</span>
-	  <span class="n">pod</span> <span class="s1">&#39;SwiftyJSON&#39;</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><h2 id="abstract-target">Abstract Target</h2>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span>target <span style="color:#2aa198">&#39;Demo1&#39;</span> <span style="color:#719e07">do</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>  pod <span style="color:#2aa198">&#39;Alamofire&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>  target <span style="color:#2aa198">&#39;Demo2&#39;</span> <span style="color:#719e07">do</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>  	pod <span style="color:#2aa198">&#39;RxSwift&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>  target <span style="color:#2aa198">&#39;Demo3&#39;</span> <span style="color:#719e07">do</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>	  pod <span style="color:#2aa198">&#39;SwiftyJSON&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span><span style="color:#719e07">end</span>
+</code></pre></div><h2 id="abstract-target">Abstract Target</h2>
 <p>上面例子中，由于 Demo1 与 Demo2 都需要依赖 Alamofire，我们通过 Target 嵌套让 Demo2 来继承 Demo1 的 Pods 库依赖。这么做可能会有一个限制，就是当 Demo1 的 Pod 依赖并非 Demo2 所需要的时候，就会有依赖冗余。此时就需要 <code>Abstract Target</code> 登场了。例如：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ruby" data-lang="ruby"><span class="n">abstract_target</span> <span class="s1">&#39;Networking&#39;</span> <span class="k">do</span>
-  <span class="n">pod</span> <span class="s1">&#39;Alamofire&#39;</span>
-
-  <span class="n">target</span> <span class="s1">&#39;Demo1&#39;</span> <span class="k">do</span>
-    <span class="n">pod</span> <span class="s1">&#39;RxSwift&#39;</span>
-  <span class="k">end</span>
-  <span class="n">target</span> <span class="s1">&#39;Demo2&#39;</span> <span class="k">do</span>
-    <span class="n">pod</span> <span class="s1">&#39;ReactCocoa&#39;</span>
-  <span class="k">end</span>
-  <span class="n">target</span> <span class="s1">&#39;Demo3&#39;</span> <span class="k">do</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>将网络请求的 pod 依赖抽象到 <code>Networking</code> target 中，这样就能避免 Demo2 对 RxSwift 的依赖。这种方式配置所生成的 <code>Pods.project</code> 并不会存在名称为 <code>Networking</code> 的 Target，它仅会在主工程的专属 Target 中留下印记：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span>abstract_target <span style="color:#2aa198">&#39;Networking&#39;</span> <span style="color:#719e07">do</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>  pod <span style="color:#2aa198">&#39;Alamofire&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>  target <span style="color:#2aa198">&#39;Demo1&#39;</span> <span style="color:#719e07">do</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>    pod <span style="color:#2aa198">&#39;RxSwift&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>  target <span style="color:#2aa198">&#39;Demo2&#39;</span> <span style="color:#719e07">do</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>    pod <span style="color:#2aa198">&#39;ReactCocoa&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>  target <span style="color:#2aa198">&#39;Demo3&#39;</span> <span style="color:#719e07">do</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>  <span style="color:#719e07">end</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span><span style="color:#719e07">end</span>
+</code></pre></div><p>将网络请求的 pod 依赖抽象到 <code>Networking</code> target 中，这样就能避免 Demo2 对 RxSwift 的依赖。这种方式配置所生成的 <code>Pods.project</code> 并不会存在名称为 <code>Networking</code> 的 Target，它仅会在主工程的专属 Target 中留下印记：</p>
 <p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gji2mw1b6fj21nk0q8aks-20210223110216273.jpg" alt="11-podfile-abstract-target"></p>
 <h1 id="总结">总结</h1>
 <p>本文结合 Xcode 工程结构来展开 CocoaPods-Core 的 Podfile 之旅，主要感受如下：</p>
