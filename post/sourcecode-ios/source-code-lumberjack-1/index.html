@@ -842,7 +842,7 @@ if (!doNotTrack) {
 <p>以上三种 logger 属于基本的终端输出，可用于替代 NSLog。限于篇幅的原因，还有 <code>DDFileLogger</code>、<code>DDAbstractDatabaseLogger</code> 以及各种扩展，如 <code>WebSocketLogger</code> 等，未在本篇出现。同时还有一整节的 <code>Formatters</code> 均放下一篇中。</p>
 <p>本篇，通过 DDLog 类对 GCD 的使用，看到了 lumberjack 的作者充分利用了 GCD 的特性来达到安全高效的异步 logging。整个过程中并未使用锁来解决线程安全，算是对 GCD 的很好实践了。该作者还出品了 <a href="https://github.com/robbiehanson/CocoaAsyncSocket">CocoaAsyncSocket</a> 、<a href="https://github.com/robbiehanson/XMPPFramework">XMPPFramework</a>、<a href="https://github.com/robbiehanson/CocoaHTTPServer">CocoaHTTPServer</a> 等知名的库。之后可以慢慢细品。</p>
 <p>最后，贴一张整理的脑图，比较简单，不喜勿喷。</p>
-<p><img src="http://ww1.sinaimg.cn/large/8157560cly1gdzcfyok9ij21ee12agqs.jpg" alt="CocoaLumberjack.png"></p>
+<p><img src="https://gitee.com/looseyi/blog-image/raw/master/uPic/8157560cly1gdzcfyok9ij21ee12agqs.jpg" alt="CocoaLumberjack.png"></p>
 </section>
 
   
