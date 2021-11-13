@@ -6,11 +6,11 @@
     <description>Recent content on Aha Edmond</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 03 Oct 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://looseyi.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 13 Nov 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://looseyi.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Move Objective-C frameworks for Swift</title>
       <link>https://looseyi.github.io/post/tool/objective-c-framework-for-swift/</link>
-      <pubDate>Sun, 03 Oct 2021 00:00:00 +0000</pubDate>
+      <pubDate>Sat, 13 Nov 2021 00:00:00 +0000</pubDate>
       
       <guid>https://looseyi.github.io/post/tool/objective-c-framework-for-swift/</guid>
       <description>引言 Swift 作为 Objective-C 的替代者，苹果每年都为其投入了大量的资源。随着 Swift ABI 稳定，国内大厂也开始投入人力推广 Swift。诚如苹果所言，他们应该是拥有 Objective-C framework 数</description>
