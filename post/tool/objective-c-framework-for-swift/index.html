@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html lang="en">
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  
+  <title>Move Objective-C frameworks for Swift - Aha Edmond</title>
+
+  
+  
+  <meta name="description" content="引言 Swift 作为 Objective-C 的替代者，苹果每年都为其投入了大量的资源。随着 Swift ABI 稳定，国内大厂也开始投入人力推广 Swift。诚如苹果所言，他们应该是拥有 Objective-C framework 数" />
+  <meta name="author" content="土土Edmond木" />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://looseyi.github.io/app.min.css" />
+
+  
+
+  
+  <link rel="preload" as="image" href="https://looseyi.github.io/theme.png" />
+
+  
+  <link rel="preload" as="image" href="https://looseyi.github.io/twitter.svg" />
+  
+  <link rel="preload" as="image" href="https://looseyi.github.io/github.svg" />
+  
+
+  
+  <link rel="icon" href="https://looseyi.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://looseyi.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.82.1" />
+
+  
+  
+  <link
+    rel="alternate"
+    type="application/rss&#43;xml"
+    href="https://looseyi.github.io/post/tool/objective-c-framework-for-swift/index.xml"
+    title="Aha Edmond"
+  />
+  
+
+  
+  
+  
+  
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-62789092-1', 'auto');
+	ga('set', 'anonymizeIp', true);
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+  
+  
+  
+  <meta property="og:title" content="Move Objective-C frameworks for Swift" />
+<meta property="og:description" content="引言 Swift 作为 Objective-C 的替代者，苹果每年都为其投入了大量的资源。随着 Swift ABI 稳定，国内大厂也开始投入人力推广 Swift。诚如苹果所言，他们应该是拥有 Objective-C framework 数" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://looseyi.github.io/post/tool/objective-c-framework-for-swift/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2021-10-03T00:00:00&#43;00:00" />
+<meta property="article:modified_time" content="2021-10-03T00:00:00&#43;00:00" />
+
+
+  
+  <meta itemprop="name" content="Move Objective-C frameworks for Swift">
+<meta itemprop="description" content="引言 Swift 作为 Objective-C 的替代者，苹果每年都为其投入了大量的资源。随着 Swift ABI 稳定，国内大厂也开始投入人力推广 Swift。诚如苹果所言，他们应该是拥有 Objective-C framework 数"><meta itemprop="datePublished" content="2021-10-03T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2021-10-03T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="3229">
+<meta itemprop="keywords" content="iOS&#39;,Swift,Framework," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Move Objective-C frameworks for Swift"/>
+<meta name="twitter:description" content="引言 Swift 作为 Objective-C 的替代者，苹果每年都为其投入了大量的资源。随着 Swift ABI 稳定，国内大厂也开始投入人力推广 Swift。诚如苹果所言，他们应该是拥有 Objective-C framework 数"/>
+
+  
+  
+</head>
+
+
+  <body class="not-ready" data-menu="true">
+    <header class="header">
+  
+  <p class="logo">
+    <a class="site-name" href="https://looseyi.github.io/">Aha Edmond</a><a class="btn-dark"></a>
+  </p>
+  
+
+  <script>
+    let bodyClx = document.body.classList;
+    let btnDark = document.querySelector('.btn-dark');
+    let sysDark = window.matchMedia('(prefers-color-scheme: dark)');
+    let darkVal = localStorage.getItem('dark');
+
+    let setDark = (isDark) => {
+      bodyClx[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark ? 'yes' : 'no');
+    };
+
+    setDark(darkVal ? darkVal === 'yes' : sysDark.matches);
+    requestAnimationFrame(() => bodyClx.remove('not-ready'));
+
+    btnDark.addEventListener('click', () => setDark(!bodyClx.contains('dark')));
+    sysDark.addEventListener('change', (event) => setDark(event.matches));
+  </script>
+
+  
+  
+  <nav class="menu">
+    
+    <a class="" href="/">Home</a>
+    
+  </nav>
+  
+
+  
+  <nav class="social">
+    
+    <a
+      class="twitter"
+      style="--url: url(./twitter.svg)"
+      href="https://twitter.com/looseyi"
+      target="_blank"
+    ></a>
+    
+    <a
+      class="github"
+      style="--url: url(./github.svg)"
+      href="https://github.com/looseyi"
+      target="_blank"
+    ></a>
+    
+  </nav>
+  
+</header>
+
+
+    <main class="main">
+			
+
+<article class="post-single">
+  <header class="post-title">
+    <p>
+      <time>2021-10-03</time>
+      
+      <span>土土Edmond木</span>
+      
+    </p>
+    <h1>Move Objective-C frameworks for Swift</h1>
+  </header>
+  <section class="post-content"><h1 id="引言">引言</h1>
+<p>Swift 作为 Objective-C 的替代者，苹果每年都为其投入了大量的资源。随着 Swift ABI 稳定，国内大厂也开始投入人力推广 Swift。诚如苹果所言，他们应该是拥有 Objective-C framework 数量最多的公司了，他们一直在持续更新其 Objective-C framework 的 interface 使其对 Swfit 友好，更有甚者是直接重写。同时也提供了很多纯 Swift 的原生框架，如 Combine、CoreML、SPM、RealityKit 等。</p>
+<p>而今天我们要讨论的是，要如何改造 Objective-C frameork 使其更友好的支持 Swift API。</p>
+<blockquote>
+<p>本文主要翻译自 SDWebImage 6.0 提案：<a href="https://github.com/SDWebImage/SDWebImage/issues/2980">Rewriten Swift API with the overlay framework instead of Objective-C exported one</a>，感谢作者 <a href="https://github.com/dreampiggy">@Dreampiggy</a>。</p>
+</blockquote>
+<h1 id="背景">背景</h1>
+<p>对普通 iOS 开发者而言，让现有的 Objective-C 框架更好的支持 Swift 也是我们无法绕开的问题之一。尽管 Swift 编译器在转换 Objective-C 接口时做了很多不错的优化工作，但仍旧无法满足所有开发者的需求。</p>
+<blockquote>
+<p>Tips: WWDC20 有专门 <a href="https://developer.apple.com/videos/play/wwdc2020/10680/">Session-10680</a> 来讨论 Refine Objective-C frameworks for Swift，也推荐看<a href="https://www.sketchk.xyz/2020/07/02/WWDC20-10680-Refine-Objective-C-frameworks-for-Swift/">sketchk.xyz 文章</a>。</p>
+</blockquote>
+<p>以 SDWebImage 5.0 的 Objective-C 代码为例：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>[imageView sd_setImageWithURL:url placeholderImage:<span style="color:#b58900">nil</span> options:<span style="color:#2aa198">0</span> context:@{SDWebImageContextQueryCacheType: @(SDImageCacheTypeMemory)} progress:<span style="color:#b58900">nil</span> completion:<span style="color:#719e07">^</span>(UIImage <span style="color:#719e07">*</span>image, NSError <span style="color:#719e07">*</span>error, SDImageCacheType cacheType, NSURL <span style="color:#719e07">*</span>url) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>  <span style="color:#586e75">// do something with result
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span><span style="color:#586e75"></span>    <span style="color:#719e07">if</span> (error) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>        NSLog(<span style="color:#2aa198">@&#34;%@&#34;</span>, error);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>    } <span style="color:#719e07">else</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>       <span style="color:#586e75">// do with image
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span><span style="color:#586e75"></span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">8</span>}];
+</code></pre></div><p>对于这样的 API，clang 编译器可以将其转换成如下的 Swift 形式的代码：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>imageView.sd_setImage(with: url, placeholderImage:<span style="color:#cb4b16">nil</span> options:[] context:[.queryCacheType : SDImageCacheType.memory.rawValue] progress:<span style="color:#cb4b16">nil</span>) { image, error, cacheType, url <span style="color:#719e07">in</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>  <span style="color:#586e75">// do something with result</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>  <span style="color:#719e07">if</span> <span style="color:#268bd2">let</span> <span style="color:#268bd2">error</span> = error {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>      <span style="color:#268bd2">print</span>(error)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>  } <span style="color:#719e07">else</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>      <span style="color:#268bd2">let</span> <span style="color:#268bd2">image</span> = image!
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span>  }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">8</span>}
+</code></pre></div><p>相比于纯 Swift API，它还是少了一些 Swifty 的味道。一个简洁优雅 Swift API 设计应该能够充分的利用其语法，包括但不限于以下特性：</p>
+<ul>
+<li><a href="https://docs.swift.org/swift-book/LanguageGuide/Functions.html">Default Parameters</a></li>
+<li><a href="https://docs.swift.org/swift-book/LanguageGuide/Enumerations.html">Enum with Associated Values</a></li>
+<li><a href="https://github.com/apple/swift-evolution/blob/master/proposals/0235-add-result.md">Result Type</a></li>
+</ul>
+<p>它看起来应该是这样的：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>imageView.sd.setImage(with: url, options: [.queryCacheType(.memory)] { result
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>    <span style="color:#719e07">switch</span> result {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>    <span style="color:#719e07">case</span> .success(<span style="color:#268bd2">let</span> <span style="color:#268bd2">value</span>):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>        <span style="color:#268bd2">let</span> <span style="color:#268bd2">image</span> = value.image
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>        <span style="color:#268bd2">let</span> <span style="color:#268bd2">data</span> = value.data
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">6</span>    <span style="color:#719e07">case</span> .failure(<span style="color:#268bd2">let</span> <span style="color:#268bd2">error</span>):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">7</span>        <span style="color:#268bd2">print</span>(error)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">8</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">9</span>}
+</code></pre></div><p>注意：<code>options</code> 参数在这里是以关联类型枚举来声明，它将 <code>SDWebImageOptions</code> 和 <code>SDWebImageContext</code> 结合到一起。而在 Objective-C 中我们就无法做到这样的效果。你知道的 Objective-C 是 C 语言的超集，而<strong>在 C 语言中 Int 类型的枚举是无法绑定对象的</strong>。</p>
+<h1 id="可选方案">可选方案</h1>
+<p>想要为现有的 Objective-C framework 提供优雅的 Swift API，我们有哪些路径呢 ？</p>
+<h2 id="0x01-利用-ns_swift_name-修改-objective-c-的-public-interface">0x01 利用 <code>NS_SWIFT_NAME</code> 修改 Objective-C 的 Public Interface</h2>
+<p><code>NS_SWIFT_NAME</code> 能够解决重命名的问题。例如，可以将 <code>SDImageCache</code> 重命名为 <code>SDWebImage.ImageCache</code> 以此来去除其前缀 <strong>SD</strong>:</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objective-c" data-lang="objective-c"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>NS_SWIFT_NAME(SDWebImage.ImageCache)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span><span style="color:#719e07">@interface</span> <span style="color:#268bd2">SDImageCache</span> : <span style="color:#268bd2">NSObject</span>
+</code></pre></div><p>然而，重命名的方式无法解决需要将 <code>SDWebImageOptions</code> 和 <code>SDWebImageContext</code> 结合为 Swift 提供的枚举结构，如 <code>SDWebImage.ImageOptions</code>：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#268bd2">enum</span> <span style="color:#268bd2">ImageOptions</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>	<span style="color:#719e07">case</span> queryCacheType(SDImageCacheType)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>	<span style="color:#719e07">case</span> priority(SDImageQueryPriority)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>	...
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span>}
+</code></pre></div><h2 id="0x02-overlay-framework--重写旧-swift-api">0x02 Overlay Framework &amp; 重写旧 Swift API</h2>
+<p>通过创建的 overlay framework 来提供 Swfit 友好的 API。Swift 社区有说明 Apple 是如何实现 <a href="https://forums.swift.org/t/how-apple-sdk-overlays-work/11317">传送门</a>。</p>
+<p>对于稳定的商业化产品而言，如果推倒重来直接用 Swift 来新写内部组件，其开发成本和潜在的风险都是需要合理评估的。因此，能够提供 Swift 友好的 API 层也不失为一个合理方案。</p>
+<p>我们以 SDWebImage 为例。</p>
+<p>首先，创建一个名称为 <code>SwiftWebImage</code> (名字待定) 的 framework，内部包含了一个名为 <code>SDWebImage.swift</code> 的文件且内容如下：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>@_exported <span style="color:#268bd2">import</span> <span style="color:#268bd2">SDWebImage</span>
+</code></pre></div><p>利用 <a href="https://forums.swift.org/t/exported-and-fixing-import-visibility/9415">@_exported</a> 关键字来扩展 import 框架的可见性，这样就不需要在每个使用 SD 的地方进行 import。</p>
+<p>接着将原有 Objective-C 的公共 API 标记为 @unavailable，具体如下：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span>@available(<span style="color:#719e07">*</span>, unavailable, renamed: <span style="color:#2aa198">&#34;SwiftWebImage.ImageOptions&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span><span style="color:#268bd2">public</span> <span style="color:#268bd2">struct</span> <span style="color:#268bd2">SDWebImageOptions</span> {}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>@available(<span style="color:#719e07">*</span>, unavailable, renamed: <span style="color:#2aa198">&#34;SwiftWebImage.ImageOptions&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">5</span><span style="color:#268bd2">public</span> <span style="color:#268bd2">struct</span> <span style="color:#268bd2">SDWebImageContext</span> {}
+</code></pre></div><p>最终，重写的 Swift API 将通过调用原有 SDWebImage 的 API 来完成逻辑：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#586e75">/// Wrapper for SDWebImage compatible types. </span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span><span style="color:#268bd2">public</span> <span style="color:#268bd2">struct</span> <span style="color:#268bd2">SDWebImageWrapper</span>&lt;Base&gt; {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>    <span style="color:#268bd2">public</span> <span style="color:#268bd2">let</span> <span style="color:#268bd2">base</span>: Base
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>    <span style="color:#268bd2">public</span> <span style="color:#268bd2">init</span>(<span style="color:#cb4b16">_</span> base: Base) {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>        <span style="color:#cb4b16">self</span>.base = base
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span><span style="color:#268bd2">extension</span> <span style="color:#268bd2">SDWebImageCompatible</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>    <span style="color:#586e75">/// Gets a namespace holder for SDWebImage compatible types.</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>    <span style="color:#268bd2">public</span> <span style="color:#268bd2">var</span> <span style="color:#268bd2">sd</span>: SDWebImageWrapper&lt;<span style="color:#cb4b16">Self</span>&gt; {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>        <span style="color:#268bd2">get</span> { <span style="color:#719e07">return</span> SDWebImageWrapper(<span style="color:#cb4b16">self</span>) }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>        <span style="color:#268bd2">set</span> { }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span><span style="color:#268bd2">extension</span> <span style="color:#268bd2">UIImageView</span> : SDWebImageCompatible {}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span><span style="color:#268bd2">public</span> <span style="color:#268bd2">protocol</span> <span style="color:#268bd2">ImageResource</span> {}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span><span style="color:#268bd2">extension</span> <span style="color:#268bd2">URL</span> : ImageResource {}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">22</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">23</span><span style="color:#268bd2">extension</span> <span style="color:#268bd2">SDWebImageWrapper</span> <span style="color:#719e07">where</span> Base: UIImageView {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">24</span>    @discardableResult
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">25</span>    <span style="color:#268bd2">public</span> <span style="color:#268bd2">func</span> <span style="color:#268bd2">setImage</span>(
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">26</span>        with resource: ImageResource?,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">27</span>        placeholder: UIImage? = <span style="color:#cb4b16">nil</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">28</span>        options: ImageOptions? = <span style="color:#cb4b16">nil</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">29</span>        progress: LoaderProgressBlock? = <span style="color:#cb4b16">nil</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">30</span>        completion: ((Result&lt;ImageResult, ImageError&gt;) -&gt; <span style="color:#b58900">Void</span>)? = <span style="color:#cb4b16">nil</span>) -&gt; CombinedOperation? {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">31</span>            <span style="color:#586e75">// convert the `ImageOptions` into the actual `SDWebImage` and `SDWebImageContext`</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">32</span>            <span style="color:#586e75">// finally call the exist `sd_setImage(with:) API</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">33</span>        }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">34</span>}
+</code></pre></div><p>当用户引入 <code>SwiftWebImage</code> framework 时，旧的 Swift API 将被标记为不可用。此时，我们就能愉快的使用新 API 了。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#268bd2">import</span> <span style="color:#268bd2">SwiftWebIamge</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span><span style="color:#268bd2">import</span> <span style="color:#268bd2">SDWebImage</span> <span style="color:#586e75">// This will be overlayed and not visible, actuallly you don&#39;t need to import this</span>
+</code></pre></div><p>另外，这里通过 <code>SDWebImageWrapper</code> 实现了 Swift NameSpace 形式的 extension。<code>SDWebImageWrapper</code> 作为装饰器将对原类型进行封装，然后我们再对 <code>SDWebImageWrapper</code> 进行自定义方法的扩展，从而避免了命名冲突的问题，方便我们对系统库中的已有类型作自定义扩展。</p>
+<h2 id="0x03-overlay-framework-naming">0x03 Overlay framework naming</h2>
+<p>我们发现一个问题：像苹果提供的标准库 <code>Network.framework</code>,  它在 Swift Runtime 时能够提供一种 <code>overlay framework</code> 其名称与原有 framework 一样，同为 <code>Network</code>。此时我们可以像下面这样使用：</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#268bd2">import</span> <span style="color:#268bd2">Network</span>
+</code></pre></div><p>其背后，我们 import 的并非 <code>Network.framework</code>, 而是 <code>libSwiftNetwork.dylib</code> 及其对应的 module。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#268bd2">import</span> <span style="color:#268bd2">SwiftNetwork</span> <span style="color:#586e75">// Actually what you do</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span><span style="color:#586e75">// The libSwiftNetwork has this:</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span>@<span style="color:#268bd2">_exported</span> <span style="color:#268bd2">import</span> <span style="color:#268bd2">Network</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span>@available(<span style="color:#719e07">*</span>, unavailable, renamed: <span style="color:#2aa198">&#34;Network.NWInterface&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span><span style="color:#268bd2">typealias</span> nw_interface_t = OS_nw_interface
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span><span style="color:#268bd2">public</span> <span style="color:#268bd2">class</span> <span style="color:#268bd2">NWInterface</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>    <span style="color:#586e75">// ...Call C API for internal implementations</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>}
+</code></pre></div><p>SDWebImage 也想采用这样的方案，如此就不用将 <code>import SDWebImage</code> 替换为 <code>import SwiftWebImage</code>，然而事与愿违，毕竟我们同时支持了 3 种包管理方式：</p>
+<ul>
+<li>CocoaPods: 支持自定义的 script phase，<code>prepare_script</code> 来完成 <code>module name</code> 的替换；</li>
+<li>Carthage: 支持在 Xcode Project 中自定义 Build Phase；</li>
+<li>SwiftPM: 不允许在一个 module name 下同时声明两个 framework；</li>
+</ul>
+<p>同时，对现有的 SDWebImage 5.0 用户，如果他们不愿意更新为新的 Swifty API，仍可以通过  <code>import SDWebImage</code> 来使用原有 Objective-C 生成的 API。</p>
+<p>以重命名的方式提供不同于 <code>SDWebImage</code> 名称的  overlay framework 可以支持这样的操作。</p>
+<p>什么意思呢 ？意味着你的项目中可同时存在两种不同的 Swift API，它取决于你导入的 framework。</p>
+<ul>
+<li>不使用 overlay framework</li>
+</ul>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#268bd2">import</span> <span style="color:#268bd2">SDWebImage</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span><span style="color:#268bd2">let</span> <span style="color:#268bd2">imageCache</span> = SDImageCache.shared
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>imageView.sd_setImage(with: url, options: [], context: [.imageScaleFactor : <span style="color:#2aa198">3</span>])
+</code></pre></div><ul>
+<li>使用 overlay framework</li>
+</ul>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">1</span><span style="color:#268bd2">import</span> <span style="color:#268bd2">SwiftWebImage</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">3</span><span style="color:#268bd2">let</span> <span style="color:#268bd2">imageCache</span> = ImageCache.shared
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">4</span>imageView.sd.setImage(with: url, options: [.scaleFactor(<span style="color:#2aa198">3</span>)])
+</code></pre></div><p>毕竟，我们都知道 Swift 是有 name space 隔离的。</p>
+<h2 id="0x04-放弃-objective-c-用户--用-swift-重写">0x04 放弃 Objective-C 用户 &amp; 用 Swift 重写</h2>
+<p>作为个人意见，这并非一个好主意。在 iOS 社区中已经有很多很棒的纯 Swift 的图片加载框架，如 <a href="https://github.com/onevcat/Kingfisher">Kingfisher</a>, <a href="https://github.com/kean/Nuke">Nuke</a> 等。</p>
+<p>大家都有一些共通的设计和解决方案。如果完全重写将需要花费大量的时间和单测来保证功能的稳定性。况且，仍然有很多 Objective-C 项目和用户在使用 SDWebImage 5.0。尤其在国内，80% 以上采用 Objective-C 的公司都在使用 SDWebImage (非个人)。他们中还有大量使用 Swift 与 Objective-C 混编。放弃这些用户值得深思！</p>
+<p>对于现阶段而言，不论是选择 Objective-C 或者 Swift 都是实现细节，而采用 Swift 可能有的优势：</p>
+<ul>
+<li><strong>线程安全</strong>：不赞同，在 Kingfisher 和 Nuke 中同样有线程安全问题，这并非语言层面可以解决的。 当然，Swift 提供了严格的 Optioanl 类型来避免一些常见的错误，如 null 检查。另外，Swift 5.5 中提供的 Actor 也能从一定程度上规避并非带来的问题；</li>
+<li>**性能：**对于图片加载框架而言其性能瓶颈并非由 Objective-C runtime 的消息发送架构决定的，而是由一些调度队列、图片解码等其他问题的。这些也并非 Swift 能解决的；</li>
+<li>**维护：**作为主要原因，对于 iOS 程序员的新手来说，他们可能不太了解一些 Objective-C 的最佳实践和良好的代码规范，而用 Swift 实现的话可以吸引更多优秀新人为 SDWebImage 贡献；</li>
+</ul>
+<p>因此，现阶段而言，我们仅需要提供 Swift 友好的 API 即可，内核仍以 Objective-C 实现。毕竟 SDWebImage 经过这么多年的迭代，可靠性与稳定性都有很好的保证。</p>
+<h1 id="开源实践">开源实践</h1>
+<p>在提案的讨论中，也提到了优秀大厂的一些实践。他们的做法也是值得我们考虑的。</p>
+<h2 id="facebook-ios-sdk">facebook-ios-sdk</h2>
+<p>facebook 家提供的 <a href="https://github.com/facebook/facebook-ios-sdk">facebook-ios-sdk</a>，他们为 Swift 用户提供了新的符合 Swift 特性的 Swift Module，不过它基于原有的 Objective-C framework 来包装的产物。因此，用户可以根据其选择来 import 不同的 framework。显然像 facebook-ios-sdk 复杂的 framework，他们选择了成本相对较低的 <code>Overlay Framework</code> 方案。如前面提到用 Swift 重写也未能显著提高性能或者安全性，毕竟他们已通过使用较低的 C API 和线程安全锁解决了，这在 Swift 语言层面无法解决的。</p>
+<p>我们通过版本 <code>v12.0.0</code> 的 <a href="https://github.com/facebook/facebook-ios-sdk/blob/main/Package.swift">Package.swift</a> 的以产物之一 <code>FacebookCore</code> 来举例。</p>
+<div class="highlight"><pre style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 1</span><span style="color:#268bd2">import</span> <span style="color:#268bd2">PackageDescription</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 3</span><span style="color:#268bd2">let</span> <span style="color:#268bd2">conditionalCompilationFlag</span> = <span style="color:#2aa198">&#34;FBSDK_SWIFT_PACKAGE&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 4</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 5</span><span style="color:#268bd2">let</span> <span style="color:#268bd2">package</span> = Package(
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 6</span>    name: <span style="color:#2aa198">&#34;Facebook&#34;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 7</span>    products: [
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 8</span>        .library(
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050"> 9</span>            name: <span style="color:#2aa198">&#34;FacebookCore&#34;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">10</span>            targets: [<span style="color:#2aa198">&#34;FacebookCore&#34;</span>, <span style="color:#2aa198">&#34;FBSDKCoreKit&#34;</span>]
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">11</span>        ),
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">12</span>	     ...
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">13</span>    ],
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">14</span>    targets: [
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">15</span>        .target(
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">16</span>            name: <span style="color:#2aa198">&#34;FBSDKCoreKit_Basics&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">17</span>        ),
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">18</span>        .target(
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">19</span>            name: <span style="color:#2aa198">&#34;LegacyCore&#34;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">20</span>            dependencies: [<span style="color:#2aa198">&#34;FBSDKCoreKit_Basics&#34;</span>, <span style="color:#2aa198">&#34;FBAEMKit&#34;</span>],
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">21</span>            path: <span style="color:#2aa198">&#34;FBSDKCoreKit/FBSDKCoreKit&#34;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">22</span>            exclude: [<span style="color:#2aa198">&#34;Swift&#34;</span>], ...
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">23</span>        ),
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">24</span>        .target(
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">25</span>            name: <span style="color:#2aa198">&#34;FacebookCore&#34;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">26</span>            dependencies: [<span style="color:#2aa198">&#34;LegacyCore&#34;</span>], ...
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">27</span>        ),
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">28</span>        .target(
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">29</span>            name: <span style="color:#2aa198">&#34;FBSDKCoreKit&#34;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">30</span>            dependencies: [<span style="color:#2aa198">&#34;LegacyCore&#34;</span>, <span style="color:#2aa198">&#34;FacebookCore&#34;</span>], ...
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">31</span>        ),
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">32</span>    ]
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#495050">33</span>)
+</code></pre></div><blockquote>
+<p>Tips：新提供的 FacebookCore framework 仅支持 SPM，尚未支持 CocoaPods 方式引入。</p>
+</blockquote>
+<h3 id="framework-products">framework products</h3>
+<p>看构建产物 library FacebookCore 作为核心 SDK，它提供了两种可导入 module 产物，<code>FacebookCore</code> 和 <code>FBSDKCoreKit</code> 。注意，这里有两种不同的前缀 <code>Facebook</code> 和 <code>FB</code>。<code>Facebook</code> 代表的则是新提供的 Swift framework，而 <code>FB</code> 则代表的是原有的 Objective-C framework。</p>
+<p>这里按语言将 FacebookCore 分成 Objective-C 与 Swift 两个 target 也是不得已而为之，因为 <a href="https://forums.swift.org/t/using-a-swift-package-in-a-mixed-swift-and-objective-c-project/27348">SPM 目前仍不支持 多语言混编</a>。另外为了更好复用编译产物，他们对公用逻辑进行二次拆分，剥离出 <code>LegacyCore</code> target。</p>
+<p>FacebookCore 将通过 overlay framework 来提供面向 Swift 友好的 API，最后用户也将被分为三部分：</p>
+<ol>
+<li>引入 <code>FacebookCore</code> 来使用完善 Swift API 的 Swift 用户；</li>
+<li>引入 <code>FBSDKCoreKit</code> 来使用由 Objective-C 接口翻译过来的 Swift 用户；</li>
+<li>引入 <code>FBSDKCoreKit</code> 的 Objective-C 用户；</li>
+</ol>
+<h1 id="总结">总结</h1>
+<p>要说使用 Swift 优点的话，对 iOS 开发初学者更具吸引力算是一点。对于需要深入特定领域的问题，如 decoding 或者 transformer，用 Swift 重写和 Objective-C 一样丑陋，并无太多区别 😅。因此，作为框架提供者，要跳出语言的限制，从更高角度看待问题。</p>
+<p>纵观整个 SDWebImage 6.0 提案的讨论过程，我们也可以看到其维护者的严谨态度。不仅能从用户使用体验和维护成本角度来权衡方案变更带来的影响，并且做了详细的调研和研究分析。</p>
+<p>希望本文能为从 Objective-C 转向 Swift 的开发者提供一些帮助。</p>
+</section>
+
+  
+  
+  <footer class="post-tags">
+     
+    <a href="https://looseyi.github.io/tags/ios">iOS&#39;</a>
+     
+    <a href="https://looseyi.github.io/tags/swift">Swift</a>
+     
+    <a href="https://looseyi.github.io/tags/framework">Framework</a>
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="post-nav">
+     
+    <a class="next" href="https://looseyi.github.io/post/sourcecode-ios/cocoapods-binary-1/"><span>浅析 cocoapods-binary</span><span>→</span></a>
+    
+  </nav>
+  
+
+  
+  
+</article>
+
+
+			
+
+  
+
+  
+    <script src="https://utteranc.es/client.js"
+            repo="looseyi/looseyi.github.io"
+            issue-term="pathname"
+            theme="github-light"
+            crossorigin="anonymous"
+            async>
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/utterance">comments powered by utterances.</a></noscript>
+
+		</main>
+
+    <footer class="footer">
+  <p>&copy; 2021 <a href="https://looseyi.github.io/">Aha Edmond</a></p>
+  <p>Powered by <a href="https://gohugo.io/" rel="noopener" target="_blank">Hugo️️</a>️</p>
+  <p>
+    <a href="https://github.com/nanxiaobei/hugo-paper" rel="noopener" target="_blank">Paper 5.1</a>
+  </p>
+</footer>
+
+		
+
+
+  </body>
+</html>
